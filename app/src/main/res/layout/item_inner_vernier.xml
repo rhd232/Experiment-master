@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="120dp"
+    android:layout_height="wrap_content">
+
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="305dp"
+        android:orientation="horizontal"
+
+        >
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorCBCBCB" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.wind.base.widget.VernierDragLayout
+                android:id="@+id/vernier_drag_layout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/vernier_height" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorCBCBCB" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="center"
+                android:text="Step 1"
+                android:textColor="@color/color333333" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorCBCBCB" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_add"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:src="@drawable/icon_add"
+        android:layout_margin="12dp"/>
+
+    <ImageView
+        android:id="@+id/iv_del"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="right"
+        android:src="@drawable/icon_minus"
+        android:layout_margin="12dp"/>
+</FrameLayout>

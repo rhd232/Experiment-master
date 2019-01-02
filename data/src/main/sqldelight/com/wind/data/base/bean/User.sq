@@ -1,0 +1,16 @@
+CREATE TABLE user(
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL
+);
+
+find_user_by_username_and_pwd:
+select *
+from user where username = ? and password=?;
+
+find_user_by_username:
+select *
+from user where username = ?;
+
+update_user_by_username:
+update user set  password = ? where username = ?;

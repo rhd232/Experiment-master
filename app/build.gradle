@@ -1,0 +1,88 @@
+apply plugin: 'com.android.application'
+apply plugin: 'coco'
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.jz.experiment"
+        minSdkVersion 19
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_7
+        targetCompatibility = JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
+    //implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation project (':domain')
+    implementation project (path: ':location')
+    implementation project (path: ':wview')
+    implementation project (path: ':toastlib')
+
+    implementation project(path:':aop-annotations')
+    implementation project(path:':aop-runtime')
+
+    implementation project (path:':coder-annotations')
+    annotationProcessor project(path:':coder-compiler')
+
+    implementation presentationDependencies.rxbinding
+    implementation androidDependencies.cardview
+    implementation presentationDependencies.eventbus
+    implementation 'com.yanzhenjie:permission:2.0.0-rc12'
+    /****dagger注解处理器*******/
+    annotationProcessor presentationDependencies.daggerCompiler
+
+    implementation presentationDependencies.dagger
+    provided presentationDependencies.javaxAnnotation
+
+    //implementation 'com.google.dagger:dagger-android:2.16'
+    //implementation 'com.google.dagger:dagger-android-support:2.16' // if you use the support libraries
+    //annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
+
+
+    /****butterKnife注解处理器*******/
+    annotationProcessor baseDependencies.butterKnifeProcessor
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.android.support:design:26.0.2'
+        force 'com.android.support:support-v4:26.0.2'
+        force 'com.android.support:appcompat-v7:26.0.2'
+        force 'com.android.support:recyclerview-v7:26.0.2'
+
+        force 'com.android.support:support-core-utils:26.0.2'
+        force 'com.android.support:support-core-ui:26.0.2'
+    }
+}

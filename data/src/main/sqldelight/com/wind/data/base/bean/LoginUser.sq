@@ -1,0 +1,11 @@
+CREATE TABLE login_user(
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    json_user TEXT NOT NULL
+);
+
+select_login_user:
+select *
+from login_user;
+
+delete_login_user:
+delete from login_user;

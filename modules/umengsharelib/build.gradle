@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        //manifestPlaceholders = [UMENG_APPKEY : "5abb4772f43e48568d000111"]
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    def androidDependencies = rootProject.ext.androidDependencies
+    api androidDependencies.appcompat
+
+    def umengDependencies = rootProject.ext.umengDependencies
+    //api umengDependencies.umeng_common
+    //api umengDependencies.umeng_analytics
+    api 'com.umeng.sdk:analytics:7.5.3'
+    compile project(':toastlib')
+   /* api 'com.umeng.sdk:share-core:latest.integration'
+    api 'com.umeng.sdk:share-qq:latest.integration'
+    api 'com.umeng.sdk:share-wechat:latest.integration'*/
+    api 'com.alibaba:fastjson:1.1.52.android'
+   // compile project (path: ':toastcompat')
+    //compile 'com.android.support:appcompat-v7:24.2.1'
+    testCompile 'junit:junit:4.12'
+}

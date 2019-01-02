@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/wd_carousel_dot_size"
+    android:layout_height="@dimen/wd_carousel_dot_size"
+    android:layout_marginLeft="@dimen/wd_carousel_dot_inter_dot_margin"
+    android:layout_marginRight="@dimen/wd_carousel_dot_inter_dot_margin"
+    android:background="@drawable/wd_carousel_dot_selector"
+    >
+
+</TextView>

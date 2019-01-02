@@ -1,0 +1,23 @@
+CREATE TABLE stage_info(
+    --实验基本信息
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    type INTEGER, --stage类型
+    startScale REAL,
+    curScale REAL,
+    stepName TEXT,
+
+    serialNumber INTEGER,  --cyclingstage和part编号，
+    cycling_count INTEGER,
+
+    part_takepic INTEGER,--partStage是否需要拍照
+    cycling_id INTEGER,--part对应的cyclingstage
+
+    --next_id INTEGER,
+    --外键
+    expe_id INTEGER NOT NULL,
+    FOREIGN KEY(expe_id) REFERENCES expe_info(_id)
+
+);
+
+find_by_expeid:
+select * from stage_info where expe_id = ?;

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/iv_start_share_weibo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/live_btn_kaiqi_weibo_selector"
+        />
+
+    <ImageView
+        android:id="@+id/iv_start_share_weixin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/live_btn_kaiqi_weixin_selector" />
+
+    <ImageView
+        android:id="@+id/iv_start_share_circle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/live_btn_kaiqi_circle_selector" />
+
+    <ImageView
+        android:id="@+id/iv_start_share_qq"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/live_btn_kaiqi_qq_selector" />
+
+    <ImageView
+        android:id="@+id/iv_start_share_qzone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/live_btn_kaiqi_qzone_selector" />
+</LinearLayout>

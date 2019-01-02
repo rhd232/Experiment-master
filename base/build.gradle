@@ -1,0 +1,63 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+   // compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    def baseDependencies = rootProject.ext.baseDependencies
+    def androidDependencies = rootProject.ext.androidDependencies
+    api baseDependencies.rxJava
+    api baseDependencies.rxAndroid
+    api baseDependencies.mosbymvp
+    api baseDependencies.okhttputils
+    //api baseDependencies.fastjson
+
+   // api baseDependencies.appcompat
+    api androidDependencies.recycler_view
+    //apt baseDependencies.daggerCompilerr //apt is deprecated annotationProcessor instead
+
+    annotationProcessor baseDependencies.daggerCompiler
+    api baseDependencies.dagger
+
+    api 'com.google.dagger:dagger-android:2.16'
+    api 'com.google.dagger:dagger-android-support:2.16' // if you use the support libraries
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
+
+    api rootProject.ext.presentationDependencies.loadinglayout
+    api baseDependencies.butterKnife
+    annotationProcessor baseDependencies.butterKnifeProcessor
+    api baseDependencies.icepick
+    annotationProcessor baseDependencies.icepickprocessor
+
+    api baseDependencies.adapterdelegates
+    api androidDependencies.palette
+
+    api baseDependencies.retrofit
+    api baseDependencies.httplogginterceptor
+    //api baseDependencies.converter_gson
+    api baseDependencies.converter_fastjson
+    api baseDependencies.adapter_rxjava
+    provided baseDependencies.javaxAnnotation
+    api baseDependencies.logger
+
+    compile project(':umengsharelib')
+    compile project(':wview')
+    compile project(':PullToRefreshLib')
+}

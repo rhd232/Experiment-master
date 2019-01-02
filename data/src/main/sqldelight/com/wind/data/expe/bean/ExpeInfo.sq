@@ -1,0 +1,26 @@
+CREATE TABLE expe_info(
+    --实验基本信息
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    device TEXT NOT NULL,
+    millitime INTEGER NOT NULL,
+    status INTEGER NOT NULL,
+    status_desc TEXT NOT NULL,
+
+    --实验设置信息
+    mode TEXT NOT NULL,
+    startTemperature TEXT,
+    endTemperature TEXT
+
+);
+
+find_all:
+select *
+from expe_info order by millitime desc limit 3;
+
+        --需要用到关联查询
+find_by_id:
+select * from expe_info where _id= ?;
+--select expe.name,expe.millitime, channel.name,channel.value,channel.remark,sample.name,sample.type
+--from expe_info expe inner join channel_info channel  on channel.expe_id =expe._id
+--inner join sample_info sample on sample.expe_id =expe._id and expe._id = ?;

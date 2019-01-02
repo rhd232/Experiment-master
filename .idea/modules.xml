@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Experiment-master.iml" filepath="$PROJECT_DIR$/Experiment-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/PullToRefreshLib/PullToRefreshLib.iml" filepath="$PROJECT_DIR$/modules/PullToRefreshLib/PullToRefreshLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/aop-annotations/aop-annotations.iml" filepath="$PROJECT_DIR$/modules/aop-annotations/aop-annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/aop-plugin/aop-plugin.iml" filepath="$PROJECT_DIR$/modules/aop-plugin/aop-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/aop-runtime/aop-runtime.iml" filepath="$PROJECT_DIR$/modules/aop-runtime/aop-runtime.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/base/base.iml" filepath="$PROJECT_DIR$/base/base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/coder-annotations/coder-annotations.iml" filepath="$PROJECT_DIR$/modules/coder-annotations/coder-annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/coder-compiler/coder-compiler.iml" filepath="$PROJECT_DIR$/modules/coder-compiler/coder-compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/data/data.iml" filepath="$PROJECT_DIR$/data/data.iml" />
+      <module fileurl="file://$PROJECT_DIR$/domain/domain.iml" filepath="$PROJECT_DIR$/domain/domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/location/location.iml" filepath="$PROJECT_DIR$/modules/location/location.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/toastlib/toastlib.iml" filepath="$PROJECT_DIR$/modules/toastlib/toastlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/umengsharelib/umengsharelib.iml" filepath="$PROJECT_DIR$/modules/umengsharelib/umengsharelib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/wview/wview.iml" filepath="$PROJECT_DIR$/modules/wview/wview.iml" />
+    </modules>
+  </component>
+</project>

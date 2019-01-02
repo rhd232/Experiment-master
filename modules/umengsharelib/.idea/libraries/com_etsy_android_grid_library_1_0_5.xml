@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="com.etsy.android.grid:library-1.0.5">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.0.5.aar/3c03a7bbb83258ef18f3cbf060e0ac88/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.0.5.aar/3c03a7bbb83258ef18f3cbf060e0ac88/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.etsy.android.grid/library/1.0.5/c8c6d6a46f3e25f76d98a75f91e3325deef19e49/library-1.0.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

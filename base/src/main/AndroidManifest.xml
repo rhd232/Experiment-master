@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.wind.base">
+    <uses-sdk tools:overrideLibrary="com.github.czy1121.loadinglayout"/>
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true">
+
+    </application>
+
+</manifest>

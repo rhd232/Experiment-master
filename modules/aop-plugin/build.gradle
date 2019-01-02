@@ -1,0 +1,37 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+
+dependencies {
+    implementation gradleApi();
+    compile localGroovy();
+    compile 'org.aspectj:aspectjtools:1.8.6'
+    compile 'org.aspectj:aspectjrt:1.8.6'
+    compile 'com.android.tools.build:gradle:3.0.0'
+
+}
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
+//设置maven deployer
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //设置插件的GAV参数
+            pom.groupId = 'com.wind.plugin'
+            pom.artifactId = 'aop-plugin'
+            pom.version = '1.0.0'
+            //文件发布到下面目录
+            repository(url: uri('../repo'))
+           /* repository(
+                    mavenLocal()
+            )*/
+        }
+    }
+}
+
+
+repositories{
+    mavenCentral()
+    mavenLocal()
+}
+

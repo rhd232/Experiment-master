@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Lunch.iml" filepath="$PROJECT_DIR$/../Lunch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../PhotoSelector/PhotoSelector.iml" filepath="$PROJECT_DIR$/../PhotoSelector/PhotoSelector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../PhotoSelectorLib/PhotoSelectorLib.iml" filepath="$PROJECT_DIR$/../PhotoSelectorLib/PhotoSelectorLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../PullToRefreshLib/PullToRefreshLib.iml" filepath="$PROJECT_DIR$/../PullToRefreshLib/PullToRefreshLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SwipeMenuListView/SwipeMenuListView.iml" filepath="$PROJECT_DIR$/../SwipeMenuListView/SwipeMenuListView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../app/app.iml" filepath="$PROJECT_DIR$/../app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../baselib/baselib.iml" filepath="$PROJECT_DIR$/../baselib/baselib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../galleryfinal/galleryfinal.iml" filepath="$PROJECT_DIR$/../galleryfinal/galleryfinal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../photoview/photoview.iml" filepath="$PROJECT_DIR$/../photoview/photoview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/umengsharelib.iml" filepath="$PROJECT_DIR$/umengsharelib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../wheel/wheel.iml" filepath="$PROJECT_DIR$/../wheel/wheel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../wheelpicker/wheelpicker.iml" filepath="$PROJECT_DIR$/../wheelpicker/wheelpicker.iml" />
+    </modules>
+  </component>
+</project>

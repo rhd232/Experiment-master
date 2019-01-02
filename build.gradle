@@ -1,0 +1,50 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply from: 'buildsystem/dependencies.gradle'
+buildscript {
+    ext.kotlin_version = '1.2.51'
+
+    repositories {
+        maven {
+            url uri("repo")
+        }
+        google()
+        jcenter()
+    }
+    dependencies {
+
+
+        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.squareup.sqldelight:gradle-plugin:0.6.1'
+
+        classpath 'com.wind.plugin:aop-plugin:1.0.0'
+        classpath 'org.aspectj:aspectjtools:1.8.6'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven {url "https://clojars.org/repo/"}
+        maven { url "https://jitpack.io" }
+    }
+}
+configurations.all {
+    resolutionStrategy {
+        force 'com.android.support:design:26.0.2'
+        force 'com.android.support:support-v4:26.0.2'
+        force 'com.android.support:appcompat-v7:26.0.2'
+        force 'com.android.support:recyclerview-v7:26.0.2'
+        force 'com.android.support:support-fragment:26.0.2'
+        force 'com.android.support:support-core-utils:26.0.2'
+        force 'com.android.support:support-core-ui:26.0.2'
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

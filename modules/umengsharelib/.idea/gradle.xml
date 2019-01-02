@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/.." />
+            <option value="$PROJECT_DIR$/../PhotoSelector" />
+            <option value="$PROJECT_DIR$/../PhotoSelectorLib" />
+            <option value="$PROJECT_DIR$/../PullToRefreshLib" />
+            <option value="$PROJECT_DIR$/../SwipeMenuListView" />
+            <option value="$PROJECT_DIR$/../app" />
+            <option value="$PROJECT_DIR$/../baselib" />
+            <option value="$PROJECT_DIR$/../galleryfinal" />
+            <option value="$PROJECT_DIR$/../photoview" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/../wheel" />
+            <option value="$PROJECT_DIR$/../wheelpicker" />
+          </set>
+        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

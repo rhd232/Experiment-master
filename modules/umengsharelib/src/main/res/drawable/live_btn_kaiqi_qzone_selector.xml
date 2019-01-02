@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_activated="true" android:drawable="@drawable/live_btn_kaiqi_qzone_selected"></item>
+    <item android:drawable="@drawable/live_btn_kaiqi_qzone_normal"></item>
+</selector>

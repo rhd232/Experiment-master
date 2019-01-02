@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--CarouselViewPager-->
+    <dimen name="wd_carousel_dot_inter_dot_margin">5dp</dimen>
+    <dimen name="wd_carousel_dots_bottom_margin">25dp</dimen>
+    <dimen name="wd_carousel_dot_size">12dp</dimen>
+</resources>

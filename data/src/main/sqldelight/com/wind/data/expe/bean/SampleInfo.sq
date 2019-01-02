@@ -1,0 +1,17 @@
+CREATE TABLE sample_info(
+    --实验基本信息
+    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    type INTEGER NOT NULL,
+
+    --外键
+    expe_id INTEGER NOT NULL,
+    FOREIGN KEY(expe_id) REFERENCES expe_info(_id)
+
+);
+
+find_by_expeid_and_type:
+select * from sample_info where expe_id =? and type = ? ;
+
+find_by_expeid:
+select * from sample_info where expe_id =?;

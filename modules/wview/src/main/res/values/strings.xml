@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WindView</string>
+
+    <string name="mobile_not_correct">手机号码输入不正确，请检查</string>
+    <string name="mobile_not_correct_1">手机号码有误，请重新输入</string>
+    <string name="wd_countdown">%1$ss</string>
+</resources>

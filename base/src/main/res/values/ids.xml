@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="title_bar" type="id"></item>
+    <item name="webcontent" type="id"></item>
+    <item name="layout_tab" type="id"></item>
+    <item name="layout_view_pager" type="id"></item>
+    <item name="fl_fragment_container" type="id"></item>
+
+    <item name="tv_key" type="id"></item>
+    <item name="tv_value" type="id"></item>
+    <item name="layout_loading" type="id"></item>
+    <item name="prv" type="id"></item>
+    <item name="ll_back" type="id"></item>
+    <item name="titlebar_left" type="id"></item>
+</resources>
