@@ -19,7 +19,7 @@
 
 
     <TextView
-        android:id="@+id/tv_dev_list"
+        android:id="@+id/tv_device_state"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="设备未连接"
@@ -33,5 +33,5 @@
         android:paddingBottom="2dp"
         android:layout_marginRight="12dp"
         android:background="@drawable/shape_solidffffff_corner10"
-        android:textColor="@color/color999999"/>
+        android:textColor="@color/selector_999999_f2bc00"/>
 </RelativeLayout>

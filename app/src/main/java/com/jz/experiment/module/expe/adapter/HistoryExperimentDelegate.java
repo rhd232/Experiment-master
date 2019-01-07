@@ -7,11 +7,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
-import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
+import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.wind.base.adapter.BaseAdapterDelegate;
 import com.wind.base.adapter.DisplayItem;
 import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.HistoryExperiment;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -48,7 +50,8 @@ public class HistoryExperimentDelegate extends BaseAdapterDelegate<HistoryExperi
         vh.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UserSettingsStep1Activity.start(mActivity,experiment);
+                EventBus.getDefault().post(new ToExpeSettingsEvent(experiment));
+               // UserSettingsStep1Activity.start(mActivity,experiment);
             }
         });
     }

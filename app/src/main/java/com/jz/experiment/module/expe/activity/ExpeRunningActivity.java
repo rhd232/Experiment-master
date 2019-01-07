@@ -37,6 +37,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class ExpeRunningActivity extends BaseActivity {
+    public static final int WHAT_REFRESH_CHART=1;
 
     public static void start(Context context, HistoryExperiment experiment) {
         Navigator.navigate(context, ExpeRunningActivity.class, experiment);
@@ -172,6 +173,7 @@ public class ExpeRunningActivity extends BaseActivity {
 
             }
         }));
+        chart.setTouchEnabled(false);
         chart.setDrawBorders(false);
         chart.setData(mLineData);
         chart.invalidate(); // refresh
@@ -202,7 +204,7 @@ public class ExpeRunningActivity extends BaseActivity {
                     mDataSets.get(j - 1).addEntry(entry);
                 }
 
-                mHandler.sendEmptyMessage(1);
+                mHandler.sendEmptyMessage(WHAT_REFRESH_CHART);
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -239,7 +241,9 @@ public class ExpeRunningActivity extends BaseActivity {
                     List<Entry> entries = lineDataSet.getValues();
                     com.wind.data.expe.bean.LineData lineData = new com.wind.data.expe.bean.LineData();
                     lineData.setEntries(entries);
+                    lineData.setColor(mLineColors.get(i));
                     lineDataList.add(lineData);
+
                 }
                 chartData.setLineDataList(lineDataList);
 

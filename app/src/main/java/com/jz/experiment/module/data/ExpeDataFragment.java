@@ -110,6 +110,7 @@ public class ExpeDataFragment extends BaseFragment {
 
         mLineData = new LineData(mDataSets);
         // chart.setMarker(new ChartMarkerView(getActivity()));
+        chart.setTouchEnabled(false);
         chart.setDrawBorders(false);
         chart.setData(mLineData);
         chart.animateX(1500);

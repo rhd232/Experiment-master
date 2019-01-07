@@ -99,22 +99,12 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
                 checkBluetoothPermission();
             }
 
-            // Register the BroadcastReceiver
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-            //蓝牙连接成功
-            filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-            //蓝牙请求断开连接
-            filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-            //蓝牙已断开连接
-            filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+            registerScanReceiver();
 
-            getActivity().registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
         }
 
+        bindService();
 
-        Intent intent = new Intent(getActivity(), BluetoothService.class);
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         mBluetoothReceiver = new BluetoothReceiver();
         mBluetoothReceiver.setBluetoothConnectInteface(this);
@@ -124,20 +114,39 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
 
     }
 
+    private void registerScanReceiver() {
+        // Register the BroadcastReceiver
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+       /*     //蓝牙连接成功
+            filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+            //蓝牙请求断开连接
+            filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+            //蓝牙已断开连接
+            filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);*/
+
+        getActivity().registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+
+    }
+
+    private void bindService() {
+        Intent intent = new Intent(getActivity(), BluetoothService.class);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
     private BluetoothService mBluetoothService;
-    private boolean mBinded;
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
             mBluetoothService = binder.getService();
             mBluetoothService.initialize();
-            mBinded = true;
+            //TODO 获取以及连接的设备
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mBinded = false;
+            mBluetoothService=null;
         }
     };
 
@@ -215,7 +224,6 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
                     public void run() {
                         // 获取设备对象
                         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                        device.fetchUuidsWithSdp();
                         ParcelUuid parcelUuid = intent.getParcelableExtra(BluetoothDevice.EXTRA_UUID);
                         if (parcelUuid != null) {
                             String uuid = parcelUuid.getUuid().toString();
@@ -239,38 +247,18 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
             } //搜索完成
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.e(TAG, "onReceive: 搜索完成");
+            }else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)){
+                Log.e(TAG, "onReceive: 蓝牙连接成功");
+            }else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)){
+                Log.e(TAG, "onReceive: 蓝牙请求断开连接");
+            }else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)){
+                Log.e(TAG, "onReceive: 蓝牙已断开连接");
             }
         }
     };
 
 
-    // 扫描蓝牙设备的回调
-    /*private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 
-        @Override
-        public void onLeScan(final BluetoothDevice device, final int rssi,
-                             final byte[] scanRecord) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    layout_loading.showContent();
-                    Log.d("SacanLeDevice", "2 step  add device");
-                    DeviceInfo deviceInfo=new DeviceInfo();
-                    deviceInfo.setName(device.getName());
-                    deviceInfo.setAddress(device.getAddress());
-                    if (!deviceInfoSet.contains(deviceInfo)){
-                        deviceInfoSet.add(deviceInfo);
-                        List<DeviceInfo> list=new ArrayList<>(deviceInfoSet);
-                        mAdapter.replace(list);
-
-                        if ("DingDing".equals(device.getName())){
-                            mPlayerBluetoothDevice=device;
-                        }
-                    }
-                }
-            });
-        }
-    };*/
 
     public static IntentFilter makeIntentFilter() { // 注册接收的事件
         final IntentFilter intentFilter = new IntentFilter();
@@ -304,7 +292,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     @Subscribe
     public void onConnectRequestEvent(ConnectRequestEvent event) {
         DeviceInfo deviceInfo = event.getDeviceInfo();
-        if (mBinded){
+        if (mBluetoothService!=null){
             mBluetoothService.connect(deviceInfo.getDevice());
         }
 
@@ -315,6 +303,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        getActivity().unbindService(mConnection);
         EventBus.getDefault().unregister(this);
         getActivity().unregisterReceiver(mReceiver);
         getActivity().unregisterReceiver(mBluetoothReceiver);

@@ -7,11 +7,14 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.util.Log;
+
+import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,10 +22,10 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 public class BluetoothService extends Service {
-    public static final String TAG="BluetoothService";
+    public static final String TAG = "BluetoothService";
 
     //蓝牙串口服务
-    public static String  SerialPortServiceClass_UUID = "00001101-0000-1000-8000-00805F9B34FB";
+    public static String SerialPortServiceClass_UUID = "00001101-0000-1000-8000-00805F9B34FB";
 
     public static String SDP_AVRemoteControlServiceClass_UUID = "0000110E-0000-1000-8000-00805F9B34FB";
     public static String SDP_AudioSinkServiceClass_UUID = "0000110B-0000-1000-8000-00805F9B34FB";
@@ -68,9 +71,21 @@ public class BluetoothService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         initialize();
-      /*  IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
-        registerReceiver(mReceiver,filter);*/
+        registerACLReceiver();
         return mBinder;
+    }
+
+    private void registerACLReceiver() {
+        // Register the BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
+        //蓝牙连接成功
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        //蓝牙请求断开连接
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        //蓝牙已断开连接
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+
+        registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
     }
 
     private void broadcastUpdate(final String action) {
@@ -86,24 +101,16 @@ public class BluetoothService extends Service {
     }
 
 
-
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (BluetoothDevice.ACTION_UUID.equals(action)) {
-                Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
-                for (int i=0; uuidExtra!=null&&i<uuidExtra.length; i++) {
-                    String uuid = uuidExtra[i].toString();
-                    Log.e(TAG,"uuid:"+uuid);
-                    if (SDP_AudioSinkServiceClass_UUID.equalsIgnoreCase(uuid)){
-                        if (mDevice!=null){
-                            ConnectThread connectThread=new ConnectThread(mDevice);
-                            connectThread.start();
-                        }
+            if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                mConnectedThread.setRun(false);
+                //发送蓝牙已断开连接通知
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                EventBus.getDefault().post(new BluetoothDisConnectedEvent(device.getName()));
 
-                    }
-                }
             }
         }
     };
@@ -119,39 +126,54 @@ public class BluetoothService extends Service {
 
         return true;
     }
-    private BluetoothDevice mDevice;
 
+
+    /**连接线程*/
+    private ConnectThread mConnectThread;
+    /**已连接线程*/
+    private ConnectedThread mConnectedThread;
     public void connect(BluetoothDevice device) {
         if (mBluetoothAdapter == null || device == null) {
             return;
         }
-        //mDevice=device;
-      /*  //首先获取uuid
-        ParcelUuid[] uuids=device.getUuids();
-        if (uuids==null|| uuids.length==0) {
-            boolean flag = device.fetchUuidsWithSdp();
-            Log.e(TAG,"connect:"+flag);
-        }else {
-            for (int i=0; uuids!=null&&i<uuids.length; i++) {
-                String uuid = uuids[i].toString();
-                Log.e(TAG,"uuid:"+uuid);
-                if (SDP_AudioSinkServiceClass_UUID.equalsIgnoreCase(uuid)){
-                    ConnectThread connectThread=new ConnectThread(mDevice);
-                    connectThread.start();
-                }
-            }
-        }*/
 
-
-        ConnectThread connectThread=new ConnectThread(device);
-        connectThread.start();
+        mConnectThread = new ConnectThread(device);
+        mConnectThread.start();
 
     }
 
+    /**
+     * 获取已经连接的设备
+     * @return
+     */
+    public BluetoothDevice getConnectedDevice(){
+        if (isConnected()){
+            return mConnectThread.getConnectedDevice();
+        }
+        return null;
+
+    }
+    /**
+     * 设备是否已连接
+     * @return
+     */
+    public boolean isConnected() {
+        return mConnectThread==null?false:mConnectThread.isConnected();
+    }
+
     private class ConnectThread extends Thread {
+        /**
+         * 已经连接的设备
+         */
         private final BluetoothSocket mmSocket;
+        /**
+         * 已经连接的设备
+         */
         private final BluetoothDevice mmDevice;
 
+        public BluetoothDevice getConnectedDevice(){
+            return mmDevice;
+        }
         public ConnectThread(BluetoothDevice device) {
             // Use a temporary object that is later assigned to mmSocket,
             // because mmSocket is final
@@ -163,7 +185,7 @@ public class BluetoothService extends Service {
                 // MY_UUID is the app's UUID string, also used by the server code
                 tmp = device.createRfcommSocketToServiceRecord(UUID.fromString(SerialPortServiceClass_UUID));
                 //安卓系统4.2以后的蓝牙通信端口为 1 ，但是默认为 -1，所以只能通过反射修改，才能成功
-             /*   tmp =(BluetoothSocket) device.getClass()
+               /* tmp =(BluetoothSocket) device.getClass()
                         .getDeclaredMethod("createRfcommSocket",new Class[]{int.class})
                         .invoke(device,1);*/
             } catch (Exception e) {
@@ -190,6 +212,7 @@ public class BluetoothService extends Service {
 
                 try {
                     mmSocket.close();
+
                 } catch (IOException closeException) {
 
                 }
@@ -198,6 +221,15 @@ public class BluetoothService extends Service {
 
             // Do work to manage the connection (in a separate thread)
             manageConnectedSocket(mmSocket);
+        }
+
+
+        /**
+         * 设备是否已连接
+         * @return
+         */
+        public boolean isConnected() {
+            return mmSocket==null?false:mmSocket.isConnected();
         }
 
         /**
@@ -212,8 +244,8 @@ public class BluetoothService extends Service {
     }
 
     private void manageConnectedSocket(BluetoothSocket socket) {
-        ConnectedThread connectedThread = new ConnectedThread(socket);
-        connectedThread.start();
+        mConnectedThread = new ConnectedThread(socket);
+        mConnectedThread.start();
     }
 
 
@@ -221,12 +253,17 @@ public class BluetoothService extends Service {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private boolean mRun;
+
+        public void setRun(boolean run) {
+            this.mRun = run;
+        }
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
-
+            mRun=true;
             // Get the input and output streams, using temp objects because
             // member streams are final
             try {
@@ -247,7 +284,7 @@ public class BluetoothService extends Service {
             int bytes; // bytes returned from read()
 
             // Keep listening to the InputStream until an exception occurs
-            while (true) {
+            while (mRun) {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
@@ -282,7 +319,7 @@ public class BluetoothService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        //unregisterReceiver(mReceiver);
+        unregisterReceiver(mReceiver);
         return super.onUnbind(intent);
     }
 }

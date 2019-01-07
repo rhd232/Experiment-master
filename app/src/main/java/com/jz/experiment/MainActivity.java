@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import com.jz.experiment.module.bluetooth.BluetoothService;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
 import com.jz.experiment.module.expe.bean.Tab;
@@ -59,6 +60,15 @@ public class MainActivity extends BaseActivity {
         mAdapter = new MainPagerAdapter(getSupportFragmentManager(), fragments);
         view_pager.setAdapter(mAdapter);
         onViewClick(layout_expe);
+
+
+        startBluetoothService();
+    }
+
+    Intent mServiceIntent;
+    private void startBluetoothService() {
+        mServiceIntent=new Intent(this,BluetoothService.class);
+        startService(mServiceIntent);
 
     }
 
@@ -125,6 +135,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopService(mServiceIntent);
         EventBus.getDefault().unregister(this);
     }
 
@@ -139,4 +150,7 @@ public class MainActivity extends BaseActivity {
             onViewClick(layout_data);
         }
     }
+
+
+
 }

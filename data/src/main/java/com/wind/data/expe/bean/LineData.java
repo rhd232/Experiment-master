@@ -13,10 +13,14 @@ import java.util.List;
 public class LineData implements Parcelable {
 
     private List<Entry> entries;
+    private int color;
 
-    public LineData(){}
+    public LineData() {
+    }
+
     protected LineData(Parcel in) {
         entries = in.createTypedArrayList(Entry.CREATOR);
+        color = in.readInt();
     }
 
     public static final Creator<LineData> CREATOR = new Creator<LineData>() {
@@ -31,13 +35,6 @@ public class LineData implements Parcelable {
         }
     };
 
-    public List<Entry> getEntries() {
-        return entries;
-    }
-
-    public void setEntries(List<Entry> entries) {
-        this.entries = entries;
-    }
 
     @Override
     public int describeContents() {
@@ -47,5 +44,22 @@ public class LineData implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeTypedList(entries);
+        dest.writeInt(color);
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public List<Entry> getEntries() {
+        return entries;
+    }
+
+    public void setEntries(List<Entry> entries) {
+        this.entries = entries;
     }
 }
