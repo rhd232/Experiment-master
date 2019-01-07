@@ -1,19 +1,68 @@
 package com.wind.data.expe.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.wind.base.adapter.DisplayItem;
 
-public class HistoryExperiment implements DisplayItem {
-    private long id;//实验id
+public class HistoryExperiment implements DisplayItem,Parcelable {
+    public static final long ID_NONE=-1;
+    private long id=ID_NONE;//实验id
     private String name;     //实验名称
     private String device;  //实验连接的设备
-    private String timestamp; //实验时间
     private long millitime;//实验时间毫秒值
-    private ExperimentStatus status;
+    private ExperimentStatus status;//实验状态
 
 
     private ExpeSettingsFirstInfo settingsFirstInfo;
     private ExpeSettingSecondInfo settingSecondInfo;
 
+    private ChartData dtChartData;//变温扩增曲线数据
+    private ChartData meltaChartData;//溶解曲线数据
+
+    public HistoryExperiment(){}
+
+    protected HistoryExperiment(Parcel in) {
+        id = in.readLong();
+        name = in.readString();
+        device = in.readString();
+        millitime = in.readLong();
+        status=in.readParcelable(ExperimentStatus.class.getClassLoader());
+        settingsFirstInfo=in.readParcelable(ExperimentStatus.class.getClassLoader());
+        settingSecondInfo=in.readParcelable(ExperimentStatus.class.getClassLoader());
+        dtChartData = in.readParcelable(ChartData.class.getClassLoader());
+        meltaChartData = in.readParcelable(ChartData.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(name);
+        dest.writeString(device);
+        dest.writeLong(millitime);
+        dest.writeParcelable(status,flags);
+        dest.writeParcelable(settingsFirstInfo,flags);
+        dest.writeParcelable(settingSecondInfo,flags);
+        dest.writeParcelable(dtChartData, flags);
+        dest.writeParcelable(meltaChartData, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<HistoryExperiment> CREATOR = new Creator<HistoryExperiment>() {
+        @Override
+        public HistoryExperiment createFromParcel(Parcel in) {
+            return new HistoryExperiment(in);
+        }
+
+        @Override
+        public HistoryExperiment[] newArray(int size) {
+            return new HistoryExperiment[size];
+        }
+    };
 
     public String getName() {
         return name;
@@ -31,13 +80,8 @@ public class HistoryExperiment implements DisplayItem {
         this.device = device;
     }
 
-    public String getTimestamp() {
-        return timestamp;
-    }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
+
 
     public ExperimentStatus getStatus() {
         return status;
@@ -77,5 +121,21 @@ public class HistoryExperiment implements DisplayItem {
 
     public void setSettingSecondInfo(ExpeSettingSecondInfo settingSecondInfo) {
         this.settingSecondInfo = settingSecondInfo;
+    }
+
+    public ChartData getDtChartData() {
+        return dtChartData;
+    }
+
+    public void setDtChartData(ChartData dtChartData) {
+        this.dtChartData = dtChartData;
+    }
+
+    public ChartData getMeltaChartData() {
+        return meltaChartData;
+    }
+
+    public void setMeltaChartData(ChartData meltaChartData) {
+        this.meltaChartData = meltaChartData;
     }
 }

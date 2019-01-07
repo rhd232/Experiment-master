@@ -3,6 +3,7 @@ package com.jz.experiment.module.expe.adapter;
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
 import com.jz.experiment.R;
 import com.wind.base.bean.CyclingStage;
@@ -39,7 +40,7 @@ public class VernierAdapter extends BaseRecyclerAdapter<PartStage,VernierAdapter
         partStage.setStepName("step "+(position+1));
       //  partStage.setPosition(position);
 
-
+        holder.tv_step_name.setText("step "+(position+1));
         float startScale=partStage.getStartScale();
         float curScale=partStage.getCurScale();
      //   holder.vernier_drag_layout.setLink(null);
@@ -81,10 +82,12 @@ public class VernierAdapter extends BaseRecyclerAdapter<PartStage,VernierAdapter
 
         View iv_add,iv_del;
         VernierDragLayout vernier_drag_layout;
+        TextView tv_step_name;
         public ViewHolder(View itemView) {
             super(itemView);
             iv_add=itemView.findViewById(R.id.iv_add);
             iv_del=itemView.findViewById(R.id.iv_del);
+            tv_step_name=itemView.findViewById(R.id.tv_step_name);
             vernier_drag_layout=itemView.findViewById(R.id.vernier_drag_layout);
         }
     }

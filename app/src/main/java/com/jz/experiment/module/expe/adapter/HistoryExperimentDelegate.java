@@ -7,8 +7,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
+import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
 import com.wind.base.adapter.BaseAdapterDelegate;
 import com.wind.base.adapter.DisplayItem;
+import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.HistoryExperiment;
 
 import java.util.List;
@@ -35,12 +37,20 @@ public class HistoryExperimentDelegate extends BaseAdapterDelegate<HistoryExperi
 
     @Override
     protected void onBindViewHolder(@NonNull List<DisplayItem> items, int position, @NonNull RecyclerView.ViewHolder holder, @NonNull List<Object> payloads) {
-        HistoryExperiment experiment= (HistoryExperiment) items.get(position);
+        final HistoryExperiment experiment= (HistoryExperiment) items.get(position);
         ViewHolder vh= (ViewHolder) holder;
         vh.tv_expe_name.setText(experiment.getName());
         vh.tv_expe_device.setText(experiment.getDevice());
-        vh.tv_expe_time.setText(experiment.getTimestamp());
+        String date=DateUtil.get(experiment.getMillitime(),"yy-MM-dd HH:mm:ss");
+        vh.tv_expe_time.setText(date);
         vh.tv_expe_status.setText(experiment.getStatus().getDesc());
+
+        vh.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UserSettingsStep1Activity.start(mActivity,experiment);
+            }
+        });
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{

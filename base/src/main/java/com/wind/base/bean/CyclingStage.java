@@ -1,19 +1,47 @@
 package com.wind.base.bean;
 
+import android.os.Parcel;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CyclingStage extends Stage {
 
     private int serialNumber;//CyclingStage编号
-    private List<PartStage> partStageList;
     private int cyclingCount;//循环次数
-    private PartStage picStage;//拍照阶段
+   // private PartStage picStage;//拍照阶段
+    private List<PartStage> partStageList;
     public CyclingStage() {
         setType(TYPE_CYCLING);
         partStageList = new ArrayList<>();
     }
 
+    public CyclingStage(Parcel in){
+        super(in);
+        serialNumber=in.readInt();
+        cyclingCount=in.readInt();
+        partStageList=in.readArrayList(PartStage.class.getClassLoader());
+
+    }
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest,flags);
+        dest.writeInt(serialNumber);
+        dest.writeInt(cyclingCount);
+        dest.writeList(partStageList);
+
+    }
+    public static final Creator<Stage> CREATOR = new Creator<Stage>() {
+        @Override
+        public Stage createFromParcel(Parcel in) {
+            return new CyclingStage(in);
+        }
+
+        @Override
+        public Stage[] newArray(int size) {
+            return new CyclingStage[size];
+        }
+    };
 
     public List<PartStage> getPartStageList() {
         return partStageList;
@@ -58,13 +86,7 @@ public class CyclingStage extends Stage {
         this.cyclingCount = cyclingCount;
     }
 
-    public PartStage getPicStage() {
-        return picStage;
-    }
 
-    public void setPicStage(PartStage picStage) {
-        this.picStage = picStage;
-    }
 
     public int getSerialNumber() {
         return serialNumber;

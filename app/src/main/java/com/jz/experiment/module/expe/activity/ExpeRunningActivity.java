@@ -18,11 +18,16 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
+import com.wind.data.expe.bean.ChartData;
+import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.widget.ChartMarkerView;
 import com.jz.experiment.widget.DuringView;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.Navigator;
+import com.wind.data.expe.bean.ColorfulEntry;
+import com.wind.data.expe.bean.HistoryExperiment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +38,13 @@ import butterknife.OnClick;
 
 public class ExpeRunningActivity extends BaseActivity {
 
-    public static void start(Context context){
-        Navigator.navigate(context,ExpeRunningActivity.class);
+    public static void start(Context context, HistoryExperiment experiment) {
+        Navigator.navigate(context, ExpeRunningActivity.class, experiment);
     }
 
     @BindView(R.id.chart)
     LineChart chart;
-
+    ChartMarkerView mChartMarkerView;
     LineData mLineData;
     ArrayList<ILineDataSet> mDataSets;
 
@@ -47,6 +52,9 @@ public class ExpeRunningActivity extends BaseActivity {
     TextView tv_cur_mode;
     @BindView(R.id.tv_duration)
     DuringView tv_duration;
+    private List<Integer> mLineColors;
+    private HistoryExperiment mHistoryExperiment;
+
     @Override
     protected void setTitle() {
         mTitleBar.setTitle("运行");
@@ -58,48 +66,53 @@ public class ExpeRunningActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expe_running);
         ButterKnife.bind(this);
+        mHistoryExperiment = Navigator.getParcelableExtra(this);
+
         tv_cur_mode.setText("当前模式：变温扩增");
         tv_duration.start();
         mDataSets = new ArrayList<>();
-        for (int i=1;i<=4;i++){
+        mLineColors=new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {//4组数据
 
-            List<Entry> expeData=new ArrayList<>();
+            List<Entry> expeData = new ArrayList<>();
 
-            for (int j=0;j<10;j++){
-                float y=0;
+            for (int j = 0; j < 10; j++) {
+                float y = 0;
 
-                if (i==1){
-                    y=j;
-                }else if (i==2){
-                    y=j*10;
-                }else if (i==3){
-                   y= (float) Math.pow(j,2);
-                }else if (i==4){
-                    y=j*20;
+                if (i == 1) {
+                    y = j;
+                } else if (i == 2) {
+                    y = j * 10;
+                } else if (i == 3) {
+                    y = (float) Math.pow(j, 2);
+                } else if (i == 4) {
+                    y = j * 20;
                 }
-                Entry entry=new Entry(j, y);
+                Entry entry = new Entry(j, y);
                 expeData.add(entry);
             }
 
-            LineDataSet dataSet = new LineDataSet(expeData, "通道"+i);
-            switch (i){
+            LineDataSet dataSet = new LineDataSet(expeData, "通道" + i);
+            int color=-1;
+            switch (i) {
                 case 1:
-                    dataSet.setColor(Color.parseColor("#355ABB"));
+                    color=Color.parseColor("#355ABB");
+                    dataSet.setColor(color);
                     break;
                 case 2:
-                    dataSet.setColor(Color.parseColor("#1F994A"));
+                    dataSet.setColor(color=Color.parseColor("#1F994A"));
                     break;
                 case 3:
-                    dataSet.setColor(Color.parseColor("#DBAE11"));
+                    dataSet.setColor(color=Color.parseColor("#DBAE11"));
                     break;
                 case 4:
-                    dataSet.setColor(Color.parseColor("#F13B3B"));
+                    dataSet.setColor(color=Color.parseColor("#F13B3B"));
                     break;
             }
             dataSet.setDrawCircles(false);
             dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             dataSet.setDrawValues(false);
-
+            mLineColors.add(color);
             mDataSets.add(dataSet);
         }
 
@@ -111,53 +124,82 @@ public class ExpeRunningActivity extends BaseActivity {
         xAxis.setDrawLabels(true);
         xAxis.setDrawAxisLine(true);
 
-        YAxis yAxisRight=chart.getAxisRight();
+        YAxis yAxisRight = chart.getAxisRight();
         yAxisRight.setEnabled(false);
 
-        YAxis yAxisLeft=chart.getAxisLeft();
+        YAxis yAxisLeft = chart.getAxisLeft();
         yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         yAxisLeft.setDrawGridLines(false);
 
 
-        Description description=new Description();
+        Description description = new Description();
         description.setEnabled(false);
         chart.setDescription(description);
-        Legend legend=chart.getLegend();
-       // legend.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
+        Legend legend = chart.getLegend();
+        // legend.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
         legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
 
         mLineData = new LineData(mDataSets);
-        chart.setMarker(new ChartMarkerView(getActivity()));
+
+        chart.setMarker(mChartMarkerView=new ChartMarkerView(getActivity(), new ChartMarkerView.OnPointSelectedListener() {
+            @Override
+            public void onPointSelected(Entry e) {
+
+                int index = -1;
+                for (int i = 0; i < mDataSets.size(); i++) {
+                    LineDataSet lineDataSet = (LineDataSet) mDataSets.get(i);
+                    index = lineDataSet.getEntryIndex(e);
+                    if (index != -1) {
+                        break;
+                    }
+                }
+                if (index == -1) {
+                    return;
+                }
+                List<ColorfulEntry> entries=new ArrayList<>();
+                for (int i = 0; i < mDataSets.size(); i++) {
+                    LineDataSet lineDataSet = (LineDataSet) mDataSets.get(i);
+                    Entry entry = lineDataSet.getEntryForIndex(index);
+                    ColorfulEntry colorfulEntry=new ColorfulEntry();
+                    colorfulEntry.setEntry(entry);
+                    colorfulEntry.setColor(mLineColors.get(i));
+                    entries.add(colorfulEntry);
+
+                }
+
+                mChartMarkerView.getAdapter().replaceAll(entries);
+
+            }
+        }));
         chart.setDrawBorders(false);
         chart.setData(mLineData);
         chart.invalidate(); // refresh
 
 
-
-        Thread thread=new Thread(mRun);
+        Thread thread = new Thread(mRun);
         thread.start();
     }
 
-    private int i=10;
-    private Runnable mRun=new Runnable() {
+    private int i = 10;
+    private Runnable mRun = new Runnable() {
         @Override
         public void run() {
-            while (i<100){
+            while (i < 100) {
                 i++;
-                for (int j=1;j<=4;j++){
-                    float y=0;
-                    if (j==1){
-                        y=i;
-                    }else if (j==2){
-                        y=i*10;
-                    }else if (j==3){
-                        y= (float) Math.pow(i,2);
-                    }else if (j==4){
-                        y= i*20;
+                for (int j = 1; j <= 4; j++) {
+                    float y = 0;
+                    if (j == 1) {
+                        y = i;
+                    } else if (j == 2) {
+                        y = i * 10;
+                    } else if (j == 3) {
+                        y = (float) Math.pow(i, 2);
+                    } else if (j == 4) {
+                        y = i * 20;
                     }
-                    Entry entry=new Entry(i, y);
-                    mDataSets.get(j-1).addEntry(entry);
+                    Entry entry = new Entry(i, y);
+                    mDataSets.get(j - 1).addEntry(entry);
                 }
 
                 mHandler.sendEmptyMessage(1);
@@ -172,7 +214,7 @@ public class ExpeRunningActivity extends BaseActivity {
     };
 
 
-    private Handler mHandler =new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             mLineData.notifyDataChanged();
@@ -183,10 +225,30 @@ public class ExpeRunningActivity extends BaseActivity {
 
 
     @OnClick({R.id.tv_stop})
-    public void onViewClick(View view){
-        switch (view.getId()){
+    public void onViewClick(View view) {
+        switch (view.getId()) {
             case R.id.tv_stop:
+                //下一步
+                //数据
+                //变增扩温曲线数据
+                //TODO 溶解曲线曲线数据
+                ChartData chartData = new ChartData();
+                List<com.wind.data.expe.bean.LineData> lineDataList = new ArrayList<>();
+                for (int i = 0; i < mDataSets.size(); i++) {
+                    LineDataSet lineDataSet = (LineDataSet) mDataSets.get(i);
+                    List<Entry> entries = lineDataSet.getValues();
+                    com.wind.data.expe.bean.LineData lineData = new com.wind.data.expe.bean.LineData();
+                    lineData.setEntries(entries);
+                    lineDataList.add(lineData);
+                }
+                chartData.setLineDataList(lineDataList);
 
+
+                mHistoryExperiment.setDtChartData(chartData);
+                Tab tab = new Tab();
+                tab.setIndex(MainActivity.TAB_INDEX_DATA);
+                tab.setExtra(mHistoryExperiment);
+                MainActivity.start(getActivity(), tab);
                 break;
         }
     }

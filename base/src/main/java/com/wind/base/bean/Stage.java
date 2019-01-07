@@ -2,10 +2,13 @@ package com.wind.base.bean;
 
 //import com.jz.experiment.widget.VernierDragLayout;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.wind.base.adapter.DisplayItem;
 import com.wind.base.widget.VernierDragLayout;
 
-public class Stage implements DisplayItem {
+public class Stage implements DisplayItem,Parcelable {
     public static final int TYPE_START=0;
     public static final int TYPE_CYCLING=1;
     public static final int TYPE_PART=2;
@@ -28,7 +31,44 @@ public class Stage implements DisplayItem {
     /**下游stage*/
     private Stage next;
 
-    private VernierDragLayout layout;
+    private transient VernierDragLayout layout;
+
+    protected Stage(Parcel in) {
+        type = in.readInt();
+        startScale = in.readFloat();
+        curScale = in.readFloat();
+        id = in.readInt();
+        stepName = in.readString();
+        next = in.readParcelable(Stage.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(type);
+        dest.writeFloat(startScale);
+        dest.writeFloat(curScale);
+        dest.writeInt(id);
+        dest.writeString(stepName);
+        dest.writeParcelable(next, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Stage> CREATOR = new Creator<Stage>() {
+        @Override
+        public Stage createFromParcel(Parcel in) {
+            return new Stage(in);
+        }
+
+        @Override
+        public Stage[] newArray(int size) {
+            return new Stage[size];
+        }
+    };
+
     public int getId() {
         return id;
     }

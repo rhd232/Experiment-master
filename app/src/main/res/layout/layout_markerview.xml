@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/tv_yvalue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-    android:background="#80000000"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_solid80ffffff_corner8"
+    android:minHeight="100dp"
+    android:orientation="vertical">
+
+
+    <ListView
+        android:id="@+id/lv"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:listSelector="@android:color/transparent"
+        android:padding="12dp"
+      />
+
+</FrameLayout>

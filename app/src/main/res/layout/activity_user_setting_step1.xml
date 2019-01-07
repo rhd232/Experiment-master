@@ -2,10 +2,26 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.jz.experiment.widget.DeviceStateBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+        <com.wind.view.TitleBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/title_bar"
+            />
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="64dp">
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
@@ -13,11 +29,7 @@
             android:background="@color/colorF5F5F5"
             android:orientation="vertical"
             android:paddingBottom="50dp">
-            <com.wind.view.TitleBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/title_bar"
-                ></com.wind.view.TitleBar>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -37,11 +49,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="实验时间："
+                    android:text="实验名称："
                     android:textColor="@color/color333333"
                     android:textSize="14sp" />
 
-                <EditText
+                <com.wind.view.ValidateEditText
+                    android:id="@+id/et_expe_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"

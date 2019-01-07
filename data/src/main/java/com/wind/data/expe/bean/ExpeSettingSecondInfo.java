@@ -1,10 +1,13 @@
 package com.wind.data.expe.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.wind.base.bean.Stage;
 
 import java.util.List;
 
-public class ExpeSettingSecondInfo {
+public class ExpeSettingSecondInfo implements Parcelable {
     /**选择的模式*/
     private List<Mode> modes;
 
@@ -15,6 +18,42 @@ public class ExpeSettingSecondInfo {
     private String startTemperature;
     private String endTemperature;
 
+    public ExpeSettingSecondInfo(){
+     /*   modes=new ArrayList<>();
+        steps=new ArrayList<>();*/
+    }
+    protected ExpeSettingSecondInfo(Parcel in) {
+
+        modes=in.readArrayList(Mode.class.getClassLoader());
+        steps=in.readArrayList(Stage.class.getClassLoader());
+        startTemperature = in.readString();
+        endTemperature = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(modes);
+        dest.writeList(steps);
+        dest.writeString(startTemperature);
+        dest.writeString(endTemperature);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<ExpeSettingSecondInfo> CREATOR = new Creator<ExpeSettingSecondInfo>() {
+        @Override
+        public ExpeSettingSecondInfo createFromParcel(Parcel in) {
+            return new ExpeSettingSecondInfo(in);
+        }
+
+        @Override
+        public ExpeSettingSecondInfo[] newArray(int size) {
+            return new ExpeSettingSecondInfo[size];
+        }
+    };
 
     public List<Mode> getModes() {
         return modes;

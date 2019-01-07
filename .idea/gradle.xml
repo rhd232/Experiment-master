@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/modules/location" />
             <option value="$PROJECT_DIR$/modules/toastlib" />
             <option value="$PROJECT_DIR$/modules/umengsharelib" />
+            <option value="$PROJECT_DIR$/modules/wheelpicker" />
             <option value="$PROJECT_DIR$/modules/wview" />
           </set>
         </option>

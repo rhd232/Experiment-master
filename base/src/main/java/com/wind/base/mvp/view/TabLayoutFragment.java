@@ -30,7 +30,7 @@ public abstract class TabLayoutFragment
     protected TabLayout layout_tab;
     protected ViewPager view_pager;
 
-    ContainerPagerAdapter mFragmentAdapter;
+    protected ContainerPagerAdapter mFragmentAdapter;
 
     @Nullable
     @Override
@@ -86,6 +86,24 @@ public abstract class TabLayoutFragment
             this(fm, fragments);
             this.titles = titles;
         }
+        public List<String>  getTitles(){
+            return titles;
+        }
+        public List<Fragment> getFragments(){
+            return fragments;
+        }
+        public void setFragments(List<Fragment> fragments) {
+            this.fragments = fragments;
+        }
+
+        public void setTitles(List<String> titles) {
+            this.titles = titles;
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
 
         @Override
         public Fragment getItem(int position) {
@@ -94,7 +112,8 @@ public abstract class TabLayoutFragment
 
         @Override
         public int getCount() {
-            return fragments.size();
+
+            return fragments==null?0:fragments.size();
         }
 
         @Override

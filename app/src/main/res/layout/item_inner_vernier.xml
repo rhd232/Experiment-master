@@ -33,6 +33,7 @@
                 android:background="@color/colorCBCBCB" />
 
             <TextView
+                android:id="@+id/tv_step_name"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:gravity="center"

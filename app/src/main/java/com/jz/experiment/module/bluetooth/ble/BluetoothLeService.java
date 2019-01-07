@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jz.experiment.module.bluetooth;
+package com.jz.experiment.module.bluetooth.ble;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;

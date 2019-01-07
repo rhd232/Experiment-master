@@ -1,6 +1,7 @@
 package com.jz.experiment.module.expe.activity;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -16,11 +17,17 @@ public class DeviceListActivity extends BaseActivity {
     }
 
     @Override
+    public int getStatusBarColor() {
+        return Color.WHITE;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_container_with_toolbar);
 
         replaceFragment(new DeviceListFragment());
+       // replaceFragment(new DeviceListBLEFragment());
 
     }
 

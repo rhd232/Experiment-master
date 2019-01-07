@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">wheelpicker</string>
+    <string name="wheel_picker_op_cancel_text">取消</string>
+    <string name="wheel_picker_op_confirm_text">确定</string>
+</resources>

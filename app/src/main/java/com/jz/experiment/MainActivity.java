@@ -1,6 +1,7 @@
 package com.jz.experiment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.View;
 
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
+import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.module.settings.event.LogoutEvent;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.ActivityUtil;
@@ -37,6 +39,12 @@ public class MainActivity extends BaseActivity {
     public static void start(Context context){
         Navigator.navigate(context,MainActivity.class);
     }
+    public static void start(Context context, Tab tab){
+
+        Navigator.navigate(context,MainActivity.class,tab);
+
+
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +62,11 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    @Override
+    public int getStatusBarColor() {
+        return getResources().getColor(R.color.color686868);
+    }
+
     @OnClick({R.id.layout_expe, R.id.layout_data})
     public void onViewClick(View v) {
         switch (v.getId()) {
@@ -67,6 +80,11 @@ public class MainActivity extends BaseActivity {
                 resetBottomBar();
                 layout_data.setActivated(true);
                 view_pager.setCurrentItem(TAB_INDEX_DATA, false);
+                if (tab!=null){
+                    ExpeDataTabFragment expeDataTabFragment= (ExpeDataTabFragment) mAdapter.getItem(TAB_INDEX_DATA);
+                    expeDataTabFragment.setExpe(tab.getExtra());
+                    tab=null;
+                }
                 break;
 
         }
@@ -108,5 +126,17 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+
+    private Tab tab;
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        tab=Navigator.getParcelableExtra(this);
+        if (tab.getIndex()==TAB_INDEX_DATA){
+            onViewClick(layout_data);
+        }
     }
 }

@@ -1,5 +1,7 @@
 include ':app', ':base', ':data', ':domain'
 
+include ':wheelpicker'
+project(':wheelpicker').projectDir = new File(rootDir, 'modules/wheelpicker')
 include ':location'
 project(':location').projectDir = new File(rootDir, 'modules/location')
 include ':wview'

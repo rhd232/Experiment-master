@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+
+    <item-a
+        id="1"
+        label="0">
+        <item
+            id="-1"
+            label="全市" />
+    </item-a>
+</data>

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 
 
@@ -21,17 +22,31 @@ public class Navigator {
         activity = null;
         return (T)serializable;
     }
+    public static <T> T getParcelableExtra(Activity activity) {
+        Parcelable parcelable = activity.getIntent().getParcelableExtra(Navigator.PARCELABLE_EXTRA_KEY);
+        activity = null;
+        return (T)parcelable;
+    }
     public static void putSerializableExtra(Intent intent, Serializable serializable) {
         if (serializable == null) return;
         intent.putExtra(PARCELABLE_EXTRA_KEY, serializable);
+    }
+    public static void putParcelableExtra(Intent intent, Parcelable parcelable) {
+        if (parcelable == null) return;
+        intent.putExtra(PARCELABLE_EXTRA_KEY, parcelable);
     }
     public static void navigate(Context context, Class clazz,Serializable serializable){
         Intent intent=new Intent(context,clazz);
         putSerializableExtra(intent,serializable);
         context.startActivity(intent);
     }
+    public static void navigate(Context context, Class clazz,Parcelable parcelable){
+        Intent intent=new Intent(context,clazz);
+        putParcelableExtra(intent,parcelable);
+        context.startActivity(intent);
+    }
     public static void navigate(Context context, Class clazz){
-        navigate(context,clazz,null);
+        navigate(context,clazz,(Serializable) null);
     }
 
 

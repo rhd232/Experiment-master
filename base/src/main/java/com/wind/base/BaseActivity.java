@@ -22,10 +22,14 @@ public class BaseActivity extends UmengActivity {
 
     protected TitleBar mTitleBar;
 
+    public int getStatusBarColor(){
+        return Color.parseColor("#1F4E99");
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SystemUiUtil.setStatusBarColor(this, Color.WHITE);
+
+        SystemUiUtil.setStatusBarColor(this,getStatusBarColor());
     }
 
     @Override

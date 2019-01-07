@@ -101,11 +101,13 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
         float timeTranslateY=mCurPos.y+DisplayUtil.dip2px(getContext(),6);
         ViewHelper.setTranslationX(layout_time,mCurPos.x);
         ViewHelper.setTranslationY(layout_time,timeTranslateY);
-       //TODO 联动下一级VernierDrag
+       // 联动下一级VernierDrag
         if (mLink!=null){
             Stage next=mLink.getNext();
             if (next!=null){
-                next.getLayout().setStartScale(mCurPos.y);
+                VernierDragLayout nextLayout=next.getLayout();
+                if (nextLayout!=null)
+                    nextLayout.setStartScale(mCurPos.y);
             }
         }
     }
@@ -121,7 +123,7 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
         mCurPos=pos;
         Log.i("DragCallback","left:"+mCurPos.x+"-top:"+mCurPos.y);
         //刻度0-100
-        float percent=mCurPos.y/getHeight();
+        float percent=vernier_view.heightPercent(mCurPos.y);
         String temp=decimalFormat.format((1-percent)*100);
         tv_temperature.setText(temp);
         if (mLink!=null)

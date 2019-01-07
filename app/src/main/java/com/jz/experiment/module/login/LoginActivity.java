@@ -1,6 +1,7 @@
 package com.jz.experiment.module.login;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -20,4 +21,8 @@ public class LoginActivity extends BaseActivity{
     }
 
 
+    @Override
+    public int getStatusBarColor() {
+        return Color.WHITE;
+    }
 }

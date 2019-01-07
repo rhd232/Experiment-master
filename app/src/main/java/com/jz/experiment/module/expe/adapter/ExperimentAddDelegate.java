@@ -34,7 +34,7 @@ public class ExperimentAddDelegate extends BaseAdapterDelegate<ExperimentAddDele
     @Override
     protected void onBindViewHolder(@NonNull List<DisplayItem> items, int position, @NonNull RecyclerView.ViewHolder holder, @NonNull List<Object> payloads) {
         ViewHolder vh= (ViewHolder) holder;
-        vh.tv_add_expe.setOnClickListener(new View.OnClickListener() {
+        vh.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 UserSettingsStep1Activity.start(mActivity);

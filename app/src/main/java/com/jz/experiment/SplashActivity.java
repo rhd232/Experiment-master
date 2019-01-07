@@ -1,5 +1,6 @@
 package com.jz.experiment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -13,7 +14,6 @@ import com.wind.base.bean.EndStage;
 import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
-import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.ActivityUtil;
 import com.wind.data.DbOpenHelper;
@@ -46,6 +46,11 @@ import rx.schedulers.Schedulers;
 
 
 public class SplashActivity extends BaseActivity {
+
+    @Override
+    public int getStatusBarColor() {
+        return Color.WHITE;
+    }
 
     UserDataStore mUserDataStore;
     ExpeDataStore mExpeDataStore;
@@ -185,7 +190,7 @@ public class SplashActivity extends BaseActivity {
         testFindExpeById();
         //testInsertExpe();
 
-        LoadingDialogHelper.showOpLoading(getActivity());
+        //LoadingDialogHelper.showOpLoading(getActivity());
         final FindUserRequest request = new FindUserRequest();
         request.setUsername(C.Config.DEFAULT_USERNAME);
         request.setPwd(C.Config.DEFAULT_PWD);

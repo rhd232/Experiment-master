@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="20dp"
+    android:gravity="center"
+    android:background="@drawable/selector_device_state_bar">
+    <TextView
+        android:id="@+id/tv_device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="设备名称："
+        android:textSize="10sp"/>
+    <TextView
+        android:id="@+id/tv_device_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="连接中"
+        android:textSize="10sp"/>
+</LinearLayout>

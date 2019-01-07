@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.wind.base.R;
 import com.wind.view.DisplayUtil;
 
 public class VernierView extends View {
@@ -34,7 +35,7 @@ public class VernierView extends View {
     private Paint mPaint;
 
     private boolean initialized;
-
+    private float spaceTopHeight;
     private void init() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStrokeWidth(DisplayUtil.dip2px(getContext(), 4));
@@ -42,7 +43,7 @@ public class VernierView extends View {
 
         mPaint.setColor( Color.parseColor("#F2BC00"));
 
-
+        spaceTopHeight=getResources().getDimensionPixelSize(R.dimen.space_height);
     }
 
     @Override
@@ -54,19 +55,26 @@ public class VernierView extends View {
             setScale(getMeasuredHeight() / 2f);
         }*/
       if (startScale==-1){
-          setStartScale(getMeasuredHeight() / 2f);
-          setScale(getMeasuredHeight() / 2f);
+          float startScale=getDragHeight() / 2f+spaceTopHeight;
+          setStartScale(startScale);
+          setScale(getDragHeight() / 2f+spaceTopHeight);
       }
+    }
+
+    public float heightPercent(float y){
+        float percent=(y-spaceTopHeight)/getDragHeight();
+        return percent;
+    }
+    public float getDragHeight(){
+        return getMeasuredHeight()-spaceTopHeight;//上方留出空白
     }
     RectF mBoldLineRectF;
     PointF mPos=new PointF();
     @Override
     protected void onDraw(Canvas canvas) {
-        int height = getMeasuredHeight();
+      //  float height =getDragHeight();
         int width = getMeasuredWidth();
-
         float lineWidth = width / 2f;
-        float halfHieght = height / 2f;
 
         mPaint.setStrokeWidth(DisplayUtil.dip2px(getContext(), 1));
         canvas.drawLine(0, startScale, lineWidth, mScale, mPaint);
@@ -78,9 +86,9 @@ public class VernierView extends View {
         mPos.x=lineWidth;
         mPos.y=mScale;
         float top=mScale-LINE_OFFSET;
-        top=top<0?0:top;
+       // top=top<spaceTopHeight?spaceTopHeight:top;
         float bottom=mScale+LINE_OFFSET;
-        bottom=bottom>height?height:bottom;
+      //  bottom=bottom>getHeight()-spaceHeight?getHeight()-spaceHeight:bottom;
         mBoldLineRectF=new RectF(lineWidth,top,width,bottom);
         if (listener!=null)
             listener.onViewPositionChanged(mPos);
@@ -126,8 +134,8 @@ public class VernierView extends View {
                     if (y>getHeight()){
                         y=getHeight();
                     }
-                    if (y<0){
-                        y=0;
+                    if (y<spaceTopHeight){
+                        y=spaceTopHeight;
                     }
                     setScale(y);
                 }

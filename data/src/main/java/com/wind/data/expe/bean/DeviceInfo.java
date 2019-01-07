@@ -1,18 +1,30 @@
 package com.wind.data.expe.bean;
 
+import android.bluetooth.BluetoothDevice;
+import android.text.TextUtils;
+
 import java.util.Objects;
 
 public class DeviceInfo {
+    private BluetoothDevice device;
 
-    private String name;
     private boolean connected;
     private String address;
     public String getName() {
+        String name=device.getName();
+        if (TextUtils.isEmpty(name)){
+            name=device.getAddress();
+        }
         return name;
+
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public BluetoothDevice getDevice() {
+        return device;
+    }
+
+    public void setDevice(BluetoothDevice device) {
+        this.device = device;
     }
 
     public boolean isConnected() {
@@ -24,16 +36,14 @@ public class DeviceInfo {
     }
 
     public String getAddress() {
-        return address;
+        return device.getAddress();
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+
 
     @Override
     public int hashCode() {
-        return Objects.hash(name,address);
+        return Objects.hash(getName(),getAddress());
     }
 
     @Override

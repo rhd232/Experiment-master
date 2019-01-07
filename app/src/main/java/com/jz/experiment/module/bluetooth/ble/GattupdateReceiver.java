@@ -1,4 +1,4 @@
-package com.jz.experiment.module.bluetooth;
+package com.jz.experiment.module.bluetooth.ble;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

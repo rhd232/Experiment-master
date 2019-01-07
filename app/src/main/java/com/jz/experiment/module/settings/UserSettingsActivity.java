@@ -1,6 +1,7 @@
 package com.jz.experiment.module.settings;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -22,6 +23,10 @@ public class UserSettingsActivity extends BaseActivity {
 
     public static void start(Context context){
         Navigator.navigate(context,UserSettingsActivity.class);
+    }
+    @Override
+    public int getStatusBarColor() {
+        return Color.WHITE;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.jz.experiment.module.settings;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -29,6 +30,10 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class EditPwdActivity extends BaseActivity {
+    @Override
+    public int getStatusBarColor() {
+        return Color.WHITE;
+    }
 
     public static void start(Context context){
         Navigator.navigate(context,EditPwdActivity.class);

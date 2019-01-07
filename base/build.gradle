@@ -28,7 +28,7 @@ dependencies {
     api baseDependencies.mosbymvp
     api baseDependencies.okhttputils
     //api baseDependencies.fastjson
-
+    api 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
    // api baseDependencies.appcompat
     api androidDependencies.recycler_view
     //apt baseDependencies.daggerCompilerr //apt is deprecated annotationProcessor instead

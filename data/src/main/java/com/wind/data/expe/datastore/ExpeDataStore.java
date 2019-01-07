@@ -12,11 +12,13 @@ import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.ChannelInfoModel;
+import com.wind.data.expe.bean.DtMode;
 import com.wind.data.expe.bean.ExpeInfoModel;
 import com.wind.data.expe.bean.ExpeSettingSecondInfo;
 import com.wind.data.expe.bean.ExpeSettingsFirstInfo;
 import com.wind.data.expe.bean.ExperimentStatus;
 import com.wind.data.expe.bean.HistoryExperiment;
+import com.wind.data.expe.bean.MeltMode;
 import com.wind.data.expe.bean.Mode;
 import com.wind.data.expe.bean.Sample;
 import com.wind.data.expe.bean.SampleInfoModel;
@@ -84,6 +86,7 @@ public class ExpeDataStore {
                     }
                     //插入主表实验数据
                     ExpeInfoModel.Marshal marshal = ExpeInfo.FACTORY.marshal();
+
                     ContentValues values = marshal.name(experiment.getName())
                             .device(experiment.getDevice())
                             .millitime(experiment.getMillitime())
@@ -92,12 +95,26 @@ public class ExpeDataStore {
                             .mode(sBuilder.toString())
                             .asContentValues();
                     mBriteDb.insert(ExpeInfo.TABLE_NAME, values);
+                   /* if (experiment.getId()>=0){
+                        mBriteDb.update(ExpeInfo.TABLE_NAME,values,"_id = ?",new String[]{experiment.getId()+""});
+                    }else {
+                        mBriteDb.insert(ExpeInfo.TABLE_NAME, values);
+                    }*/
                     // long rowId = mBriteDb.insert(User.TABLE_NAME, values);
                     //获取主键id
                     Cursor idCursor = mBriteDb.getReadableDatabase().rawQuery("select last_insert_rowid() from expe_info", null);
                     idCursor.moveToFirst();
                     int expe_id = idCursor.getInt(0);
                     idCursor.close();
+                   /* int expe_id;
+                    if (experiment.getId()==HistoryExperiment.ID_NONE) {
+                        Cursor idCursor = mBriteDb.getReadableDatabase().rawQuery("select last_insert_rowid() from expe_info", null);
+                        idCursor.moveToFirst();
+                        expe_id = idCursor.getInt(0);
+                        idCursor.close();
+                    }else {
+                        expe_id= (int) experiment.getId();
+                    }*/
 
                     //插入channel表
                     ExpeSettingsFirstInfo firstInfo = experiment.getSettingsFirstInfo();
@@ -109,6 +126,12 @@ public class ExpeDataStore {
                                 .remark(channel.getRemark())
                                 .expe_id(expe_id).asContentValues();
                         mBriteDb.insert(ChannelInfo.TABLE_NAME, channelValues);
+                        /*if (channel.getId()==HistoryExperiment.ID_NONE){
+                            mBriteDb.insert(ChannelInfo.TABLE_NAME, channelValues);
+                        }else {
+                            mBriteDb.update(ChannelInfo.TABLE_NAME, channelValues,"_id = ?",new String[]{channel.getId()+""});
+                        }*/
+
                     }
                     //插入samplesA
                     for (int i = 0; i < firstInfo.getSamplesA().size(); i++) {
@@ -120,6 +143,12 @@ public class ExpeDataStore {
                                 .type(Sample.TYPE_A)
                                 .asContentValues();
                         mBriteDb.insert(SampleInfo.TABLE_NAME, sampleValues);
+                     /*   if (sample.getId()==HistoryExperiment.ID_NONE){
+                            mBriteDb.insert(SampleInfo.TABLE_NAME, sampleValues);
+                        }else {
+                            mBriteDb.update(SampleInfo.TABLE_NAME, sampleValues,"_id = ?",new String[]{sample.getId()+""});
+                        }*/
+
                     }
                     //插入samplesB
                     for (int i = 0; i < firstInfo.getSamplesB().size(); i++) {
@@ -131,6 +160,11 @@ public class ExpeDataStore {
                                 .type(Sample.TYPE_B)
                                 .asContentValues();
                         mBriteDb.insert(SampleInfo.TABLE_NAME, sampleValues);
+                       /* if (sample.getId()==HistoryExperiment.ID_NONE){
+                            mBriteDb.insert(SampleInfo.TABLE_NAME, sampleValues);
+                        }else {
+                            mBriteDb.update(SampleInfo.TABLE_NAME, sampleValues,"_id = ?",new String[]{sample.getId()+""});
+                        }*/
                     }
 
                     //插入stage表
@@ -149,6 +183,7 @@ public class ExpeDataStore {
                                     .cycling_count((long) cyclingStage.getCyclingCount())
                                     .serialNumber((long) cyclingStage.getSerialNumber())
                                     .asContentValues();
+
                             mBriteDb.insert(StageInfo.TABLE_NAME, stageValues);
                             //获取主键id
                             Cursor cyclingCursor = mBriteDb.getReadableDatabase().rawQuery("select last_insert_rowid() from stage_info", null);
@@ -194,22 +229,18 @@ public class ExpeDataStore {
         });
 
     }
-
-
-    public Observable<FindExpeResponse> findAll(final FindExpeRequest request) {
+    public Observable<FindExpeResponse> findAllCompleted() {
         final FindExpeResponse response = new FindExpeResponse();
         response.setErr(-1);
-        final SqlDelightStatement statement = ExpeInfo.FACTORY.find_all();
-        return mBriteDb.createQuery(ExpeInfo.TABLE_NAME,
-                statement.statement)
+        final SqlDelightStatement statement = ExpeInfo.FACTORY.find_all_completed();
+        return mBriteDb.createQuery(ExpeInfo.TABLE_NAME,statement.statement)
                 .mapToList(new Func1<Cursor, HistoryExperiment>() {
                     @Override
                     public HistoryExperiment call(Cursor cursor) {
                         final BriteDatabase.Transaction transaction = mBriteDb.newTransaction();
-                        HistoryExperiment experiment = null;
+                        HistoryExperiment experiment = new HistoryExperiment();
                         try {
-
-                            ExpeInfo expeInfo = ExpeInfo.FACTORY.find_allMapper().map(cursor);
+                            ExpeInfo expeInfo = ExpeInfo.FACTORY.find_all_completedMapper().map(cursor);
                             experiment.setName(expeInfo.name());
                             experiment.setId(expeInfo._id());
                             experiment.setDevice(expeInfo.device());
@@ -218,6 +249,8 @@ public class ExpeDataStore {
                             status.setStatus((int) expeInfo.status());
                             status.setDesc(expeInfo.status_desc());
                             experiment.setStatus(status);
+
+
                             transaction.markSuccessful();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -229,7 +262,49 @@ public class ExpeDataStore {
                 }).map(new Func1<List<HistoryExperiment>, FindExpeResponse>() {
                     @Override
                     public FindExpeResponse call(List<HistoryExperiment> historyExperiments) {
+                        response.setItems(historyExperiments);
                         response.setErr(0);
+                        return response;
+                    }
+                });
+    }
+
+    public Observable<FindExpeResponse> findAll() {
+        final FindExpeResponse response = new FindExpeResponse();
+        response.setErr(-1);
+        final SqlDelightStatement statement = ExpeInfo.FACTORY.find_all();
+        return mBriteDb.createQuery(ExpeInfo.TABLE_NAME,
+                statement.statement)
+                .mapToList(new Func1<Cursor, HistoryExperiment>() {
+                    @Override
+                    public HistoryExperiment call(Cursor cursor) {
+                        final BriteDatabase.Transaction transaction = mBriteDb.newTransaction();
+                        HistoryExperiment experiment = new HistoryExperiment();
+                        try {
+
+                            ExpeInfo expeInfo = ExpeInfo.FACTORY.find_allMapper().map(cursor);
+                            experiment.setName(expeInfo.name());
+                            experiment.setId(expeInfo._id());
+                            experiment.setDevice(expeInfo.device());
+                            experiment.setMillitime(expeInfo.millitime());
+                            ExperimentStatus status = new ExperimentStatus();
+                            status.setStatus((int) expeInfo.status());
+                            status.setDesc(expeInfo.status_desc());
+                            experiment.setStatus(status);
+
+                            response.setErr(0);
+                            transaction.markSuccessful();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            transaction.end();
+                        }
+                        return experiment;
+                    }
+                }).map(new Func1<List<HistoryExperiment>, FindExpeResponse>() {
+                    @Override
+                    public FindExpeResponse call(List<HistoryExperiment> historyExperiments) {
+
                         response.setItems(historyExperiments);
                         return response;
                     }
@@ -260,6 +335,13 @@ public class ExpeDataStore {
                             status.setDesc(expeInfo.status_desc());
                             experiment.setStatus(status);
 
+                            String mode=expeInfo.mode();
+                            String []modes=mode.split("-");
+                            List<Mode> modeList=new ArrayList<>();
+                            modeList.add(new DtMode(modes[0]));
+                            if (modes.length>1){
+                                modeList.add(new MeltMode(modes[1]));
+                            }
 
                             ExpeSettingsFirstInfo expeSettingsFirstInfo = new ExpeSettingsFirstInfo();
                             experiment.setSettingsFirstInfo(expeSettingsFirstInfo);
@@ -301,6 +383,7 @@ public class ExpeDataStore {
 
 
                             ExpeSettingSecondInfo secondInfo = new ExpeSettingSecondInfo();
+                            secondInfo.setModes(modeList);
                             experiment.setSettingSecondInfo(secondInfo);
                             SqlDelightStatement stageStatement = StageInfo.FACTORY.find_by_expeid(expeInfo._id());
                             Cursor stageCursor = mBriteDb.query(stageStatement.statement, stageStatement.args);
