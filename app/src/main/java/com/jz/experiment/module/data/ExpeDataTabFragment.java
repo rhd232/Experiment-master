@@ -8,13 +8,15 @@ import android.view.View;
 
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
+import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.wind.base.mvp.view.TabLayoutFragment;
 import com.wind.base.response.BaseResponse;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.datastore.ExpeDataStore;
 import com.wind.data.expe.response.FindExpeResponse;
 import com.wind.view.TitleBar;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +44,8 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                 inflated.findViewById(R.id.tv_add).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        UserSettingsStep1Activity.start(getActivity());
+                        EventBus.getDefault().post(new ToExpeSettingsEvent(null));
+
                     }
                 });
             }
@@ -56,7 +59,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                         .getInstance(ProviderModule.getInstance()
                                 .getBriteDb(getActivity().getApplicationContext()));
 
-        //获取之前已经完成且保存的历史实验
+        //TODO 获取之前已经完成且保存的历史实验
         loadExpe();
 
 
@@ -122,10 +125,23 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         return R.layout.fragment_tab_expe_data;
     }
 
+  /*  @Override
+    public List<String> getTitles() {
+        List<String> title=new ArrayList<>();
+        title.add("历史实验");
+        title.add("历史实验");
+        title.add("历史实验");
+        return title;
+    }*/
 
     @Override
     protected List<Fragment> getFragments() {
-        return null;
+       /* List<Fragment> fragments=new ArrayList<>();
+        fragments.add(ExpeDataFragment.newInstance(null));
+        fragments.add(ExpeDataFragment.newInstance(null));
+        fragments.add(ExpeDataFragment.newInstance(null));
+        return fragments;*/
+       return null;
     }
 
 

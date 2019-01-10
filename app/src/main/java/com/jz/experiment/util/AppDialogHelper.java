@@ -280,6 +280,22 @@ public class AppDialogHelper {
         });
     }
 
+    public static void showSingleBtnDialog(Context context, final DialogOperCallback callback) {
+        showSingleBtnDialog(context,"确定",callback);
+    }
+    public static void showSingleBtnDialog(Context context, String msg, final DialogOperCallback callback) {
+        final AlertDialog alertDialog = AlertDialogUtil.showAlertDialog(context, R.layout.dialog_single, true);
+        TextView tv_msg = alertDialog.findViewById(R.id.tv_msg);
+        tv_msg.setText(msg);
+
+        alertDialog.findViewById(R.id.tv_ok).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                callback.onDialogConfirmClick();
+            }
+        });
+    }
 
     public static void showNormalDialog(Context context, String msg, final DialogOperCallback callback) {
         showNormalDialog(context, msg, "取消", "确定", callback);

@@ -17,6 +17,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class FilterActivity extends BaseActivity {
 
@@ -95,5 +96,19 @@ public class FilterActivity extends BaseActivity {
                 mSampleBAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+
+    @OnClick(R.id.tv_confirm)
+    public void onViewClick(View view){
+        switch (view.getId()){
+            case R.id.tv_confirm:
+                //获取选择的通道
+                List<StringSelectable> selectedChannelList=mChannelAdapter.getSelectedList();
+                List<StringSelectable> selectedSampleAList=mSampleAAdapter.getSelectedList();
+                List<StringSelectable> selectedSampleBList=mSampleBAdapter.getSelectedList();
+
+                break;
+        }
     }
 }

@@ -21,6 +21,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.jz.experiment.R;
 import com.jz.experiment.module.bluetooth.BluetoothReceiver;
@@ -28,7 +31,10 @@ import com.jz.experiment.module.bluetooth.BluetoothService;
 import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.expe.adapter.DeviceAdapter;
 import com.jz.experiment.module.expe.event.ConnectRequestEvent;
+import com.jz.experiment.util.AppDialogHelper;
+import com.wind.base.bean.Config;
 import com.wind.base.mvp.view.BaseFragment;
+import com.wind.base.repo.ConfigRepo;
 import com.wind.base.utils.ActivityUtil;
 import com.wind.data.expe.bean.DeviceInfo;
 import com.wind.toastlib.ToastUtil;
@@ -61,6 +67,13 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     BluetoothAdapter mBluetoothAdapter;
     BluetoothReceiver mBluetoothReceiver;
 
+    @BindView(R.id.rl_connected)
+    RelativeLayout rl_connected;
+    @BindView(R.id.tv_connected_dev_name)
+    TextView tv_connected_dev_name;
+
+    @BindView(R.id.checkbox)
+    ImageView checkbox;
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_device_list;
@@ -71,6 +84,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         EventBus.getDefault().register(this);
+        rl_connected.setVisibility(View.GONE);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rv_devices.setLayoutManager(manager);
@@ -112,6 +126,29 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
                 makeIntentFilter());
 
 
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkbox.isActivated()&& mBluetoothService.isConnected()){
+                    AppDialogHelper.showNormalDialog(getActivity(), "您将断开与该设备的连接", new AppDialogHelper.DialogOperCallback() {
+                        @Override
+                        public void onDialogConfirmClick() {
+                            mBluetoothService.cancel();
+                            checkbox.setActivated(false);
+                            rl_connected.setVisibility(View.GONE);
+                            DeviceInfo deviceInfo = new DeviceInfo();
+                            deviceInfo.setDevice(mConnectedDevice);
+
+                            deviceInfoSet.add(deviceInfo);
+                            List<DeviceInfo> list = new ArrayList<>(deviceInfoSet);
+                            mAdapter.replace(list);
+                        }
+                    });
+                }
+            }
+        });
+
+
     }
 
     private void registerScanReceiver() {
@@ -135,13 +172,22 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     }
 
     private BluetoothService mBluetoothService;
+    private BluetoothDevice mConnectedDevice;
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
             mBluetoothService = binder.getService();
             mBluetoothService.initialize();
-            //TODO 获取以及连接的设备
+            // 获取以及连接的设备
+            mConnectedDevice=mBluetoothService.getConnectedDevice();
+            if (mConnectedDevice!=null){
+                checkbox.setActivated(true);
+                rl_connected.setVisibility(View.VISIBLE);
+                tv_connected_dev_name.setText(mConnectedDevice.getName());
+            }else{
+                //TODO 连接上次的设备
+            }
         }
 
         @Override
@@ -235,18 +281,31 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
                         layout_loading.showContent();
                         DeviceInfo deviceInfo = new DeviceInfo();
                         deviceInfo.setDevice(device);
+                        if (mConnectedDevice!=null){
+                            boolean eq=device.getAddress().equals(mConnectedDevice.getAddress());
+                            if (eq){
+                                return;
+                            }
+                        }
+
                         if (!deviceInfoSet.contains(deviceInfo)) {
                             deviceInfoSet.add(deviceInfo);
                             List<DeviceInfo> list = new ArrayList<>(deviceInfoSet);
                             mAdapter.replace(list);
 
                         }
+
                     }
                 });
 
             } //搜索完成
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.e(TAG, "onReceive: 搜索完成");
+                if (!deviceInfoSet.contains(mConnectedDevice)){
+                    checkbox.setActivated(false);
+                    rl_connected.setVisibility(View.GONE);
+                    mConnectedDevice=null;
+                }
             }else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)){
                 Log.e(TAG, "onReceive: 蓝牙连接成功");
             }else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)){
@@ -313,11 +372,34 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     @Override
     public void onConnectSuccess() {
         ToastUtil.showToast(getActivity(),"连接成功");
+
+
+        rl_connected.setVisibility(View.VISIBLE);
+        mConnectedDevice=mBluetoothService.getConnectedDevice();
+        tv_connected_dev_name.setText(mConnectedDevice.getName());
+        checkbox.setActivated(true);
+        DeviceInfo deviceInfo=new DeviceInfo();
+        deviceInfo.setDevice(mConnectedDevice);
+        deviceInfoSet.remove(deviceInfo);
+        List<DeviceInfo> list = new ArrayList<>(deviceInfoSet);
+        mAdapter.replace(list);
+
+        //TODO 保存最后连接的设置，下次进来自动连接该设备
+        Config config=new Config();
+        config.setBluetoothDeviceName(mConnectedDevice.getName());
+        config.setBluetoothDeviceAddress(mConnectedDevice.getAddress());
+        ConfigRepo.getInstance().store(getActivity(),config);
     }
 
     @Override
     public void onConnectCancel() {
-        ToastUtil.showToast(getActivity(),"连接失败");
+        AppDialogHelper.showSingleBtnDialog(getActivity(), "连接失败请重试", new AppDialogHelper.DialogOperCallback() {
+            @Override
+            public void onDialogConfirmClick() {
+
+            }
+        });
+
     }
 
     @Override
@@ -331,4 +413,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
         //AT+BRSF=191
         ToastUtil.showToast(getActivity(),"蓝牙设备发来了消息："+data);
     }
+
+
+
 }

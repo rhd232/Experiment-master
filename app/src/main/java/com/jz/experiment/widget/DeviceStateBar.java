@@ -1,5 +1,6 @@
 package com.jz.experiment.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,7 +9,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
+import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
+import com.wind.base.utils.SystemUiUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,7 +58,25 @@ public class DeviceStateBar extends FrameLayout {
     }
 
     /**
-     *
+     * 蓝牙设备连接成功
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBluetoothConnectedEvent(BluetoothConnectedEvent event){
+        tv_device_name.setText(event.getDeviceName());
+        tv_device_state.setText("连接中");
+        setActivated(false);
+        setStatusbarColor(getContext().getResources().getColor(R.color.color1F4E99));
+    }
+
+    private void setStatusbarColor(int color){
+        if(getContext() instanceof Activity){
+            Activity activity= (Activity) getContext();
+            SystemUiUtil.setStatusBarColor(activity, color);
+        }
+    }
+    /**
+     *蓝牙设备连接成功
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -63,6 +84,7 @@ public class DeviceStateBar extends FrameLayout {
         tv_device_name.setText(event.getDeviceName());
         tv_device_state.setText("连接已中断");
         setActivated(true);
+        setStatusbarColor(getContext().getResources().getColor(R.color.colorD54646));
     }
 
 

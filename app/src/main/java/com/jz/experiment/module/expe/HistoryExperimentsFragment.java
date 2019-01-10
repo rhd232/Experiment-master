@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.bluetooth.BluetoothService;
+import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.module.expe.activity.DeviceListActivity;
 import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
 import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
@@ -34,6 +35,7 @@ import com.wind.view.DisplayUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -82,7 +84,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 inflated.findViewById(R.id.tv_add).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        UserSettingsStep1Activity.start(getActivity());
+                        onToExpeSettingsEvent(new ToExpeSettingsEvent(null));
                     }
                 });
             }
@@ -118,6 +120,15 @@ public class HistoryExperimentsFragment extends BaseFragment {
         }
     }
 
+    /**
+     * 设备连接断开
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBluetoothDisConnectedEvent(BluetoothDisConnectedEvent event){
+        tv_device_state.setText("设备未连接");
+        tv_device_state.setActivated(false);
+    }
     private void loadData() {
 
         mExpeDataStore
@@ -148,13 +159,13 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
     }
 
-    @OnClick({R.id.tv_dev_list, R.id.tv_user})
+    @OnClick({R.id.tv_device_state, R.id.tv_user})
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.tv_user:
                 UserSettingsActivity.start(getActivity());
                 break;
-            case R.id.tv_dev_list:
+            case R.id.tv_device_state:
                 DeviceListActivity.start(getActivity());
                 break;
         }

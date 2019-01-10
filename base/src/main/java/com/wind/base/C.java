@@ -65,6 +65,11 @@ public class C {
         public static final String LOCATION_CITY="city";
 
 
+        /**
+         * 最后连接的蓝牙设备
+         */
+        public static final String DEVICE_NAME="device_name";
+        public static final String DEVICE_ADDRESS="device_address";
     }
     public static class Api{
         /**

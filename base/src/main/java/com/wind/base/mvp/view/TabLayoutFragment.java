@@ -54,13 +54,14 @@ public abstract class TabLayoutFragment
 
         layout_tab.setupWithViewPager(view_pager);
 
-        layout_tab.post(new Runnable() {
+        /*layout_tab.post(new Runnable() {
             @Override
             public void run() {
                 setUpIndicatorWidth(layout_tab, 0, 0);
             }
         });
-        layout_tab.setTabMode(TabLayout.MODE_SCROLLABLE);
+        layout_tab.setTabMode(TabLayout.MODE_SCROLLABLE);*/
+        layout_tab.setTabMode(TabLayout.MODE_FIXED);
     }
 
     protected abstract List<Fragment> getFragments();

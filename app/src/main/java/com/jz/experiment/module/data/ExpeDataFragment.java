@@ -29,6 +29,7 @@ import com.wind.data.expe.bean.ChannelData;
 import com.wind.data.expe.bean.ChartData;
 import com.wind.data.expe.bean.ExperimentStatus;
 import com.wind.data.expe.bean.HistoryExperiment;
+import com.wind.data.expe.request.InsertExpeRequest;
 import com.wind.toastlib.ToastUtil;
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
@@ -91,6 +92,9 @@ public class ExpeDataFragment extends BaseFragment {
     }
 
     private void inflateChart() {
+        if (mExeperiment==null){
+            return;
+        }
         ChartData chartData = mExeperiment.getDtChartData();
         List<com.wind.data.expe.bean.LineData> lineDataList = chartData.getLineDataList();
         mDataSets = new ArrayList<>();
@@ -102,7 +106,7 @@ public class ExpeDataFragment extends BaseFragment {
             dataSet.setDrawCircles(false);
             dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             dataSet.setDrawValues(false);
-
+            dataSet.setColor(lineData.getColor());
             mDataSets.add(dataSet);
         }
 
@@ -205,10 +209,12 @@ public class ExpeDataFragment extends BaseFragment {
                 mExeperiment.setStatus(status);
                 //新插入一条数据
                 mExeperiment.setId(HistoryExperiment.ID_NONE);
+                InsertExpeRequest request=new InsertExpeRequest();
+                request.setExperiment(mExeperiment);
+                //TODO 保存实验数据
               /*  ExpeDataStore
                         .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))
-
-                        .insertExpe();*/
+                        .insertExpe(request);*/
 
 
                 break;

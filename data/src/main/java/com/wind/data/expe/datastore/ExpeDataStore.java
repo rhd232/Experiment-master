@@ -67,6 +67,14 @@ public class ExpeDataStore {
         this.mBriteDb = briteDb;
     }
 
+    public Observable<InsertExpeResponse> insertExpeData(final InsertExpeRequest request) {
+        return Observable.create(new Observable.OnSubscribe<InsertExpeResponse>() {
+            @Override
+            public void call(Subscriber<? super InsertExpeResponse> subscriber) {
+
+            }
+        });
+    }
 
     public Observable<InsertExpeResponse> insertExpe(final InsertExpeRequest request) {
         return Observable.create(new Observable.OnSubscribe<InsertExpeResponse>() {

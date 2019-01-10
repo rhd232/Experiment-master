@@ -63,14 +63,31 @@ public class MainActivity extends BaseActivity {
 
 
         startBluetoothService();
+        view_pager.post(new Runnable() {
+            @Override
+            public void run() {
+                //TODO bindService
+
+            }
+        });
+
+       /* Config config=ConfigRepo.getInstance().get(getActivity());
+        if (!TextUtils.isEmpty(config.getBluetoothDeviceAddress())){
+            //自动连接设备
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (bluetoothAdapter!=null && bluetoothAdapter.isEnabled()){
+
+            }
+
+        }*/
     }
 
     Intent mServiceIntent;
     private void startBluetoothService() {
         mServiceIntent=new Intent(this,BluetoothService.class);
         startService(mServiceIntent);
-
     }
+
 
     @Override
     public int getStatusBarColor() {

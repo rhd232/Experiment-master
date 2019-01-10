@@ -7,6 +7,9 @@ import com.jz.experiment.module.data.StringSelectable;
 import com.wind.base.adapter.BaseAdapterHelper;
 import com.wind.base.adapter.QuickAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StringSelectableAdapter extends QuickAdapter<StringSelectable> {
     public StringSelectableAdapter(Context context, int layoutResId) {
         super(context, layoutResId);
@@ -18,5 +21,18 @@ public class StringSelectableAdapter extends QuickAdapter<StringSelectable> {
         tv.setText(item.getVal());
 
         tv.setActivated(item.isSelected());
+    }
+
+
+
+    public List<StringSelectable> getSelectedList(){
+        List<StringSelectable> selectedList=new ArrayList<>();
+        for (int i=0;i<getCount();i++){
+            StringSelectable selectable=getItem(i);
+            if (selectable .isSelected()){
+                selectedList.add(selectable);
+            }
+        }
+        return selectedList;
     }
 }
