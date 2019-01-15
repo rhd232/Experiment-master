@@ -19,6 +19,8 @@ import org.greenrobot.eventbus.EventBus;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class BluetoothService extends Service {
     public static final String TAG = "BluetoothService";
@@ -92,11 +94,16 @@ public class BluetoothService extends Service {
         sendBroadcast(intent);
     }
 
-    private void broadcastUpdate(String action, byte[] buffer) {
-        final Intent intent = new Intent(action);
-        String str = new String(buffer);
-        intent.putExtra(EXTRA_DATA, str);
-        sendBroadcast(intent);
+    private void broadcastUpdate(String action, Data data) {
+        try {
+            final Intent intent = new Intent(action);
+          //  String str = new String(buffer,"ISO-8859-1");
+            intent.putExtra(EXTRA_DATA, data);
+            sendBroadcast(intent);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -173,6 +180,17 @@ public class BluetoothService extends Service {
        }
 
     }
+
+    public void write(PcrCommand command){
+        if (isConnected()){
+            ArrayList<Byte> bytes=command.getCommandList();
+            byte[] data = new byte[bytes.size()];
+            for (int i = 0; i < bytes.size(); i++) {
+                data[i] = bytes.get(i).byteValue();
+            }
+            mConnectedThread.write(data);
+        }
+    }
     private class ConnectThread extends Thread {
         /**
          * 已经连接的设备
@@ -195,11 +213,11 @@ public class BluetoothService extends Service {
             // Get a BluetoothSocket to connect with the given BluetoothDevice
             try {
                 // MY_UUID is the app's UUID string, also used by the server code
-              //  tmp = device.createRfcommSocketToServiceRecord(UUID.fromString(SerialPortServiceClass_UUID));
+                tmp = device.createRfcommSocketToServiceRecord(UUID.fromString(SerialPortServiceClass_UUID));
                 //安卓系统4.2以后的蓝牙通信端口为 1 ，但是默认为 -1，所以只能通过反射修改，才能成功
-                tmp =(BluetoothSocket) device.getClass()
+            /*    tmp =(BluetoothSocket) device.getClass()
                         .getDeclaredMethod("createRfcommSocket",new Class[]{int.class})
-                        .invoke(device,1);
+                        .invoke(device,1);*/
             } catch (Exception e) {
 
             }
@@ -302,8 +320,8 @@ public class BluetoothService extends Service {
                     bytes = mmInStream.read(buffer);
                     // Send the obtained bytes to the UI activity
                     //有数据可读
-
-                    broadcastUpdate(ACTION_DATA_AVAILABLE, buffer);
+                    Data data=new Data(buffer,bytes);
+                    broadcastUpdate(ACTION_DATA_AVAILABLE, data);
                   /*  new Handler().obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();*/
                 } catch (IOException e) {

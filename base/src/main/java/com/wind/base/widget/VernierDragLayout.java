@@ -7,16 +7,24 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding.widget.RxTextView;
 import com.wind.base.R;
 import com.wind.base.bean.Stage;
+import com.wind.base.utils.KeyboardHelper;
 import com.wind.base.utils.ViewHelper;
 import com.wind.view.DisplayUtil;
 
 import java.text.DecimalFormat;
+
+import rx.functions.Action1;
 
 public class VernierDragLayout extends FrameLayout implements VernierView.OnViewPositionChangedListener {
 
@@ -45,7 +53,7 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
     VernierView vernier_view;
     PointF mCurPos;
 
-    //EditText et_time;
+    EditText et_time;
     TextView tv_temperature;
     DecimalFormat decimalFormat;
     private void init() {
@@ -59,7 +67,22 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
         layout_time=findViewById(R.id.layout_time);
         vernier_view.setOnViewPositionChangedListener(this);
 
-      /*  et_time=findViewById(R.id.et_time);
+        et_time=findViewById(R.id.et_time);
+        RxTextView.textChanges(et_time).subscribe(new Action1<CharSequence>() {
+            @Override
+            public void call(CharSequence charSequence) {
+                  if (mLink!=null){
+                      short during=10;
+                      try {
+                           during=Short.parseShort(charSequence.toString());
+
+                      }catch (Exception e){
+                          e.printStackTrace();
+                      }
+                      mLink.setDuring(during);
+                  }
+            }
+        });
         et_time.setLongClickable(false);
         et_time.setOnClickListener(new OnClickListener() {
             @Override
@@ -88,7 +111,7 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
 
             }
 
-        });*/
+        });
 
     }
 
@@ -124,8 +147,10 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
         Log.i("DragCallback","left:"+mCurPos.x+"-top:"+mCurPos.y);
         //刻度0-100
         float percent=vernier_view.heightPercent(mCurPos.y);
-        String temp=decimalFormat.format((1-percent)*100);
+        float t=(1-percent)*100;
+        String temp=decimalFormat.format(t);
         tv_temperature.setText(temp);
+        mLink.setTemp(Float.parseFloat(temp));
         if (mLink!=null)
             mLink.setCurScale(mCurPos.y);
         translateView();

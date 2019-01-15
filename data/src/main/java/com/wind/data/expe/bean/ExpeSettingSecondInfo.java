@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.wind.base.bean.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExpeSettingSecondInfo implements Parcelable {
@@ -65,6 +66,16 @@ public class ExpeSettingSecondInfo implements Parcelable {
 
     public List<Stage> getSteps() {
         return steps;
+    }
+
+
+    public List<Stage> getCyclingSteps(){
+        List<Stage> cyclingStageList=new ArrayList<>();
+        cyclingStageList.addAll(steps);
+        cyclingStageList.remove(0);
+        cyclingStageList.remove(cyclingStageList.size()-1);
+        return cyclingStageList;
+
     }
 
     public void setSteps(List<Stage> steps) {

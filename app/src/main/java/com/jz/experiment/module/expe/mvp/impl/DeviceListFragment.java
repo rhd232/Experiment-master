@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.jz.experiment.R;
 import com.jz.experiment.module.bluetooth.BluetoothReceiver;
 import com.jz.experiment.module.bluetooth.BluetoothService;
+import com.jz.experiment.module.bluetooth.Data;
 import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.expe.adapter.DeviceAdapter;
 import com.jz.experiment.module.expe.event.ConnectRequestEvent;
@@ -408,7 +409,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     }
 
     @Override
-    public void onReceivedData(String data) {
+    public void onReceivedData(Data data) {
         Log.e(TAG,"onReceivedData:"+data);
         //AT+BRSF=191
         ToastUtil.showToast(getActivity(),"蓝牙设备发来了消息："+data);

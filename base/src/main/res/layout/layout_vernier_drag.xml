@@ -44,7 +44,7 @@
         android:id="@+id/layout_time"
        >
 
-        <TextView
+        <EditText
             android:id="@+id/et_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             android:paddingBottom="6dp"
             android:textColor="@color/color333333"
             android:textSize="16dp"
-            android:maxLength="5"
+            android:maxLength="3"
             android:text="10"
             android:inputType="number"/>
 

@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.jz.experiment.R;
+import com.jz.experiment.module.bluetooth.Data;
 import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.bluetooth.ble.BluetoothLeService;
 import com.jz.experiment.module.bluetooth.ble.GattupdateReceiver;
@@ -235,7 +236,7 @@ public class DeviceListBLEFragment extends BaseFragment implements BluetoothConn
     }
 
     @Override
-    public void onReceivedData(String data) {
+    public void onReceivedData(Data data) {
 
     }
 

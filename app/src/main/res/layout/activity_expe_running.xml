@@ -27,6 +27,26 @@
             android:layout_marginLeft="12dp"
             android:text="当前模式："
             android:textColor="@color/color333333" />
+        <LinearLayout
+            android:id="@+id/ll_cycling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/color333333"
+                android:text="循环："/>
+            <TextView
+                android:id="@+id/tv_cycling"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/color333333"
+                android:text="1/40"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -56,8 +76,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@color/white" />
-
+        android:background="@color/white"
+        android:visibility="gone"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/tv_received_msg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </ScrollView>
     <TextView
         android:id="@+id/tv_stop"
         android:layout_width="match_parent"

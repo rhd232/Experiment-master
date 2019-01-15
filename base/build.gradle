@@ -25,6 +25,7 @@ dependencies {
     def androidDependencies = rootProject.ext.androidDependencies
     api baseDependencies.rxJava
     api baseDependencies.rxAndroid
+    api presentationDependencies.rxbinding
     api baseDependencies.mosbymvp
     api baseDependencies.okhttputils
     //api baseDependencies.fastjson

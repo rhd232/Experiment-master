@@ -34,7 +34,7 @@ public class GattupdateReceiver extends BroadcastReceiver {
                 case 3: // 接受到数据
 
                     if (mBluetoothConnetListenr != null) {
-                        mBluetoothConnetListenr.onReceivedData(data);
+                        //mBluetoothConnetListenr.onReceivedData(data);
                     }
 
                     break;

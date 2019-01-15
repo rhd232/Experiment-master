@@ -76,7 +76,7 @@ public class DeviceStateBar extends FrameLayout {
         }
     }
     /**
-     *蓝牙设备连接成功
+     *蓝牙设备断开连接
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)

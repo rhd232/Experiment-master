@@ -11,7 +11,7 @@ import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 
 public class BluetoothReceiver extends BroadcastReceiver {
     public static String TAG = "BluetoothReceiver";
-    String data;
+    Data data;
     private BluetoothConnectionListener mBluetoothConnetListenr;//实现接口
     private final Handler mHandler = new Handler() {
         @Override
@@ -70,7 +70,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
         } else if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) { //接受到数据
             Log.e(TAG, "RECV DATA");
 
-            data = intent.getStringExtra(BluetoothService.EXTRA_DATA);
+            data = intent.getParcelableExtra(BluetoothService.EXTRA_DATA);
             mHandler.sendEmptyMessage(3);
         }
     }

@@ -18,6 +18,12 @@ public class Stage implements DisplayItem,Parcelable {
 
     private float startScale;
     private float curScale;
+
+    /**温度*/
+    private float temp;
+    /**持续时间*/
+    private short during;
+
     public Stage(){
         startScale=-1;
         curScale=-1;
@@ -33,10 +39,13 @@ public class Stage implements DisplayItem,Parcelable {
 
     private transient VernierDragLayout layout;
 
+
     protected Stage(Parcel in) {
         type = in.readInt();
         startScale = in.readFloat();
         curScale = in.readFloat();
+        temp = in.readFloat();
+        during = (short) in.readInt();
         id = in.readInt();
         stepName = in.readString();
         next = in.readParcelable(Stage.class.getClassLoader());
@@ -47,6 +56,8 @@ public class Stage implements DisplayItem,Parcelable {
         dest.writeInt(type);
         dest.writeFloat(startScale);
         dest.writeFloat(curScale);
+        dest.writeFloat(temp);
+        dest.writeInt((int) during);
         dest.writeInt(id);
         dest.writeString(stepName);
         dest.writeParcelable(next, flags);
@@ -131,5 +142,21 @@ public class Stage implements DisplayItem,Parcelable {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public float getTemp() {
+        return temp;
+    }
+
+    public void setTemp(float temp) {
+        this.temp = temp;
+    }
+
+    public short getDuring() {
+        return during;
+    }
+
+    public void setDuring(short during) {
+        this.during = during;
     }
 }
