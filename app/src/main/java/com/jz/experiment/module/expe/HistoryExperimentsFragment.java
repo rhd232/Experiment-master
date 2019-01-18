@@ -1,10 +1,6 @@
 package com.jz.experiment.module.expe;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,13 +9,13 @@ import android.widget.TextView;
 
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.module.bluetooth.BluetoothService;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.module.expe.activity.DeviceListActivity;
 import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
 import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
+import com.jz.experiment.util.DeviceProxyHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.recyclerview.decoration.VerticalSpacesItemDecoration;
 import com.wind.base.response.BaseResponse;
@@ -47,8 +43,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-import static android.content.Context.BIND_AUTO_CREATE;
-
 @Heros(
         param = @Param(
                 viewCanonicalName = "com.jz.experiment.module.expe.mvp.HistoryExperimentsView",
@@ -67,6 +61,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
     LoadingLayout layout_loading;
     @BindView(R.id.tv_device_state)
     TextView tv_device_state;
+
+    private DeviceProxyHelper sDeviceProxyHelper;
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_hostory_experiments;
@@ -100,18 +96,18 @@ public class HistoryExperimentsFragment extends BaseFragment {
                         .getApplicationContext()));
         loadData();
 
-        bindService();
+        //初始化blutoothservice
+        sDeviceProxyHelper=DeviceProxyHelper
+                .getInstance(getActivity());
+
     }
 
-    private void bindService() {
-        Intent serviceIntent=new Intent(getActivity(),BluetoothService.class);
-        getActivity().bindService(serviceIntent,mBluetoothServiceConnection,BIND_AUTO_CREATE);
-    }
+
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mBluetoothService!=null && mBluetoothService.isConnected()){
+        if (sDeviceProxyHelper.isConnected()){
             tv_device_state.setText("设备已连接");
             tv_device_state.setActivated(true);
         }else {
@@ -172,20 +168,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     }
 
 
-    BluetoothService mBluetoothService;
-    private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
-            mBluetoothService = binder.getService();
-            mBluetoothService.initialize();
-        }
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mBluetoothService = null;
-        }
-    };
 
     /**
      * 去实验设置页面
@@ -194,7 +177,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Subscribe
     public void onToExpeSettingsEvent(ToExpeSettingsEvent event){
         //判断是否已经连接设备
-        if (mBluetoothService!=null && mBluetoothService.isConnected()){
+        if (sDeviceProxyHelper.isConnected()){
             UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
         }else {
             ToastUtil.showToast(getActivity(),"请先连接设备");
@@ -205,7 +188,6 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        getActivity().unbindService(mBluetoothServiceConnection);
         EventBus.getDefault().unregister(this);
     }
 }

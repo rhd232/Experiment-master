@@ -23,6 +23,64 @@ public class ExampleUnitTest {
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
     }
+
+
+    @Test
+    public void testShortLSB_MSB(){
+        short during=1;
+     /*   System.out.println(Float.floatToIntBits(temperature));
+        System.out.println();*/
+        byte[] tempBytes = ByteBufferUtil.getBytes(during,ByteOrder.LITTLE_ENDIAN);//LITTLE_ENDIAN 0011266  BIG_ENDIAN 6611200
+        System.out.println("LSB");
+        for (int i = 0; i < tempBytes.length; i++) {
+
+            System.out.print(tempBytes[i]);
+        }
+        System.out.println();
+        tempBytes = ByteBufferUtil.getBytes(during,ByteOrder.BIG_ENDIAN);//LITTLE_ENDIAN 0011266  BIG_ENDIAN 6611200
+        System.out.println("MSB");
+        for (int i = 0; i < tempBytes.length; i++) {
+
+            System.out.print(tempBytes[i]);
+        }
+    }
+
+
+
+    @Test
+    public void testFloatLSB(){
+        float temperature=17.625f;
+     /*   System.out.println(Float.floatToIntBits(temperature));
+        System.out.println();*/
+        byte[] tempBytes = ByteBufferUtil.getBytes(temperature,ByteOrder.LITTLE_ENDIAN);//LITTLE_ENDIAN 0011266  BIG_ENDIAN 6611200
+        StringBuilder hex = new StringBuilder(tempBytes.length * 2);
+        for (byte b : tempBytes) {
+            if ((b & 0xFF) < 0x10) hex.append("0");
+            hex.append(Integer.toHexString(b & 0xFF));
+        }
+        System.out.println(hex.toString().toLowerCase());
+      /*  for (int i = 0; i < tempBytes.length; i++) {
+           System.out.print(tempBytes[i]);
+        }*/
+
+    }
+    @Test
+    public void testBitOp(){
+        int [] channelOp={1,1,0,1};
+        int channel=channelOp[0] | (channelOp[1] << 1) | (channelOp[2] << 2) | (channelOp[3] << 3);
+        //int channel=channelOp[0] << 3| channelOp[1] << 2 | channelOp[2] << 1|channelOp[3];
+        System.out.println(Integer.toBinaryString(channel));
+
+        int a=1;
+        int channel1=a & 0x1;
+        int channel2=a >> 1 & 0x1;
+        int channel3=a >>2 & 0x1;
+        int channel4=a >>3 & 0x1;
+        System.out.println("channel1:"+channel1);
+        System.out.println("channel2:"+channel2);
+        System.out.println("channel3:"+channel3);
+        System.out.println("channel4:"+channel4);
+    }
     @Test
     public void testHex(){
         int hexValue=24;

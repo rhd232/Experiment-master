@@ -5,16 +5,12 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.ParcelUuid;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,6 +29,7 @@ import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.expe.adapter.DeviceAdapter;
 import com.jz.experiment.module.expe.event.ConnectRequestEvent;
 import com.jz.experiment.util.AppDialogHelper;
+import com.jz.experiment.util.DeviceProxyHelper;
 import com.wind.base.bean.Config;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.repo.ConfigRepo;
@@ -75,6 +72,10 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
 
     @BindView(R.id.checkbox)
     ImageView checkbox;
+
+    private DeviceProxyHelper sDeviceProxyHelper;
+    private BluetoothService mBluetoothService;
+    private BluetoothDevice mConnectedDevice;
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_device_list;
@@ -109,7 +110,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
                     }
                 });
 
-                // mBluetoothAdapter.enable();
+
             } else {
                 checkBluetoothPermission();
             }
@@ -168,19 +169,27 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     }
 
     private void bindService() {
-        Intent intent = new Intent(getActivity(), BluetoothService.class);
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        sDeviceProxyHelper=DeviceProxyHelper.getInstance(getActivity());
+        mBluetoothService=sDeviceProxyHelper.getBluetoothService();
+        mConnectedDevice=mBluetoothService.getConnectedDevice();
+        if (mConnectedDevice!=null){
+            checkbox.setActivated(true);
+            rl_connected.setVisibility(View.VISIBLE);
+            tv_connected_dev_name.setText(mConnectedDevice.getName());
+        }else{
+            //TODO 连接上次的设备
+        }
     }
 
-    private BluetoothService mBluetoothService;
-    private BluetoothDevice mConnectedDevice;
-    private ServiceConnection mConnection = new ServiceConnection() {
+
+
+    /* private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
             mBluetoothService = binder.getService();
             mBluetoothService.initialize();
-            // 获取以及连接的设备
+           // 获取已经连接的设备
             mConnectedDevice=mBluetoothService.getConnectedDevice();
             if (mConnectedDevice!=null){
                 checkbox.setActivated(true);
@@ -195,7 +204,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
         public void onServiceDisconnected(ComponentName name) {
             mBluetoothService=null;
         }
-    };
+    };*/
 
     private void checkBluetoothPermission() {
         if (ActivityCompat.checkSelfPermission(getActivity(),
@@ -271,11 +280,11 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
                     public void run() {
                         // 获取设备对象
                         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                        ParcelUuid parcelUuid = intent.getParcelableExtra(BluetoothDevice.EXTRA_UUID);
+                     /*   ParcelUuid parcelUuid = intent.getParcelableExtra(BluetoothDevice.EXTRA_UUID);
                         if (parcelUuid != null) {
                             String uuid = parcelUuid.getUuid().toString();
                             Log.e(TAG, "uuid:" + uuid);
-                        }
+                        }*/
                         //提取强度信息
                         // int rssi = intent.getExtras().getShort(BluetoothDevice.EXTRA_RSSI);
                         //Log.e(TAG, device.getName() + "\n" + device.getAddress() + "\n强度：" + rssi);
@@ -363,7 +372,6 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        getActivity().unbindService(mConnection);
         EventBus.getDefault().unregister(this);
         getActivity().unregisterReceiver(mReceiver);
         getActivity().unregisterReceiver(mBluetoothReceiver);

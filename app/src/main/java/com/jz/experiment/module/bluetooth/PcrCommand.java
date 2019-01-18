@@ -2,6 +2,7 @@ package com.jz.experiment.module.bluetooth;
 
 import com.jz.experiment.util.ByteBufferUtil;
 
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,16 +41,40 @@ public class PcrCommand {
     }
 
     /**
+     * Length: 	          包含type以及有效数据data部分的长度
+     *
      * 设置通道
      *              header command  length  type
      * 十六进制码    0xaa     0x1             0x24
      * 十进制码      170        1             36
      *
-     * @param channel
+     * @param channelOp  数组长度为4  取值0|1   	0 关闭 1开启
      */
-    public void step1(int channel) {
-        int length=1;
-        byte[] cmd = new byte[]{(byte) 170, 1, (byte) length, 36, (byte) channel};
+    public void step1(int[] channelOp) {
+
+        int header=170;
+        int command=1;
+        int length=2;
+        int type=36;
+        //channel 0 在最右边
+        int channel=channelOp[0] | (channelOp[1] << 1) | (channelOp[2] << 2) | (channelOp[3] << 3);
+
+        byte[] cmd = new byte[8];
+        cmd[0]= (byte)header;
+        cmd[1]= (byte)command;
+        cmd[2]= (byte)length;
+        cmd[3]= (byte)type;
+
+        cmd[4]= (byte)channel;
+
+        cmd[5]=(byte)0;
+        for(int i=1; i<5; i++)
+            cmd[5] += cmd[i];//求校验和
+        if(cmd[5] == (byte) 0x17)
+            cmd[5] = 0x18;
+        cmd[6] = 0x17;
+        cmd[7] = 0x17;
+
         addCommand(cmd);
     }
 
@@ -57,20 +82,67 @@ public class PcrCommand {
      * sensor #1
      * 为热盖的序号。热盖的温度保持时间为Peltier关闭后延迟关闭时间。（默认为105，不延迟）
      * Sensor 2#为Peltier的。
+     *              header command   length    type    data
+     *                      0x10              0x01
+     *                      16                   1
      *
+     *        data字段构成
+     *      Sensor index，     4 byte （float）目标温度， 2 byte （word）
+     * 		 1 ---LID           LSB在前，MSB在后，         MSB 在前， LSB在后， 单位 S
+     * 		 2 --  peltier                               如果0，无限执行，直到收到off命令
      * @param temperature
      * @param during
      */
     public void step2(float temperature, short during) {
+        int length=8;
+        int header=170;
+        int command=16;
+        int type=1;
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) header);
+        bytes.add((byte) command);
+        bytes.add((byte) length);
+        bytes.add((byte) type);
+        //sensor index
+        bytes.add((byte)2);
+        byte[] tempBytes = ByteBufferUtil.getBytes(temperature,ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < tempBytes.length; i++) {
+            bytes.add(tempBytes[i]);
+        }
+        byte[] duringBytes = ByteBufferUtil.getBytes(during,ByteOrder.BIG_ENDIAN);
+        for (int i = 0; i < duringBytes.length; i++) {
+            bytes.add(duringBytes[i]);
+        }
 
+
+        addCommonBytes(bytes);
+
+
+        byte[] cmd = listToByteArray(bytes);
+        addCommand(cmd);
+    }
+
+    private void addCommonBytes(List<Byte> bytes) {
+        byte checksum=0;
+        for (int i=1;i<bytes.size();i++){
+            checksum+=bytes.get(i);
+        }
+
+
+        if(checksum == (byte) 0x17)
+            checksum = 0x18;
+
+        bytes.add(checksum);
+        bytes.add((byte)0x17);
+        bytes.add((byte)0x17);
     }
 
 
     /**
      * 循环参数设置
-     * command  type
-     * *      0x13      0x3
-     * *       19        3
+     *        command  length    type
+     * *      0x13               0x3
+     * *       19                 3
      *
      * @param cyclingCount 循环数
      * @param cur_cycling  当前第x循环
@@ -78,29 +150,32 @@ public class PcrCommand {
      * @param steps        此步骤阶段数
      * @param combineList  每个阶段的温度和持续时间
      */
-    public void step3(int cyclingCount, int cur_cycling, int picStep, int steps, List<TempDuringCombine> combineList) {
-        int length = 3+combineList.size()*(4+2);
+    public void step3(int picStep, int steps, List<TempDuringCombine> combineList) {
+        int length = combineList.size()*(4+2)+2+1;
         int picAndSteps = picStep << 4 | steps;//[7-4]为拍照阶段，[3:0]为区间内阶段数
         //  byte [] cmd=new byte[]{19,length,3,cyclingCount,cur_cycling,picAndSteps};
         List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) 0xaa);
         bytes.add((byte) 19);
         bytes.add((byte) length);
         bytes.add((byte) 3);
-        bytes.add((byte) cyclingCount);
-        bytes.add((byte) cur_cycling);
-        bytes.add((byte) picAndSteps);
+
+        bytes.add((byte) 0);//固定为0
+        bytes.add((byte) 1);//固定为1
+        bytes.add((byte) steps);
 
 
         for (TempDuringCombine combine : combineList) {
-            byte[] tempBytes = ByteBufferUtil.getBytes(combine.getTemp());
+            byte[] tempBytes = ByteBufferUtil.getBytes(combine.getTemp(),ByteOrder.LITTLE_ENDIAN);
             for (int i = 0; i < tempBytes.length; i++) {
                 bytes.add(tempBytes[i]);
             }
-            byte[] duringBytes = ByteBufferUtil.getBytes(combine.getDuring());
+            byte[] duringBytes = ByteBufferUtil.getBytes(combine.getDuring(),ByteOrder.BIG_ENDIAN);
             for (int i = 0; i < duringBytes.length; i++) {
                 bytes.add(duringBytes[i]);
             }
         }
+        addCommonBytes(bytes);
         byte[] cmd = listToByteArray(bytes);
         addCommand(cmd);
 
@@ -126,9 +201,10 @@ public class PcrCommand {
      */
     public void step4(Control control, int cyclingCount, CmdMode cmdMode, TempDuringCombine predenaturationCombine,
                       TempDuringCombine extendCombine) {
-        int length=3+(4+2)*2;
+        int length=3+(4+2)*2+1;
         int cfg = cmdMode.getValue() << 4;//initial_mode值为0，所以不用设置
         List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte)0xaa);
         bytes.add((byte)19);
         bytes.add((byte)length);
         bytes.add((byte)4);
@@ -138,24 +214,24 @@ public class PcrCommand {
         bytes.add((byte)cfg);
 
         //设置预变性目标温度时间
-        byte[] tempBytes = ByteBufferUtil.getBytes(predenaturationCombine.getTemp());
+        byte[] tempBytes = ByteBufferUtil.getBytes(predenaturationCombine.getTemp(),ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < tempBytes.length; i++) {
             bytes.add(tempBytes[i]);
         }
-        byte[] duringBytes = ByteBufferUtil.getBytes(predenaturationCombine.getDuring());
+        byte[] duringBytes = ByteBufferUtil.getBytes(predenaturationCombine.getDuring(),ByteOrder.BIG_ENDIAN);
         for (int i = 0; i < duringBytes.length; i++) {
             bytes.add(duringBytes[i]);
         }
         //设置延伸目标温度时间
-        byte[] exTempBytes = ByteBufferUtil.getBytes(extendCombine.getTemp());
+        byte[] exTempBytes = ByteBufferUtil.getBytes(extendCombine.getTemp(),ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < exTempBytes.length; i++) {
             bytes.add(exTempBytes[i]);
         }
-        byte[] exDuringBytes = ByteBufferUtil.getBytes(extendCombine.getDuring());
+        byte[] exDuringBytes = ByteBufferUtil.getBytes(extendCombine.getDuring(),ByteOrder.BIG_ENDIAN);
         for (int i = 0; i < exDuringBytes.length; i++) {
             bytes.add(exDuringBytes[i]);
         }
-
+        addCommonBytes(bytes);
         byte[] cmd = listToByteArray(bytes);
         addCommand(cmd);
     }
@@ -163,18 +239,26 @@ public class PcrCommand {
 
     /**
      * 查询图像板是否准备好
-     *          command   length    type   data
-     *          0x15       0x2      0x01    0x00
-     *          21          2         1      0
+     *  header    command   length    type   data
+     *   0xaa       0x15       0x2      0x01    0x00
+     *              21          2         1      0
      */
     public void step5(){
-        int length=0;
-        byte []cmd=new byte[]{21,(byte) length,1,0};
+        int length=2;
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) 0xaa);
+        bytes.add((byte) 21);
+        bytes.add((byte) length);
+        bytes.add((byte) 1);
+        bytes.add((byte) 0);//data not care
+
+        addCommonBytes(bytes);
+        byte[] cmd = listToByteArray(bytes);
         addCommand(cmd);
     }
 
     /**
-     * 获取图像板数据
+     * 获取图像板数据  ，图像默认格式是 12*12
      *        command  length  type  data
      *         0x2             0x8    0xff
      *                         0x18
@@ -182,9 +266,15 @@ public class PcrCommand {
      *                         0x38
      */
     public void step6(PCR_IMAGE pcr_image){
-        int length=1;
-        byte[] cmd=new byte[]{2,(byte)length,pcr_image.getValue(),(byte)255};
-        addCommand(cmd);
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) 0xaa);
+        bytes.add((byte) 0x2);
+        bytes.add((byte) 1);
+        bytes.add(pcr_image.getValue());
+        bytes.add((byte)0x0);
+        addCommonBytes(bytes);
+
+        addCommand(listToByteArray(bytes));
     }
 
     /**
@@ -304,25 +394,43 @@ public class PcrCommand {
     }
 
     /**
+     * 24*24格式
      *  0x08    8
      *  0x18    24
      *  0x28    40
      *  0x38    56
+     *
+     *  12*12格式
+     *        0x2    2
+     *        0x12   18
+     *        0x22    34
+     *        0x32    50
      */
     public static enum PCR_IMAGE{
-        PCR4(56,null),PCR3(40,PCR4),PCR2(24,PCR3), PCR1(8,PCR2);
+        PCR_24_CHANNEL_3(56),PCR_24_CHANNEL_2(40),PCR_24_CHANNEL_1(24) ,PCR_24_CHANNEL_0(8),
+        PCR_12_CHANNEL_3(50), PCR_12_CHANNEL_2(34), PCR_12_CHANNEL_1(18),  PCR_12_CHANNEL_0(2);
         private int value;
-        private PCR_IMAGE next;
-        PCR_IMAGE(int value,PCR_IMAGE next) {
+
+        PCR_IMAGE(int value) {
             this.value = value;
         }
 
-        public PCR_IMAGE getNext() {
-            return next;
-        }
 
         public byte getValue() {
             return (byte) value;
+        }
+    }
+
+
+    public static enum IMAGE_MODE{
+        IMAGE_12(12),IMAGE_24(24);
+        private int size;
+        IMAGE_MODE(int size){
+            this.size=size;
+        }
+
+        public int getSize() {
+            return size;
         }
     }
 }

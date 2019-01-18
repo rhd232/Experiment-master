@@ -1,14 +1,10 @@
 package com.jz.experiment.module.expe.activity;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -31,8 +27,12 @@ import com.jz.experiment.module.bluetooth.Data;
 import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
+import com.jz.experiment.module.expe.bean.ChannelImageStatus;
 import com.jz.experiment.module.expe.bean.Tab;
+import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.ByteHelper;
+import com.jz.experiment.util.DeviceProxyHelper;
+import com.jz.experiment.util.StatusChecker;
 import com.jz.experiment.widget.ChartMarkerView;
 import com.jz.experiment.widget.DuringView;
 import com.wind.base.BaseActivity;
@@ -41,6 +41,7 @@ import com.wind.base.bean.EndStage;
 import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
+import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.expe.bean.ChartData;
 import com.wind.data.expe.bean.ColorfulEntry;
@@ -88,9 +89,14 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     private List<Integer> mLineColors;
     private HistoryExperiment mHistoryExperiment;
     BluetoothReceiver mBluetoothReceiver;
-
+    BluetoothService mBluetoothService;
     @BindView(R.id.tv_received_msg)
     TextView tv_received_msg;
+    /**
+     * 当前图像格式
+     */
+    private PcrCommand.IMAGE_MODE mImageMode;
+
     @Override
     protected void setTitle() {
         mTitleBar.setTitle("运行");
@@ -103,6 +109,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         setContentView(R.layout.activity_expe_running);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
+        mImageMode = PcrCommand.IMAGE_MODE.IMAGE_12;
         mHistoryExperiment = Navigator.getParcelableExtra(this);
 
         tv_cur_mode.setText("当前模式：变温扩增");
@@ -120,8 +127,22 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     }
 
     private void bindService() {
-        Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
-        getActivity().bindService(serviceIntent, mBluetoothServiceConnection, BIND_AUTO_CREATE);
+      /*  Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
+        getActivity().bindService(serviceIntent, mBluetoothServiceConnection, BIND_AUTO_CREATE);*/
+        mBluetoothService = DeviceProxyHelper.getInstance(getActivity()).getBluetoothService();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!ActivityUtil.isFinish(getActivity())) {
+                    //TODO 给设备发指令 step1-
+                    PcrCommand cmd = new PcrCommand();
+                    int[] channelOp = {1, 1, 1, 1};//
+                    cmd.step1(channelOp);
+                    mBluetoothService.write(cmd);
+                }
+            }
+        }, 500);
+
 
         mBluetoothReceiver = new BluetoothReceiver();
         mBluetoothReceiver.setBluetoothConnectInteface(this);
@@ -135,8 +156,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         return intentFilter;
     }
 
-    BluetoothService mBluetoothService;
-    private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
+
+  /*  private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
@@ -154,7 +175,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         public void onServiceDisconnected(ComponentName name) {
             mBluetoothService = null;
         }
-    };
+    };*/
 
     private void initChart() {
         mDataSets = new ArrayList<>();
@@ -377,6 +398,19 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     public void onReceivedData(Data data) {
         //接收到数据 TODO 根据command和type执行操作
         byte[] reveicedBytes = data.getBuffer();
+        int statusIndex = 1;
+        int status = hexToDecimal(reveicedBytes[statusIndex]);
+        boolean succ = StatusChecker.checkStatus(status);
+        if (!succ) {
+            AppDialogHelper.showSingleBtnDialog(getActivity(), StatusChecker.getStatusDesc(status), new AppDialogHelper.DialogOperCallback() {
+                @Override
+                public void onDialogConfirmClick() {
+
+                }
+            });
+            return;
+        }
+
         int cmdIndex = 2;
         int cmd = hexToDecimal(reveicedBytes[cmdIndex]);
 
@@ -402,6 +436,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
     }
 
+
     /**
      * 十六进制转十进制
      *
@@ -409,7 +444,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
      * @return
      */
     private int hexToDecimal(int value) {
-        return Integer.parseInt(value + "", 16);
+        return value;//Integer.parseInt(value + "", 16);
 
     }
 
@@ -422,7 +457,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
         byte[] reveicedBytes = data.getBuffer();
         try {
-            String msg=new String(reveicedBytes,"ISO-8859-1");
+            String msg = new String(reveicedBytes, "ISO-8859-1");
             tv_received_msg.append(msg);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -486,7 +521,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
 
 
-        command.step3(cyclingCount, mCurCycling, picIndex, cyclingStage.getPartStageList().size(), combines);
+        //command.step3(cyclingCount, mCurCycling, picIndex, cyclingStage.getPartStageList().size(), combines);
+        command.step3(picIndex, cyclingStage.getPartStageList().size(), combines);
         mBluetoothService.write(command);
     }
 
@@ -571,36 +607,70 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
     }
 
+    private List<ChannelImageStatus> mChannelStatusList;
+
     private void doReceiveStep5(Data data) {
+        mChannelStatusList = new ArrayList<>();
         int typeIndex = 4;
         int dataIndex = 5;
         byte[] reveicedBytes = data.getBuffer();
         int type = hexToDecimal(reveicedBytes[typeIndex]);
         if (type == PcrCommand.STEP_5_TYPE) {
             int status = hexToDecimal(reveicedBytes[dataIndex]);
-            if (status > 0) {
-                mNextPcrImage = PcrCommand.PCR_IMAGE.PCR1;
-                //图像板已经准备好数据
-                readPcrData();
-            } else {
+            int channel0 = status & 0x1;
+            int channel1 = status >> 1 & 0x1;
+            int channel2 = status >> 2 & 0x1;
+            int channel3 = status >> 3 & 0x1;
+            ChannelImageStatus channel0ImageStatus = new ChannelImageStatus(0, mImageMode.getSize());
+            channel0ImageStatus.setReadable(channel0 == 1);
+            mChannelStatusList.add(channel0ImageStatus);
+
+            ChannelImageStatus channel1ImageStatus = new ChannelImageStatus(1, mImageMode.getSize());
+            channel1ImageStatus.setReadable(channel1 == 1);
+            mChannelStatusList.add(channel1ImageStatus);
+
+            ChannelImageStatus channel2ImageStatus = new ChannelImageStatus(2, mImageMode.getSize());
+            channel2ImageStatus.setReadable(channel2 == 1);
+            mChannelStatusList.add(channel2ImageStatus);
+
+            ChannelImageStatus channel3ImageStatus = new ChannelImageStatus(3, mImageMode.getSize());
+            channel3ImageStatus.setReadable(channel3 == 1);
+            mChannelStatusList.add(channel3ImageStatus);
+            int readableIndex = -1;
+            for (int i = 0; i < mChannelStatusList.size(); i++) {
+                if (mChannelStatusList.get(i).isReadable()) {
+                    readableIndex = i;
+                    break;
+                }
+            }
+            if (readableIndex==-1){
                 //图像板还未准备好,继续询问
                 delayAskTriggerStatus();
-
+            }else {
+                //读取通道图像数据
+                readPcrImageData(mChannelStatusList.get(readableIndex).getPctImageCmd());
             }
 
         }
     }
 
-    private PcrCommand.PCR_IMAGE mNextPcrImage;
+    //  private PcrCommand.PCR_IMAGE mNextPcrImage;
+
+    private void readPcrImageData(PcrCommand.PCR_IMAGE pcr_image) {
+        PcrCommand command = new PcrCommand();
+        command.step6(pcr_image);
+        mBluetoothService.write(command);
+    }
 
     /**
      * 读取PCR数据
+     * <p>
+     * private void readPcrData() {
+     * PcrCommand command = new PcrCommand();
+     * command.step6(mNextPcrImage);
+     * mBluetoothService.write(command);
+     * }
      */
-    private void readPcrData() {
-        PcrCommand command = new PcrCommand();
-        command.step6(mNextPcrImage);
-        mBluetoothService.write(command);
-    }
 
     private void doReceiveStep6(Data data) {
         /*
@@ -611,22 +681,75 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
          *       上位机通过polling下位机温度循环状态，可判断下位机是在温度循环中还是溶解曲线中，据此判断图像数据报中是否包含温度信息。
          */
 
-        if (mInCycling) {
-            //处于温度循环状态
-        } else {
-             //处于溶解曲线中
+        int lengthIndex = 3;
+        int typeIndex = 4;
+        int dataStartIndex = 5;
+
+        byte[] reveicedBytes = data.getBuffer();
+        int type = hexToDecimal(reveicedBytes[typeIndex]);
+        int length = hexToDecimal(reveicedBytes[lengthIndex]);
+        int total =reveicedBytes[dataStartIndex++];
+        int curRowIndex =reveicedBytes[dataStartIndex++];//从0开始
+        byte pixs[]=new byte[mImageMode.getSize()*2];//每个图像像素有2个字节组成
+        for (int i=0;i<mImageMode.getSize()*2;i++){
+            pixs[i]=reveicedBytes[dataStartIndex++];
         }
-        if (mNextPcrImage != PcrCommand.PCR_IMAGE.PCR4) {
+
+        if (mInCycling) {
+            boolean readed=false;//本通道数据是否已经读完
+            //处于温度循环状态
+            if (type==PcrCommand.PCR_IMAGE.PCR_12_CHANNEL_0.getValue()){
+                //通道1图像数据返回
+                mChannelStatusList.get(0).setCurReadRow((curRowIndex+1));//
+                readed=mChannelStatusList.get(0).readed();
+            }else if (type==PcrCommand.PCR_IMAGE.PCR_12_CHANNEL_1.getValue()){
+                //通道2图像数据返回
+                mChannelStatusList.get(1).setCurReadRow((curRowIndex+1));//
+                readed=mChannelStatusList.get(1).readed();
+            }else if (type==PcrCommand.PCR_IMAGE.PCR_12_CHANNEL_2.getValue()){
+                //通道3图像数据返回
+                mChannelStatusList.get(2).setCurReadRow((curRowIndex+1));//
+                readed=mChannelStatusList.get(2).readed();
+            }else if (type==PcrCommand.PCR_IMAGE.PCR_12_CHANNEL_3.getValue()){
+                //通道4图像数据返回
+                mChannelStatusList.get(3).setCurReadRow((curRowIndex+1));//
+                readed=mChannelStatusList.get(3).readed();
+            }
+            //检查本通道是否已经读取完毕
+            if(readed){
+                //执行下一个通道的读取操作
+                int next=-1;
+                for (int i=0;i<mChannelStatusList.size();i++){
+                    ChannelImageStatus status=mChannelStatusList.get(i);
+                    if (status.isReadable()&& !status.readed()){
+                        next=i;
+                        break;
+                    }
+                }
+                if (next==-1){//全部通道已经全部读取完
+                    /*
+                     * 一个循环图像及数据显示处理完毕,询问是否继续polling图像板
+                     */
+                    askIfContinuePolling();
+                }else {
+                    readPcrImageData(mChannelStatusList.get(next).getPctImageCmd());
+                }
+            }
+        } else {
+            //处于溶解曲线中
+        }
+
+        /*if (mNextPcrImage != PcrCommand.PCR_IMAGE.PCR4) {
             //继续获取图像数据
             mNextPcrImage = mNextPcrImage.getNext();
             readPcrData();
         } else {
-            /*
+            *//*
              * 一个循环图像及数据显示处理完毕,询问是否继续polling图像板
-             */
+             *//*
             askIfContinuePolling();
 
-        }
+        }*/
     }
 
     /*
@@ -679,11 +802,11 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                  */
 
                 CyclingStage cyclingStage = (CyclingStage) getCyclingSteps().get(mCyclingStageIndex);
-                boolean curCyclingOn = cyclingStage.getCyclingCount() > mCurCycling;
+              /*  boolean curCyclingOn = cyclingStage.getCyclingCount() > mCurCycling;
                 if (curCyclingOn) {
                     mCurCycling++;
                     step3();
-                } else {
+                } else {*/
                     mCyclingStageIndex++;
                     CyclingStage nextCyclingStage = (CyclingStage) getCyclingSteps().get(mCyclingStageIndex);
                     if (nextCyclingStage != null) {
@@ -706,7 +829,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                         }
 
                     }
-                }
+               // }
 
             } else if (hasNewParam == 1) {
                 //有新参数在等待当前循环结束

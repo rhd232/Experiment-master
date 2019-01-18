@@ -1,6 +1,7 @@
 package com.jz.experiment.util;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class ByteBufferUtil {
 
@@ -11,12 +12,21 @@ public class ByteBufferUtil {
     }
     public static byte[] getBytes(short data)
     {
-        return ByteBuffer.allocate(4).putShort(data).array();
+        return getBytes(data,ByteOrder.nativeOrder());
+
+    }
+    public static byte[] getBytes(short data,ByteOrder order)
+    {
+        return ByteBuffer.allocate(4).order(order).putShort(data).array();
 
     }
 
     public static byte[] getBytes(float data)
     {
-        return ByteBuffer.allocate(4).putFloat(data).array();
+        return getBytes(data,ByteOrder.nativeOrder());
+    }
+    public static byte[] getBytes(float data,ByteOrder order)
+    {
+        return ByteBuffer.allocate(4).order(order).putFloat(data).array();
     }
 }
