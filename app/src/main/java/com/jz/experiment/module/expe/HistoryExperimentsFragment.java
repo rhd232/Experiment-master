@@ -26,7 +26,6 @@ import com.wind.data.expe.bean.AddExperiment;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.datastore.ExpeDataStore;
 import com.wind.data.expe.response.FindExpeResponse;
-import com.wind.toastlib.ToastUtil;
 import com.wind.view.DisplayUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -177,12 +176,12 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Subscribe
     public void onToExpeSettingsEvent(ToExpeSettingsEvent event){
         //判断是否已经连接设备
-        if (sDeviceProxyHelper.isConnected()){
+       /* if (sDeviceProxyHelper.isConnected()){
             UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
         }else {
             ToastUtil.showToast(getActivity(),"请先连接设备");
-        }
-
+        }*/
+        UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
     }
 
     @Override

@@ -239,6 +239,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
             case R.id.tv_next:
                 if (validate()) {
                     buildExperiment();
+                   //ExpeRunningActivityBackup.start(getActivity(), mHistoryExperiment);
                     ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
 
                 }

@@ -28,6 +28,7 @@ public class DuringView extends TextView {
     }
 
     Subscription mSubscription;
+    private long mDuring;
     public void start() {
         setText("00:00:00");
         mSubscription=Observable
@@ -38,7 +39,7 @@ public class DuringView extends TextView {
                     @Override
                     public void call(Long aLong) {
                         // String time = DateUtil.get(aLong * 1000, "HH:mm:ss");
-
+                        mDuring=aLong;
                         String hh = new DecimalFormat("00").format(aLong / 3600);
                         String mm = new DecimalFormat("00").format(aLong % 3600 / 60);
                         String ss = new DecimalFormat("00").format(aLong % 60);
@@ -52,5 +53,13 @@ public class DuringView extends TextView {
         if (mSubscription!=null&&  !mSubscription.isUnsubscribed()){
             mSubscription.unsubscribe();
         }
+    }
+
+    /**
+     * 单位为秒
+     * @return
+     */
+    public long getDuring(){
+        return mDuring;
     }
 }

@@ -107,7 +107,25 @@ public class FilterActivity extends BaseActivity {
                 List<StringSelectable> selectedChannelList=mChannelAdapter.getSelectedList();
                 List<StringSelectable> selectedSampleAList=mSampleAAdapter.getSelectedList();
                 List<StringSelectable> selectedSampleBList=mSampleBAdapter.getSelectedList();
-
+                List<String> ChanList = new ArrayList<>();
+                for (StringSelectable selectable:selectedChannelList){
+                    switch (selectable.getVal()){
+                        case "通道1":
+                            ChanList.add("Chip#1");
+                            break;
+                        case "通道2":
+                            ChanList.add("Chip#2");
+                            break;
+                        case "通道3":
+                            ChanList.add("Chip#3");
+                            break;
+                        case "通道4":
+                            ChanList.add("Chip#4");
+                            break;
+                    }
+                }
+                List<String> KSList = new ArrayList<String>();
+                //EventBus.getDefault().post();
                 break;
         }
     }

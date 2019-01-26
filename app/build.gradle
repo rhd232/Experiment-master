@@ -12,9 +12,12 @@ android {
         multiDexEnabled true
         externalNativeBuild {
             cmake {
-                cppFlags ""
+                arguments '-DANDROID_PLATFORM=android-19',
+                        '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_shared', '-DCMAKE_BUILD_TYPE=Release ..'
+                cppFlags "-std=c++11 -O3"
             }
         }
+
     }
     buildTypes {
         debug {
@@ -22,7 +25,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

@@ -20,17 +20,17 @@ public class PcrCommand {
 
     public static final int STEP_4_TYPE=4;
 
-    public static final int STEP_5_CMD=21;
-    public static final int STEP_5_TYPE=1;
+    public static final int STEP_6_CMD=21;
+    public static final int STEP_6_TYPE=1;
 
-    public static final int STEP_6_CMD=2;
-    public static final int STEP_6_TYPE1=8;
-    public static final int STEP_6_TYPE2=24;
-    public static final int STEP_6_TYPE3=40;
-    public static final int STEP_6_TYPE4=56;
+    public static final int STEP_7_CMD=2;
+    public static final int STEP_7_TYPE1=2;
+    public static final int STEP_7_TYPE2=18;
+    public static final int STEP_7_TYPE3=34;
+    public static final int STEP_7_TYPE4=50;
 
-    public static final int STEP_7_CMD=20;
-    public static final int STEP_7_TYPE=21;
+    public static final int STEP_5_CMD=20;
+    public static final int STEP_5_TYPE=21;
 
     public void reset() {
         commandList.clear();
@@ -40,6 +40,14 @@ public class PcrCommand {
         return commandList;
     }
 
+  /*  public void step0(){
+        int header=0xaa;
+        int command=0x1;
+        int length=0x2;
+        int type=0x26;
+
+
+    }*/
     /**
      * Length: 	          包含type以及有效数据data部分的长度
      *
@@ -52,29 +60,21 @@ public class PcrCommand {
      */
     public void step1(int[] channelOp) {
 
-        int header=170;
-        int command=1;
-        int length=2;
-        int type=36;
+        int header=0xaa;
+        int command=0x1;
+        int length=0x2;
+        int type=0x24;
         //channel 0 在最右边
         int channel=channelOp[0] | (channelOp[1] << 1) | (channelOp[2] << 2) | (channelOp[3] << 3);
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) header);
+        bytes.add((byte) command);
+        bytes.add((byte) length);
+        bytes.add((byte) type);
+        bytes.add((byte)channel);
 
-        byte[] cmd = new byte[8];
-        cmd[0]= (byte)header;
-        cmd[1]= (byte)command;
-        cmd[2]= (byte)length;
-        cmd[3]= (byte)type;
-
-        cmd[4]= (byte)channel;
-
-        cmd[5]=(byte)0;
-        for(int i=1; i<5; i++)
-            cmd[5] += cmd[i];//求校验和
-        if(cmd[5] == (byte) 0x17)
-            cmd[5] = 0x18;
-        cmd[6] = 0x17;
-        cmd[7] = 0x17;
-
+        addCommonBytes(bytes);
+        byte[] cmd = listToByteArray(bytes);
         addCommand(cmd);
     }
 
@@ -104,7 +104,7 @@ public class PcrCommand {
         bytes.add((byte) length);
         bytes.add((byte) type);
         //sensor index
-        bytes.add((byte)2);
+        bytes.add((byte)1);
         byte[] tempBytes = ByteBufferUtil.getBytes(temperature,ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < tempBytes.length; i++) {
             bytes.add(tempBytes[i]);
@@ -144,8 +144,6 @@ public class PcrCommand {
      * *      0x13               0x3
      * *       19                 3
      *
-     * @param cyclingCount 循环数
-     * @param cur_cycling  当前第x循环
      * @param picStep      拍照阶段
      * @param steps        此步骤阶段数
      * @param combineList  每个阶段的温度和持续时间
@@ -162,7 +160,7 @@ public class PcrCommand {
 
         bytes.add((byte) 0);//固定为0
         bytes.add((byte) 1);//固定为1
-        bytes.add((byte) steps);
+        bytes.add((byte) picAndSteps);//总阶段
 
 
         for (TempDuringCombine combine : combineList) {
@@ -238,12 +236,13 @@ public class PcrCommand {
 
 
     /**
+     * 查询有无中断
      * 查询图像板是否准备好
      *  header    command   length    type   data
      *   0xaa       0x15       0x2      0x01    0x00
      *              21          2         1      0
      */
-    public void step5(){
+    public void step6(){
         int length=2;
         List<Byte> bytes = new ArrayList<>();
         bytes.add((byte) 0xaa);
@@ -265,11 +264,11 @@ public class PcrCommand {
      *                         0x28
      *                         0x38
      */
-    public void step6(PCR_IMAGE pcr_image){
+    public void step7(PCR_IMAGE pcr_image){
         List<Byte> bytes = new ArrayList<>();
         bytes.add((byte) 0xaa);
         bytes.add((byte) 0x2);
-        bytes.add((byte) 1);
+        bytes.add((byte) 2);
         bytes.add(pcr_image.getValue());
         bytes.add((byte)0x0);
         addCommonBytes(bytes);
@@ -278,15 +277,23 @@ public class PcrCommand {
     }
 
     /**
+     * 查询循环状态
      * 询问是否继续polling图像板
      *       command  length  type  data
      *        0x14             0x15
      *        20                21
      */
-    public void step7(){
-        int length=0;
-        byte[] cmd=new byte[]{20,(byte) length,21,0};
-        addCommand(cmd);
+    public void step5(){
+        int length=2;
+        //byte[] cmd=new byte[]{20,(byte) length,21,0};
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) 0xaa);
+        bytes.add((byte) 20);
+        bytes.add((byte) length);
+        bytes.add((byte) 21);
+        bytes.add((byte) 0);
+        addCommonBytes(bytes);
+        addCommand(listToByteArray(bytes));
     }
 
     /**
@@ -302,6 +309,7 @@ public class PcrCommand {
     public void meltingCurve(Control control,float startTemp,float endTemp,float speed){
         List<Byte> bytes = new ArrayList<>();
         int length=4+4+4;
+        bytes.add((byte)0xaa);
         bytes.add((byte)19);
         bytes.add((byte)length);
         bytes.add((byte)11);

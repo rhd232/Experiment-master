@@ -335,6 +335,7 @@ public class BluetoothService extends Service {
             try {
                 mmOutStream.write(bytes);
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 

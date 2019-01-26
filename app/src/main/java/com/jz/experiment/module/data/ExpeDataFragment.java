@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -25,6 +26,7 @@ import com.jz.experiment.module.data.adapter.ChannelDataAdapter;
 import com.jz.experiment.util.AppDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.utils.AppUtil;
+import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.ChannelData;
 import com.wind.data.expe.bean.ChartData;
 import com.wind.data.expe.bean.ExperimentStatus;
@@ -37,6 +39,7 @@ import com.yanzhenjie.permission.AndPermission;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +60,15 @@ public class ExpeDataFragment extends BaseFragment {
     @BindView(R.id.tv_melt)
     TextView tv_melt;
 
+    @BindView(R.id.tv_expe_name)
+    TextView tv_expe_name;
+    @BindView(R.id.tv_worker_name)
+    TextView tv_worker_name;
+    @BindView(R.id.tv_finish_time)
+    TextView tv_finish_time;
+    @BindView(R.id.tv_elapsed_time)
+    TextView tv_elapsed_time;
+
     @BindView(R.id.gv_a)
     GridView gv_a;
 
@@ -65,6 +77,9 @@ public class ExpeDataFragment extends BaseFragment {
 
     @BindView(R.id.chart)
     LineChart chart;
+
+    @BindView(R.id.sv)
+    ScrollView sv;
 
     LineData mLineData;
     ArrayList<ILineDataSet> mDataSets;
@@ -81,6 +96,9 @@ public class ExpeDataFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
+
+        inflateBase();
+
         inflateChart();
         tv_dt.setActivated(true);
         tv_melt.setActivated(false);
@@ -89,6 +107,19 @@ public class ExpeDataFragment extends BaseFragment {
         gvs[1] = gv_b;
         String[] titles = {"A", "B"};
         buildChannelData(gvs, titles);
+    }
+
+    private void inflateBase() {
+        tv_expe_name.setText(mExeperiment.getName());
+        tv_worker_name.setText("admin");
+        String finishTime=DateUtil.getDateTime(mExeperiment.getFinishMilliTime());
+        tv_finish_time.setText(finishTime);
+        long during=mExeperiment.getDuring();
+        String hh = new DecimalFormat("00").format(during / 3600);
+        String mm = new DecimalFormat("00").format(during % 3600 / 60);
+        String ss = new DecimalFormat("00").format(during % 60);
+        String duringTime = new String(hh + ":" + mm + ":" + ss);
+        tv_elapsed_time.setText(duringTime);
     }
 
     private void inflateChart() {
@@ -262,19 +293,25 @@ public class ExpeDataFragment extends BaseFragment {
             public void call(Subscriber<? super Boolean> subscriber) {
                 PdfDocument document = new PdfDocument();
                 int width = AppUtil.getScreenWidth(getActivity());
-                int height = AppUtil.getScreenHeight(getActivity());
+                int height =0;// AppUtil.getScreenHeight(getActivity());
+                //计算scrollview的高度
+                for (int i = 0; i < sv.getChildCount(); i++) {
+                    height += sv.getChildAt(i).getHeight();
+                }
+
                 PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo
-                        .Builder(width, height, 1)
+                        .Builder(width,height, 1)
                         .create();
 
                 PdfDocument.Page page = document.startPage(pageInfo);
                 Canvas canvas = page.getCanvas();
-                chart.draw(canvas);
+                sv.draw(canvas);
+              /*  chart.draw(canvas);
                 canvas.translate(0, chart.getHeight());
 
                 gv_a.draw(canvas);
                 canvas.translate(0, gv_a.getHeight());
-                gv_b.draw(page.getCanvas());
+                gv_b.draw(page.getCanvas());*/
 
                 document.finishPage(page);
                 String pdfName = System.currentTimeMillis() + ".pdf";
