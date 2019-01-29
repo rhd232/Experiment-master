@@ -1,6 +1,5 @@
 package com.jz.experiment.chart;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CurveReader {
@@ -12,11 +11,11 @@ public class CurveReader {
     public static CurveReader getInstance(){
         return INSTANCE;
     }
-    public void readCurve(){
+    public void readCurve(List<String> tdlist,List<String> kslist){
         double[][][]  m_yData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
         CCurveShow cCurveShow = new CCurveShow();
         cCurveShow.InitData();
-        List<String> kslist = new ArrayList<>();//定义孔数
+       /* List<String> kslist = new ArrayList<>();//定义孔数
         kslist.add("A1");
         kslist.add("A2");
         kslist.add("A3");
@@ -24,9 +23,9 @@ public class CurveReader {
         kslist.add("B1");
         kslist.add("B2");
         kslist.add("B3");
-        kslist.add("B4");
+        kslist.add("B4");*/
 
-        List<String> tdlist = new ArrayList<>();//定义通道
+      /*  List<String> tdlist = new ArrayList<>();//定义通道
         if (CommData.cboChan1 == 1)
         {
             tdlist.add("Chip#1");
@@ -42,7 +41,7 @@ public class CurveReader {
         if (CommData.cboChan4 == 1)
         {
             tdlist.add("Chip#4");
-        }
+        }*/
 
 
         int cyclenum = 0;
@@ -53,7 +52,7 @@ public class CurveReader {
                 List<ChartData> cdlist = CommData.GetChartData(tdlist.get(i), 0, kslist.get(n));//获取选点值
                 for (int k = 0; k < cdlist.size(); k++)
                 {
-                    m_yData[i][ n][ k] = cdlist.get(k).y / CommData.m_factorData[GetChan(tdlist.get(i))][k];
+                    m_yData[i][n][ k] = cdlist.get(k).y / CommData.m_factorData[GetChan(tdlist.get(i))][k];
                 }
             }
             if (CommData.diclist.size() > 0)

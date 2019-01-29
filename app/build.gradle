@@ -50,6 +50,7 @@ dependencies {
     implementation project (path: ':location')
     implementation project (path: ':wview')
     implementation project (path: ':toastlib')
+    implementation project (path: ':usbSerialForAndroid')
 
     implementation project(path:':aop-annotations')
     implementation project(path:':aop-runtime')

@@ -17,8 +17,12 @@ public class ByteBufferUtil {
     }
     public static byte[] getBytes(short data,ByteOrder order)
     {
-        return ByteBuffer.allocate(4).order(order).putShort(data).array();
+        byte []tempBytes= ByteBuffer.allocate(4).order(order).putShort(data).array();//长度为4
 
+        byte [] shortByte=new byte[2];
+        shortByte[0]=tempBytes[0];
+        shortByte[1]=tempBytes[1];
+        return shortByte;
     }
 
     public static byte[] getBytes(float data)

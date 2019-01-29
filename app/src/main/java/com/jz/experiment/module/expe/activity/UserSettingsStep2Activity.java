@@ -211,6 +211,10 @@ public class UserSettingsStep2Activity extends BaseActivity {
             secondInfo = new ExpeSettingSecondInfo();
             mHistoryExperiment.setSettingSecondInfo(secondInfo);
         }
+        String startT=tv_start_temp.getText().toString().trim();
+        String endT=tv_end_temp.getText().toString().trim();
+        secondInfo.setStartTemperature(startT);
+        secondInfo.setEndTemperature(endT);
         secondInfo.setModes(mModes);
         List<Stage> stageList = new ArrayList<>();
         for (int i = 0; i < mStageAdapter.getItemCount(); i++) {
@@ -230,6 +234,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
                 WheelPickerFactory.showWheelNumberAAPicker(tv_start_temp, new WheelPickerFactory.OnWheelClickListener() {
                     @Override
                     public void onResult(View v, IWheelVo[] result, int[] indexs, String[] unit) {
+
                         tv_start_temp.setText(result[0].getLabel());
                         tv_end_temp.setText(result[1].getLabel());
                     }

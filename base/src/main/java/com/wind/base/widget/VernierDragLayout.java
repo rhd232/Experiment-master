@@ -5,6 +5,7 @@ import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.ViewDragHelper;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;
@@ -73,13 +74,19 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
             public void call(CharSequence charSequence) {
                   if (mLink!=null){
                       short during=10;
-                      try {
-                           during=Short.parseShort(charSequence.toString());
+                      String s=charSequence.toString();
+                      if (TextUtils.isEmpty(s)){
+                          mLink.setDuring(during);
+                      }else {
 
-                      }catch (Exception e){
-                          e.printStackTrace();
+                          try {
+                              during=Short.parseShort(s);
+                          }catch (Exception e){
+                              e.printStackTrace();
+                          }
+                          mLink.setDuring(during);
                       }
-                      mLink.setDuring(during);
+
                   }
             }
         });

@@ -1,5 +1,6 @@
 package com.jz.experiment.module.expe;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +27,10 @@ import com.wind.data.expe.bean.AddExperiment;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.datastore.ExpeDataStore;
 import com.wind.data.expe.response.FindExpeResponse;
+import com.wind.toastlib.ToastUtil;
 import com.wind.view.DisplayUtil;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -62,6 +66,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     TextView tv_device_state;
 
     private DeviceProxyHelper sDeviceProxyHelper;
+
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_hostory_experiments;
@@ -91,25 +96,24 @@ public class HistoryExperimentsFragment extends BaseFragment {
         rv.setAdapter(mAdapter);
         rv.addItemDecoration(new VerticalSpacesItemDecoration(DisplayUtil.dip2px(getActivity(), 8)));
         mExpeDataStore = new ExpeDataStore(ProviderModule.getInstance()
-                        .getBriteDb(getActivity()
+                .getBriteDb(getActivity()
                         .getApplicationContext()));
         loadData();
 
         //初始化blutoothservice
-        sDeviceProxyHelper=DeviceProxyHelper
+        sDeviceProxyHelper = DeviceProxyHelper
                 .getInstance(getActivity());
 
     }
 
 
-
     @Override
     public void onResume() {
         super.onResume();
-        if (sDeviceProxyHelper.isConnected()){
+        if (sDeviceProxyHelper.isConnected()) {
             tv_device_state.setText("设备已连接");
             tv_device_state.setActivated(true);
-        }else {
+        } else {
             tv_device_state.setText("设备未连接");
             tv_device_state.setActivated(false);
         }
@@ -117,13 +121,15 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
     /**
      * 设备连接断开
+     *
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onBluetoothDisConnectedEvent(BluetoothDisConnectedEvent event){
+    public void onBluetoothDisConnectedEvent(BluetoothDisConnectedEvent event) {
         tv_device_state.setText("设备未连接");
         tv_device_state.setActivated(false);
     }
+
     private void loadData() {
 
         mExpeDataStore
@@ -167,21 +173,35 @@ public class HistoryExperimentsFragment extends BaseFragment {
     }
 
 
-
-
     /**
      * 去实验设置页面
+     *
      * @param event
      */
     @Subscribe
-    public void onToExpeSettingsEvent(ToExpeSettingsEvent event){
+    public void onToExpeSettingsEvent(final ToExpeSettingsEvent event) {
         //判断是否已经连接设备
        /* if (sDeviceProxyHelper.isConnected()){
             UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
         }else {
             ToastUtil.showToast(getActivity(),"请先连接设备");
         }*/
-        UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
+        AndPermission.with(getActivity())
+                .runtime()
+                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .onGranted(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                    }
+                })
+                .onDenied(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                         ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
+                    }
+                }).start();
+
     }
 
     @Override

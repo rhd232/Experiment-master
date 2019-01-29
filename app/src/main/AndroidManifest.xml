@@ -3,7 +3,7 @@
     package="com.jz.experiment">
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-
+    <uses-feature android:name="android.hardware.usb.host" />
     <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -64,6 +64,7 @@
             ></activity>
         <service android:name=".module.bluetooth.ble.BluetoothLeService"></service>
         <service android:name=".module.bluetooth.BluetoothService"></service>
+        <service android:name=".module.bluetooth.UsbService"></service>
     </application>
 
 </manifest>

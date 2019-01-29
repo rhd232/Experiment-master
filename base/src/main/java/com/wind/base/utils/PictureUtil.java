@@ -98,7 +98,7 @@ public class PictureUtil {
         String imgName=System.currentTimeMillis()+"";
         //String imgName=getfilepath(filePath);
 
-        String sdPath= C.Value.TEMP_IMAGE_PATH;
+        String sdPath= C.Value.APP_FOLDER+"/img";
 
         File parent =new File(sdPath);
         if(!parent.exists()){  

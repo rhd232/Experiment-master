@@ -9,6 +9,10 @@ import java.util.List;
 public class PcrCommand {
     public static final String TAG = "PcrCommand";
     private ArrayList<Byte> commandList = new ArrayList<>();
+
+
+    public static final int STEP_MELTING_TYPE=0x0b;
+
     public static final int STEP_1_CMD=1;
     public static final int STEP_1_TYPE=36;
 
@@ -148,8 +152,40 @@ public class PcrCommand {
      * @param steps        此步骤阶段数
      * @param combineList  每个阶段的温度和持续时间
      */
-    public void step3(int picStep, int steps, List<TempDuringCombine> combineList) {
-        int length = combineList.size()*(4+2)+2+1;
+    public void step3(int rsvd,int picStep, int steps, List<TempDuringCombine> combineList) {
+      /*  int length = combineList.size()*(4+2+4)+3+1;
+        int picAndSteps = picStep << 4 | steps;//[7-4]为拍照阶段，[3:0]为区间内阶段数
+        //  byte [] cmd=new byte[]{19,length,3,cyclingCount,cur_cycling,picAndSteps};
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) 0xaa);
+        bytes.add((byte) 0x13);
+        bytes.add((byte) length);
+        bytes.add((byte) 0x09);
+
+        bytes.add((byte) 0);//固定为0
+        bytes.add((byte) 1);//固定为1
+        bytes.add((byte) picAndSteps);//总阶段
+
+
+        for (TempDuringCombine combine : combineList) {
+            byte[] tempBytes = ByteBufferUtil.getBytes(combine.getTemp(),ByteOrder.LITTLE_ENDIAN);
+            for (int i = 0; i < tempBytes.length; i++) {
+                bytes.add(tempBytes[i]);
+            }
+            byte[] duringBytes = ByteBufferUtil.getBytes(combine.getDuring(),ByteOrder.BIG_ENDIAN);
+            for (int i = 0; i < duringBytes.length; i++) {
+                bytes.add(duringBytes[i]);
+            }
+
+            byte[] slopBytes = ByteBufferUtil.getBytes(1f,ByteOrder.LITTLE_ENDIAN);
+            for (int i = 0; i < slopBytes.length; i++) {
+                bytes.add(slopBytes[i]);
+            }
+        }
+        addCommonBytes(bytes);
+        byte[] cmd = listToByteArray(bytes);
+        addCommand(cmd);*/
+        int length = combineList.size()*(4+2)+3+1;
         int picAndSteps = picStep << 4 | steps;//[7-4]为拍照阶段，[3:0]为区间内阶段数
         //  byte [] cmd=new byte[]{19,length,3,cyclingCount,cur_cycling,picAndSteps};
         List<Byte> bytes = new ArrayList<>();
@@ -158,9 +194,9 @@ public class PcrCommand {
         bytes.add((byte) length);
         bytes.add((byte) 3);
 
-        bytes.add((byte) 0);//固定为0
+        bytes.add((byte) rsvd);//固定为0
         bytes.add((byte) 1);//固定为1
-        bytes.add((byte) picAndSteps);//总阶段
+        bytes.add((byte) steps);//总阶段
 
 
         for (TempDuringCombine combine : combineList) {
@@ -308,30 +344,51 @@ public class PcrCommand {
      */
     public void meltingCurve(Control control,float startTemp,float endTemp,float speed){
         List<Byte> bytes = new ArrayList<>();
-        int length=4+4+4;
+        int length=4+4+4+1+1;
         bytes.add((byte)0xaa);
         bytes.add((byte)19);
         bytes.add((byte)length);
         bytes.add((byte)11);
 
+        //没有设置驻留阶段
         bytes.add((byte)control.getValue());
 
-        byte[] startTempBytes = ByteBufferUtil.getBytes(startTemp);
+
+
+        byte[] startTempBytes = ByteBufferUtil.getBytes(startTemp,ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < startTempBytes.length; i++) {
             bytes.add(startTempBytes[i]);
         }
 
-        byte[] endTempBytes = ByteBufferUtil.getBytes(endTemp);
+        byte[] endTempBytes = ByteBufferUtil.getBytes(endTemp,ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < endTempBytes.length; i++) {
             bytes.add(endTempBytes[i]);
         }
-        byte[] speedBytes = ByteBufferUtil.getBytes(speed);
+        byte[] speedBytes = ByteBufferUtil.getBytes(speed,ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < speedBytes.length; i++) {
             bytes.add(speedBytes[i]);
         }
         byte[] cmd = listToByteArray(bytes);
         addCommand(cmd);
     }
+
+    /**
+     * 停止循环
+     *    header     cmd   length   type   data
+     *    0xaa      0x13             0x04
+     */
+    public void stopCycling(int cyclingCount, CmdMode cmdMode, TempDuringCombine predenaturationCombine,
+                            TempDuringCombine extendCombine){
+       step4(Control.STOP,cyclingCount,cmdMode,predenaturationCombine,extendCombine);
+    }
+
+    /**
+     * 停止溶解曲线
+     */
+    public void stopMelting(float startTemp,float endTemp,float speed){
+        meltingCurve(Control.STOP,startTemp,endTemp,speed);
+    }
+
     private byte[] listToByteArray(List<Byte> bytes){
         byte[] cmd = new byte[bytes.size()];
         for (int i=0;i<bytes.size();i++) {
@@ -389,7 +446,7 @@ public class PcrCommand {
      * 如果在结束前没有新的参数下发，则正常结束循环。
      */
     public static enum CmdMode {
-        NORMAL(0), CONTINU(1);
+        NORMAL(0), CONTINU(15);
         private int value;
 
         CmdMode(int value) {

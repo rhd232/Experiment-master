@@ -53,7 +53,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
         // TODO Auto-generated method stub
 
         final String action = intent.getAction();
-        Log.d(TAG, "Action==" + action);
+  //      Log.d(TAG, "Action==" + action);
         if (BluetoothService.ACTION_DEVICE_CONNECTED.equals(action)) { //连接成功
             Log.e(TAG, "Only gatt, just wait");
 
@@ -68,7 +68,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
             mHandler.sendEmptyMessage(2);
 
         } else if (BluetoothService.ACTION_DATA_AVAILABLE.equals(action)) { //接受到数据
-            Log.e(TAG, "RECV DATA");
+          //  Log.e(TAG, "RECV DATA");
 
             data = intent.getParcelableExtra(BluetoothService.EXTRA_DATA);
             mHandler.sendEmptyMessage(3);

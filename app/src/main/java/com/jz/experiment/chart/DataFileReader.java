@@ -1,6 +1,5 @@
 package com.jz.experiment.chart;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -27,6 +26,7 @@ public class DataFileReader {
     public DataFileReader(){
         SetInitData();
     }
+
     public void SetInitData()
     {
         for (int i = 0; i < MAX_CHAN; i++)
@@ -118,9 +118,11 @@ public class DataFileReader {
 
     }
 
-    public void ReadAssetsFileData(Context context) {
+
+    public void ReadFileData(InputStream ips) {
         try {
-            InputStream ips = context.getAssets().open("fluorescence_data.txt");
+            CommData.diclist.clear();
+          //  InputStream ips = context.getAssets().open("fluorescence_data.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
             String line;
             String name = "";
@@ -228,6 +230,16 @@ public class DataFileReader {
         }
 
 //        return 0;
+    }
+
+
+    public String GetFactValueByXS(int n)
+    {
+        int chan = n - 1;
+        int currCycle = xhindex - 1;
+        double value = 5000 + m_factorData[chan][currCycle] * 10000;
+        int v= (int) value;
+        return v+"";
     }
 
 }

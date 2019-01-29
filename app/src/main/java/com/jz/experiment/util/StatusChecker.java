@@ -48,7 +48,7 @@ public class StatusChecker {
                 succ = true;
                 break;
         }
-        return false;
+        return succ;
     }
 
     public static String getStatusDesc(int status) {

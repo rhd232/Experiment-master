@@ -614,7 +614,8 @@ public class ExpeRunningActivityBackup extends BaseActivity implements Bluetooth
 
 
         //command.step3(cyclingCount, mCurCycling, picIndex, cyclingStage.getPartStageList().size(), combines);
-        command.step3(picIndex, cyclingStage.getPartStageList().size(), combines);
+        int rsvd=0;
+        command.step3(rsvd,picIndex, cyclingStage.getPartStageList().size(), combines);
         mBluetoothService.write(command);
     }
 

@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertEquals;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
+
 
 
     @Test
@@ -35,7 +37,37 @@ public class ExampleUnitTest {
         PcrCommand cmd = new PcrCommand();
         int channel[] = {1, 1, 1, 1};
         cmd.step1(channel);
+        toByteString(cmd);
 
+
+        PcrCommand cmd2 = new PcrCommand();
+        short t=0;
+        cmd2.step2(105f,t);
+        toByteString(cmd2);
+
+        PcrCommand cmd3 = new PcrCommand();
+        float temp=50;
+        short tt=10;
+        PcrCommand.TempDuringCombine combine=new PcrCommand.TempDuringCombine(temp,tt);
+        List<PcrCommand.TempDuringCombine> combines=new ArrayList<>();
+        combines.add(combine);
+        cmd3.step3(1,1,combines);
+        toByteString(cmd3);
+
+
+        PcrCommand cmd4 = new PcrCommand();
+        int cyclingCount=2;
+        float preT=95;
+        short preD=5;
+        PcrCommand.TempDuringCombine predenaturationCombine = new PcrCommand.TempDuringCombine(preT, preD);
+        float extendT=50;
+        short extD=5;
+        PcrCommand.TempDuringCombine extendCombine = new PcrCommand.TempDuringCombine(extendT, extD);
+        cmd4.step4(PcrCommand.Control.START, cyclingCount, PcrCommand.CmdMode.NORMAL,
+                predenaturationCombine, extendCombine);
+        toByteString(cmd4);
+    }
+    private void  toByteString(PcrCommand cmd){
         ArrayList<Byte> bytes = cmd.getCommandList();
         byte[] data = new byte[bytes.size()];
         for (int i = 0; i < bytes.size(); i++) {
@@ -49,7 +81,6 @@ public class ExampleUnitTest {
         }
         System.out.println(hex.toString().toLowerCase());
     }
-
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
@@ -77,22 +108,27 @@ public class ExampleUnitTest {
 
     @Test
     public void testShortLSB_MSB() {
-        short during = 1;
+        short during = 5;
      /*   System.out.println(Float.floatToIntBits(temperature));
         System.out.println();*/
         byte[] tempBytes = ByteBufferUtil.getBytes(during, ByteOrder.LITTLE_ENDIAN);//LITTLE_ENDIAN 0011266  BIG_ENDIAN 6611200
-        System.out.println("LSB");
+       /* System.out.println("LSB");
         for (int i = 0; i < tempBytes.length; i++) {
 
             System.out.print(tempBytes[i]);
         }
-        System.out.println();
+        System.out.println();*/
         tempBytes = ByteBufferUtil.getBytes(during, ByteOrder.BIG_ENDIAN);//LITTLE_ENDIAN 0011266  BIG_ENDIAN 6611200
         System.out.println("MSB");
-        for (int i = 0; i < tempBytes.length; i++) {
-
-            System.out.print(tempBytes[i]);
+        byte [] shortByte=new byte[2];
+        shortByte[0]=tempBytes[0];
+        shortByte[1]=tempBytes[1];
+        StringBuilder hex = new StringBuilder(shortByte.length * 2);
+        for (byte b : shortByte) {
+            if ((b & 0xFF) < 0x10) hex.append("0");
+            hex.append(Integer.toHexString(b & 0xFF));
         }
+        System.out.println(hex.toString().toLowerCase());
     }
 
 
@@ -134,11 +170,19 @@ public class ExampleUnitTest {
 
     @Test
     public void testHex() {
-        int hexValue = 24;
+      /*  int hexValue = 24;
         int decimal = Integer.parseInt(hexValue + "", 16);
 
         System.out.println(decimal);//36
-        System.out.println(0x24);//36
+        System.out.println(0x24);//36*/
+
+        String h="a";
+        int a=Integer.parseInt(h,16);
+        System.out.println(a);
+        int picStep=1;
+        int steps=3;
+        int picAndSteps = picStep << 4 | steps;
+        System.out.println(Integer.toBinaryString(picAndSteps));
     }
 
     @Test

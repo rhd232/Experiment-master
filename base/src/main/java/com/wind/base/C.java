@@ -44,8 +44,9 @@ public class C {
         public static final String SHOW_ERROR_RETRY_LAYOUT = "10";
     }
     public static class Value{
-        public static final String APP_FOLDER= Environment.getExternalStorageDirectory().getAbsolutePath()+"/Dinner/";
-        public static final String TEMP_IMAGE_PATH=APP_FOLDER+"/ImgTmp";
+        public static final String APP_FOLDER= Environment.getExternalStorageDirectory().getAbsolutePath()+"/anitoa/";
+        public static final String IMAGE_DATA=APP_FOLDER+"imageData/";
+        public static final String REPORT_FOLDER=APP_FOLDER+"report/";
         public static final int MAX_PHOTO_COUNT = 9;
 
         public static final int REQUEST_CODE_GALLERY=100;
@@ -70,6 +71,10 @@ public class C {
          */
         public static final String DEVICE_NAME="device_name";
         public static final String DEVICE_ADDRESS="device_address";
+
+
+        public static final String PREF_KEY_USB_DEVICE_NAME="pref_key_usb_device_name";
+
     }
     public static class Api{
         /**

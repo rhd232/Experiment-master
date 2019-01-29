@@ -4,7 +4,6 @@ import android.Manifest;
 import android.graphics.Canvas;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -24,6 +23,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.jz.experiment.R;
 import com.jz.experiment.module.data.adapter.ChannelDataAdapter;
 import com.jz.experiment.util.AppDialogHelper;
+import com.wind.base.C;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.utils.AppUtil;
 import com.wind.base.utils.DateUtil;
@@ -336,7 +336,7 @@ public class ExpeDataFragment extends BaseFragment {
 
     private String getPdfFilePath(String pdfName) {
         try {
-            String dir = Environment.getExternalStorageDirectory() + "/anito/";
+            String dir = C.Value.REPORT_FOLDER;
             File dirFile = new File(dir);
             if (!dirFile.exists()) {
                 dirFile.mkdirs();
