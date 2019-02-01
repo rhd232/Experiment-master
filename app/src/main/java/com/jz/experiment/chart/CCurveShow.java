@@ -9,7 +9,7 @@ public class CCurveShow {
     public static boolean GD_MOMENTUM = true;
     public static int MAX_CHAN = 4;
     public static int MAX_WELL = 8;
-    public static int MAX_CYCL = 400;//400
+    public static int MAX_CYCL = 61;//400
     int numWells = 4;
     int MIN_CT = 12;//之前15 // minimal allowed CT
     int CT_TH_MULTI = 6;// 6 instead of 10, this is pre calc of Ct anyway
@@ -39,19 +39,20 @@ public class CCurveShow {
     //float[] log_threshold = new float[] { 11f, 11f, 11f, 11f };
 
     float[] ct_offset = new float[4];
-    Random ran = new Random();
+    Random ran;
 
     private static CCurveShow INSTANCE=new CCurveShow();
+
     public static CCurveShow getInstance(){
         return INSTANCE;
     }
 
-    public CCurveShow(){
-        InitData();
+    private CCurveShow(){
     }
 
     public void InitData() {
-        //numWells = CommData.KsIndex;//先写死
+        numWells = CommData.KsIndex;//读取dataposition文件
+        System.out.println("numWells:"+numWells);
         int i, j;
         for (i = 0; i < MAX_CHAN; i++) {
             for (j = 0; j < numWells; j++) {
@@ -71,7 +72,7 @@ public class CCurveShow {
         for (i = 0; i < 4; i++) {
             ct_offset[i] = (float) Math.log(1 / log_threshold[i] - 1);
         }
-
+        ran = new Random(1);
     }
 
     public void UpdateAllcurve() {
@@ -128,7 +129,7 @@ public class CCurveShow {
         double[] cyc = new double[MAX_CYCL];
 
         double mean = 0;
-        double ct;
+        double ct=0;
 
         for (int iy = 0; iy < MAX_CHAN; iy++) {
 
@@ -180,8 +181,7 @@ public class CCurveShow {
                 val[i] = sigmoid(x[i], k[frameindex][iy], r[frameindex][iy], t[frameindex][iy]);
 
                 yData[i] -= mean;
-                val[i] += cheat_factor * (yData[i] - val[i]) * k[frameindex][iy] /
-                        8;        // Some cheating :)
+                val[i] += cheat_factor * (yData[i] - val[i]) * k[frameindex][iy] / 8;        // Some cheating :)
             }
 
             for (int i = 0; i < size; i++) {

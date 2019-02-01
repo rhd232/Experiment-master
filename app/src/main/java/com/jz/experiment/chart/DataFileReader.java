@@ -6,117 +6,26 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 
 public class DataFileReader {
     public static final int MAX_CHAN = 4;
+    private static int MAX_CYCL = 61;
     boolean[] m_dynIntTime = new boolean[MAX_CHAN];
     float[] m_factorIntTime = new float[MAX_CHAN];
     int[] m_maxPixVal = new int[MAX_CHAN];
     double[][] m_factorData = new double[MAX_CHAN][100];
-
+    public double[][] factorValue = new double[MAX_CHAN][MAX_CYCL];
     private static DataFileReader INSTANCE=new DataFileReader();
     public static DataFileReader getInstance(){
         return INSTANCE;
     }
 
-    public DataFileReader(){
-        SetInitData();
+    private DataFileReader(){
+       // SetInitData();
     }
 
-    public void SetInitData()
-    {
-        for (int i = 0; i < MAX_CHAN; i++)
-        {
-            m_dynIntTime[i] = false;
-            m_factorIntTime[i] = (float)1.0;
-            m_maxPixVal[i] = 100;
 
-            for (int n = 0; n < 100; n++)
-            {
-                m_factorData[i][ n] = 1;
-            }
-        }
-
-
-    }
-    public void UpdatePCRCurve(int PCRNum, int pixelNum) {
-        List<Integer> list = GetMaxValue(PCRNum);
-        if (list.size() > 1) {
-            int max = list.get(0);
-            int last_max = list.get(1);
-            if (max + (max - last_max) > 3300) {
-                m_dynIntTime[PCRNum - 1] = true;
-            }
-        }
-
-    }
-
-    public List<Integer> GetMaxValue(int PCRNum) {
-        List<Integer> list = new ArrayList<>();
-        String chip = "";
-        switch (PCRNum) {
-            case 1:
-                chip = "Chip#1";
-                break;
-            case 2:
-                chip = "Chip#2";
-                break;
-            case 3:
-                chip = "Chip#3";
-                break;
-            case 4:
-                chip = "Chip#4";
-                break;
-        }
-        if (CommData.diclist.get(chip) != null && CommData.diclist.get(chip).size() > 0) {
-            int n = (CommData.diclist.get(chip).size() / CommData.imgFrame) - 1;
-            int max = GetValue(chip, n);
-            list.add(max);
-            int last_max = m_maxPixVal[PCRNum - 1];
-            list.add(last_max);
-
-            m_maxPixVal[PCRNum - 1] = max;
-        }
-        return list;
-    }
-
-    public int GetValue(final String chip, final int n) {
-        try {
-            final List<Integer> listOne = new ArrayList<>();
-
-          /*  List<String> strlist = Observable.from(CommData.diclist.get(chip))
-                    .toList().skip(n * CommData.imgFrame)
-                    .take(CommData.imgFrame).toBlocking().first();*/
-
-            List<String> strlist =CommData.diclist.get(chip).subList(n * CommData.imgFrame,n * CommData.imgFrame+CommData.imgFrame);
-            for (int k = 0; k < strlist.size(); k++) {
-                String[] datalis = strlist.get(k).split(" ");
-                for (int j = 0; j < datalis.length; j++) {
-                    if (j == 11 || j == 23) continue;
-                    if (TextUtils.isEmpty(datalis[j])) continue;
-                    listOne.add(Integer.parseInt(datalis[j]));
-                }
-            }
-
-            Collections.sort(listOne, new Comparator<Integer>() {
-                @Override
-                public int compare(Integer o1, Integer o2) {
-                    return o1.intValue() - o2.intValue();
-                }
-            });
-            int max = listOne.get(listOne.size() - 1);
-            return max;
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return 0;
-        }
-
-    }
 
 
     public void ReadFileData(InputStream ips) {
@@ -140,13 +49,23 @@ public class DataFileReader {
                 }
 
             }
+            for (String item:CommData.diclist.keySet()){
+                if (CommData.diclist.get(item).size() == 0) continue;
+                CommData.Cycle = CommData.diclist.get(item).size() / CommData.imgFrame;
 
-            for (int i = 1; i <= MAX_CHAN; i++) {
-                UpdatePCRCurve(i, 0);
+                int chan = GetChan(item);
+                for (int i = 1; i <= CommData.Cycle; i++)
+                {
+                    //   int index=i-1;
+                    int k = (i * 12) - 1;
+                    String[] strs = CommData.diclist.get(item).get(k).split(" ");
+                    int v=Integer.parseInt(strs[11]);
+                    factorValue[chan][ i] = CommData.GetFactor(v);
+                    if (i == 1) factorValue[chan][0] = factorValue[chan][i];
+                }
             }
 
-            DynamicUpdateIntTime();
-            CommData.m_factorData = m_factorData;
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,34 +75,7 @@ public class DataFileReader {
     }
 
     int xhindex = 1;
-    public void DynamicUpdateIntTime()
-    {
 
-        for (int i = 0; i < MAX_CHAN; i++)
-        {
-
-            //		if (m_factorInt[i].empty()) {
-            //			m_factorInt[i].push_back(m_factorIntTime[i]);    // First time push twice
-            //		}
-            //		m_factorInt[i].push_back(m_factorIntTime[i]);
-
-            if (m_dynIntTime[i] && m_factorIntTime[i] > 0.03)
-            {
-                m_factorIntTime[i] *= (float)0.5;
-
-                // Call to update Int time
-                float new_factor;
-                new_factor = DynamicUpdateIntTime(m_factorIntTime[i], i);	// done here because we need to set int time before auto trigger happens.
-                m_factorIntTime[i] = new_factor;
-                m_dynIntTime[i] = false;
-            }
-
-            m_factorData[i][xhindex] = m_factorIntTime[i];
-        }
-
-        xhindex++;
-
-    }
     float int_time1 = 1;
     float int_time2 = 1;
     float int_time3 = 1;
@@ -240,6 +132,29 @@ public class DataFileReader {
         double value = 5000 + m_factorData[chan][currCycle] * 10000;
         int v= (int) value;
         return v+"";
+    }
+
+
+    public int GetChan(String chan)
+    {
+        int currChan = -1;
+
+        switch (chan)
+        {
+            case "Chip#1":
+                currChan = 0;
+                break;
+            case "Chip#2":
+                currChan = 1;
+                break;
+            case "Chip#3":
+                currChan = 2;
+                break;
+            case "Chip#4":
+                currChan = 3;
+                break;
+        }
+        return currChan;
     }
 
 }

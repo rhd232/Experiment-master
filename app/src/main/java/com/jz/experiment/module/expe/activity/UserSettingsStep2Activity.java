@@ -18,6 +18,7 @@ import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.expe.adapter.StageAdapter;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
 import com.jz.experiment.module.expe.event.DelCyclingStageEvent;
+import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.module.expe.event.RefreshStageAdapterEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.wind.base.BaseActivity;
@@ -28,6 +29,7 @@ import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.response.BaseResponse;
+import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.DbOpenHelper;
 import com.wind.data.expe.bean.DtMode;
@@ -285,6 +287,11 @@ public class UserSettingsStep2Activity extends BaseActivity {
         }
 
         return true;
+    }
+
+    @Subscribe
+    public void onExpeNormalFinishEvent(ExpeNormalFinishEvent event){
+        ActivityUtil.finish(getActivity());
     }
 
 }

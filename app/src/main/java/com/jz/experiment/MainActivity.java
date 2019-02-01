@@ -246,8 +246,16 @@ public class MainActivity extends BaseActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         tab = Navigator.getParcelableExtra(this);
+
         if (tab.getIndex() == TAB_INDEX_DATA) {
             onViewClick(layout_data);
+        }else if (tab.getIndex()==TAB_INDEX_EXPE){
+            tab=null;
+            HistoryExperimentsFragment f= (HistoryExperimentsFragment) mAdapter.getItem(TAB_INDEX_EXPE);
+            if (f!=null){
+                f.loadData();
+            }
+            onViewClick(layout_expe);
         }
     }
 

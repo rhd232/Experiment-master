@@ -167,10 +167,14 @@
         </RelativeLayout>
 
         <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart"
+            android:id="@+id/chart_dt"
             android:layout_width="match_parent"
-            android:layout_height="465dp" />
-
+            android:layout_height="265dp" />
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart_melt"
+            android:layout_width="match_parent"
+            android:layout_height="465dp"
+            android:visibility="gone"/>
         <com.wind.base.widget.NoFlexibleGridView
             android:id="@+id/gv_a"
             android:layout_width="match_parent"

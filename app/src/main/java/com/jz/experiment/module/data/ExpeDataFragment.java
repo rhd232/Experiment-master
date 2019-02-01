@@ -6,35 +6,42 @@ import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
+import com.jz.experiment.chart.CommData;
+import com.jz.experiment.chart.CurveReader;
+import com.jz.experiment.chart.DtChart;
+import com.jz.experiment.chart.MeltingChart;
+import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.data.adapter.ChannelDataAdapter;
+import com.jz.experiment.module.expe.bean.Tab;
+import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.util.AppDialogHelper;
-import com.wind.base.C;
+import com.jz.experiment.util.DataFileUtil;
+import com.wind.base.bean.CyclingStage;
 import com.wind.base.mvp.view.BaseFragment;
+import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.AppUtil;
 import com.wind.base.utils.DateUtil;
+import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.ChannelData;
-import com.wind.data.expe.bean.ChartData;
 import com.wind.data.expe.bean.ExperimentStatus;
 import com.wind.data.expe.bean.HistoryExperiment;
+import com.wind.data.expe.datastore.ExpeDataStore;
 import com.wind.data.expe.request.InsertExpeRequest;
+import com.wind.data.expe.response.InsertExpeResponse;
 import com.wind.toastlib.ToastUtil;
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -75,17 +82,23 @@ public class ExpeDataFragment extends BaseFragment {
     @BindView(R.id.gv_b)
     GridView gv_b;
 
-    @BindView(R.id.chart)
-    LineChart chart;
+    @BindView(R.id.chart_dt)
+    LineChart chart_dt;
+
+    @BindView(R.id.chart_melt)
+    LineChart chart_melt;
 
     @BindView(R.id.sv)
     ScrollView sv;
 
-    LineData mLineData;
-    ArrayList<ILineDataSet> mDataSets;
+   /* LineData mLineData;
+    ArrayList<ILineDataSet> mDataSets;*/
+
+    DtChart mDtChart;
+    MeltingChart mMeltingChart;
 
     private HistoryExperiment mExeperiment;
-
+    private boolean mSaved;
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_expe_data;
@@ -96,25 +109,29 @@ public class ExpeDataFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
-
-        inflateBase();
-
-        inflateChart();
-        tv_dt.setActivated(true);
-        tv_melt.setActivated(false);
+        mChannelDataAdapters = new ChannelDataAdapter[2];
         GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
         gvs[1] = gv_b;
         String[] titles = {"A", "B"};
         buildChannelData(gvs, titles);
+
+        init();
+        inflateBase();
+
+        inflateChart();
+        tv_dt.setActivated(true);
+        tv_melt.setActivated(false);
+
+
     }
 
     private void inflateBase() {
         tv_expe_name.setText(mExeperiment.getName());
         tv_worker_name.setText("admin");
-        String finishTime=DateUtil.getDateTime(mExeperiment.getFinishMilliTime());
+        String finishTime = DateUtil.getDateTime(mExeperiment.getFinishMilliTime());
         tv_finish_time.setText(finishTime);
-        long during=mExeperiment.getDuring();
+        long during = mExeperiment.getDuring();
         String hh = new DecimalFormat("00").format(during / 3600);
         String mm = new DecimalFormat("00").format(during % 3600 / 60);
         String ss = new DecimalFormat("00").format(during % 60);
@@ -122,11 +139,78 @@ public class ExpeDataFragment extends BaseFragment {
         tv_elapsed_time.setText(duringTime);
     }
 
+    private List<String> ChanList = new ArrayList<>();
+    private List<String> KSList = new ArrayList<String>();
+
+    public void init() {
+        CommData.diclist.clear();
+        CommData.positionlist.clear();
+        List<Channel> channels = mExeperiment.getSettingsFirstInfo().getChannels();
+        CommData.cboChan1 = 0;
+        CommData.cboChan2 = 0;
+        CommData.cboChan3 = 0;
+        CommData.cboChan4 = 0;
+
+        ChanList.clear();
+        if (!TextUtils.isEmpty(channels.get(0).getValue())) {
+            CommData.cboChan1 = 1;
+            ChanList.add("Chip#1");
+        }
+        if (!TextUtils.isEmpty(channels.get(1).getValue())) {
+            CommData.cboChan2 = 1;
+            ChanList.add("Chip#2");
+        }
+        if (!TextUtils.isEmpty(channels.get(2).getValue())) {
+            CommData.cboChan3 = 1;
+            ChanList.add("Chip#3");
+        }
+        if (!TextUtils.isEmpty(channels.get(3).getValue())) {
+            CommData.cboChan4 = 1;
+            ChanList.add("Chip#4");
+        }
+
+        KSList.clear();
+        KSList.add("A1");
+        KSList.add("A2");
+        KSList.add("A3");
+        KSList.add("A4");
+
+        KSList.add("B1");
+        KSList.add("B2");
+        KSList.add("B3");
+        KSList.add("B4");
+    }
+
+    private boolean mHasMeltingMode;
+
     private void inflateChart() {
-        if (mExeperiment==null){
+        if (mExeperiment == null) {
             return;
         }
-        ChartData chartData = mExeperiment.getDtChartData();
+        CyclingStage cyclingStage = (CyclingStage) mExeperiment.getSettingSecondInfo().getCyclingSteps().get(0);
+        mDtChart = new DtChart(chart_dt, cyclingStage.getCyclingCount());
+        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
+
+        //获取CT value
+
+        for (String chan : ChanList) {
+            for (String ks : KSList) {
+                getCtValue(chan, ks);
+            }
+        }
+        mChannelDataAdapters[0].notifyDataSetChanged();
+        mChannelDataAdapters[1].notifyDataSetChanged();
+
+        mHasMeltingMode = mExeperiment.getSettingSecondInfo().getModes().size() > 1;
+        if (mHasMeltingMode) {
+            tv_melt.setVisibility(View.VISIBLE);
+            mMeltingChart = new MeltingChart(chart_melt);
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
+        } else {
+            tv_melt.setVisibility(View.GONE);
+        }
+
+      /*  ChartData chartData = mExeperiment.getDtChartData();
         List<com.wind.data.expe.bean.LineData> lineDataList = chartData.getLineDataList();
         mDataSets = new ArrayList<>();
         for (int i = 0; i < lineDataList.size(); i++) {//4组数据
@@ -149,10 +233,104 @@ public class ExpeDataFragment extends BaseFragment {
         chart.setDrawBorders(false);
         chart.setData(mLineData);
         chart.animateX(1500);
-        chart.invalidate(); // refresh
+        chart.invalidate(); // refresh*/
     }
 
-    private void setupChartStyle() {
+    private void getCtValue(String chan, String currks) {
+        if (!CommData.diclist.keySet().contains(chan) || CommData.diclist.get(chan).size() == 0)
+            return;
+
+        int currChan = 0;
+        int ksindex = -1;
+
+        int line=1;
+        switch (chan) {
+            case "Chip#1":
+                currChan = 0;
+
+                line=1;
+                break;
+            case "Chip#2":
+                currChan = 1;
+                line=2;
+                break;
+            case "Chip#3":
+                currChan = 2;
+                line=3;
+
+                break;
+            case "Chip#4":
+                currChan = 3;
+                line=4;
+                break;
+        }
+
+
+        int gvIndex = 0;
+        int ksIndexInAdapter=0;
+        int lineCount=9;//反应孔数+1
+
+        switch (currks) {
+            case "A1":
+                gvIndex = 0;
+                ksindex = 0;
+
+                ksIndexInAdapter = lineCount*line+1;
+                break;
+            case "A2":
+                gvIndex = 0;
+                ksindex = 1;
+
+                ksIndexInAdapter = lineCount*line+2;
+                break;
+            case "A3":
+                gvIndex = 0;
+                ksindex = 2;
+
+                ksIndexInAdapter =  lineCount*line+3;
+                break;
+            case "A4":
+                gvIndex = 0;
+                ksindex = 3;
+
+                ksIndexInAdapter = lineCount*line+4;
+                break;
+            case "B1":
+                gvIndex = 1;
+                ksindex = 4;
+
+                ksIndexInAdapter = lineCount*line+1;
+                break;
+            case "B2":
+                gvIndex = 1;
+                ksindex = 5;
+
+                ksIndexInAdapter = lineCount*line+2;
+                break;
+            case "B3":
+                gvIndex = 1;
+                ksindex = 6;
+
+                ksIndexInAdapter = lineCount*line+3;
+                break;
+            case "B4":
+                gvIndex = 1;
+                ksindex = 7;
+
+                ksIndexInAdapter = lineCount*line+4;
+                break;
+        }
+        double[][] ctValues = CurveReader.getInstance().m_CTValue;
+        double val = ctValues[currChan][ksindex];
+        DecimalFormat format = new DecimalFormat("#0.00");
+        String ctValue = format.format(val);
+        System.out.println("ctValue:" + ctValue);
+        mChannelDataAdapters[gvIndex].getItem(ksIndexInAdapter).setSampleVal(ctValue);
+
+
+    }
+
+    /*private void setupChartStyle() {
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setEnabled(true);
@@ -179,12 +357,13 @@ public class ExpeDataFragment extends BaseFragment {
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
 
 
-    }
+    }*/
+    private ChannelDataAdapter[] mChannelDataAdapters;
 
     private void buildChannelData(GridView[] gvs, String[] titles) {
         for (int k = 0; k < gvs.length; k++) {
-            ChannelDataAdapter channelDataAdapter = new ChannelDataAdapter(getActivity(), R.layout.item_channel_data);
-            gvs[k].setAdapter(channelDataAdapter);
+            mChannelDataAdapters[k] = new ChannelDataAdapter(getActivity(), R.layout.item_channel_data);
+            gvs[k].setAdapter(mChannelDataAdapters[k]);
             List<ChannelData> channelDataAList = new ArrayList<>();
             for (int j = 0; j < 5; j++) {
                 for (int i = 0; i < 9; i++) {
@@ -211,7 +390,7 @@ public class ExpeDataFragment extends BaseFragment {
                     channelDataAList.add(channelData);
                 }
             }
-            channelDataAdapter.replaceAll(channelDataAList);
+            mChannelDataAdapters[k].replaceAll(channelDataAList);
         }
     }
 
@@ -224,7 +403,9 @@ public class ExpeDataFragment extends BaseFragment {
         return f;
 
     }
-
+    public HistoryExperiment getExeperiment(){
+        return mExeperiment;
+    }
     public boolean isSavedExpe() {
         return mExeperiment.getId() != HistoryExperiment.ID_NONE;
     }
@@ -234,18 +415,29 @@ public class ExpeDataFragment extends BaseFragment {
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.iv_save:
-                ExperimentStatus status = new ExperimentStatus();
-                status.setStatus(ExperimentStatus.STATUS_COMPLETED);
-                status.setDesc("已完成");
-                mExeperiment.setStatus(status);
-                //新插入一条数据
-                mExeperiment.setId(HistoryExperiment.ID_NONE);
-                InsertExpeRequest request=new InsertExpeRequest();
-                request.setExperiment(mExeperiment);
-                //TODO 保存实验数据
-              /*  ExpeDataStore
-                        .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))
-                        .insertExpe(request);*/
+
+                if (!isSavedExpe()&&!mSaved ){
+                    mSaved=true;
+                    saveExpe()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Action1<InsertExpeResponse>() {
+                                @Override
+                                public void call(InsertExpeResponse response) {
+                                    if (response.getErrCode()== BaseResponse.CODE_SUCCESS){
+                                        EventBus.getDefault().post(new SavedExpeDataEvent());
+                                        ToastUtil.showToast(getActivity(), "已保存到本地");
+                                        Tab tab = new Tab();
+                                        tab.setIndex(MainActivity.TAB_INDEX_EXPE);
+                                        MainActivity.start(getActivity(), tab);
+                                    }else {
+                                        ToastUtil.showToast(getActivity(), "保存失败");
+                                    }
+
+                                }
+                            });
+                }
+
 
 
                 break;
@@ -286,6 +478,23 @@ public class ExpeDataFragment extends BaseFragment {
         }
     }
 
+    private Observable<InsertExpeResponse> saveExpe() {
+        ExperimentStatus status = new ExperimentStatus();
+        status.setStatus(ExperimentStatus.STATUS_COMPLETED);
+        status.setDesc("已完成");
+        mExeperiment.setStatus(status);
+        //新插入一条数据
+        mExeperiment.setId(HistoryExperiment.ID_NONE);
+
+        InsertExpeRequest request = new InsertExpeRequest();
+        request.setExperiment(mExeperiment);
+        //TODO 保存实验数据
+        return ExpeDataStore
+                .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))
+                .insertExpe(request);
+
+    }
+
     private Observable<Boolean> generatePdf() {
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
 
@@ -293,14 +502,14 @@ public class ExpeDataFragment extends BaseFragment {
             public void call(Subscriber<? super Boolean> subscriber) {
                 PdfDocument document = new PdfDocument();
                 int width = AppUtil.getScreenWidth(getActivity());
-                int height =0;// AppUtil.getScreenHeight(getActivity());
+                int height = 0;// AppUtil.getScreenHeight(getActivity());
                 //计算scrollview的高度
                 for (int i = 0; i < sv.getChildCount(); i++) {
                     height += sv.getChildAt(i).getHeight();
                 }
 
                 PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo
-                        .Builder(width,height, 1)
+                        .Builder(width, height, 1)
                         .create();
 
                 PdfDocument.Page page = document.startPage(pageInfo);
@@ -315,7 +524,7 @@ public class ExpeDataFragment extends BaseFragment {
 
                 document.finishPage(page);
                 String pdfName = System.currentTimeMillis() + ".pdf";
-                File file = new File(getPdfFilePath(pdfName));
+                File file = new File(DataFileUtil.getPdfFilePath(pdfName));
 
                 try {
                     FileOutputStream outputStream = new FileOutputStream(file);
@@ -334,22 +543,5 @@ public class ExpeDataFragment extends BaseFragment {
 
     }
 
-    private String getPdfFilePath(String pdfName) {
-        try {
-            String dir = C.Value.REPORT_FOLDER;
-            File dirFile = new File(dir);
-            if (!dirFile.exists()) {
-                dirFile.mkdirs();
-            }
-            File pdfFile = new File(dir, pdfName);
-            if (pdfFile.exists()) {
-                pdfFile.createNewFile();
-            }
-            return pdfFile.getAbsolutePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
 
-    }
 }

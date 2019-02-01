@@ -1,6 +1,7 @@
 package com.jz.experiment.chart;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -77,12 +78,16 @@ public class CommData {
 
     public static void ReadDatapositionFile(Context context) {
         InputStream ips = null;
+        BufferedReader reader=null;
         try {
             ips = context.getAssets().open("dataposition.ini");
             //判断相应月份文件夹是否存在，没有则创建
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
+            reader = new BufferedReader(new InputStreamReader(ips));
             String line = null;
             while ((line = reader.readLine()) != null) {
+                if (TextUtils.isEmpty(line)){
+                    continue;
+                }
                 if (!line.contains("CHIP")) {
                     if (line.contains("NWELLS")) {
                         String[] strs = line.split("=");
@@ -92,7 +97,7 @@ public class CommData {
                 }
                 int startIndex = line.indexOf("=");//开始位置
                 int ssindex = startIndex + 1;
-                String str = line.substring(ssindex, line.length() - ssindex);//从开始位置截取一个新的字符串
+                String str = line.substring(ssindex, line.length());//从开始位置截取一个新的字符串
 
                 String str1 = line.substring(0, startIndex);
                 switch (str1) {
@@ -113,6 +118,11 @@ public class CommData {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if (ips != null) {
                 try {
                     ips.close();
@@ -126,11 +136,19 @@ public class CommData {
     }
 
     public static List<String> GetPList(String ss) {
-        List<String> strlist = new ArrayList<>();
-        ss = ss.replace("A", "0-").replace("B", "1-").replace("C", "2-").replace("D", "3-").replace("E", "4-").replace("F", "5-").replace("G", "6-")
-                .replace("H", "7-").replace("I", "8-").replace("J", "9-").replace("K", "10-").replace("L", "11-").replace("M", "12-").replace("N", "13-").replace("O", "14-")
-                .replace("P", "15-").replace("Q", "16-").replace("R", "17-").replace("S", "18-").replace("T", "19-").replace("U", "20-").replace("V", "21-").replace("W", "22-")
-                .replace("X", "23-");
+        List<String> strlist;
+        ss = ss.replace("A", "0-").replace("B", "1-")
+                .replace("C", "2-").replace("D", "3-")
+                .replace("E", "4-").replace("F", "5-")
+                .replace("G", "6-").replace("H", "7-")
+                .replace("I", "8-").replace("J", "9-")
+                .replace("K", "10-").replace("L", "11-")
+                .replace("M", "12-").replace("N", "13-")
+                .replace("O", "14-").replace("P", "15-")
+                .replace("Q", "16-").replace("R", "17-")
+                .replace("S", "18-").replace("T", "19-")
+                .replace("U", "20-").replace("V", "21-")
+                .replace("W", "22-").replace("X", "23-");
 
         String[] sts = ss.split(",");
         strlist = Arrays.asList(sts);
@@ -178,13 +196,11 @@ public class CommData {
                 final ChartData cd = new ChartData();
                 cd.x = i;
 
-               /* List<String> strlist =Observable.from(diclist.get(chan)).toList().skip(i * imgFrame)
-                        .take(imgFrame).toBlocking().first();*/
                 List<String> strlist =diclist.get(chan).subList(i * imgFrame,i * imgFrame+imgFrame);
+
                 Map<Integer, List<String>> datalist = new HashMap<>();
                 for (int k = 0; k < strlist.size(); k++) {
-                    String[] parts = strlist.get(k).replace("  "," ").split(" ");
-                    List<String> list = Arrays.asList(parts);
+                    List<String> list =Arrays.asList(strlist.get(k).split(" "));
                     datalist.put(k, list);
 
                 }
@@ -198,7 +214,9 @@ public class CommData {
                     if (nstrs.length > 1) {
                         int j = Integer.parseInt(nstrs[0]);
                         int k = Integer.parseInt(nstrs[1]);
-                        int v = Integer.parseInt(datalist.get(k).get(j)) - 100;
+                      //  int v = Integer.parseInt(datalist.get(k).get(j)) - 100;
+                        int val=Integer.parseInt(datalist.get(k).get(j));
+                        int v = val- 100;
                         value += v;
                     }
                 }
@@ -225,7 +243,7 @@ public class CommData {
         if (value < 5000) {
             factor = 1;
         } else {
-            factor = (double) (((double) value - 5000) / 10000);
+            factor = (((double) value - 5000) / 10000d);
         }
         return factor;
     }

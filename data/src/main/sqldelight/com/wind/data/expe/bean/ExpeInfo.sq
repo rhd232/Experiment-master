@@ -7,6 +7,9 @@ CREATE TABLE expe_info(
     status INTEGER NOT NULL,
     status_desc TEXT NOT NULL,
 
+    finish_millitime INTEGER,
+    during INTEGER,
+
     --实验设置信息
     mode TEXT NOT NULL,
     startTemperature TEXT,

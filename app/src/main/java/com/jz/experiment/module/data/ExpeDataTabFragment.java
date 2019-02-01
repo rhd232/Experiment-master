@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.wind.base.mvp.view.TabLayoutFragment;
 import com.wind.base.response.BaseResponse;
@@ -17,6 +18,7 @@ import com.wind.data.expe.response.FindExpeResponse;
 import com.wind.view.TitleBar;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().register(this);
         layout_loading = view.findViewById(R.id.layout_loading);
         layout_loading.setEmpty(R.layout.layout_expe_empty);
         layout_loading.setOnEmptyInflateListener(new LoadingLayout.OnInflateListener() {
@@ -64,6 +67,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
 
     }
+
 
     private void initTitleBar() {
         mTitleBar.setTextColor(Color.WHITE);
@@ -102,11 +106,11 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                                 List<String> titles = new ArrayList<>();
                                 for (int i = 0; i < experiments.size(); i++) {
                                     titles.add("历史实验");
-                                /*    HistoryExperiment expe = experiments.get(i);
+                                    HistoryExperiment expe = experiments.get(i);
                                     ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
                                     fragments.add(f);
 
-                                    titles.add(expe.getName());*/
+                                   // titles.add(expe.getName());
 
                                 }
                                 mFragmentAdapter.setFragments(fragments);
@@ -145,7 +149,10 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     }
 
 
+
     public void setExpe(HistoryExperiment expe) {
+
+       // view_pager.setAdapter(null);
         //增加一个tab显示本实验
         ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
         List<Fragment> fragments = mFragmentAdapter.getFragments();
@@ -164,10 +171,36 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
 
         }
-        titles.add(0,"基因实验");
-        fragments.add(0, f);
+        List<Fragment> newFragment=new ArrayList<>();
+        newFragment.add(f);
+        for (Fragment fragment:fragments){
+            ExpeDataFragment expeF=(ExpeDataFragment)fragment;
+            if (expeF.isSavedExpe()){
+                newFragment.add(ExpeDataFragment.newInstance(expeF.getExeperiment()));
+            }
+        }
+        titles.add(0,"本次实验");
+        mFragmentAdapter = new ContainerPagerAdapter(getChildFragmentManager(),
+                newFragment, titles);
+        view_pager.setAdapter(mFragmentAdapter);
         mFragmentAdapter.notifyDataSetChanged();
         view_pager.setCurrentItem(0, false);
+
+
+
         layout_loading.showContent();
     }
+
+    @Subscribe
+    public void onSavedExpeDataEvent(SavedExpeDataEvent event){
+        loadExpe();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
 }
+
+

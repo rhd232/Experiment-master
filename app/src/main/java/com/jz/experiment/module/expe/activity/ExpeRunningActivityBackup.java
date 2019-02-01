@@ -52,7 +52,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +69,7 @@ public class ExpeRunningActivityBackup extends BaseActivity implements Bluetooth
         Navigator.navigate(context, ExpeRunningActivityBackup.class, experiment);
     }
 
-    @BindView(R.id.chart)
+    @BindView(R.id.chart_dt)
     LineChart chart;
     ChartMarkerView mChartMarkerView;
     LineData mLineData;
@@ -90,8 +89,7 @@ public class ExpeRunningActivityBackup extends BaseActivity implements Bluetooth
     private HistoryExperiment mHistoryExperiment;
     BluetoothReceiver mBluetoothReceiver;
     BluetoothService mBluetoothService;
-    @BindView(R.id.tv_received_msg)
-    TextView tv_received_msg;
+
     /**
      * 当前图像格式
      */
@@ -548,12 +546,6 @@ public class ExpeRunningActivityBackup extends BaseActivity implements Bluetooth
         int typeIndex = 4;
 
         byte[] reveicedBytes = data.getBuffer();
-        try {
-            String msg = new String(reveicedBytes, "ISO-8859-1");
-            tv_received_msg.append(msg);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
 
         int type = hexToDecimal(reveicedBytes[typeIndex]);
 

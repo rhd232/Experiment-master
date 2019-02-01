@@ -14,20 +14,25 @@ import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.expe.adapter.ChannelAdapter;
 import com.jz.experiment.module.expe.adapter.SampleAdapter;
+import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
+import com.jz.experiment.util.AppDialogHelper;
+import com.wind.base.BaseActivity;
+import com.wind.base.utils.ActivityUtil;
+import com.wind.base.utils.DateUtil;
+import com.wind.base.utils.Navigator;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.ChannelMaterial;
 import com.wind.data.expe.bean.ExpeSettingsFirstInfo;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.bean.Sample;
-import com.jz.experiment.util.AppDialogHelper;
-import com.wind.base.BaseActivity;
-import com.wind.base.utils.DateUtil;
-import com.wind.base.utils.Navigator;
 import com.wind.data.expe.datastore.ExpeDataStore;
 import com.wind.data.expe.request.FindExpeByIdResponse;
 import com.wind.data.expe.request.FindExpeRequest;
 import com.wind.toastlib.ToastUtil;
 import com.wind.view.ValidateEditText;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -79,6 +84,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_setting_step1);
+        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         mExperiment = Navigator.getParcelableExtra(this);
         if (mExperiment == null) {
@@ -242,5 +248,15 @@ public class UserSettingsStep1Activity extends BaseActivity {
         }
 
         return true;
+    }
+
+    @Subscribe
+    public void onExpeNormalFinishEvent(ExpeNormalFinishEvent event){
+        ActivityUtil.finish(getActivity());
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

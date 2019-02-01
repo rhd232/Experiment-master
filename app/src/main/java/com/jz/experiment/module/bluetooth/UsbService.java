@@ -240,7 +240,7 @@ public class UsbService extends Service {
         try {
             if (mReadThread==null || !mReadThread.mRun){
                 startReadThread();
-                Thread.sleep(50);
+                Thread.sleep(100);
             }
             toByteString(command);
             ArrayList<Byte> bytes = command.getCommandList();
@@ -287,6 +287,7 @@ public class UsbService extends Service {
                 }
                 byte[] buffer = new byte[1024];
                 int bytes = this.mUsbDeviceConnection.bulkTransfer(mUsbEndpointIn, buffer, 64, 5000);
+
                 if (bytes > 0) {
                     StringBuilder hex = new StringBuilder(buffer.length * 2);
                     for (byte b : buffer) {

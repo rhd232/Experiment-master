@@ -100,6 +100,8 @@ public class ExpeDataStore {
                             .millitime(experiment.getMillitime())
                             .status(experiment.getStatus().getStatus())
                             .status_desc(experiment.getStatus().getDesc())
+                            .finish_millitime(experiment.getFinishMilliTime())
+                            .during(experiment.getDuring())
                             .mode(sBuilder.toString())
                             .asContentValues();
                     mBriteDb.insert(ExpeInfo.TABLE_NAME, values);
@@ -253,13 +255,163 @@ public class ExpeDataStore {
                             experiment.setId(expeInfo._id());
                             experiment.setDevice(expeInfo.device());
                             experiment.setMillitime(expeInfo.millitime());
+                            experiment.setFinishMilliTime(expeInfo.finish_millitime());
+                            experiment.setDuring(expeInfo.during());
                             ExperimentStatus status = new ExperimentStatus();
                             status.setStatus((int) expeInfo.status());
                             status.setDesc(expeInfo.status_desc());
                             experiment.setStatus(status);
 
+                            String mode=expeInfo.mode();
+                            String []modes=mode.split("-");
+                            List<Mode> modeList=new ArrayList<>();
+                            modeList.add(new DtMode(modes[0]));
+                            if (modes.length>1){
+                                modeList.add(new MeltMode(modes[1]));
+                            }
 
-                            transaction.markSuccessful();
+                            ExpeSettingsFirstInfo expeSettingsFirstInfo = new ExpeSettingsFirstInfo();
+                            experiment.setSettingsFirstInfo(expeSettingsFirstInfo);
+                            //channel信息
+                            List<Channel> channelList = new ArrayList<>();
+                            SqlDelightStatement channelStatement = ChannelInfo.FACTORY.find_by_expeid(expeInfo._id());
+                            Cursor channelCursor = mBriteDb.query(channelStatement.statement, channelStatement.args);
+                            while (channelCursor.moveToNext()) {
+                                ChannelInfo channelInfo = ChannelInfo.FACTORY.find_by_expeidMapper().map(channelCursor);
+                                Channel channel = new Channel();
+                                channel.setName(channelInfo.name());
+                                channel.setValue(channelInfo.value());
+                                channel.setRemark(channelInfo.remark());
+                                channelList.add(channel);
+                            }
+                            expeSettingsFirstInfo.setChannels(channelList);
+                            channelCursor.close();
+
+                            //samples信息
+                            List<Sample> sampleAList = new ArrayList<>();
+                            List<Sample> sampleBList = new ArrayList<>();
+                            SqlDelightStatement sampleStatement = SampleInfo.FACTORY.find_by_expeid(expeInfo._id());
+                            Cursor sampleCursor = mBriteDb.query(sampleStatement.statement, sampleStatement.args);
+                            while (sampleCursor.moveToNext()) {
+                                SampleInfo sampleInfo = SampleInfo.FACTORY.find_by_expeidMapper().map(sampleCursor);
+                                Sample sample = new Sample();
+                                sample.setName(sampleInfo.name());
+                                sample.setType((int) sampleInfo.type());
+                                if (sampleInfo.type() == Sample.TYPE_A) {
+                                    sampleAList.add(sample);
+                                } else {
+                                    sampleBList.add(sample);
+                                }
+
+                            }
+                            sampleCursor.close();
+                            expeSettingsFirstInfo.setSamplesA(sampleAList);
+                            expeSettingsFirstInfo.setSamplesB(sampleBList);
+
+
+                            ExpeSettingSecondInfo secondInfo = new ExpeSettingSecondInfo();
+                            secondInfo.setModes(modeList);
+                            experiment.setSettingSecondInfo(secondInfo);
+                            SqlDelightStatement stageStatement = StageInfo.FACTORY.find_by_expeid(expeInfo._id());
+                            Cursor stageCursor = mBriteDb.query(stageStatement.statement, stageStatement.args);
+
+                            List<CyclingStage> cyclingStageList=new ArrayList<>();
+                            List<PartStage> partStageList=new ArrayList<>();
+                            List<Stage> stageList=new ArrayList<>();
+                            EndStage endStage=new EndStage();
+                            StartStage startStage=new StartStage();
+                            while (stageCursor.moveToNext()) {
+                                StageInfo stageInfo = StageInfo.FACTORY.find_by_expeidMapper().map(stageCursor);
+                                long type = stageInfo.type();
+
+                                double startScale=0;
+                                if (stageInfo.startScale()!=null){
+                                    startScale=stageInfo.startScale();
+                                }
+                                double curScale=0;
+                                if (stageInfo.curScale()!=null){
+                                    curScale=stageInfo.curScale();
+                                }
+                                long serialNumber=0;
+                                if (stageInfo.serialNumber()!=null){
+                                    serialNumber=stageInfo.serialNumber();
+                                }
+
+                                switch ((int) type) {
+                                    case Stage.TYPE_END:
+                                        endStage.setStartScale((float) startScale);
+                                        endStage.setCurScale((float) curScale);
+
+                                        break;
+                                    case Stage.TYPE_START:
+
+                                        startStage.setStartScale((float) startScale);
+                                        startStage.setCurScale((float) curScale);
+
+                                        break;
+                                    case Stage.TYPE_CYCLING:
+                                        long count=stageInfo.cycling_count();
+
+                                        long id=stageInfo._id();
+                                        CyclingStage cyclingStage=new CyclingStage();
+                                        cyclingStage.setCyclingCount((int) count);
+                                        cyclingStage.setSerialNumber((int) serialNumber);
+                                        cyclingStage.setId((int) id);
+
+                                        cyclingStageList.add(cyclingStage);
+                                        break;
+                                    case Stage.TYPE_PART:
+                                        long cyclingId=stageInfo.cycling_id();
+                                        long takepic=stageInfo.part_takepic();
+                                        PartStage partStage=new PartStage();
+                                        partStage.setStartScale((float) startScale);
+                                        partStage.setCurScale((float) curScale);
+                                        partStage.setSerialNumber((int) serialNumber);
+                                        partStage.setCyclingId((int) cyclingId);
+                                        partStage.setTakePic(takepic==1?true:false);
+
+                                        partStageList.add(partStage);
+                                        break;
+                                }
+                            }
+                            stageCursor.close();
+                            Collections.sort(cyclingStageList, new Comparator<CyclingStage>() {
+                                @Override
+                                public int compare(CyclingStage o1, CyclingStage o2) {
+                                    return o1.getSerialNumber()-o2.getSerialNumber();
+                                }
+                            });
+                            for (int i=0;i<cyclingStageList.size();i++){
+                                CyclingStage cyclingStage=cyclingStageList.get(i);
+                                for (int j=0;j<partStageList.size();j++){
+                                    int cyclingId=partStageList.get(j).getCyclingId();
+                                    if (cyclingStage.getId()==cyclingId){
+                                        cyclingStage.getPartStageList().add(partStageList.get(j));
+                                    }
+                                }
+                                Collections.sort(cyclingStage.getPartStageList(), new Comparator<PartStage>() {
+                                    @Override
+                                    public int compare(PartStage o1, PartStage o2) {
+                                        return o1.getSerialNumber()-o2.getSerialNumber();
+                                    }
+                                });
+                            }
+                            Collections.sort(cyclingStageList, new Comparator<CyclingStage>() {
+                                @Override
+                                public int compare(CyclingStage o1, CyclingStage o2) {
+                                    return o1.getSerialNumber()-o2.getSerialNumber();
+                                }
+                            });
+
+                            stageList.add(startStage);
+                            for (int i=0;i<cyclingStageList.size();i++){
+                                stageList.add(cyclingStageList.get(i));
+                            }
+                            stageList.add(endStage);
+
+                            secondInfo.setSteps(stageList);
+
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         } finally {

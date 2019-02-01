@@ -74,22 +74,20 @@
 
 
     <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart"
+        android:id="@+id/chart_dt"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@color/white"
       />
-    <ScrollView
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart_melt"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:visibility="gone">
-        <TextView
-            android:id="@+id/tv_received_msg"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </ScrollView>
+        android:background="@color/white"
+        android:visibility="gone"
+        />
     <TextView
         android:id="@+id/tv_stop"
         android:layout_width="match_parent"

@@ -1,16 +1,23 @@
 package com.wind.appframework;
 
+import com.jz.experiment.chart.ChartData;
 import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.util.ByteBufferUtil;
 import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.CvtUtil;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,7 +28,81 @@ import static org.junit.Assert.assertEquals;
  */
 public class ExampleUnitTest {
 
+    @Test
+    public void sub1717(){
+        String source="aa00fsi843784fjskhfsgskhfhskghskfjutu381717ksg99948848433e400000000000000000000000";
+        int index=source.indexOf("1717");
+        source=source.substring(0,index+4);
+        System.out.println(source);//aa00fsi843784fjskhfsgskhfhskghskfjutu381717
 
+    }
+
+    @Test
+    public void testJsonArray(){
+        String json="[[\n" +
+                "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0],\n" +
+                "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0]\n" +
+                "]\n" +
+                ",[\n" +
+                "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0],\n" +
+                "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0]\n" +
+                "]\n" +
+                "]";
+        Map<Integer,List<Double>> chanMap=new LinkedHashMap<>();
+        try {
+            JSONArray jsonArray=new JSONArray(json);
+            for (int i=0;i<jsonArray.length();i++){
+
+                JSONArray subJSONArray=jsonArray.getJSONArray(i);
+                for (int j=0;j<subJSONArray.length();i++){
+                    JSONArray subSubJSONArray=subJSONArray.getJSONArray(j);
+                    List<Double> yVals=new ArrayList<>();
+                    for (int k=0;k<subSubJSONArray.length();k++){
+                        double y=subSubJSONArray.getDouble(k);
+                        yVals.add(y);
+                    }
+                    chanMap.put(i,yVals);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        for (int i=0;i<chanMap.size();i++){
+            List<Double> yVals=chanMap.get(i);
+            for (double y:yVals){
+                System.out.print(y+" ");
+            }
+            System.out.println();
+        }
+    }
+
+    @Test
+    public void testListMax(){
+        double rate = 8e-8;
+        System.out.println(rate);
+        List<ChartData> cdlist=new ArrayList<>();
+        ChartData c=new ChartData();
+        c.y=23;
+        cdlist.add(c);
+        ChartData c1=new ChartData();
+        c1.y=22;
+        cdlist.add(c1);
+
+        ChartData c2=new ChartData();
+        c2.y=24;
+        cdlist.add(c2);
+        ChartData c3=new ChartData();
+        c3.y=21;
+        cdlist.add(c3);
+        double y_max_value=Collections.max(cdlist, new Comparator<ChartData>() {
+            @Override
+            public int compare(ChartData o1, ChartData o2) {
+                return o1.y-o2.y;
+            }
+        }).y;
+        System.out.println(y_max_value);
+    }
 
     @Test
     public void testSplit(){
@@ -51,7 +132,7 @@ public class ExampleUnitTest {
         PcrCommand.TempDuringCombine combine=new PcrCommand.TempDuringCombine(temp,tt);
         List<PcrCommand.TempDuringCombine> combines=new ArrayList<>();
         combines.add(combine);
-        cmd3.step3(1,1,combines);
+        cmd3.step3(0,1,1,combines);
         toByteString(cmd3);
 
 
@@ -66,6 +147,13 @@ public class ExampleUnitTest {
         cmd4.step4(PcrCommand.Control.START, cyclingCount, PcrCommand.CmdMode.NORMAL,
                 predenaturationCombine, extendCombine);
         toByteString(cmd4);
+
+        PcrCommand meltingCurveCmd = new PcrCommand();
+        float startT=50;
+        float endT=55;
+        float speed=1;
+        meltingCurveCmd.meltingCurve(PcrCommand.Control.START,startT,endT,speed);
+        toByteString(meltingCurveCmd);
     }
     private void  toByteString(PcrCommand cmd){
         ArrayList<Byte> bytes = cmd.getCommandList();

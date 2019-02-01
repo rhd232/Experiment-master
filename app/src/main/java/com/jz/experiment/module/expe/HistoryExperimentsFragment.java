@@ -130,7 +130,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
         tv_device_state.setActivated(false);
     }
 
-    private void loadData() {
+    public void loadData() {
 
         mExpeDataStore
                 .findAll()
