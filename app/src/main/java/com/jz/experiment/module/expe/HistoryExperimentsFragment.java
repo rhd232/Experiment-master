@@ -193,12 +193,21 @@ public class HistoryExperimentsFragment extends BaseFragment {
                     @Override
                     public void onAction(List<String> data) {
                         UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                      /*  if (sDeviceProxyHelper.getUsbService().hasPermission()){
+                            UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                        }else {
+                            sDeviceProxyHelper.getUsbService().requestPermission();
+                        }*/
+
+
                     }
                 })
                 .onDenied(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
-                         ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
+
+                            ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
+
                     }
                 }).start();
 

@@ -1,11 +1,5 @@
 package com.jz.experiment.chart;
 
-import com.wind.base.C;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +32,7 @@ public class CurveReader {
         tdlist.add("Chip#3");
         tdlist.add("Chip#4");
 
-        File file= new File(C.Value.IMAGE_DATA,"ydata_no_factor.txt");
+        //File file= new File(C.Value.IMAGE_DATA,"ydata_no_factor.txt");
         int cyclenum = 0;
         for (int i = 0; i < tdlist.size(); i++)
         {
@@ -50,8 +44,8 @@ public class CurveReader {
                     double [][] factorValues=DataFileReader.getInstance().factorValue;
                     double factorValue=factorValues[GetChan(tdlist.get(i))][k];
                     m_yData[i][n][k] = cdlist.get(k).y /factorValue;
-                    String t=i+"-"+n+"-"+k+"="+ cdlist.get(k).y;
-                    AppendToFile(t,file);
+                    //String t=i+"-"+n+"-"+k+"="+ cdlist.get(k).y;
+                    //AppendToFile(t,file);
                 }
             }
             if (CommData.diclist.size() > 0)
@@ -92,44 +86,6 @@ public class CurveReader {
     }
 
 
-    private void AppendToFile(String txt, File file) {
 
-        FileOutputStream fos = null;
-        OutputStreamWriter osw = null;
-
-        try {
-            if (!file.exists()) {
-                boolean hasFile = file.createNewFile();
-               /* if (hasFile) {
-                    System.out.println("file not exists, create new file");
-                }*/
-                fos = new FileOutputStream(file);
-            } else {
-                // System.out.println("file exists");
-                fos = new FileOutputStream(file, true);
-            }
-
-            osw = new OutputStreamWriter(fos, "utf-8");
-            osw.write(txt); //写入内容
-            osw.write("\r\n");  //换行
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {   //关闭流
-            try {
-                if (osw != null) {
-                    osw.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
 }

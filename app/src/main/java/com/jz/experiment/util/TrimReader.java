@@ -116,7 +116,8 @@ public class TrimReader {
                     auto_v20 = new int[2];
                     //List<String> AutoV20_lgs = ss.ToList().Skip(i + 1).Take(1).ToList();
                     List<String> AutoV20_lgs = ss.subList(i + 1, i + 1+1);
-                    String mm = AutoV20_lgs.get(0).trim();
+                   // String mm = AutoV20_lgs.get(0).trim();
+                    String mm = AutoV20_lgs.get(0).trim().replace("0x","");
                     int a = Integer.parseInt(mm, 16);
                     auto_v20[0] = a;
                /* uint a = Convert.ToUInt32(mm, 16);

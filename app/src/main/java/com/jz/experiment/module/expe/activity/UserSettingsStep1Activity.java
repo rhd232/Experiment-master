@@ -74,6 +74,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
 
     private HistoryExperiment mExperiment;
     Subscription findSubscription;
+
     @Override
     protected void setTitle() {
         mTitleBar.setTitle("用户设置1");
@@ -116,7 +117,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
             //需要根据expe_id查询具体的Expe
             FindExpeRequest request = new FindExpeRequest();
             request.setId(mExperiment.getId());
-            findSubscription=ExpeDataStore
+            findSubscription = ExpeDataStore
                     .getInstance(ProviderModule.getInstance()
                             .getBriteDb(getActivity()
                                     .getApplicationContext()))
@@ -127,7 +128,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
                         @Override
                         public void call(FindExpeByIdResponse response) {
                             findSubscription.unsubscribe();
-                            mExperiment=response.getData();
+                            mExperiment = response.getData();
                             inflateData();
                         }
                     });
@@ -164,7 +165,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            AppDialogHelper.showChannelSelectDialog(getActivity(), (position + 1), new AppDialogHelper.OnChannelSelectListener() {
+            AppDialogHelper.showChannelSelectDialog(getActivity(), position , new AppDialogHelper.OnChannelSelectListener() {
                 @Override
                 public void onChannelSelected(int position, ChannelMaterial material) {
                     mChannelAdapter.getItem(position).setValue(material.getName());
@@ -222,9 +223,9 @@ public class UserSettingsStep1Activity extends BaseActivity {
             ToastUtil.showToast(getActivity(), "请设置通道染料");
             return false;
         }
-        boolean sampleSetted = false;
+        /*  boolean sampleSetted = false;
         //检查样本
-        List<Sample> samplesA = mSampleAdapterA.getData();
+            List<Sample> samplesA = mSampleAdapterA.getData();
         for (int i = 0; i < samplesA.size(); i++) {
             Sample sample = samplesA.get(i);
             if (!TextUtils.isEmpty(sample.getName())) {
@@ -245,15 +246,16 @@ public class UserSettingsStep1Activity extends BaseActivity {
         if (!sampleSetted) {
             ToastUtil.showToast(getActivity(), "请设置样本B名称");
             return false;
-        }
+        }*/
 
         return true;
     }
 
     @Subscribe
-    public void onExpeNormalFinishEvent(ExpeNormalFinishEvent event){
+    public void onExpeNormalFinishEvent(ExpeNormalFinishEvent event) {
         ActivityUtil.finish(getActivity());
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

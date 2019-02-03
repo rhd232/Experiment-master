@@ -10,6 +10,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,31 +18,35 @@ import java.util.Map;
 
 public class DtChart extends WindChart {
 
-
     public DtChart(LineChart chart,int cylingCount) {
-        super(chart);
+        this(chart,cylingCount,null);
+
+
+    }
+    public DtChart(LineChart chart,int cylingCount,FactUpdater factUpdater) {
+        super(chart,factUpdater);
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setLabelCount(cylingCount + 4, true);
         xAxis.setAxisMaximum(cylingCount + 3);
     }
 
-    @Override
     public void show(List<String> ChanList, List<String> KSList,File dataFile) {
-         CommData.ReadDatapositionFile(mChart.getContext());
 
         InputStream ips = null;
         try {
-          // ips = new FileInputStream(dataFile);
-            ips = mChart.getContext().getAssets().open("fluorescence_data.txt");
+            ips = new FileInputStream(dataFile);
+            // ips = mChart.getContext().getAssets().open("fluorescence_data.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
         //读取图像文件数据
         DataFileReader.getInstance().ReadFileData(ips);
         CurveReader.getInstance().readCurve();
-
-       // Map<Integer,List<List<String>>> chanMap= DataParser.parseDtData(dataFile);
+        if (mRunning) {
+            mFactUpdater.updateFact();
+        }
+        // Map<Integer,List<List<String>>> chanMap= DataParser.parseDtData(dataFile);
         //请求服务器，解析图像版返回的原始数据
 
         mLegendEntries = new ArrayList<>();
@@ -51,7 +56,7 @@ public class DtChart extends WindChart {
         for (String chan : ChanList) {
             for (String ks : KSList) {
                 DrawLine(chan, 4, ks);
-               // DrawLineFromServer(chan,ks,chanMap);
+                // DrawLineFromServer(chan,ks,chanMap);
             }
         }
 
@@ -59,8 +64,8 @@ public class DtChart extends WindChart {
         legend.setCustom(mLegendEntries);
 
         mHandler.sendEmptyMessage(WHAT_REFRESH_CHART);
-
     }
+
     public void DrawLineFromServer(String chan,String currks, Map<Integer,List<List<String>>> chanMap) {
         int currChan = 0;
         int ksindex = -1;

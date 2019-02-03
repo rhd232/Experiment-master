@@ -77,6 +77,9 @@ public class CommData {
 
 
     public static void ReadDatapositionFile(Context context) {
+        if (positionlist.get("Chip#1")!=null && !positionlist.get("Chip#1").isEmpty()){
+            return;
+        }
         InputStream ips = null;
         BufferedReader reader=null;
         try {

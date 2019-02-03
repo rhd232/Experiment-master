@@ -165,7 +165,7 @@ public class AppDialogHelper {
                 alertDialog.dismiss();
             }
         });
-        tv.setText(context.getString(R.string.channel_select_title, position + ""));
+        tv.setText(context.getString(R.string.channel_select_title, (position+1) + ""));
         GridView gv = alertDialog.findViewById(R.id.gv_ranliao);
         final ChannelMaterialAdapter adapter = new ChannelMaterialAdapter(context, R.layout.item_sel_channel_material);
         alertDialog.findViewById(R.id.tv_confirm).setOnClickListener(new View.OnClickListener() {
@@ -178,7 +178,7 @@ public class AppDialogHelper {
                     if (channelMaterial.isSelected()) {
                         String remark = et_remark.getText().toString().trim();
                         channelMaterial.setRemark(remark);
-                        listener.onChannelSelected(position - 1, channelMaterial);
+                        listener.onChannelSelected(position, channelMaterial);
                         break;
                     }
                 }
@@ -187,15 +187,32 @@ public class AppDialogHelper {
             }
         });
         gv.setAdapter(adapter);
-        ChannelMaterial channelMaterial1 = new ChannelMaterial("HEX");
-        ChannelMaterial channelMaterial2 = new ChannelMaterial("VIC");
-        ChannelMaterial channelMaterial3 = new ChannelMaterial("TET");
-        ChannelMaterial channelMaterial4 = new ChannelMaterial("JOE");
         List<ChannelMaterial> list = new ArrayList<>();
-        list.add(channelMaterial1);
-        list.add(channelMaterial2);
-        list.add(channelMaterial3);
-        list.add(channelMaterial4);
+        switch (position){
+            case 0:
+                list.add(new ChannelMaterial("FAM"));
+                list.add(new ChannelMaterial("SYBR"));
+                break;
+            case 1:
+                list.add(new ChannelMaterial("HEX"));
+                list.add(new ChannelMaterial("VIC"));
+                list.add(new ChannelMaterial("TET"));
+                list.add(new ChannelMaterial("JOE"));
+                break;
+            case 2:
+                list.add(new ChannelMaterial("ROX"));
+                list.add(new ChannelMaterial("TexRed"));
+                break;
+            case 3:
+                list.add(new ChannelMaterial("Cy5"));
+                list.add(new ChannelMaterial("Quasar670"));
+                break;
+        }
+        if (list.size()>3){
+            gv.setNumColumns(3);
+        }else {
+            gv.setNumColumns(2);
+        }
         adapter.replaceAll(list);
         gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

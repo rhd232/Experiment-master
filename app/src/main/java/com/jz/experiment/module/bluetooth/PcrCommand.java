@@ -44,6 +44,38 @@ public class PcrCommand {
         return commandList;
     }
 
+    public void setIntergrationTime(float InTime){
+        int header=0xaa;
+        int command=0x1;
+        int length=0x05;
+        int type=0x20;
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) header);
+        bytes.add((byte) command);
+        bytes.add((byte) length);
+        bytes.add((byte) type);
+
+        byte[] bs=ByteBufferUtil.getBytes(InTime,ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < bs.length; i++) {
+            bytes.add(bs[i]);
+        }
+        addCommonBytes(bytes);
+        addCommand(listToByteArray(bytes));
+    }
+    public void setSensor(int cisIndex){
+        int header=0xaa;
+        int command=0x1;
+        int length=0x02;
+        int type=0x26;
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) header);
+        bytes.add((byte) command);
+        bytes.add((byte) length);
+        bytes.add((byte) type);
+        bytes.add((byte)cisIndex);
+        addCommonBytes(bytes);
+        addCommand(listToByteArray(bytes));
+    }
 
     /**
      * 强制设备复位

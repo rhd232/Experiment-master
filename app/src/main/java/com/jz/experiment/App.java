@@ -8,6 +8,7 @@ import com.jz.experiment.di.DaggerAppComponent;
 
 import javax.inject.Inject;
 
+import cat.ereza.customactivityoncrash.config.CaocConfig;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
@@ -21,7 +22,7 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
     public void onCreate() {
         super.onCreate();
         sInstance = this;
-
+        CaocConfig.Builder.create().apply();
         mAppComponent = createComponent();
         mAppComponent.inject(this);
     }

@@ -27,8 +27,14 @@ public abstract class WindChart {
     private ChartMarkerView mChartMarkerView;
     protected LineChart mChart;
     protected List<LegendEntry> mLegendEntries;
+
+    protected FactUpdater mFactUpdater;
     public WindChart(LineChart chart){
+        this(chart,null);
+    }
+    public WindChart(LineChart chart,FactUpdater factUpdater){
         this.mChart=chart;
+        this.mFactUpdater=factUpdater;
         mDataSets = new ArrayList<>();
         mLineColors = new ArrayList<>();
         XAxis xAxis = chart.getXAxis();
@@ -94,8 +100,14 @@ public abstract class WindChart {
             }
         }));
         // chart.setTouchEnabled(false);
+
+        //设置是否可以通过双击屏幕放大图表。默认是true
+        chart.setDoubleTapToZoomEnabled(false);
+        //设置是否可以缩放 x和y，默认true
+        chart.setScaleEnabled(false);
         chart.setDrawBorders(false);
         chart.setData(mLineData);
+
         chart.invalidate(); // refresh
     }
     public static final int WHAT_REFRESH_CHART = 1234;
@@ -124,6 +136,9 @@ public abstract class WindChart {
 
         }
     };
-
+    protected boolean mRunning;
+    public void setRunning(boolean running){
+        this.mRunning=running;
+    }
     public abstract void show(List<String> ChanList, List<String> KSList,File dataFile);
 }

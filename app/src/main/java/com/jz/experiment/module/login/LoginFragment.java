@@ -83,36 +83,9 @@ public class LoginFragment extends BaseFragment {
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.tv_login:
-                //testServer();
 
-                if (validate()) {
-                    LoadingDialogHelper.showOpLoading(getActivity());
-                    String username = et_username.getText().toString().trim();
-                    String pwd = et_pwd.getText().toString().trim();
-                    final FindUserRequest request = new FindUserRequest();
-                    request.setUsername(username);
-                    request.setPwd(pwd);
-                    loginSubscription=UserDataStore
-                            .getInstance(ProviderModule.getInstance()
-                                    .getBriteDb(getActivity().getApplicationContext()))
-                            .findUserByUsernameAndPwd(request)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Action1<FindUserResponse>() {
-                                @Override
-                                public void call(FindUserResponse response) {
-                                    loginSubscription.unsubscribe();
-                                    LoadingDialogHelper.hideOpLoading();
-                                    if (response.getErrCode()==BaseResponse.CODE_SUCCESS){
-                                        //登录成功
-                                        MainActivity.start(getActivity());
-                                        ActivityUtil.finish(getActivity());
-                                    }else {
-                                        tv_msg.setText("用户不存在或密码错误");
-                                    }
-                                }
-                            });
-                }
+               // TrimReader.getInstance(getActivity());
+                login();
                 break;
             case R.id.iv_pwd_toggle:
                 if (iv_pwd_toggle.isActivated()) {
@@ -128,6 +101,36 @@ public class LoginFragment extends BaseFragment {
         }
     }
 
+    private void login(){
+        if (validate()) {
+            LoadingDialogHelper.showOpLoading(getActivity());
+            String username = et_username.getText().toString().trim();
+            String pwd = et_pwd.getText().toString().trim();
+            final FindUserRequest request = new FindUserRequest();
+            request.setUsername(username);
+            request.setPwd(pwd);
+            loginSubscription=UserDataStore
+                    .getInstance(ProviderModule.getInstance()
+                            .getBriteDb(getActivity().getApplicationContext()))
+                    .findUserByUsernameAndPwd(request)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<FindUserResponse>() {
+                        @Override
+                        public void call(FindUserResponse response) {
+                            loginSubscription.unsubscribe();
+                            LoadingDialogHelper.hideOpLoading();
+                            if (response.getErrCode()==BaseResponse.CODE_SUCCESS){
+                                //登录成功
+                                MainActivity.start(getActivity());
+                                ActivityUtil.finish(getActivity());
+                            }else {
+                                tv_msg.setText("用户不存在或密码错误");
+                            }
+                        }
+                    });
+        }
+    }
     private boolean validate() {
         if (!et_username.validate()) {
             tv_msg.setText("输入用户名");

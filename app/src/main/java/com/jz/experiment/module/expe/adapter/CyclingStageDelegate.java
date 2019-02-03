@@ -116,6 +116,12 @@ public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelega
                 if (TextUtils.isEmpty(s)) {
                     s = "1";
                 }
+                try {
+                    vh.et_cycling_cnt.setSelection(s.length());
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
                 int count = Integer.parseInt(s);
                 stage.setCyclingCount(count);
             }

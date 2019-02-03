@@ -12,8 +12,8 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
-import com.jz.experiment.chart.DataFileReader;
 import com.jz.experiment.chart.DtChart;
+import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.module.bluetooth.BluetoothReceiver;
 import com.jz.experiment.module.bluetooth.BluetoothService;
@@ -29,6 +29,7 @@ import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.ByteHelper;
+import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.StatusChecker;
@@ -116,7 +117,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
     private DtChart mDtChart;
     private MeltingChart mMeltingChart;
-
+    private FactUpdater mFactUpdater;
     @Override
     protected void setTitle() {
         mTitleBar.setTitle("运行");
@@ -135,6 +136,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         setContentView(R.layout.activity_expe_running);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
+
         mImageMode = PcrCommand.IMAGE_MODE.IMAGE_12;
         mHistoryExperiment = Navigator.getParcelableExtra(this);
         List<Mode> modeList = mHistoryExperiment.getSettingSecondInfo().getModes();
@@ -150,16 +152,15 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
 
         initChart();
-
+        //读取dataposition文件
+        CommData.ReadDatapositionFile(getActivity());
 
         bindService();
-
         init();
-
 
         mExecutorService = Executors.newSingleThreadExecutor();
 
-        mDtChart.show(ChanList,KSList,null);
+       // mDtChart.show(ChanList,KSList,null);
        /* Thread thread = new Thread(mRun);
         thread.start();*/
 
@@ -170,11 +171,13 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
         mBluetoothService = DeviceProxyHelper.getInstance(getActivity()).getBluetoothService();
         mUsbService = DeviceProxyHelper.getInstance(getActivity()).getUsbService();
+        mFactUpdater=new FactUpdater(mUsbService);
+        mFactUpdater.SetInitData();
         chart_dt.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (!ActivityUtil.isFinish(getActivity())) {
-                   // step1();
+                    step1();
                 }
             }
         }, 500);
@@ -221,8 +224,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     }
 
     private void initChart() {
-        mDtChart = new DtChart(chart_dt, getCurCyclingStage().getCyclingCount());
-        mMeltingChart = new MeltingChart(chart_melt);
+        mDtChart = new DtChart(chart_dt, getCurCyclingStage().getCyclingCount(),mFactUpdater);
+        mDtChart.setRunning(true);
+        mMeltingChart = new MeltingChart(chart_melt,mFactUpdater);
+        mMeltingChart.setRunning(true);
     }
 
     private List<String> ChanList = new ArrayList<>();
@@ -271,14 +276,17 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     private Runnable mRun = new Runnable() {
         @Override
         public void run() {
-            if (mInCycling)
-                showDtChart();
-            if (mInMeltCurve) {
-                showMeltChart();
-            }
+            showChart();
         }
     };
 
+    private void showChart(){
+        if (mInCycling)
+            showDtChart();
+        if (mInMeltCurve) {
+            showMeltChart();
+        }
+    }
     private void showMeltChart() {
         mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mHistoryExperiment));
     }
@@ -364,10 +372,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         switch (view.getId()) {
             case R.id.tv_stop:
                 //强行终止：停止循环和停止溶解曲线
-                //onBackPressed();
+                onBackPressed();
 
 
-                toAnalyzePage();
+               // toAnalyzePage();
 
                /* mHistoryExperiment.setDuring(tv_duration.getDuring());
                 mHistoryExperiment.setFinishMilliTime(System.currentTimeMillis());
@@ -443,8 +451,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
         KSList =
                 event.getKSList();
-
-        mExecutorService.execute(mRun);
+        showChart();
+        //mExecutorService.execute(mRun);
     }
 
     @Override
@@ -1109,9 +1117,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 }
             }
             if (next == -1) {//全部通道已经全部读取完
-                //TODO 绘制图形
-                mExecutorService.execute(mRun);
 
+                //TODO 绘制图形
+                //mExecutorService.execute(mRun);
+                showChart();
                 /**
                  * 读循环状态
                  */
@@ -1126,7 +1135,12 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 }
 
     private String transferImageData(int chan, int k, byte[] reveicedBytes) {
-        int count = mImageMode.getSize() + 1;
+        int count;
+        if (mInCycling){
+            count=mImageMode.getSize() + 1;
+        }else {
+            count=mImageMode.getSize()+2;
+        }
         int[] txData = new int[count];
 
         //aa 00 02 1c 02 0b 07112b12001117115012bb1063118b0a6311741bb50e000ed07a0d1717
@@ -1135,13 +1149,27 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             byte low = reveicedBytes[numData * 2 + 6];
 
             int value = TrimReader.getInstance(getActivity())
-                    .tocalADCCorrection(numData, high, low, mImageMode.getSize(), chan, CommData.gain_mode, 0);
+                    .tocalADCCorrection(numData, high, low,
+                            mImageMode.getSize(), chan,
+                            CommData.gain_mode, 0);
 
             txData[numData] = value;
         }
         //当前行号
         txData[mImageMode.getSize()] = reveicedBytes[5];
-
+        if (mInMeltCurve){
+            if ( reveicedBytes[5]==0){
+                //TODO 待验证
+                byte[] buffers = new byte[4];
+                buffers[0] = reveicedBytes[CommData.imgFrame * 2 + 6];
+                buffers[1] = reveicedBytes[CommData.imgFrame * 2 + 7];
+                buffers[2] = reveicedBytes[CommData.imgFrame * 2 + 8];
+                buffers[3] = reveicedBytes[CommData.imgFrame * 2 + 9];
+                //float t = BitConverter.ToSingle(buffers, 0);
+                float t =ByteUtil.getFloat(buffers);
+                txData[count - 1] = (int) t;
+            }
+        }
         String res = "";
         String newres = "";
         for (int i = 0; i < txData.length; i++) {
@@ -1154,8 +1182,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     newres += "    " + txData[i];
                 } else {
                     if (k == 11 || k == 23) {
-                        res += " " + DataFileReader.getInstance().GetFactValueByXS(chan);
-                        newres += "    " + DataFileReader.getInstance().GetFactValueByXS(chan);
+                        res += " " + mFactUpdater.GetFactValueByXS(chan);
+                        newres += "    " + mFactUpdater.GetFactValueByXS(chan);
                     } else {
                         res += " " + txData[i];
                         newres += "    " + txData[i];

@@ -22,6 +22,7 @@ import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.data.adapter.ChannelDataAdapter;
 import com.jz.experiment.module.expe.bean.Tab;
+import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DataFileUtil;
@@ -42,6 +43,7 @@ import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,6 +51,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -90,15 +94,17 @@ public class ExpeDataFragment extends BaseFragment {
 
     @BindView(R.id.sv)
     ScrollView sv;
-
+    @BindView(R.id.iv_save)
+    View iv_save;
    /* LineData mLineData;
     ArrayList<ILineDataSet> mDataSets;*/
 
     DtChart mDtChart;
     MeltingChart mMeltingChart;
-
+    ExecutorService mExecutorService;
     private HistoryExperiment mExeperiment;
     private boolean mSaved;
+
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_expe_data;
@@ -108,6 +114,7 @@ public class ExpeDataFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        EventBus.getDefault().register(this);
         mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
         mChannelDataAdapters = new ChannelDataAdapter[2];
         GridView[] gvs = new GridView[2];
@@ -116,13 +123,17 @@ public class ExpeDataFragment extends BaseFragment {
         String[] titles = {"A", "B"};
         buildChannelData(gvs, titles);
 
+        mExecutorService = Executors.newSingleThreadExecutor();
         init();
         inflateBase();
-
         inflateChart();
         tv_dt.setActivated(true);
         tv_melt.setActivated(false);
 
+        if (isSavedExpe()){
+            iv_save.setVisibility(View.GONE);
+        }
+       // mExecutorService.execute(mRun);
 
     }
 
@@ -182,6 +193,19 @@ public class ExpeDataFragment extends BaseFragment {
     }
 
     private boolean mHasMeltingMode;
+
+
+    private boolean mDtShow=true;
+    private Runnable mRun = new Runnable() {
+        @Override
+        public void run() {
+            if (mDtShow)
+                mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
+            else {
+
+            }
+        }
+    };
 
     private void inflateChart() {
         if (mExeperiment == null) {
@@ -324,7 +348,7 @@ public class ExpeDataFragment extends BaseFragment {
         double val = ctValues[currChan][ksindex];
         DecimalFormat format = new DecimalFormat("#0.00");
         String ctValue = format.format(val);
-        System.out.println("ctValue:" + ctValue);
+      //  System.out.println("ctValue:" + ctValue);
         mChannelDataAdapters[gvIndex].getItem(ksIndexInAdapter).setSampleVal(ctValue);
 
 
@@ -543,5 +567,52 @@ public class ExpeDataFragment extends BaseFragment {
 
     }
 
+    boolean mVisibleToUser;
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        mVisibleToUser=isVisibleToUser;
+    }
 
+    @Subscribe
+    public void onFilterEvent(FilterEvent event){
+        if (!mVisibleToUser){
+            return;
+        }
+        ChanList =
+                event.getChanList();
+        for (String chan : ChanList) {
+            if (chan.equals("Chip#1")) {
+                CommData.cboChan1 = 1;
+            } else {
+                CommData.cboChan1 = 0;
+            }
+            if (chan.equals("Chip#2")) {
+                CommData.cboChan2 = 1;
+            } else {
+                CommData.cboChan2 = 0;
+            }
+            if (chan.equals("Chip#3")) {
+                CommData.cboChan3 = 1;
+            } else {
+                CommData.cboChan3 = 0;
+            }
+            if (chan.equals("Chip#4")) {
+                CommData.cboChan4 = 1;
+            } else {
+                CommData.cboChan4 = 0;
+            }
+        }
+
+
+        KSList =
+                event.getKSList();
+
+        mExecutorService.execute(mRun);
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
 }

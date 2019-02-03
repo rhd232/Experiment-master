@@ -12,6 +12,7 @@ import com.jz.experiment.module.data.adapter.StringSelectableAdapter;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.Navigator;
+import com.wind.toastlib.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -129,6 +130,11 @@ public class FilterActivity extends BaseActivity {
                             break;
                     }
                 }
+
+                if (ChanList.isEmpty()){
+                    ToastUtil.showToast(getActivity(),"最少选择一个通道");
+                    return;
+                }
                 List<String> KSList = new ArrayList<String>();
                 for (StringSelectable selectable : selectedSampleAList) {
                     KSList.add("A"+selectable.getVal());
@@ -136,6 +142,12 @@ public class FilterActivity extends BaseActivity {
                 for (StringSelectable selectable : selectedSampleBList) {
                     KSList.add("B"+selectable.getVal());
                 }
+
+                if (KSList.isEmpty()){
+                    ToastUtil.showToast(getActivity(),"最少选择一个样本");
+                    return;
+                }
+
                 EventBus.getDefault().post(new FilterEvent(ChanList,KSList));
                 finish();
                 break;

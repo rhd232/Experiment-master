@@ -17,14 +17,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,8 +48,7 @@ public class UsbService extends Service {
         return mBinder;
     }
 
-    private List<UsbSerialDriver> mAllAvailableDrivers;
-    private UsbSerialPort mUsbSerialPort;
+
     private UsbEndpoint mUsbEndpointIn;
     private UsbEndpoint mUsbEndpointOut;
     private UsbDeviceConnection mUsbDeviceConnection;
@@ -79,10 +75,9 @@ public class UsbService extends Service {
         mAllAvailableDrivers = prober.findAllDrivers(mUsbManager);*/
     }
 
-    public boolean isConnected() {
-        return mUsbSerialPort != null;
-    }
 
+
+    private UsbDevice mTargetDevice;
     public void connect(String deviceName) {
         HashMap<String, UsbDevice> deviceMap = mUsbManager.getDeviceList();
         Iterator<UsbDevice> iterator = deviceMap.values().iterator();
@@ -94,7 +89,7 @@ public class UsbService extends Service {
                 break;
             }
         }
-
+        mTargetDevice=targetDevice;
         if (targetDevice != null) {
             if (mUsbManager.hasPermission(targetDevice)) {
                 usbDeviceInit(targetDevice);
@@ -105,6 +100,21 @@ public class UsbService extends Service {
         }
     }
 
+    public boolean hasPermission(){
+        if (mTargetDevice!=null) {
+            return mUsbManager.hasPermission(mTargetDevice);
+        }else{
+            return false;
+        }
+    }
+    public void requestPermission(){
+        if (mTargetDevice!=null)
+            mUsbManager.requestPermission(mTargetDevice, mRequestPermissionPendingIntent);
+    }
+
+    public boolean isConnected(){
+       return hasPermission();
+    }
     private BroadcastReceiver mUsbPermissionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

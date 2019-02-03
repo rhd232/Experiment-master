@@ -7,9 +7,11 @@ import java.util.List;
 
 public class MeltingChart extends WindChart {
 
-
-    public MeltingChart(LineChart chart) {
+    public MeltingChart(LineChart chart){
         super(chart);
+    }
+    public MeltingChart(LineChart chart,FactUpdater factUpdater) {
+        super(chart,factUpdater);
     }
 
     @Override

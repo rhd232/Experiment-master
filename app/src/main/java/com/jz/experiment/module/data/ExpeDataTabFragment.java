@@ -129,22 +129,9 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         return R.layout.fragment_tab_expe_data;
     }
 
-  /*  @Override
-    public List<String> getTitles() {
-        List<String> title=new ArrayList<>();
-        title.add("历史实验");
-        title.add("历史实验");
-        title.add("历史实验");
-        return title;
-    }*/
 
     @Override
     protected List<Fragment> getFragments() {
-       /* List<Fragment> fragments=new ArrayList<>();
-        fragments.add(ExpeDataFragment.newInstance(null));
-        fragments.add(ExpeDataFragment.newInstance(null));
-        fragments.add(ExpeDataFragment.newInstance(null));
-        return fragments;*/
        return null;
     }
 
@@ -152,7 +139,6 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     public void setExpe(HistoryExperiment expe) {
 
-       // view_pager.setAdapter(null);
         //增加一个tab显示本实验
         ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
         List<Fragment> fragments = mFragmentAdapter.getFragments();
@@ -163,28 +149,20 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
             mFragmentAdapter.setFragments(fragments);
             mFragmentAdapter.setTitles(titles);
         } else {
-            ExpeDataFragment expeDataFragment= (ExpeDataFragment) fragments.get(0);
+            int lastIndex=fragments.size()-1;
+            ExpeDataFragment expeDataFragment= (ExpeDataFragment) fragments.get(lastIndex);
             if (!expeDataFragment.isSavedExpe()){
-                fragments.remove(0);
-                titles.remove(0);
+                fragments.remove(lastIndex);
+                titles.remove(lastIndex);
             }
 
 
         }
-        List<Fragment> newFragment=new ArrayList<>();
-        newFragment.add(f);
-        for (Fragment fragment:fragments){
-            ExpeDataFragment expeF=(ExpeDataFragment)fragment;
-            if (expeF.isSavedExpe()){
-                newFragment.add(ExpeDataFragment.newInstance(expeF.getExeperiment()));
-            }
-        }
-        titles.add(0,"本次实验");
-        mFragmentAdapter = new ContainerPagerAdapter(getChildFragmentManager(),
-                newFragment, titles);
-        view_pager.setAdapter(mFragmentAdapter);
+
+        titles.add("本次实验");
+        fragments.add(f);
         mFragmentAdapter.notifyDataSetChanged();
-        view_pager.setCurrentItem(0, false);
+        view_pager.setCurrentItem(fragments.size()-1, false);
 
 
 

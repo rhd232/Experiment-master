@@ -11,10 +11,7 @@ import java.util.ArrayList;
 public class DataFileReader {
     public static final int MAX_CHAN = 4;
     private static int MAX_CYCL = 61;
-    boolean[] m_dynIntTime = new boolean[MAX_CHAN];
-    float[] m_factorIntTime = new float[MAX_CHAN];
-    int[] m_maxPixVal = new int[MAX_CHAN];
-    double[][] m_factorData = new double[MAX_CHAN][100];
+
     public double[][] factorValue = new double[MAX_CHAN][MAX_CYCL];
     private static DataFileReader INSTANCE=new DataFileReader();
     public static DataFileReader getInstance(){
@@ -22,7 +19,6 @@ public class DataFileReader {
     }
 
     private DataFileReader(){
-       // SetInitData();
     }
 
 
@@ -49,6 +45,7 @@ public class DataFileReader {
                 }
 
             }
+
             for (String item:CommData.diclist.keySet()){
                 if (CommData.diclist.get(item).size() == 0) continue;
                 CommData.Cycle = CommData.diclist.get(item).size() / CommData.imgFrame;
@@ -74,65 +71,10 @@ public class DataFileReader {
 
     }
 
-    int xhindex = 1;
-
-    float int_time1 = 1;
-    float int_time2 = 1;
-    float int_time3 = 1;
-    float int_time4 = 1;
-
-    float int_time_1 = 1;
-    float int_time_2 = 1;
-    float int_time_3 = 1;
-    float int_time_4 = 1;
-    public float DynamicUpdateIntTime(float factor, int chan)
-    {
-        switch (chan)
-        {
-            case 0:
-                int_time1 = int_time_1;
-                int_time1 = (float)Math.round(int_time1 * factor);
-              //  SetSensor(1, int_time1);
-                return int_time1 /int_time_1;
-            // break;
-
-            case 1:
-                int_time2 = int_time_2;
-                int_time2 = (float)Math.round(int_time2 * factor);
-                //SetSensor(2, int_time2);
-                return int_time2 / int_time_2;
-            //		break;
-
-            case 2:
-                int_time3 = int_time_3;
-                int_time3 = (float)Math.round(int_time3 * factor);
-              //  SetSensor(3, int_time3);
-                return int_time3 / int_time_3;
-            //		break;
-
-            case 3:
-                int_time4 = int_time_4;
-                int_time4 = (float)Math.round(int_time4 * factor);
-               // SetSensor(4, int_time4);
-                return int_time4 / int_time_4;
-            //		break;
-
-            default:
-                return 1;
-        }
-
-//        return 0;
-    }
 
 
-    public String GetFactValueByXS(int n)
-    {
-        int chan = n - 1;
-        int currCycle = xhindex - 1;
-        double value = 5000 + m_factorData[chan][currCycle] * 10000;
-        int v= (int) value;
-        return v+"";
-    }
+
+
 
 
     public int GetChan(String chan)
