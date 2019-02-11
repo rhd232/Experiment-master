@@ -69,7 +69,8 @@
             ></activity>
         <service android:name=".module.bluetooth.ble.BluetoothLeService"></service>
         <service android:name=".module.bluetooth.BluetoothService"></service>
-        <service android:name=".module.bluetooth.UsbService"></service>
+        <service android:name=".module.bluetooth.UsbService">
+        </service>
     </application>
 
 </manifest>

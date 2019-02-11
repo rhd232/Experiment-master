@@ -181,18 +181,14 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Subscribe
     public void onToExpeSettingsEvent(final ToExpeSettingsEvent event) {
         //判断是否已经连接设备
-       /* if (sDeviceProxyHelper.isConnected()){
-            UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
-        }else {
-            ToastUtil.showToast(getActivity(),"请先连接设备");
-        }*/
-        AndPermission.with(getActivity())
-                .runtime()
-                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .onGranted(new Action<List<String>>() {
-                    @Override
-                    public void onAction(List<String> data) {
-                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+        if (sDeviceProxyHelper.isConnected(DeviceProxyHelper.ConnectMode.USB)){
+            AndPermission.with(getActivity())
+                    .runtime()
+                    .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .onGranted(new Action<List<String>>() {
+                        @Override
+                        public void onAction(List<String> data) {
+                            UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
                       /*  if (sDeviceProxyHelper.getUsbService().hasPermission()){
                             UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
                         }else {
@@ -200,16 +196,25 @@ public class HistoryExperimentsFragment extends BaseFragment {
                         }*/
 
 
-                    }
-                })
-                .onDenied(new Action<List<String>>() {
-                    @Override
-                    public void onAction(List<String> data) {
+                        }
+                    })
+                    .onDenied(new Action<List<String>>() {
+                        @Override
+                        public void onAction(List<String> data) {
 
                             ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
 
-                    }
-                }).start();
+                        }
+                    }).start();
+        }else {
+            sDeviceProxyHelper.getUsbService().requestPermission();
+        }
+       /* if (sDeviceProxyHelper.isConnected()){
+            UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
+        }else {
+            ToastUtil.showToast(getActivity(),"请先连接设备");
+        }*/
+
 
     }
 

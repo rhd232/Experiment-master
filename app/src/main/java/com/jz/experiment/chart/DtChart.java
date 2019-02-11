@@ -32,7 +32,7 @@ public class DtChart extends WindChart {
     }
 
     public void show(List<String> ChanList, List<String> KSList,File dataFile) {
-
+        CommData.ReadDatapositionFile(mChart.getContext());
         InputStream ips = null;
         try {
             ips = new FileInputStream(dataFile);

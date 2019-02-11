@@ -4,7 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.wind.base.C;
+
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -83,7 +87,15 @@ public class CommData {
         InputStream ips = null;
         BufferedReader reader=null;
         try {
-            ips = context.getAssets().open("dataposition.ini");
+
+            //查看sd卡目录下anitoa/trim文件夹下是否存在dataposition文件，优先读取该目录下文件
+            File dataPositionFile=new File(C.Value.TRIM_FOLDER,"dataposition.ini");
+            if (dataPositionFile.exists()){
+                ips=new FileInputStream(dataPositionFile);
+            }else {
+                ips = context.getAssets().open("dataposition.ini");
+            }
+
             //判断相应月份文件夹是否存在，没有则创建
             reader = new BufferedReader(new InputStreamReader(ips));
             String line = null;
@@ -233,7 +245,7 @@ public class CommData {
             }
 
         } catch (Exception ex) {
-
+            ex.printStackTrace();
         }
 
 

@@ -7,7 +7,7 @@ public class CurveReader {
 
     public double[][][] m_zData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][ CCurveShow.MAX_CYCL];
     public double[][] m_CTValue = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL];
-
+    private CurveReader(){}
     private static CurveReader INSTANCE=new CurveReader();
     public static CurveReader getInstance(){
         return INSTANCE;
@@ -48,7 +48,7 @@ public class CurveReader {
                     //AppendToFile(t,file);
                 }
             }
-            if (CommData.diclist.size() > 0)
+            if (CommData.diclist.size() > 0 && CommData.diclist.get(tdlist.get(i))!=null)
             {
                 cyclenum = (CommData.diclist.get(tdlist.get(i)).size() / CommData.imgFrame);
             }

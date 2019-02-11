@@ -13,11 +13,16 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
+import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
+import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +35,8 @@ public class UsbService extends Service {
     private UsbManager mUsbManager;
     public static final String ACTION_DEVICE_PERMISSION = "action_device_permission";
 
-
+    public static final String ACTION_DEVICE_ATTACHED = "action_device_attached";
+    public static final String ACTION_DEVICE_DETACHED = "action_device_detached";
 
     public class LocalBinder extends Binder {
         public UsbService getService() {
@@ -64,6 +70,12 @@ public class UsbService extends Service {
         IntentFilter permissionFilter = new IntentFilter(ACTION_DEVICE_PERMISSION);
         registerReceiver(mUsbPermissionReceiver, permissionFilter);
 
+        IntentFilter usbEventFilter = new IntentFilter();
+        usbEventFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        usbEventFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+
+        registerReceiver(mUsbEventReceiver, usbEventFilter);
+
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
 
 
@@ -76,8 +88,10 @@ public class UsbService extends Service {
     }
 
 
-
     private UsbDevice mTargetDevice;
+    public UsbDevice getConnectedDevice(){
+        return mTargetDevice;
+    }
     public void connect(String deviceName) {
         HashMap<String, UsbDevice> deviceMap = mUsbManager.getDeviceList();
         Iterator<UsbDevice> iterator = deviceMap.values().iterator();
@@ -89,7 +103,7 @@ public class UsbService extends Service {
                 break;
             }
         }
-        mTargetDevice=targetDevice;
+        mTargetDevice = targetDevice;
         if (targetDevice != null) {
             if (mUsbManager.hasPermission(targetDevice)) {
                 usbDeviceInit(targetDevice);
@@ -100,21 +114,23 @@ public class UsbService extends Service {
         }
     }
 
-    public boolean hasPermission(){
-        if (mTargetDevice!=null) {
+    public boolean hasPermission() {
+        if (mTargetDevice != null) {
             return mUsbManager.hasPermission(mTargetDevice);
-        }else{
+        } else {
             return false;
         }
     }
-    public void requestPermission(){
-        if (mTargetDevice!=null)
+
+    public void requestPermission() {
+        if (mTargetDevice != null)
             mUsbManager.requestPermission(mTargetDevice, mRequestPermissionPendingIntent);
     }
 
-    public boolean isConnected(){
-       return hasPermission();
+    public boolean isConnected() {
+        return hasPermission();
     }
+
     private BroadcastReceiver mUsbPermissionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -125,6 +141,7 @@ public class UsbService extends Service {
                 if (granted) {
                     //获得了usb使用权限
                     usbDeviceInit(device);
+
                 }
             }
         }
@@ -170,7 +187,16 @@ public class UsbService extends Service {
                 mReadThread = new ReadThread();
                 mReadThread.start();*/
             }
+            String name = "HID";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                name = device.getProductName();
+            }
+           /* byte[] bytes = name.getBytes();
+            Data data = new Data(bytes, bytes.length);
+            broadcastUpdate(ACTION_DEVICE_ATTACHED, data);*/
 
+            BluetoothConnectedEvent event=new BluetoothConnectedEvent(name);
+            EventBus.getDefault().post(event);
 
         }
 
@@ -231,7 +257,7 @@ public class UsbService extends Service {
         }
     }
 */
-    private void  toByteString(PcrCommand cmd){
+    private void toByteString(PcrCommand cmd) {
         ArrayList<Byte> bytes = cmd.getCommandList();
         byte[] data = new byte[bytes.size()];
         for (int i = 0; i < bytes.size(); i++) {
@@ -243,12 +269,13 @@ public class UsbService extends Service {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
         }
-        System.out.println("发送："+hex.toString().toLowerCase());
+        System.out.println("发送：" + hex.toString().toLowerCase());
     }
+
     public int sendPcrCommand(PcrCommand command) {
         int err = 0;
         try {
-            if (mReadThread==null || !mReadThread.mRun){
+            if (mReadThread == null || !mReadThread.mRun) {
                 startReadThread();
                 Thread.sleep(100);
             }
@@ -266,6 +293,7 @@ public class UsbService extends Service {
         return err;
 
     }
+
     public byte[] sendPcrCommandSync(PcrCommand command) {
         //停止读取线程。
         stopReadThread();
@@ -277,6 +305,7 @@ public class UsbService extends Service {
         }
         return bulkSync(bytes);
     }
+
     private byte[] bulkSync(ArrayList<Byte> command) {
         if (command != null && !command.isEmpty()) {
 
@@ -304,7 +333,7 @@ public class UsbService extends Service {
                         if ((b & 0xFF) < 0x10) hex.append("0");
                         hex.append(Integer.toHexString(b & 0xFF));
                     }
-                    System.out.println("同步接收到:"+hex.toString().toLowerCase());
+                    System.out.println("同步接收到:" + hex.toString().toLowerCase());
                     //Data d = new Data(buffer, bytes);
                     //broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, d);
                 }
@@ -316,6 +345,7 @@ public class UsbService extends Service {
             return null;
         }
     }
+
     private int bulk(ArrayList<Byte> command) {
         if (command != null && !command.isEmpty()) {
 
@@ -369,15 +399,16 @@ public class UsbService extends Service {
 
     }
 
-    public void stopReadThread(){
+    public void stopReadThread() {
         if (mReadThread != null) {
             mReadThread.stopRun();
-            mReadThread=null;
+            mReadThread = null;
         }
     }
-    public void startReadThread(){
+
+    public void startReadThread() {
         stopReadThread();
-        mReadThread=new ReadThread();
+        mReadThread = new ReadThread();
         mReadThread.start();
     }
 
@@ -416,7 +447,7 @@ public class UsbService extends Service {
                                 if ((b & 0xFF) < 0x10) hex.append("0");
                                 hex.append(Integer.toHexString(b & 0xFF));
                             }
-                            System.out.println("接收到:"+hex.toString().toLowerCase());
+                            System.out.println("接收到:" + hex.toString().toLowerCase());
                             Data data = new Data(buffer, bytes);
                             broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, data);
                         }
@@ -437,4 +468,33 @@ public class UsbService extends Service {
             }
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mUsbEventReceiver);
+        unregisterReceiver(mUsbPermissionReceiver);
+    }
+
+    private final BroadcastReceiver mUsbEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String action = intent.getAction();
+            UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+            if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
+                Log.e("pangsheng", "静态广播接收器设备插入");
+                connect(device.getDeviceName());
+            } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
+                Log.e("pangsheng", "静态广播接收器设备拔出");
+                mTargetDevice = null;
+                String name = "HID";
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    name = device.getProductName();
+                }
+                BluetoothDisConnectedEvent event= new BluetoothDisConnectedEvent(name);
+                EventBus.getDefault().post(event);
+            }
+        }
+    };
 }

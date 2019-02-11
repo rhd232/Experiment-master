@@ -4,8 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.jz.experiment.chart.CommData;
+import com.wind.base.C;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -36,7 +39,14 @@ public class TrimReader {
 
     public TrimReader(Context context) {
         try {
-            InputStream ips = context.getAssets().open("trim.dat");
+            InputStream ips;
+            File trimFile=new File(C.Value.TRIM_FOLDER,"trim.dat");
+            if (trimFile.exists()) {
+                ips = new FileInputStream(trimFile);
+            }else {
+                ips = context.getAssets().open("trim.dat");
+            }
+
             ReadTrimFile(ips);
         } catch (Exception e) {
             e.printStackTrace();

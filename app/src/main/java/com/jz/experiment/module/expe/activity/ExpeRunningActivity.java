@@ -171,8 +171,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
         mBluetoothService = DeviceProxyHelper.getInstance(getActivity()).getBluetoothService();
         mUsbService = DeviceProxyHelper.getInstance(getActivity()).getUsbService();
-        mFactUpdater=new FactUpdater(mUsbService);
-        mFactUpdater.SetInitData();
+
         chart_dt.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -224,6 +223,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     }
 
     private void initChart() {
+        mFactUpdater=new FactUpdater(mUsbService);
+        mFactUpdater.SetInitData();
         mDtChart = new DtChart(chart_dt, getCurCyclingStage().getCyclingCount(),mFactUpdater);
         mDtChart.setRunning(true);
         mMeltingChart = new MeltingChart(chart_melt,mFactUpdater);
@@ -1099,12 +1100,13 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         int index=source.indexOf("1717");
         source=source.substring(0,index+4);
         sourceAppendToFile(source, sourceFile);
-        if (mInCycling) {
+       // if (mInCycling) {
             //TODO 循环过程数据转换待理解
             String imageData = transferImageData(channelIndex, curRowIndex, reveicedBytes);
+            System.out.println("trim后的图像数据："+imageData);
             //保存经过矫正图像板数据到文件
             appendToFile(imageData, file);
-        }
+        //}
         //检查本通道是否已经读取完毕
         if (readed) {
             //执行下一个通道的读取操作

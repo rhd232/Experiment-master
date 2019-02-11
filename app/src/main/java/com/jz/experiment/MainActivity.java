@@ -23,6 +23,7 @@ import com.jz.experiment.module.expe.HistoryExperimentsFragment;
 import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.module.expe.bean.UsbDeviceInfo;
 import com.jz.experiment.module.settings.event.LogoutEvent;
+import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.ActivityUtil;
@@ -97,6 +98,7 @@ public class MainActivity extends BaseActivity {
             }
 
         }*/
+        DataFileUtil.createAppFolder();
         DeviceProxyHelper.getInstance(getActivity());
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -143,7 +145,7 @@ public class MainActivity extends BaseActivity {
 
         }
 
-        if (printerCount == 1) {//默认为小票打印机
+        if (printerCount == 1) {
             for (UsbDevice device : usbManager.getDeviceList().values()) {
                 for (int i = 0; i < device.getInterfaceCount(); i++) {
                     UsbInterface usbInterface = device.getInterface(i);

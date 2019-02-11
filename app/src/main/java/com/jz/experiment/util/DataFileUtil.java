@@ -98,4 +98,17 @@ public class DataFileUtil {
         }
         return newList;
     }
+
+    public static void createAppFolder() {
+        String appDir = C.Value.APP_FOLDER;
+        File dir=new File(appDir);
+        if (!dir.exists()){
+            dir.mkdirs();
+        }
+
+        File dirTrim=new File(C.Value.TRIM_FOLDER);
+        if (!dirTrim.exists()){
+            dirTrim.mkdirs();
+        }
+    }
 }
