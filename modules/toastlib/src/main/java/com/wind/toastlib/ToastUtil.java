@@ -88,7 +88,7 @@ public class ToastUtil {
     }
 
 
-    private static void showSystemToast(Context context,String msg){
+    public static void showSystemToast(Context context,String msg){
         View toastView = LayoutInflater.from(context).inflate(R.layout.layout_toast, null);
         TextView tv = (TextView) toastView.findViewById(R.id.tv);
         tv.setText(msg);

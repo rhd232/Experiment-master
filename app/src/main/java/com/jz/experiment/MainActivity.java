@@ -98,7 +98,7 @@ public class MainActivity extends BaseActivity {
             }
 
         }*/
-        DataFileUtil.createAppFolder();
+
         DeviceProxyHelper.getInstance(getActivity());
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -114,15 +114,14 @@ public class MainActivity extends BaseActivity {
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
-
+                        DataFileUtil.createAppFolder();
                     }
                 }).onDenied(new Action<List<String>>() {
             @Override
             public void onAction(List<String> data) {
-                ToastUtil.showToast(getActivity(),"拒绝访问sd卡权限将无法新建实验");
+                ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
             }
-                })
-                .start();
+        }).start();
     }
 
     private void connectUsbDevice() {
@@ -251,10 +250,10 @@ public class MainActivity extends BaseActivity {
 
         if (tab.getIndex() == TAB_INDEX_DATA) {
             onViewClick(layout_data);
-        }else if (tab.getIndex()==TAB_INDEX_EXPE){
-            tab=null;
-            HistoryExperimentsFragment f= (HistoryExperimentsFragment) mAdapter.getItem(TAB_INDEX_EXPE);
-            if (f!=null){
+        } else if (tab.getIndex() == TAB_INDEX_EXPE) {
+            tab = null;
+            HistoryExperimentsFragment f = (HistoryExperimentsFragment) mAdapter.getItem(TAB_INDEX_EXPE);
+            if (f != null) {
                 f.loadData();
             }
             onViewClick(layout_expe);

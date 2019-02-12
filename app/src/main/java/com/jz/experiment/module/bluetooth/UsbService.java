@@ -1,7 +1,6 @@
 package com.jz.experiment.module.bluetooth;
 
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +20,7 @@ import android.util.Log;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
+import com.wind.toastlib.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class UsbService extends Service {
+public class UsbService extends CommunicationService {
     private PendingIntent mRequestPermissionPendingIntent;
     private UsbManager mUsbManager;
     public static final String ACTION_DEVICE_PERMISSION = "action_device_permission";
@@ -62,7 +62,8 @@ public class UsbService extends Service {
     private SerialInputOutputManager mSerialIoManager;
     private ReadThread mReadThread;
 
-    public void initialize() {
+    @Override
+    public boolean initialize() {
         mExecutorService = Executors.newSingleThreadExecutor();
         //申请USB使用的权限
         mRequestPermissionPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_DEVICE_PERMISSION), 0);
@@ -78,6 +79,7 @@ public class UsbService extends Service {
 
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
 
+        return true;
 
 
       /*  ProbeTable customTable = new ProbeTable();
@@ -89,8 +91,17 @@ public class UsbService extends Service {
 
 
     private UsbDevice mTargetDevice;
-    public UsbDevice getConnectedDevice(){
-        return mTargetDevice;
+    @Override
+    public Device getConnectedDevice(){
+        if (mTargetDevice==null){
+            return null;
+        }
+        String name = "HID";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            name = mTargetDevice.getProductName();
+        }
+        Device device=new Device(name,"");
+        return device;
     }
     public void connect(String deviceName) {
         HashMap<String, UsbDevice> deviceMap = mUsbManager.getDeviceList();
@@ -114,6 +125,7 @@ public class UsbService extends Service {
         }
     }
 
+
     public boolean hasPermission() {
         if (mTargetDevice != null) {
             return mUsbManager.hasPermission(mTargetDevice);
@@ -125,11 +137,15 @@ public class UsbService extends Service {
     public void requestPermission() {
         if (mTargetDevice != null)
             mUsbManager.requestPermission(mTargetDevice, mRequestPermissionPendingIntent);
+        else {
+            ToastUtil.showSystemToast(getApplicationContext(),"请插入HID设备");
+        }
     }
-
+    @Override
     public boolean isConnected() {
         return hasPermission();
     }
+
 
     private BroadcastReceiver mUsbPermissionReceiver = new BroadcastReceiver() {
         @Override
@@ -483,10 +499,9 @@ public class UsbService extends Service {
             String action = intent.getAction();
             UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
-                Log.e("pangsheng", "静态广播接收器设备插入");
+
                 connect(device.getDeviceName());
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
-                Log.e("pangsheng", "静态广播接收器设备拔出");
                 mTargetDevice = null;
                 String name = "HID";
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

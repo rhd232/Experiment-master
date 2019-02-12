@@ -26,18 +26,21 @@ public class TrimReader {
 
     private static TrimReader sInstance;
 
-    public static TrimReader getInstance(Context context) {
+    public static TrimReader getInstance() {
         if (sInstance == null) {
             synchronized (TrimReader.class) {
                 if (sInstance == null) {
-                    sInstance = new TrimReader(context);
+                    sInstance = new TrimReader();
                 }
             }
         }
         return sInstance;
     }
 
-    public TrimReader(Context context) {
+    public TrimReader() {
+    }
+
+    public void ReadTrimFile(Context context){
         try {
             InputStream ips;
             File trimFile=new File(C.Value.TRIM_FOLDER,"trim.dat");
@@ -54,6 +57,10 @@ public class TrimReader {
 
     }
 
+    /**
+     * TODO 跟c#版本比对读取的数据是否一致
+     * @param ips
+     */
     private void ReadTrimFile(InputStream ips) {
         //判断相应月份文件夹是否存在，没有则创建
        /* String path = AppDomain.CurrentDomain.BaseDirectory + "trim/trim.dat";

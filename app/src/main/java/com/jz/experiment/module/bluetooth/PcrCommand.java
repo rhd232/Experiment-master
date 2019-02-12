@@ -1,5 +1,6 @@
 package com.jz.experiment.module.bluetooth;
 
+import com.jz.experiment.chart.CommData;
 import com.jz.experiment.util.ByteBufferUtil;
 
 import java.nio.ByteOrder;
@@ -44,6 +45,38 @@ public class PcrCommand {
         return commandList;
     }
 
+    public void setGainMode(){
+
+        byte[] TxData = new byte[18];
+        TxData[0] =(byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x02;		//data length
+        TxData[3] = 0x07;		//data type, date edit first byte
+        if (CommData.gain_mode == 1)//1低Gain 0高Gain
+        {
+            TxData[4] = 0x01;
+        }
+        else
+        {
+            TxData[4] = 0x00;
+        }
+
+
+        //0x01 means send vedio data
+        //0x00 means stop vedio data
+        for (int i = 1; i < 5; i++)
+        {
+            TxData[5] += TxData[i];
+        }
+        if (TxData[5] == 0x17)
+            TxData[5] = 0x18;
+        else
+            TxData[5] = TxData[5];
+        TxData[6] = 0x17;		//back code
+        TxData[7] = 0x17;		//back code
+
+        addCommand(TxData);
+    }
     public void setIntergrationTime(float InTime){
         int header=0xaa;
         int command=0x1;
@@ -62,19 +95,26 @@ public class PcrCommand {
         addCommonBytes(bytes);
         addCommand(listToByteArray(bytes));
     }
-    public void setSensor(int cisIndex){
-        int header=0xaa;
-        int command=0x1;
-        int length=0x02;
-        int type=0x26;
-        List<Byte> bytes = new ArrayList<>();
-        bytes.add((byte) header);
-        bytes.add((byte) command);
-        bytes.add((byte) length);
-        bytes.add((byte) type);
-        bytes.add((byte)cisIndex);
-        addCommonBytes(bytes);
-        addCommand(listToByteArray(bytes));
+    public void setSensor(int c){
+        byte[] TxData = new byte[18];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x03;		//data length
+        TxData[3] = 0x26;		//data type
+        TxData[4] = (byte)c;		//real data
+        TxData[5] = 0x00;
+        for (int i = 1; i < 6; i++)
+        {
+            TxData[6] += TxData[i];
+        }
+        if (TxData[6] == 0x17)
+            TxData[6] = 0x18;
+        else
+            TxData[6] = TxData[6];
+        TxData[7] = 0x17;		//back code
+        TxData[8] = 0x17;		//back code
+        addCommand(TxData);
+
     }
 
     /**
@@ -408,6 +448,201 @@ public class PcrCommand {
      */
     public void stopMelting(float startTemp,float endTemp,float speed){
         meltingCurve(Control.STOP,startTemp,endTemp,speed);
+    }
+
+    /**
+     * 选择图像芯片
+     * @param n
+     */
+    public void SelSensor(int n){
+        if (n < 1 || n > 4) return;
+
+        byte[] TxData = new byte[9];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x03;		//data length
+        TxData[3] = 0x26;		//data type
+        TxData[4] =(byte) (n - 1);		//real data
+        TxData[5] = 0x00;
+        for (int i = 1; i < 6; i++)
+            TxData[6] += TxData[i];
+        if (TxData[6] == 0x17)
+            TxData[6] = 0x18;
+        else
+            TxData[6] = TxData[6];
+        TxData[7] = 0x17;		//back code
+        TxData[8] = 0x17;		//back code
+        addCommand(TxData);
+    }
+
+    public void ResetParams()
+    {
+
+        byte[] TxData = new byte[9];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x03;		//data length
+        TxData[3] = 0x0F;		//data type, dat edit first byte
+        TxData[4] = 0x00;		//real data, data edit second byte
+        TxData[5] = 0x00;		//real data, data edit third byte
+        TxData[6] = 0x13;		//check sum
+        TxData[7] = 0x17;		//back code
+        TxData[8] = 0x17;		//back code
+        addCommand(TxData);
+    }
+
+    public void SetRampgen(int rampgen)
+    {
+
+        byte[] TxData = new byte[8];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x02;		//data length
+        TxData[3] = 0x01;		//data type, date edit first byte
+        TxData[4] = (byte)rampgen;	//real data, date edit second byte
+        //0x01 means send video data
+        //0x00 means stop video data
+        for (int i = 1; i < 5; i++)
+            TxData[5] += TxData[i];
+        if (TxData[5] == 0x17)
+            TxData[5] = 0x18;
+        else
+            TxData[5] = TxData[5];
+        TxData[6] = 0x17;		//back code
+        TxData[7] = 0x17;		//back code
+        addCommand(TxData);
+    }
+
+    public void SetTXbin(byte txbin)
+    {
+
+        byte[] TxData = new byte[8];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x02;		//data length
+        TxData[3] = 0x08;		//data type, date edit first byte
+        TxData[4] = txbin;	//real data, date edit second byte
+        //0x01 means send vedio data
+        //0x00 means stop vedio data
+        for (int i = 1; i < 5; i++)
+            TxData[5] += TxData[i];
+        if (TxData[5] == 0x17)
+            TxData[5] = 0x18;
+        else
+            TxData[5] = TxData[5];
+        TxData[6] = 0x17;		//back code
+        TxData[7] = 0x17;		//back code
+        addCommand(TxData);
+    }
+
+    public void SetRange(byte range)
+    {
+        byte[] inputdatas = new byte[64];
+        byte[] TxData = new byte[8];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x02;		//data length
+        TxData[3] = 0x02;		//data type, date edit first byte
+        TxData[4] = range;	//real data, date edit second byte
+        //0x01 means send vedio data
+        //0x00 means stop vedio data
+        for (int i = 1; i < 5; i++)
+            TxData[5] += TxData[i];
+        if (TxData[5] == 0x17)
+            TxData[5] = 0x18;
+        else
+            TxData[5] = TxData[5];
+        TxData[6] = 0x17;		//back code
+        TxData[7] = 0x17;		//back code
+        addCommand(TxData);
+    }
+
+    public void SetV15(int v15)
+    {
+
+        byte[] TxData = new byte[8];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x02;		//data length
+        TxData[3] = 0x05;		//data type, date edit first byte
+        TxData[4] = (byte)v15;	//real data, date edit second byte
+        for (int i = 1; i < 5; i++)
+            TxData[5] += TxData[i];
+        if (TxData[5] == 0x17)
+            TxData[5] = 0x18;
+        else
+            TxData[5] = TxData[5];
+        TxData[6] = 0x17;		//back code
+        TxData[7] = 0x17;		//back code
+        addCommand(TxData);
+    }
+
+   /* public void SetV20(int v20, int i)
+    {
+        SelSensor(i);
+        SetV20(v20);
+    }*/
+
+    public void SetV20(int v20)
+    {
+
+        byte[] TxData = new byte[8];
+        TxData[0] = (byte)0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x02;		//data length
+        TxData[3] = 0x04;		//data type, date edit first byte
+        TxData[4] = (byte)v20;		//real data, date edit second byte
+        //0x01 means send vedio data
+        //0x00 means stop vedio data
+        for (int i = 1; i < 5; i++)
+            TxData[5] += TxData[i];
+        if (TxData[5] == 0x17)
+            TxData[5] = 0x18;
+        else
+            TxData[5] = TxData[5];
+        TxData[6] = 0x17;		//back code
+        TxData[7] = 0x17;		//back code
+        addCommand(TxData);
+    }
+
+    public void SetLEDConfig(int IndvEn, int Chan1, int Chan2, int Chan3, int Chan4)
+    {
+
+        byte[] TxData = new byte[8];
+        TxData[0] = (byte)0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x02;		//data length
+        TxData[3] = 0x23;		//data type, date edit first byte
+
+        if (IndvEn == 0)
+        {
+            TxData[4] = Chan1 == 1 ? (byte)1 : (byte)0;									//real data, date edit second byte
+        }
+        else
+        {
+            TxData[4] = (byte) 0x80;
+            if (Chan1 == 1)
+                TxData[4] |= 1;
+            if (Chan2 == 1)
+                TxData[4] |= 2;
+            if (Chan3 == 1)
+                TxData[4] |= 4;
+            if (Chan4 == 1)
+                TxData[4] |= 8;
+        }
+
+        for (int i = 1; i < 5; i++)
+            TxData[5] += TxData[i];
+
+        if (TxData[5] == 0x17)
+            TxData[5] = 0x18;
+        else
+            TxData[5] = TxData[5];
+
+        TxData[6] = 0x17;		//back code
+        TxData[7] = 0x17;		//back code
+
+        addCommand(TxData);
     }
 
     private byte[] listToByteArray(List<Byte> bytes){

@@ -18,9 +18,22 @@ public class FactUpdater {
     int[] m_maxPixVal = new int[CCurveShow.MAX_CHAN];
     double[][] m_factorData = new double[CCurveShow.MAX_CHAN][ 100];
     private UsbService mUsbService;
-    public FactUpdater(UsbService usbService){
-        this.mUsbService=usbService;
+    private static FactUpdater sInstance;
+    public static FactUpdater getInstance(UsbService service){
+        if (sInstance==null){
+            synchronized (FactUpdater.class){
+                if (sInstance==null){
+                    sInstance=new FactUpdater(service);
+                }
+            }
+        }
+        return sInstance;
     }
+    private  FactUpdater(UsbService service){
+        this.mUsbService=service;
+    }
+
+
     public void updateFact(){
 
         for (int i = 1; i <= CCurveShow.MAX_CHAN; i++)
@@ -49,7 +62,16 @@ public class FactUpdater {
             }
         }
 
+        xhindex=1;
+        int_time1 = 1;
+        int_time2 = 1;
+        int_time3 = 1;
+        int_time4 = 1;
 
+        int_time_1=20;//默认积分时间20ms
+        int_time_2=20;
+        int_time_3=20;
+        int_time_4=20;
     }
     int xhindex = 1;
 
@@ -58,10 +80,10 @@ public class FactUpdater {
     float int_time3 = 1;
     float int_time4 = 1;
 
-    float int_time_1 = 1;
-    float int_time_2 = 1;
-    float int_time_3 = 1;
-    float int_time_4 = 1;
+    public float int_time_1 = 1;
+    public float int_time_2 = 1;
+    public float int_time_3 = 1;
+    public float int_time_4 = 1;
     private void DynamicUpdateIntTime()
     {
 

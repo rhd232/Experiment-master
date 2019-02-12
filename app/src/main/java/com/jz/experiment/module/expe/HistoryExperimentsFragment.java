@@ -9,7 +9,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
+import com.jz.experiment.chart.CommData;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.bluetooth.CommunicationService;
+import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.module.expe.activity.DeviceListActivity;
 import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
@@ -17,6 +20,8 @@ import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
 import com.jz.experiment.util.DeviceProxyHelper;
+import com.jz.experiment.util.TrimReader;
+import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.recyclerview.decoration.VerticalSpacesItemDecoration;
 import com.wind.base.response.BaseResponse;
@@ -42,6 +47,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ezy.ui.layout.LoadingLayout;
+import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -104,8 +111,123 @@ public class HistoryExperimentsFragment extends BaseFragment {
         sDeviceProxyHelper = DeviceProxyHelper
                 .getInstance(getActivity());
 
+        //读取dataposition文件
+        CommData.ReadDatapositionFile(getActivity());
+        //trim文件读取到CommonData中
+        TrimReader.getInstance().ReadTrimFile(getActivity());
     }
 
+    /**
+     * 下位机复位
+     */
+    public void resetTrim() {
+        CommunicationService service = sDeviceProxyHelper.getCommunicationService();
+        if (service.getConnectedDevice() != null &&
+                service.isConnected()) {
+            LoadingDialogHelper.showOpLoading(getActivity());
+            doResetTrim(service)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<Boolean>() {
+                        @Override
+                        public void call(Boolean aBoolean) {
+                            LoadingDialogHelper.hideOpLoading();
+                        }
+                    });
+        }else {
+            ToastUtil.showToast(getActivity(),"未连接设备");
+        }
+    }
+
+    private Observable<Boolean> doResetTrim(final CommunicationService service) {
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                PcrCommand cmd = new PcrCommand();
+                for (int i = 1; i <= 4; i++) {
+                    cmd.SelSensor(i);
+                    service.sendPcrCommandSync(cmd);
+                    cmd.reset();
+                    cmd.ResetParams();
+                    service.sendPcrCommandSync(cmd);
+                }
+                int[] chan_campgen = {
+                        CommData.chan1_rampgen,
+                        CommData.chan2_rampgen,
+                        CommData.chan3_rampgen,
+                        CommData.chan4_rampgen};
+
+                int[] v15 = {
+                        CommData.chan1_auto_v15,
+                        CommData.chan2_auto_v15,
+                        CommData.chan3_auto_v15,
+                        CommData.chan4_auto_v15};
+                for (int i = 1; i <= 4; i++) {
+                    cmd.reset();
+                    cmd.SelSensor(i);
+                    service.sendPcrCommandSync(cmd);
+
+                    cmd.reset();
+                    cmd.SetRampgen(chan_campgen[i - 1]);
+                    service.sendPcrCommandSync(cmd);
+
+                    cmd.reset();
+                    cmd.SetTXbin((byte) 0xf);
+                    service.sendPcrCommandSync(cmd);
+
+                    cmd.reset();
+                    cmd.SetRange((byte) 0x0f);
+                    service.sendPcrCommandSync(cmd);
+
+                    cmd.reset();
+                    cmd.SetV15(v15[i - 1]);
+                    service.sendPcrCommandSync(cmd);
+                }
+
+
+                CommData.gain_mode = 0;// initialize to high gain mode, consistent with HW default
+
+                doSetV20(service, CommData.chan1_auto_v20[1], 1);
+                doSetV20(service, CommData.chan2_auto_v20[1], 2);
+                doSetV20(service, CommData.chan3_auto_v20[1], 3);
+                doSetV20(service, CommData.chan4_auto_v20[1], 4);
+
+                CommData.int_time1 = CommData.int_time2 = CommData.int_time3 = CommData.int_time4 = 1;
+
+                doSetLEDConfig(service);
+
+                subscriber.onNext(true);
+                subscriber.onCompleted();
+            }
+        });
+
+
+    }
+
+    private void doSetLEDConfig(CommunicationService service) {
+        PcrCommand cmd = new PcrCommand();
+        cmd.reset();
+        cmd.SetLEDConfig(1, 1, 1, 1, 1);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        cmd.SetLEDConfig(1, 0, 0, 0, 0);
+        service.sendPcrCommandSync(cmd);
+    }
+
+    private void doSetV20(CommunicationService service, int v20, int index) {
+        PcrCommand cmd = new PcrCommand();
+
+        cmd.SelSensor(index);
+        service.sendPcrCommandSync(cmd);
+
+        cmd.reset();
+        cmd.SetV20(v20);
+        service.sendPcrCommandSync(cmd);
+    }
 
     @Override
     public void onResume() {
@@ -160,9 +282,12 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
     }
 
-    @OnClick({R.id.tv_device_state, R.id.tv_user})
+    @OnClick({R.id.tv_device_state, R.id.tv_user, R.id.tv_reset_device})
     public void onViewClick(View v) {
         switch (v.getId()) {
+            case R.id.tv_reset_device:
+                resetTrim();
+                break;
             case R.id.tv_user:
                 UserSettingsActivity.start(getActivity());
                 break;
@@ -181,7 +306,32 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Subscribe
     public void onToExpeSettingsEvent(final ToExpeSettingsEvent event) {
         //判断是否已经连接设备
-        if (sDeviceProxyHelper.isConnected(DeviceProxyHelper.ConnectMode.USB)){
+        AndPermission.with(getActivity())
+                .runtime()
+                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .onGranted(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                      /*  if (sDeviceProxyHelper.getUsbService().hasPermission()){
+                            UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                        }else {
+                            sDeviceProxyHelper.getUsbService().requestPermission();
+                        }*/
+
+
+                    }
+                })
+                .onDenied(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+
+                        ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
+
+                    }
+                }).start();
+      /*  if (sDeviceProxyHelper.isConnected(DeviceProxyHelper.ConnectMode.USB)){
+
             AndPermission.with(getActivity())
                     .runtime()
                     .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -189,11 +339,11 @@ public class HistoryExperimentsFragment extends BaseFragment {
                         @Override
                         public void onAction(List<String> data) {
                             UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
-                      /*  if (sDeviceProxyHelper.getUsbService().hasPermission()){
+                      *//*  if (sDeviceProxyHelper.getUsbService().hasPermission()){
                             UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
                         }else {
                             sDeviceProxyHelper.getUsbService().requestPermission();
-                        }*/
+                        }*//*
 
 
                         }
@@ -207,8 +357,9 @@ public class HistoryExperimentsFragment extends BaseFragment {
                         }
                     }).start();
         }else {
+
             sDeviceProxyHelper.getUsbService().requestPermission();
-        }
+        }*/
        /* if (sDeviceProxyHelper.isConnected()){
             UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
         }else {

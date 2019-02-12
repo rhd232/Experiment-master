@@ -22,7 +22,9 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
     public void onCreate() {
         super.onCreate();
         sInstance = this;
-        CaocConfig.Builder.create().apply();
+        CaocConfig.Builder.create()
+                .errorActivity(DefaultErrorActivity.class)
+                .apply();
         mAppComponent = createComponent();
         mAppComponent.inject(this);
     }

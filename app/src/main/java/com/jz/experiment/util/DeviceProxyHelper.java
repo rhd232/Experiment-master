@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import com.jz.experiment.module.bluetooth.BluetoothService;
+import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.UsbService;
 
 public class DeviceProxyHelper {
@@ -72,6 +73,9 @@ public class DeviceProxyHelper {
         return mBluetoothService;
     }
     public UsbService getUsbService() {
+        return mUsbService;
+    }
+    public CommunicationService getCommunicationService(){
         return mUsbService;
     }
     public boolean isConnected(){

@@ -64,6 +64,9 @@ public class UserSettingsStep1Activity extends BaseActivity {
     @BindView(R.id.lv_channel)
     ListView lv_channel;
 
+    @BindView(R.id.et_integration_time)
+    ValidateEditText et_integration_time;
+
     @BindView(R.id.gv_sample_a)
     GridView gv_sample_a;
     @BindView(R.id.gv_sample_b)
@@ -183,6 +186,17 @@ public class UserSettingsStep1Activity extends BaseActivity {
         switch (view.getId()) {
             case R.id.tv_next:
                 if (validate()) {
+
+                    String integrationTimeStr=et_integration_time.getText().toString().trim();
+                    int integrationTime=10;
+                    try {
+                         integrationTime=Integer.parseInt(integrationTimeStr);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                    mExperiment.setIntegrationTime(integrationTime);
+
                     //获取实验名称，通道设置，样板设置
                     ExpeSettingsFirstInfo firstInfo = new ExpeSettingsFirstInfo();
 

@@ -14,13 +14,17 @@ import android.widget.TextView;
 import com.aigestudio.wheelpicker.utils.WheelPickerFactory;
 import com.aigestudio.wheelpicker.widget.IWheelVo;
 import com.jz.experiment.R;
+import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.bluetooth.PcrCommand;
+import com.jz.experiment.module.bluetooth.UsbService;
 import com.jz.experiment.module.expe.adapter.StageAdapter;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
 import com.jz.experiment.module.expe.event.DelCyclingStageEvent;
 import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.module.expe.event.RefreshStageAdapterEvent;
 import com.jz.experiment.util.AppDialogHelper;
+import com.jz.experiment.util.DeviceProxyHelper;
 import com.wind.base.BaseActivity;
 import com.wind.base.adapter.DisplayItem;
 import com.wind.base.bean.CyclingStage;
@@ -51,6 +55,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -146,7 +152,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
             mModes = expeSettingSecondInfo.getModes();
             buildModeShowName();
             List<DisplayItem> list = new ArrayList<>();
-            List<Stage> stageList=expeSettingSecondInfo.getSteps();
+            List<Stage> stageList = expeSettingSecondInfo.getSteps();
             list.addAll(stageList);
             mStageAdapter.replace(list);
 
@@ -213,8 +219,8 @@ public class UserSettingsStep2Activity extends BaseActivity {
             secondInfo = new ExpeSettingSecondInfo();
             mHistoryExperiment.setSettingSecondInfo(secondInfo);
         }
-        String startT=tv_start_temp.getText().toString().trim();
-        String endT=tv_end_temp.getText().toString().trim();
+        String startT = tv_start_temp.getText().toString().trim();
+        String endT = tv_end_temp.getText().toString().trim();
         secondInfo.setStartTemperature(startT);
         secondInfo.setEndTemperature(endT);
         secondInfo.setModes(mModes);
@@ -226,9 +232,21 @@ public class UserSettingsStep2Activity extends BaseActivity {
         secondInfo.setSteps(stageList);
     }
 
-    private List<Mode> mModes;
+    public void setSensorAndInTime(int c, float inTime) {
+        PcrCommand sensorCmd = new PcrCommand();
+        sensorCmd.setSensor(c);
+        mUsbService.sendPcrCommandSync(sensorCmd);
 
-    @OnClick({R.id.rl_mode_sel, R.id.tv_next,R.id.tv_start_temp,R.id.tv_end_temp})
+        PcrCommand inTimeCmd = new PcrCommand();
+        inTimeCmd.setIntergrationTime(inTime);
+        mUsbService.sendPcrCommandSync(inTimeCmd);
+
+    }
+
+    private List<Mode> mModes;
+    UsbService mUsbService;
+
+    @OnClick({R.id.rl_mode_sel, R.id.tv_next, R.id.tv_start_temp, R.id.tv_end_temp})
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.tv_end_temp:
@@ -240,14 +258,26 @@ public class UserSettingsStep2Activity extends BaseActivity {
                         tv_start_temp.setText(result[0].getLabel());
                         tv_end_temp.setText(result[1].getLabel());
                     }
-                },0,100,"","",false);
+                }, 0, 100, "", "", false);
 
                 break;
             case R.id.tv_next:
                 if (validate()) {
+                    LoadingDialogHelper.showOpLoading(getActivity());
                     buildExperiment();
-                   //ExpeRunningActivityBackup.start(getActivity(), mHistoryExperiment);
-                    ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
+                    //设置积分时间
+                    mUsbService = DeviceProxyHelper.getInstance(getActivity()).getUsbService();
+                    setIntergrationTime()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Action1<Boolean>() {
+                                @Override
+                                public void call(Boolean aBoolean) {
+                                    LoadingDialogHelper.hideOpLoading();
+                                    ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
+                                }
+                            });
+
 
                 }
 
@@ -266,6 +296,38 @@ public class UserSettingsStep2Activity extends BaseActivity {
                 });
                 break;
         }
+    }
+
+    public Observable<Boolean> setIntergrationTime() {
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                FactUpdater factUpdater = FactUpdater.getInstance(mUsbService);
+                factUpdater.SetInitData();
+                int integrationTime=mHistoryExperiment.getIntegrationTime();
+                if (integrationTime>0) {
+                    //获取积分时间
+                    factUpdater.int_time_1 = mHistoryExperiment.getIntegrationTime();
+                    factUpdater.int_time_2 = mHistoryExperiment.getIntegrationTime();
+                    factUpdater.int_time_3 = mHistoryExperiment.getIntegrationTime();
+                    factUpdater.int_time_4 = mHistoryExperiment.getIntegrationTime();
+                }
+                if (mUsbService != null) {
+                    PcrCommand gainCmd = new PcrCommand();
+                    gainCmd.setGainMode();
+                    mUsbService.sendPcrCommandSync(gainCmd);
+
+                    setSensorAndInTime(0, factUpdater.int_time_1);
+                    setSensorAndInTime(1, factUpdater.int_time_2);
+                    setSensorAndInTime(2, factUpdater.int_time_3);
+                    setSensorAndInTime(3, factUpdater.int_time_4);
+
+                }
+
+                subscriber.onNext(true);
+                subscriber.onCompleted();
+            }
+        });
     }
 
     public void buildModeShowName() {
@@ -290,7 +352,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
     }
 
     @Subscribe
-    public void onExpeNormalFinishEvent(ExpeNormalFinishEvent event){
+    public void onExpeNormalFinishEvent(ExpeNormalFinishEvent event) {
         ActivityUtil.finish(getActivity());
     }
 

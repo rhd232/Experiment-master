@@ -2,7 +2,6 @@ package com.jz.experiment.widget;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -10,7 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
-import com.jz.experiment.module.bluetooth.UsbService;
+import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.util.DeviceProxyHelper;
@@ -45,18 +44,11 @@ public class DeviceStateBar extends FrameLayout {
         tv_device_name=findViewById(R.id.tv_device_name);
         tv_device_state=findViewById(R.id.tv_device_state);
        // BluetoothService service=DeviceProxyHelper.getInstance(getContext()).getBluetoothService();
-        UsbService service=DeviceProxyHelper.getInstance(getContext()).getUsbService();
+        CommunicationService service=DeviceProxyHelper.getInstance(getContext()).getCommunicationService();
         String name="";
         if (service!=null){
             if (service.getConnectedDevice()!=null){
-                if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-                    name = service.getConnectedDevice().getProductName();
-                }else {
-                    name="HID";
-                }
-                /*if (TextUtils.isEmpty(name)){
-                    name=service.getConnectedDevice().getAddress();
-                }*/
+                name = service.getConnectedDevice().getDeviceName();
             }
 
         }

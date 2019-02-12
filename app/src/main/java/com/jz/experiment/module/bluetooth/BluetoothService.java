@@ -1,6 +1,5 @@
 package com.jz.experiment.module.bluetooth;
 
-import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -22,7 +21,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class BluetoothService extends Service {
+public class BluetoothService extends CommunicationService {
     public static final String TAG = "BluetoothService";
 
     //蓝牙串口服务
@@ -97,10 +96,10 @@ public class BluetoothService extends Service {
     private void broadcastUpdate(String action, Data data) {
         try {
             final Intent intent = new Intent(action);
-          //  String str = new String(buffer,"ISO-8859-1");
+            //  String str = new String(buffer,"ISO-8859-1");
             intent.putExtra(EXTRA_DATA, data);
             sendBroadcast(intent);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -112,12 +111,12 @@ public class BluetoothService extends Service {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                if (mConnectedThread!=null) {
+                if (mConnectedThread != null) {
                     mConnectedThread.setRun(false);
                 }
                 mConnectThread.cancel();
-                mConnectThread=null;
-                mConnectedThread=null;
+                mConnectThread = null;
+                mConnectedThread = null;
                 //发送蓝牙已断开连接通知
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 EventBus.getDefault().post(new BluetoothDisConnectedEvent(device.getName()));
@@ -139,10 +138,15 @@ public class BluetoothService extends Service {
     }
 
 
-    /**连接线程*/
+    /**
+     * 连接线程
+     */
     private ConnectThread mConnectThread;
-    /**已连接线程*/
+    /**
+     * 已连接线程
+     */
     private ConnectedThread mConnectedThread;
+
     public void connect(BluetoothDevice device) {
         if (mBluetoothAdapter == null || device == null) {
             return;
@@ -155,42 +159,77 @@ public class BluetoothService extends Service {
 
     /**
      * 获取已经连接的设备
+     *
      * @return
      */
-    public BluetoothDevice getConnectedDevice(){
-        if (isConnected()){
-            return mConnectThread.getConnectedDevice();
+    public Device getConnectedDevice() {
+        if (isConnected()) {
+
+            BluetoothDevice bluetoothDevice = mConnectThread.getConnectedDevice();
+            Device device = new Device(bluetoothDevice.getName(), bluetoothDevice.getAddress());
+            return device;
         }
         return null;
 
     }
+
+    public BluetoothDevice getConnectedBluetoothDevice() {
+        if (isConnected()) {
+            BluetoothDevice bluetoothDevice = mConnectThread.getConnectedDevice();
+            return bluetoothDevice;
+        }
+        return null;
+    }
+
     /**
      * 设备是否已连接
+     *
      * @return
      */
     public boolean isConnected() {
-        return mConnectThread==null?false:mConnectThread.isConnected();
+        return mConnectThread == null ? false : mConnectThread.isConnected();
     }
+
     public void cancel() {
-        if (mConnectedThread!=null){
+        if (mConnectedThread != null) {
             mConnectedThread.setRun(false);
         }
-       if (mConnectThread!=null&& mConnectThread.isConnected()){
-           mConnectThread.cancel();
-       }
-
-    }
-
-    public void write(PcrCommand command){
-        if (isConnected()){
-            ArrayList<Byte> bytes=command.getCommandList();
-            byte[] data = new byte[bytes.size()];
-            for (int i = 0; i < bytes.size(); i++) {
-                data[i] = bytes.get(i).byteValue();
-            }
-            mConnectedThread.write(data);
+        if (mConnectThread != null && mConnectThread.isConnected()) {
+            mConnectThread.cancel();
         }
+
     }
+    public byte[] sendPcrCommandSync(PcrCommand command) {
+        sendPcrCommand(command);
+        try {
+            //等待设备回复读取掉
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    @Override
+    public int sendPcrCommand(PcrCommand command) {
+        int err = 0;
+        if (isConnected()) {
+            try {
+                ArrayList<Byte> bytes = command.getCommandList();
+                byte[] data = new byte[bytes.size()];
+                for (int i = 0; i < bytes.size(); i++) {
+                    data[i] = bytes.get(i).byteValue();
+                }
+                mConnectedThread.write(data);
+            } catch (Exception e) {
+                e.printStackTrace();
+                err = -1;
+            }
+
+        }
+        return err;
+    }
+
+
     private class ConnectThread extends Thread {
         /**
          * 已经连接的设备
@@ -201,9 +240,10 @@ public class BluetoothService extends Service {
          */
         private final BluetoothDevice mmDevice;
 
-        public BluetoothDevice getConnectedDevice(){
+        public BluetoothDevice getConnectedDevice() {
             return mmDevice;
         }
+
         public ConnectThread(BluetoothDevice device) {
             // Use a temporary object that is later assigned to mmSocket,
             // because mmSocket is final
@@ -256,10 +296,11 @@ public class BluetoothService extends Service {
 
         /**
          * 设备是否已连接
+         *
          * @return
          */
         public boolean isConnected() {
-            return mmSocket==null?false:mmSocket.isConnected();
+            return mmSocket == null ? false : mmSocket.isConnected();
         }
 
         /**
@@ -293,7 +334,7 @@ public class BluetoothService extends Service {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
-            mRun=true;
+            mRun = true;
             // Get the input and output streams, using temp objects because
             // member streams are final
             try {
@@ -320,7 +361,7 @@ public class BluetoothService extends Service {
                     bytes = mmInStream.read(buffer);
                     // Send the obtained bytes to the UI activity
                     //有数据可读
-                    Data data=new Data(buffer,bytes);
+                    Data data = new Data(buffer, bytes);
                     broadcastUpdate(ACTION_DATA_AVAILABLE, data);
                   /*  new Handler().obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();*/
@@ -331,12 +372,9 @@ public class BluetoothService extends Service {
         }
 
         /* Call this from the main activity to send data to the remote device */
-        public void write(byte[] bytes) {
-            try {
-                mmOutStream.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        public void write(byte[] bytes) throws IOException {
+            mmOutStream.write(bytes);
+
         }
 
         /* Call this from the main activity to shutdown the connection */

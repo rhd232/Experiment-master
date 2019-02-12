@@ -13,6 +13,8 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
     private long millitime;//实验时间毫秒值
     private ExperimentStatus status;//实验状态
 
+    private int integrationTime;//积分时间
+
     private long finishMilliTime;//实验结束时间
     private long during;//实验持续时间，秒为单位
 
@@ -31,6 +33,7 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
         device = in.readString();
         millitime = in.readLong();
         status = in.readParcelable(ExperimentStatus.class.getClassLoader());
+        integrationTime = in.readInt();
         finishMilliTime = in.readLong();
         during = in.readLong();
         settingsFirstInfo = in.readParcelable(ExpeSettingsFirstInfo.class.getClassLoader());
@@ -46,6 +49,7 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
         dest.writeString(device);
         dest.writeLong(millitime);
         dest.writeParcelable(status, flags);
+        dest.writeInt(integrationTime);
         dest.writeLong(finishMilliTime);
         dest.writeLong(during);
         dest.writeParcelable(settingsFirstInfo, flags);
@@ -160,5 +164,13 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
 
     public void setDuring(long during) {
         this.during = during;
+    }
+
+    public int getIntegrationTime() {
+        return integrationTime;
+    }
+
+    public void setIntegrationTime(int integrationTime) {
+        this.integrationTime = integrationTime;
     }
 }

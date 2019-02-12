@@ -171,7 +171,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     private void bindService() {
         sDeviceProxyHelper=DeviceProxyHelper.getInstance(getActivity());
         mBluetoothService=sDeviceProxyHelper.getBluetoothService();
-        mConnectedDevice=mBluetoothService.getConnectedDevice();
+        mConnectedDevice=mBluetoothService.getConnectedBluetoothDevice();
         if (mConnectedDevice!=null){
             checkbox.setActivated(true);
             rl_connected.setVisibility(View.VISIBLE);
@@ -384,7 +384,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
 
 
         rl_connected.setVisibility(View.VISIBLE);
-        mConnectedDevice=mBluetoothService.getConnectedDevice();
+        mConnectedDevice=mBluetoothService.getConnectedBluetoothDevice();
         tv_connected_dev_name.setText(mConnectedDevice.getName());
         checkbox.setActivated(true);
         DeviceInfo deviceInfo=new DeviceInfo();
@@ -413,14 +413,14 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
 
     @Override
     public void onDoThing() {
-        ToastUtil.showToast(getActivity(),"可以进行写操作了");
+        //ToastUtil.showToast(getActivity(),"可以进行写操作了");
     }
 
     @Override
     public void onReceivedData(Data data) {
         Log.e(TAG,"onReceivedData:"+data);
         //AT+BRSF=191
-        ToastUtil.showToast(getActivity(),"蓝牙设备发来了消息："+data);
+        //ToastUtil.showToast(getActivity(),"蓝牙设备发来了消息："+data);
     }
 
 

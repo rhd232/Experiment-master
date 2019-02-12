@@ -124,7 +124,40 @@
                 android:layout_marginTop="1dp"
                 android:background="@color/white"
                 />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="20dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:background="@color/color1F4E99" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="积分时间（ms）："
+                    android:textColor="@color/color333333"
+                    android:textSize="14sp" />
+
+                <com.wind.view.ValidateEditText
+                    android:id="@+id/et_integration_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+
+                    android:text="10"
+                    android:inputType="number"
+                    android:textColor="@color/color333333"
+                    android:textColorHint="@color/color999999"
+                    android:textSize="14sp" />
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="44dp"

@@ -42,7 +42,6 @@ import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
 import com.wind.base.utils.ActivityUtil;
-import com.wind.base.utils.LogUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.HistoryExperiment;
@@ -152,15 +151,15 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
 
         initChart();
-        //读取dataposition文件
-        CommData.ReadDatapositionFile(getActivity());
+
 
         bindService();
         init();
 
+
         mExecutorService = Executors.newSingleThreadExecutor();
 
-       // mDtChart.show(ChanList,KSList,null);
+        //mDtChart.show(ChanList,KSList,null);
        /* Thread thread = new Thread(mRun);
         thread.start();*/
 
@@ -218,12 +217,12 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
 
         cmd.step1(channelOp);
-        mBluetoothService.write(cmd);
+        mBluetoothService.sendPcrCommand(cmd);
         mUsbService.sendPcrCommand(cmd);
     }
 
     private void initChart() {
-        mFactUpdater=new FactUpdater(mUsbService);
+        mFactUpdater=FactUpdater.getInstance(mUsbService);
         mFactUpdater.SetInitData();
         mDtChart = new DtChart(chart_dt, getCurCyclingStage().getCyclingCount(),mFactUpdater);
         mDtChart.setRunning(true);
@@ -236,7 +235,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
     public void init() {
         CommData.diclist.clear();
-        CommData.positionlist.clear();
+        //CommData.positionlist.clear();
         List<Channel> channels = mHistoryExperiment.getSettingsFirstInfo().getChannels();
         CommData.cboChan1 = 0;
         CommData.cboChan2 = 0;
@@ -557,7 +556,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 float temp = 105;
                 short during = 0;
                 command.step2(temp, during);
-                mBluetoothService.write(command);
+                mBluetoothService.sendPcrCommand(command);
                 mUsbService.sendPcrCommand(command);
                 break;
         }
@@ -621,7 +620,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }*/
         //command.step3(cyclingCount, mCurCycling, picIndex, cyclingStage.getPartStageList().size(), combines);
         command.step3(rsvd, picIndex, cyclingStage.getPartStageList().size(), combines);
-        mBluetoothService.write(command);
+        mBluetoothService.sendPcrCommand(command);
         mUsbService.sendPcrCommand(command);
 
 
@@ -659,7 +658,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         mInReadingImg = false;
         PcrCommand command = new PcrCommand();
         command.step5();
-        mBluetoothService.write(command);
+        mBluetoothService.sendPcrCommand(command);
         mUsbService.sendPcrCommand(command);
     }
 
@@ -704,8 +703,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
         PcrCommand.TempDuringCombine predenaturationCombine = new PcrCommand.TempDuringCombine(startStage.getTemp(), startStage.getDuring());
         PcrCommand.TempDuringCombine extendCombine = new PcrCommand.TempDuringCombine(endStage.getTemp(), endStage.getDuring());
-        LogUtil.e("Step4", "predenaturationCombine:" + predenaturationCombine.getTemp() + "-" + predenaturationCombine.getDuring());
-        LogUtil.e("Step4", "extendCombine:" + extendCombine.getTemp() + "-" + extendCombine.getDuring());
+//        LogUtil.e("Step4", "predenaturationCombine:" + predenaturationCombine.getTemp() + "-" + predenaturationCombine.getDuring());
+  //      LogUtil.e("Step4", "extendCombine:" + extendCombine.getTemp() + "-" + extendCombine.getDuring());
 
         PcrCommand.CmdMode cmdMode = PcrCommand.CmdMode.NORMAL;
         /*if (mHistoryExperiment.getSettingSecondInfo().getModes().size()>1){
@@ -714,7 +713,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         command.step4(PcrCommand.Control.START, cyclingCount, cmdMode,
                 predenaturationCombine, extendCombine);
 
-        mBluetoothService.write(command);
+        mBluetoothService.sendPcrCommand(command);
         mUsbService.sendPcrCommand(command);
 
     }
@@ -727,7 +726,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     private void step6() {
         PcrCommand command = new PcrCommand();
         command.step6();
-        mBluetoothService.write(command);
+        mBluetoothService.sendPcrCommand(command);
         mUsbService.sendPcrCommand(command);
     }
 
@@ -843,19 +842,27 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 step5Subscription = null;
             }
             if (status == 0) {//实验已经结束
-                ToastUtil.showToast(getActivity(), "实验结束");
-                //TODO 自动跳转到实验数据分析页面
+                if (!mBackPressed){
+                    ToastUtil.showToast(getActivity(), "实验结束");
+                    //TODO 自动跳转到实验数据分析页面
 
-                toAnalyzePage();
+                    toAnalyzePage();
 
-                EventBus.getDefault().post(new ExpeNormalFinishEvent());
-                ActivityUtil.finish(getActivity());
+                    EventBus.getDefault().post(new ExpeNormalFinishEvent());
+                    ActivityUtil.finish(getActivity());
+                }
+
                 return;
             }
 
             checkHasNewParam(reveicedBytes);
             if (mInCycling || mInMeltCurve) {
                 //温度循环中，执行step6
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 step6();
             }
 
@@ -979,6 +986,11 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     }
                 });*/
                 //图像板还未准备好,应该询问循环状态
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 step5();
 
             } else {
@@ -997,7 +1009,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         mInReadingImg = true;
         PcrCommand command = new PcrCommand();
         command.step7(pcr_image);
-        mBluetoothService.write(command);
+        mBluetoothService.sendPcrCommand(command);
         mUsbService.sendPcrCommand(command);
     }
 
@@ -1150,7 +1162,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             byte high = reveicedBytes[numData * 2 + 7];
             byte low = reveicedBytes[numData * 2 + 6];
 
-            int value = TrimReader.getInstance(getActivity())
+            int value = TrimReader.getInstance()
                     .tocalADCCorrection(numData, high, low,
                             mImageMode.getSize(), chan,
                             CommData.gain_mode, 0);
@@ -1312,7 +1324,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         float speed = 1;
         command.meltingCurve(PcrCommand.Control.START, startT, endT, speed);
 
-        mBluetoothService.write(command);
+        mBluetoothService.sendPcrCommandSync(command);
         mUsbService.sendPcrCommandSync(command);
 
         // delayAskTriggerStatus();
@@ -1324,7 +1336,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         float endT = Float.parseFloat(mHistoryExperiment.getSettingSecondInfo().getEndTemperature());
         float speed = 1;
         command.stopMelting(startT, endT, speed);
-        mBluetoothService.write(command);
+        mBluetoothService.sendPcrCommandSync(command);
         mUsbService.sendPcrCommandSync(command);
     }
 
@@ -1341,7 +1353,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         PcrCommand.TempDuringCombine extendCombine = new PcrCommand.TempDuringCombine(endStage.getTemp(), endStage.getDuring());
 
         command.stopCycling(cyclingCount, PcrCommand.CmdMode.NORMAL, predenaturationCombine, extendCombine);
-        mBluetoothService.write(command);
+        mBluetoothService.sendPcrCommandSync(command);
         mUsbService.sendPcrCommandSync(command);
     }
 

@@ -174,6 +174,9 @@ public class CommData {
     public static List<ChartData> GetChartData(final String chan, int ks, String currks) {
         final List<ChartData> cdlist = new ArrayList<>();
         try {
+            if (diclist.get(chan)==null){
+                return cdlist;
+            }
             int n = (diclist.get(chan).size() / imgFrame);
             Log.e("ChartData","n:"+n);
             int ksindex = -1;
