@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.module.bluetooth.UsbService;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +20,7 @@ public class FactUpdater {
     double[][] m_factorData = new double[CCurveShow.MAX_CHAN][ 100];
     private UsbService mUsbService;
     private static FactUpdater sInstance;
+    private DecimalFormat mDecimalFormat;
     public static FactUpdater getInstance(UsbService service){
         if (sInstance==null){
             synchronized (FactUpdater.class){
@@ -31,6 +33,7 @@ public class FactUpdater {
     }
     private  FactUpdater(UsbService service){
         this.mUsbService=service;
+        mDecimalFormat=new DecimalFormat("#.00");
     }
 
 
@@ -120,28 +123,31 @@ public class FactUpdater {
         {
             case 0:
                 int_time1 = int_time_1;
-                int_time1 = (float)Math.round(int_time1 * factor);
+                //int_time1 = (float)Math.round(int_time1 * factor);
+                  int_time1 = Float.parseFloat(String.format("%.2f", int_time1 * factor));
                   SetSensor(0, int_time1);
                 return int_time1 /int_time_1;
             // break;
-
             case 1:
                 int_time2 = int_time_2;
-                int_time2 = (float)Math.round(int_time2 * factor);
+              //  int_time2 = (float)Math.round(int_time2 * factor);
+                int_time2 = Float.parseFloat(String.format("%.2f", int_time2 * factor));
                 SetSensor(1, int_time2);
                 return int_time2 / int_time_2;
             //		break;
 
             case 2:
                 int_time3 = int_time_3;
-                int_time3 = (float)Math.round(int_time3 * factor);
+               // int_time3 = (float)Math.round(int_time3 * factor);
+                int_time3 = Float.parseFloat(String.format("%.2f", int_time3 * factor));
                 SetSensor(2, int_time3);
                 return int_time3 / int_time_3;
             //		break;
 
             case 3:
                 int_time4 = int_time_4;
-                int_time4 = (float)Math.round(int_time4 * factor);
+                //int_time4 = (float)Math.round(int_time4 * factor);
+                int_time4 = Float.parseFloat(String.format("%.2f", int_time4 * factor));
                 SetSensor(3, int_time4);
                 return int_time4 / int_time_4;
             //		break;

@@ -35,6 +35,10 @@ public class ExampleUnitTest {
         source=source.substring(0,index+4);
         System.out.println(source);//aa00fsi843784fjskhfsgskhfhskghskfjutu381717
 
+        float int_time1=1f;
+        float factor=0.5f;
+        int_time1 = Float.parseFloat(String.format("%.2f",int_time1 * factor));
+        System.out.println(int_time1);
     }
 
     @Test
@@ -82,16 +86,20 @@ public class ExampleUnitTest {
         double rate = 8e-8;
         System.out.println(rate);
         List<ChartData> cdlist=new ArrayList<>();
+
         ChartData c=new ChartData();
         c.y=23;
         cdlist.add(c);
-        ChartData c1=new ChartData();
-        c1.y=22;
-        cdlist.add(c1);
 
         ChartData c2=new ChartData();
         c2.y=24;
         cdlist.add(c2);
+
+
+        ChartData c1=new ChartData();
+        c1.y=22;
+        cdlist.add(c1);
+
         ChartData c3=new ChartData();
         c3.y=21;
         cdlist.add(c3);

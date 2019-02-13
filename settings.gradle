@@ -1,4 +1,4 @@
-include ':app', ':base', ':data', ':domain', ':usbSerialForAndroid'
+include ':app', ':base', ':data', ':domain'
 
 include ':wheelpicker'
 project(':wheelpicker').projectDir = new File(rootDir, 'modules/wheelpicker')

@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import com.jz.experiment.chart.CommData;
 import com.jz.experiment.module.bluetooth.BluetoothService;
 import com.jz.experiment.module.bluetooth.DeviceRepo;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
@@ -25,6 +26,7 @@ import com.jz.experiment.module.expe.bean.UsbDeviceInfo;
 import com.jz.experiment.module.settings.event.LogoutEvent;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
+import com.jz.experiment.util.TrimReader;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Navigator;
@@ -115,6 +117,10 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onAction(List<String> data) {
                         DataFileUtil.createAppFolder();
+                        //读取dataposition文件
+                        CommData.ReadDatapositionFile(getActivity());
+                        //trim文件读取到CommonData中
+                        TrimReader.getInstance().ReadTrimFile(getActivity());
                     }
                 }).onDenied(new Action<List<String>>() {
             @Override

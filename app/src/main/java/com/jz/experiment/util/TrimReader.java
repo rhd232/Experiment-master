@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.jz.experiment.chart.CommData;
 import com.wind.base.C;
+import com.wind.base.utils.LogUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -223,6 +224,7 @@ public class TrimReader {
 
 
             }
+            LogUtil.e("读取Trim成功");
         } catch (Exception e) {
             e.printStackTrace();
         }

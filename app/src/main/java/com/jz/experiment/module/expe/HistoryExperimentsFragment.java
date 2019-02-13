@@ -1,8 +1,10 @@
 package com.jz.experiment.module.expe;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -111,10 +113,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
         sDeviceProxyHelper = DeviceProxyHelper
                 .getInstance(getActivity());
 
-        //读取dataposition文件
-        CommData.ReadDatapositionFile(getActivity());
-        //trim文件读取到CommonData中
-        TrimReader.getInstance().ReadTrimFile(getActivity());
+       /* */
     }
 
     /**
@@ -144,8 +143,10 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
+
                 PcrCommand cmd = new PcrCommand();
                 for (int i = 1; i <= 4; i++) {
+                    cmd.reset();
                     cmd.SelSensor(i);
                     service.sendPcrCommandSync(cmd);
                     cmd.reset();
@@ -214,6 +215,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        cmd.reset();
         cmd.SetLEDConfig(1, 0, 0, 0, 0);
         service.sendPcrCommandSync(cmd);
     }
@@ -298,6 +300,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     }
 
 
+    private boolean mNeedReadTrimFile;
     /**
      * 去实验设置页面
      *
@@ -305,6 +308,13 @@ public class HistoryExperimentsFragment extends BaseFragment {
      */
     @Subscribe
     public void onToExpeSettingsEvent(final ToExpeSettingsEvent event) {
+        mNeedReadTrimFile=false;
+        if (ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                !=PackageManager.PERMISSION_GRANTED) {//没有sd卡读取权限
+            mNeedReadTrimFile=true;
+        }
+
+
         //判断是否已经连接设备
         AndPermission.with(getActivity())
                 .runtime()
@@ -312,6 +322,13 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
+                        if (mNeedReadTrimFile) {
+                            //读取dataposition文件
+                            CommData.ReadDatapositionFile(getActivity());
+                            //trim文件读取到CommonData中
+                            TrimReader.getInstance().ReadTrimFile(getActivity());
+                            mNeedReadTrimFile=false;
+                        }
                         UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
                       /*  if (sDeviceProxyHelper.getUsbService().hasPermission()){
                             UserSettingsStep1Activity.start(getActivity(), event.getExperiment());

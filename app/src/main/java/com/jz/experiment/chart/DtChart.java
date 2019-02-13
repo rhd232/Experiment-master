@@ -27,19 +27,30 @@ public class DtChart extends WindChart {
         super(chart,factUpdater);
 
         XAxis xAxis = chart.getXAxis();
-        xAxis.setLabelCount(cylingCount + 4, true);
-        xAxis.setAxisMaximum(cylingCount + 3);
+      //  xAxis.setLabelCount(cylingCount + 4, true);
+        xAxis.setAxisMaximum(60);
+
     }
 
-    public void show(List<String> ChanList, List<String> KSList,File dataFile) {
-        //CommData.ReadDatapositionFile(mChart.getContext());
+    public void show(List<String> ChanList, List<String> KSList,File dataFile){
         InputStream ips = null;
         try {
             ips = new FileInputStream(dataFile);
-             //ips = mChart.getContext().getAssets().open("fluorescence_data.txt");
+            show(ChanList, KSList, ips);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    public void show(List<String> ChanList, List<String> KSList,InputStream ips) {
+       /* InputStream ips = null;
+        try {
+            ips = new FileInputStream(dataFile);
+            //ips = mChart.getContext().getAssets().open("2019_02_13_11_32_41_dt.txt");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
         //读取图像文件数据
         DataFileReader.getInstance().ReadFileData(ips);
         CurveReader.getInstance().readCurve();
@@ -259,7 +270,7 @@ public class DtChart extends WindChart {
         LineDataSet dataSet = new LineDataSet(expeData, "通道" + (currChan + 1));
         dataSet.setColor(color);
         dataSet.setDrawCircles(false);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+       // dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setDrawValues(false);
         mLineColors.add(color);
         mDataSets.add(dataSet);

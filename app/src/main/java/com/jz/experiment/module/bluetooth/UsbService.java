@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.hoho.android.usbserial.util.SerialInputOutputManager;
 import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.wind.toastlib.ToastUtil;
@@ -59,7 +58,7 @@ public class UsbService extends CommunicationService {
     private UsbEndpoint mUsbEndpointOut;
     private UsbDeviceConnection mUsbDeviceConnection;
     private ExecutorService mExecutorService;
-    private SerialInputOutputManager mSerialIoManager;
+
     private ReadThread mReadThread;
 
     @Override

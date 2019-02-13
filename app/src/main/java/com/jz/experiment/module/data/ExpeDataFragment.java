@@ -155,7 +155,6 @@ public class ExpeDataFragment extends BaseFragment {
 
     public void init() {
         CommData.diclist.clear();
-        CommData.positionlist.clear();
         List<Channel> channels = mExeperiment.getSettingsFirstInfo().getChannels();
         CommData.cboChan1 = 0;
         CommData.cboChan2 = 0;
