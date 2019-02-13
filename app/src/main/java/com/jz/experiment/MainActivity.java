@@ -54,7 +54,7 @@ public class MainActivity extends BaseActivity {
     View layout_expe;
     @BindView(R.id.layout_data)
     View layout_data;
-
+    Fragment[] fragments;
     public static void start(Context context) {
         Navigator.navigate(context, MainActivity.class);
     }
@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity {
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
 
-        Fragment[] fragments = new Fragment[2];
+        fragments = new Fragment[2];
         fragments[0] = new HistoryExperimentsFragment();
         fragments[1] = new ExpeDataTabFragment();
 
@@ -185,6 +185,12 @@ public class MainActivity extends BaseActivity {
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.layout_expe:
+                //检查是否有未保存的实验
+               /* ExpeDataTabFragment expeDataTabFragment= (ExpeDataTabFragment) fragments[1];
+                if (expeDataTabFragment.hasUnSaveExpe()){
+
+                }*/
+
                 resetBottomBar();
                 layout_expe.setActivated(true);
                 view_pager.setCurrentItem(TAB_INDEX_EXPE, false);

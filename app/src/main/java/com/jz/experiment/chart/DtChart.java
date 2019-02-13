@@ -6,6 +6,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
 
@@ -30,6 +31,8 @@ public class DtChart extends WindChart {
       //  xAxis.setLabelCount(cylingCount + 4, true);
         xAxis.setAxisMaximum(60);
 
+        YAxis yAxis=chart.getAxisLeft();
+        yAxis.setDrawGridLines(true);
     }
 
     public void show(List<String> ChanList, List<String> KSList,File dataFile){

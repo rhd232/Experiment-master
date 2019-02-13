@@ -52,7 +52,7 @@ public class CCurveShow {
 
     public void InitData() {
         numWells = CommData.KsIndex;//读取dataposition文件
-        System.out.println("numWells:"+numWells);
+      //  System.out.println("numWells:"+numWells);
         int i, j;
         for (i = 0; i < MAX_CHAN; i++) {
             for (j = 0; j < numWells; j++) {

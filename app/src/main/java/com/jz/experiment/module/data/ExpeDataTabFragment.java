@@ -3,6 +3,7 @@ package com.jz.experiment.module.data;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -152,8 +153,10 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
             int lastIndex=fragments.size()-1;
             ExpeDataFragment expeDataFragment= (ExpeDataFragment) fragments.get(lastIndex);
             if (!expeDataFragment.isSavedExpe()){
-                fragments.remove(lastIndex);
+                //fragments.remove(lastIndex);
+                //titles.remove(lastIndex);
                 titles.remove(lastIndex);
+                titles.add("历史实验");
             }
 
 
@@ -165,6 +168,9 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         view_pager.setCurrentItem(fragments.size()-1, false);
 
 
+        if (fragments.size()>4){
+            layout_tab.setTabMode(TabLayout.MODE_SCROLLABLE);
+        }
 
         layout_loading.showContent();
     }

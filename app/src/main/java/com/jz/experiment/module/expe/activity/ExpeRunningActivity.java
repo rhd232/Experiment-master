@@ -821,8 +821,17 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                                     }
 
                                 }
+                            }, new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable throwable) {
+                                    throwable.printStackTrace();
+                                    if (!mStep5Responsed) {
+                                        step5();
+                                    }
+                                }
                             });
                 }
+
                /* mExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
@@ -986,12 +995,35 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     }
                 });*/
                 //图像板还未准备好,应该询问循环状态
-                try {
+               /* try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                step5();
+                step5();*/
+                if (step5Subscription == null) {
+                    mStep5Responsed = false;
+                    step5Subscription = Observable.interval(1000, 1000, TimeUnit.MILLISECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Action1<Long>() {
+                                @Override
+                                public void call(Long aLong) {
+                                    if (!mStep5Responsed) {
+                                        step5();
+                                    }
+
+                                }
+                            }, new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable throwable) {
+                                    throwable.printStackTrace();
+                                    if (!mStep5Responsed) {
+                                        step5();
+                                    }
+                                }
+                            });
+                }
 
             } else {
                 //循环数加1

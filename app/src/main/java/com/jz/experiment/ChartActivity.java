@@ -8,7 +8,6 @@ import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.wind.base.BaseActivity;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,12 +55,12 @@ public class ChartActivity extends BaseActivity {
         DtChart dtChart2 = new DtChart(chart_line_2, 13);
 
         try {
-            InputStream ips=getAssets().open("Fluorescence_Data_2019-02-13_112107.txt");
+            InputStream ips=getAssets().open("ADCData_2019-02-13_ 022046.txt");
             dtChart.show(ChanList, KSList, ips);
 
-            InputStream ips2=getAssets().open("2019_02_13_11_32_41_dt.txt");
+            InputStream ips2=getAssets().open("2019_02_13_04_11_17_dt.txt");
             dtChart2.show(ChanList, KSList, ips2);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

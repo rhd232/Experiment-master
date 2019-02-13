@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import com.aigestudio.wheelpicker.utils.WheelPickerFactory;
 import com.aigestudio.wheelpicker.widget.IWheelVo;
+import com.aigestudio.wheelpicker.widget.WheelSimpleVo;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.di.ProviderModule;
@@ -250,15 +252,22 @@ public class UserSettingsStep2Activity extends BaseActivity {
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.tv_end_temp:
-            case R.id.tv_start_temp:
-                WheelPickerFactory.showWheelNumberAAPicker(tv_start_temp, new WheelPickerFactory.OnWheelClickListener() {
+                Stage stage= (Stage) mStageAdapter.getItem(mStageAdapter.getItemCount()-1);
+                int temp= (int) stage.getTemp();
+                tv_start_temp.setText( temp+"");
+                int start= (int) Math.ceil(temp);
+                List<IWheelVo> data=new ArrayList<>();
+                for (int i=start;i<=100;i++) {
+                    WheelSimpleVo simpleVo = new WheelSimpleVo(i,i+"");
+                    data.add(simpleVo);
+                }
+                WheelPickerFactory.showWheelAPicker(tv_start_temp, new WheelPickerFactory.OnWheelClickListener() {
                     @Override
                     public void onResult(View v, IWheelVo[] result, int[] indexs, String[] unit) {
-
-                        tv_start_temp.setText(result[0].getLabel());
-                        tv_end_temp.setText(result[1].getLabel());
+                        tv_end_temp.setText(result[0].getLabel());
                     }
-                }, 0, 100, "", "", false);
+                }, data,"℃",0);
+
 
                 break;
             case R.id.tv_next:
@@ -291,6 +300,11 @@ public class UserSettingsStep2Activity extends BaseActivity {
                     @Override
                     public void onModeSelected(List<Mode> modes) {
                         mModes = modes;
+                        if(modes.size()>1){
+                            Stage stage= (Stage) mStageAdapter.getItem(mStageAdapter.getItemCount()-1);
+                            int temp= (int) stage.getTemp();
+                            tv_start_temp.setText( temp+"");
+                        }
                         buildModeShowName();
                     }
                 });
@@ -348,6 +362,15 @@ public class UserSettingsStep2Activity extends BaseActivity {
             return false;
         }
 
+        if (mModes.size()>1){
+            //温度必须填写
+            String startTemp=tv_start_temp.getText().toString();
+            String endTemp=tv_end_temp.getText().toString();
+            if (TextUtils.isEmpty(endTemp)){
+                ToastUtil.showToast(getActivity(), "请输入溶解曲线结束温度");
+                return false;
+            }
+        }
         return true;
     }
 
