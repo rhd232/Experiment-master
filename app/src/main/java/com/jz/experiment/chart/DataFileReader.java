@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class DataFileReader {
     public static final int MAX_CHAN = 4;
-    private static int MAX_CYCL = 61;
+    private static int MAX_CYCL =400;// 61;
 
     public double[][] factorValue = new double[MAX_CHAN][MAX_CYCL];
     private static DataFileReader INSTANCE=new DataFileReader();

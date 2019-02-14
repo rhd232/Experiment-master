@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
+import com.jz.experiment.chart.MeltingChart;
 import com.wind.base.BaseActivity;
 
 import java.io.InputStream;
@@ -51,15 +52,15 @@ public class ChartActivity extends BaseActivity {
         KSList.add("B3");
         KSList.add("B4");
         CommData.ReadDatapositionFile(getActivity());
-        DtChart dtChart = new DtChart(chart, 13);
-        DtChart dtChart2 = new DtChart(chart_line_2, 13);
+        MeltingChart meltingChart=new MeltingChart(chart);
+        DtChart dtChart = new DtChart(chart_line_2, 13);
+       /* DtChart dtChart2 = new DtChart(chart_line_2, 13);*/
 
         try {
-            InputStream ips=getAssets().open("ADCData_2019-02-13_ 022046.txt");
+            InputStream ips=getAssets().open("2019_02_13_04_11_17_dt.txt");
             dtChart.show(ChanList, KSList, ips);
-
-            InputStream ips2=getAssets().open("2019_02_13_04_11_17_dt.txt");
-            dtChart2.show(ChanList, KSList, ips2);
+            InputStream ips2=getAssets().open("2019_02_14_04_34_18_melting.txt");
+            meltingChart.show(ChanList, KSList, ips2);
         } catch (Exception e) {
             e.printStackTrace();
         }

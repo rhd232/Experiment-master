@@ -76,7 +76,8 @@ public class CommData {
     public static int chan4_rampgen = 0;
     public static int[] chan4_auto_v20 = new int[2];
     public static int chan4_auto_v15 = 0;
-    public static double[][] m_factorData = new double[4][100];
+   // public static double[][] m_factorData = new double[4][100];
+    public static double[][] m_factorData = new double[4][400];
     public static int IFMet = 0;//0普通实验1溶解曲线
 
 

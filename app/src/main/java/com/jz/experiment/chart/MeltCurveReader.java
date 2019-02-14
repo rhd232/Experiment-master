@@ -96,7 +96,7 @@ public class MeltCurveReader {
         }
         catch (Exception ex)
         {
-
+            ex.printStackTrace();
         }
     }
 

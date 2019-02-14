@@ -229,7 +229,7 @@ public class ExpeDataFragment extends BaseFragment {
 
         mHasMeltingMode = mExeperiment.getSettingSecondInfo().getModes().size() > 1;
         if (mHasMeltingMode) {
-            tv_melt.setVisibility(View.VISIBLE);
+            //tv_melt.setVisibility(View.VISIBLE);
             mMeltingChart = new MeltingChart(chart_melt);
             mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
         } else {
@@ -446,6 +446,8 @@ public class ExpeDataFragment extends BaseFragment {
 
                 chart_dt.setVisibility(View.VISIBLE);
                 chart_melt.setVisibility(View.GONE);
+
+                mExecutorService.execute(mRun);
                 break;
             case R.id.tv_melt:
                 tv_dt.setActivated(false);
@@ -453,6 +455,7 @@ public class ExpeDataFragment extends BaseFragment {
 
                 chart_dt.setVisibility(View.GONE);
                 chart_melt.setVisibility(View.VISIBLE);
+                mExecutorService.execute(mRun);
                 break;
             case R.id.iv_save:
 

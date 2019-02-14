@@ -17,7 +17,7 @@ public class FactUpdater {
     boolean [] m_dynIntTime = new boolean[CCurveShow.MAX_CHAN];
     float[] m_factorIntTime = new float[CCurveShow.MAX_CHAN];
     int[] m_maxPixVal = new int[CCurveShow.MAX_CHAN];
-    double[][] m_factorData = new double[CCurveShow.MAX_CHAN][ 100];
+    double[][] m_factorData = new double[CCurveShow.MAX_CHAN][ 400];
     private UsbService mUsbService;
     private static FactUpdater sInstance;
     private DecimalFormat mDecimalFormat;
@@ -59,7 +59,7 @@ public class FactUpdater {
             m_factorIntTime[i] = (float)1.0;
             m_maxPixVal[i] = 100;
 
-            for (int n = 0; n < 100; n++)
+            for (int n = 0; n < 200; n++)
             {
                 m_factorData[i][n] = 1;
             }
