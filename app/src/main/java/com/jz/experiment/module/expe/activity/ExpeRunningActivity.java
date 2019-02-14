@@ -288,10 +288,22 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
     }
     private void showMeltChart() {
+        if (chart_melt.getVisibility()==View.GONE){
+            chart_melt.setVisibility(View.VISIBLE);
+        }
+        if (chart_dt.getVisibility()==View.VISIBLE){
+            chart_dt.setVisibility(View.GONE);
+        }
         mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mHistoryExperiment));
     }
 
     private void showDtChart() {
+        if (chart_melt.getVisibility()==View.VISIBLE){
+            chart_melt.setVisibility(View.GONE);
+        }
+        if (chart_dt.getVisibility()==View.GONE){
+            chart_dt.setVisibility(View.VISIBLE);
+        }
 
         mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mHistoryExperiment));
 
@@ -333,7 +345,6 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 }
             });
         } else {
-            //TODO 去分析数据页面
             ActivityUtil.finish(getActivity());
         }
     }

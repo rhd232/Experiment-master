@@ -24,7 +24,7 @@ public class DataFileReader {
 
 
 
-    public void ReadFileData(InputStream ips) {
+    public void ReadFileData(InputStream ips,boolean running) {
         try {
             CommData.diclist.clear();
           //  InputStream ips = context.getAssets().open("fluorescence_data.txt");
@@ -45,7 +45,9 @@ public class DataFileReader {
                 }
 
             }
-
+            if (running){
+                return;
+            }
             for (String item:CommData.diclist.keySet()){
                 if (CommData.diclist.get(item).size() == 0) continue;
                 CommData.Cycle = CommData.diclist.get(item).size() / CommData.imgFrame;

@@ -169,6 +169,104 @@ public class CommData {
         strlist = Arrays.asList(sts);
         return strlist;
     }
+    public static List<MeltChartData> GetChartDataByRJQX(String chan, int ks, String currks)
+    {
+        List<MeltChartData> cdlist = new ArrayList<>();
+        try
+        {
+            if (diclist.get(chan)==null){
+                return cdlist;
+            }
+            int n = diclist.get(chan).size() / imgFrame;
+            //if (ks == 4)
+            //{
+            int ksindex = -1;
+            switch (currks)
+            {
+                case "A1":
+                    ksindex = 0;
+                    break;
+                case "A2":
+                    ksindex = 1;
+                    break;
+                case "A3":
+                    ksindex = 2;
+                    break;
+                case "A4":
+                    ksindex = 3;
+                    break;
+                case "B1":
+                    ksindex = 4;
+                    break;
+                case "B2":
+                    ksindex = 5;
+                    break;
+                case "B3":
+                    ksindex = 6;
+                    break;
+                case "B4":
+                    ksindex = 7;
+                    break;
+            }
+            if (ksindex == -1)
+            {
+                return cdlist;
+            }
+            for (int i = 0; i < n; i++)
+            {
+
+                //List<String> strlist = diclist.chan].Skip(i * imgFrame).Take(imgFrame).ToList();
+                List<String> strlist =diclist.get(chan).subList(i*imgFrame,i*imgFrame+imgFrame);
+                if (strlist.size() == 0) continue;
+                MeltChartData cd = new MeltChartData();
+                String[] strs = strlist.get(0).split(" ");
+
+                //为方便调试暂时注释掉的
+                //if (strs.Length < 14) continue;
+                //cd.x = strs[13];
+
+                cd.x = i+"";//测试用
+
+
+                Map<Integer,List<String>> datalist=new HashMap<>();
+  //            Dictionary<int, List<string>> datalist = new Dictionary<int, List<string>>();
+                for (int k = 0; k < strlist.size(); k++)
+                {
+                    List<String> list =Arrays.asList(strlist.get(k).split(" "));
+                    datalist.put(k, list);
+                   // datalist[k] = strlist[k].Split(' ').ToList();
+                }
+
+                String ss = positionlist.get(chan).get(ksindex);
+                String[] newstrs = ss.split("\\+");
+                int value = 0;
+                for (String item : newstrs)
+                {
+                    String[] nstrs = item.split("-");
+
+                    if (nstrs.length > 1)
+                    {
+                        int j =  Integer.parseInt(nstrs[0]);
+                        int k =  Integer.parseInt(nstrs[1]);
+                        int val=Integer.parseInt(datalist.get(k).get(j));
+                        int v = val - 100;
+                        value += v;
+                    }
+                }
+
+                cd.y = value+"";
+                cdlist.add(cd);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+
+        return cdlist;
+    }
 
 
     public static List<ChartData> GetChartData(final String chan, int ks, String currks) {

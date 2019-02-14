@@ -55,11 +55,14 @@ public class DtChart extends WindChart {
             e.printStackTrace();
         }*/
         //读取图像文件数据
-        DataFileReader.getInstance().ReadFileData(ips);
-        CurveReader.getInstance().readCurve();
+        DataFileReader.getInstance().ReadFileData(ips,mRunning);
         if (mRunning) {
             mFactUpdater.updateFact();
+        }else {
+            CommData.m_factorData=DataFileReader.getInstance().factorValue;
         }
+        CurveReader.getInstance().readCurve(CommData.m_factorData);
+
         // Map<Integer,List<List<String>>> chanMap= DataParser.parseDtData(dataFile);
         //请求服务器，解析图像版返回的原始数据
 

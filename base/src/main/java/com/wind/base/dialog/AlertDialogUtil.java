@@ -56,6 +56,7 @@ public class AlertDialogUtil {
                                               boolean isFullScreen) {
         AlertDialog alertDialog = new AlertDialog.Builder(context).create();
         alertDialog.setCanceledOnTouchOutside(canceledOnTouchOutside);
+        alertDialog.setCancelable(canceledOnTouchOutside);
         alertDialog.show();
         alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 

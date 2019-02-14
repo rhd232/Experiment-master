@@ -17,6 +17,7 @@ import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.ActivityUtil;
+import com.wind.data.DbOpenHelper;
 import com.wind.data.base.datastore.UserDataStore;
 import com.wind.data.base.request.FindUserRequest;
 import com.wind.data.base.response.FindUserResponse;
@@ -65,7 +66,8 @@ public class LoginFragment extends BaseFragment {
 
     @BindView(R.id.tv_msg)
     TextView tv_msg;
-
+    UserDataStore mUserDataStore;
+    Subscription findSubscription;
     @Override
     protected int getLayoutRes() {
         return R.layout.activity_login;
@@ -76,6 +78,35 @@ public class LoginFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this,view);
+
+        //读取第一个用户，自动填充到文本框
+        mUserDataStore = new UserDataStore(
+                ProviderModule
+                        .getInstance()
+                        .provideBriteDb(DbOpenHelper.getInstance(getActivity().getApplicationContext())));
+
+
+        final FindUserRequest request = new FindUserRequest();
+        request.setUsername(C.Config.DEFAULT_USERNAME);
+        request.setPwd(C.Config.DEFAULT_PWD);
+        findSubscription=mUserDataStore.findUserByUsername(request)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<FindUserResponse>() {
+                    @Override
+                    public void call(FindUserResponse response) {
+                        findSubscription.unsubscribe();
+                        if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
+                            if (response.getUser() != null) {
+                                String username=response.getUser().username();
+                                String password=response.getUser().password();
+                                et_username.setText(username);
+                                et_pwd.setText(password);
+
+                            }
+                        }
+                    }
+                });
     }
 
     Subscription loginSubscription;

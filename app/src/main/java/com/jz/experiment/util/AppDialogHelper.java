@@ -274,7 +274,7 @@ public class AppDialogHelper {
     }
 
     public static void showNormalDialog(Context context, String msg, String leftBtnName, String rightBtnName, final DialogOperCallback callback) {
-        final AlertDialog alertDialog = AlertDialogUtil.showAlertDialog(context, R.layout.dialog_normal, true);
+        final AlertDialog alertDialog = AlertDialogUtil.showAlertDialog(context, R.layout.dialog_normal, false);
         TextView tv_left_btn = (TextView) alertDialog.findViewById(R.id.tv_left_btn);
         TextView tv_right_btn = (TextView) alertDialog.findViewById(R.id.tv_right_btn);
         TextView tv_msg = (TextView) alertDialog.findViewById(R.id.tv_msg);

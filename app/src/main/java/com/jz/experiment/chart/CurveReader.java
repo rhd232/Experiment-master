@@ -12,7 +12,7 @@ public class CurveReader {
     public static CurveReader getInstance(){
         return INSTANCE;
     }
-    public void readCurve(/*List<String> tdlist,List<String> kslist*/){
+    public void readCurve(/*List<String> tdlist,List<String> kslist*/double[][] factorValues){
         double[][][]  m_yData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
         CCurveShow cCurveShow =  CCurveShow.getInstance();
         cCurveShow.InitData();
@@ -41,7 +41,8 @@ public class CurveReader {
                 List<ChartData> cdlist = CommData.GetChartData(tdlist.get(i), 0, kslist.get(n));//获取选点值
                 for (int k = 0; k < cdlist.size(); k++)
                 {
-                    double [][] factorValues=DataFileReader.getInstance().factorValue;
+
+                    //double [][] factorValues=DataFileReader.getInstance().factorValue;
                     double factorValue=factorValues[GetChan(tdlist.get(i))][k];
                     m_yData[i][n][k] = cdlist.get(k).y /factorValue;
                     //String t=i+"-"+n+"-"+k+"="+ cdlist.get(k).y;
@@ -56,7 +57,7 @@ public class CurveReader {
 
         cCurveShow.m_yData = m_yData;
         cCurveShow.m_Size = cyclenum+1;
-        cCurveShow.ifactor = DataFileReader.getInstance().factorValue;
+        cCurveShow.ifactor = factorValues;
         cCurveShow.UpdateAllcurve();
 
         m_zData = cCurveShow.m_zData;

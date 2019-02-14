@@ -12,6 +12,7 @@ import com.jz.experiment.di.ProviderModule;
 import com.wind.base.BaseActivity;
 import com.wind.base.C;
 import com.wind.base.response.BaseResponse;
+import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.base.datastore.UserDataStore;
 import com.wind.data.base.request.FindUserRequest;
@@ -114,6 +115,8 @@ public class EditPwdActivity extends BaseActivity {
                         mUpdateSubscription.unsubscribe();
                         if (response.getErrCode()==BaseResponse.CODE_SUCCESS){
                             ToastUtil.showToast(getActivity(),"修改成功");
+                            //跳转
+                            ActivityUtil.finish(getActivity());
                         }else {
                             tv_msg.setText("修改失败");
                         }

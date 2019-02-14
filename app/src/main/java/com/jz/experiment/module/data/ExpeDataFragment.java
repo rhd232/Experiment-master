@@ -194,17 +194,20 @@ public class ExpeDataFragment extends BaseFragment {
     private boolean mHasMeltingMode;
 
 
-    private boolean mDtShow=true;
     private Runnable mRun = new Runnable() {
         @Override
         public void run() {
-            if (mDtShow)
+            if (tv_dt.isActivated())
                 mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
             else {
-
+                mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
             }
         }
     };
+
+
+
+
 
     private void inflateChart() {
         if (mExeperiment == null) {
@@ -434,9 +437,23 @@ public class ExpeDataFragment extends BaseFragment {
     }
 
 
-    @OnClick({R.id.iv_pdf, R.id.iv_save})
+    @OnClick({R.id.iv_pdf, R.id.iv_save,R.id.tv_dt,R.id.tv_melt})
     public void onViewClick(View view) {
         switch (view.getId()) {
+            case R.id.tv_dt:
+                tv_dt.setActivated(true);
+                tv_melt.setActivated(false);
+
+                chart_dt.setVisibility(View.VISIBLE);
+                chart_melt.setVisibility(View.GONE);
+                break;
+            case R.id.tv_melt:
+                tv_dt.setActivated(false);
+                tv_melt.setActivated(true);
+
+                chart_dt.setVisibility(View.GONE);
+                chart_melt.setVisibility(View.VISIBLE);
+                break;
             case R.id.iv_save:
 
                 if (!isSavedExpe()&&!mSaved ){

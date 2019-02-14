@@ -2,8 +2,8 @@ CREATE TABLE channel_info(
     --基本信息
     _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    value TEXT NOT NULL,
-    remark TEXT NOT NULL,
+    value TEXT,
+    remark TEXT,
     --外键
     expe_id INTEGER NOT NULL,
     FOREIGN KEY(expe_id) REFERENCES expe_info(_id)

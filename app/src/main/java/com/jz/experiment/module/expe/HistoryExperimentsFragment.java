@@ -241,6 +241,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
             tv_device_state.setText("设备未连接");
             tv_device_state.setActivated(false);
         }
+
+        loadData();
     }
 
     /**
