@@ -2,8 +2,8 @@ package com.jz.experiment.chart;
 
 import android.text.TextUtils;
 
+import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.PcrCommand;
-import com.jz.experiment.module.bluetooth.UsbService;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -18,10 +18,10 @@ public class FactUpdater {
     float[] m_factorIntTime = new float[CCurveShow.MAX_CHAN];
     int[] m_maxPixVal = new int[CCurveShow.MAX_CHAN];
     double[][] m_factorData = new double[CCurveShow.MAX_CHAN][ 400];
-    private UsbService mUsbService;
+    private CommunicationService mCommunicationService;
     private static FactUpdater sInstance;
     private DecimalFormat mDecimalFormat;
-    public static FactUpdater getInstance(UsbService service){
+    public static FactUpdater getInstance(CommunicationService service){
         if (sInstance==null){
             synchronized (FactUpdater.class){
                 if (sInstance==null){
@@ -31,8 +31,8 @@ public class FactUpdater {
         }
         return sInstance;
     }
-    private  FactUpdater(UsbService service){
-        this.mUsbService=service;
+    private  FactUpdater(CommunicationService service){
+        this.mCommunicationService=service;
         mDecimalFormat=new DecimalFormat("#.00");
     }
 
@@ -171,7 +171,7 @@ public class FactUpdater {
 
         PcrCommand cmd=new PcrCommand();
         cmd.setSensor(c);
-        byte[] rev_bytes=mUsbService.sendPcrCommandSync(cmd);
+        byte[] rev_bytes=mCommunicationService.sendPcrCommandSync(cmd);
         if (rev_bytes[0]>0)
         {
             SetIntergrationTime(InTime);
@@ -183,7 +183,7 @@ public class FactUpdater {
         PcrCommand cmd=new PcrCommand();
         cmd.setIntergrationTime(InTime);
 
-        return mUsbService.sendPcrCommandSync(cmd);
+        return mCommunicationService.sendPcrCommandSync(cmd);
     }
     private void UpdatePCRCurve(int PCRNum, int pixelNum)
     {

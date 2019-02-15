@@ -75,13 +75,22 @@ public class DeviceProxyHelper {
     public UsbService getUsbService() {
         return mUsbService;
     }
+
     public CommunicationService getCommunicationService(){
-        return mUsbService;
+        if (mBluetoothService!=null&& mBluetoothService.isConnected()){
+            return mBluetoothService;
+        }
+
+        if (mUsbService!=null&&mUsbService.isConnected()){
+            return mUsbService;
+        }
+
+       return mUsbService;
     }
-    public boolean isConnected(){
+   /* public boolean isConnected(){
         return mBluetoothService==null?false:mBluetoothService.isConnected();
-    }
-    public boolean isConnected(ConnectMode mode){
+    }*/
+   /* public boolean isConnected(ConnectMode mode){
         boolean connected=false;
        switch (mode){
            case BLUETOOTH:
@@ -93,7 +102,7 @@ public class DeviceProxyHelper {
        }
 
        return connected;
-    }
+    }*/
 
 
     public enum ConnectMode{
