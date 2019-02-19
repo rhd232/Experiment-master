@@ -16,16 +16,18 @@ import com.aigestudio.wheelpicker.utils.WheelPickerFactory;
 import com.aigestudio.wheelpicker.widget.IWheelVo;
 import com.aigestudio.wheelpicker.widget.WheelSimpleVo;
 import com.jz.experiment.R;
+import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.PcrCommand;
-import com.jz.experiment.module.bluetooth.UsbService;
 import com.jz.experiment.module.expe.adapter.StageAdapter;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
 import com.jz.experiment.module.expe.event.DelCyclingStageEvent;
 import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.module.expe.event.RefreshStageAdapterEvent;
 import com.jz.experiment.util.AppDialogHelper;
+import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.wind.base.BaseActivity;
 import com.wind.base.adapter.DisplayItem;
@@ -212,7 +214,12 @@ public class UserSettingsStep2Activity extends BaseActivity {
 
     private void buildExperiment() {
         ExpeSettingSecondInfo secondInfo = mHistoryExperiment.getSettingSecondInfo();
-        mHistoryExperiment.setDevice("未知设备");
+        String deviceName="未知设备";
+        if (mCommunicationService!=null && mCommunicationService.getConnectedDevice()!=null) {
+            deviceName=mCommunicationService.getConnectedDevice().getDeviceName();
+        }
+
+        mHistoryExperiment.setDevice(deviceName);
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_NOT_START);
         status.setDesc("未启动");
@@ -237,16 +244,16 @@ public class UserSettingsStep2Activity extends BaseActivity {
     public void setSensorAndInTime(int c, float inTime) {
         PcrCommand sensorCmd = new PcrCommand();
         sensorCmd.setSensor(c);
-        mUsbService.sendPcrCommandSync(sensorCmd);
+        mCommunicationService.sendPcrCommandSync(sensorCmd);
 
         PcrCommand inTimeCmd = new PcrCommand();
         inTimeCmd.setIntergrationTime(inTime);
-        mUsbService.sendPcrCommandSync(inTimeCmd);
+        mCommunicationService.sendPcrCommandSync(inTimeCmd);
 
     }
 
     private List<Mode> mModes;
-    UsbService mUsbService;
+    CommunicationService mCommunicationService;
 
     @OnClick({R.id.rl_mode_sel, R.id.tv_next, R.id.tv_start_temp, R.id.tv_end_temp})
     public void onViewClick(View v) {
@@ -274,8 +281,9 @@ public class UserSettingsStep2Activity extends BaseActivity {
                 if (validate()) {
                     LoadingDialogHelper.showOpLoading(getActivity());
                     buildExperiment();
+
                     //设置积分时间
-                    mUsbService = DeviceProxyHelper.getInstance(getActivity()).getUsbService();
+                    mCommunicationService = DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
                     setIntergrationTime()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -316,7 +324,15 @@ public class UserSettingsStep2Activity extends BaseActivity {
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
-                FactUpdater factUpdater = FactUpdater.getInstance(mUsbService);
+
+                //删除日志文件
+                DataFileUtil.removeLogFile();
+
+                //初始化设备
+                resetTrim();
+
+
+                FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
                 factUpdater.SetInitData();
                 int integrationTime=mHistoryExperiment.getIntegrationTime();
                 if (integrationTime>0) {
@@ -326,10 +342,10 @@ public class UserSettingsStep2Activity extends BaseActivity {
                     factUpdater.int_time_3 = mHistoryExperiment.getIntegrationTime();
                     factUpdater.int_time_4 = mHistoryExperiment.getIntegrationTime();
                 }
-                if (mUsbService != null) {
+                if (mCommunicationService != null) {
                     PcrCommand gainCmd = new PcrCommand();
                     gainCmd.setGainMode();
-                    mUsbService.sendPcrCommandSync(gainCmd);
+                    mCommunicationService.sendPcrCommandSync(gainCmd);
 
                     setSensorAndInTime(0, factUpdater.int_time_1);
                     setSensorAndInTime(1, factUpdater.int_time_2);
@@ -344,6 +360,89 @@ public class UserSettingsStep2Activity extends BaseActivity {
         });
     }
 
+    private void resetTrim() {
+        CommunicationService service=mCommunicationService;
+        if (service==null){
+            return;
+        }
+        PcrCommand cmd = new PcrCommand();
+        for (int i = 1; i <= 4; i++) {
+            cmd.reset();
+            cmd.SelSensor(i);
+            service.sendPcrCommandSync(cmd);
+            cmd.reset();
+            cmd.ResetParams();
+            service.sendPcrCommandSync(cmd);
+        }
+        int[] chan_campgen = {
+                CommData.chan1_rampgen,
+                CommData.chan2_rampgen,
+                CommData.chan3_rampgen,
+                CommData.chan4_rampgen};
+
+        int[] v15 = {
+                CommData.chan1_auto_v15,
+                CommData.chan2_auto_v15,
+                CommData.chan3_auto_v15,
+                CommData.chan4_auto_v15};
+        for (int i = 1; i <= 4; i++) {
+            cmd.reset();
+            cmd.SelSensor(i);
+            service.sendPcrCommandSync(cmd);
+
+            cmd.reset();
+            cmd.SetRampgen(chan_campgen[i - 1]);
+            service.sendPcrCommandSync(cmd);
+
+            cmd.reset();
+            cmd.SetTXbin((byte) 0xf);
+            service.sendPcrCommandSync(cmd);
+
+            cmd.reset();
+            cmd.SetRange((byte) 0x0f);
+            service.sendPcrCommandSync(cmd);
+
+            cmd.reset();
+            cmd.SetV15(v15[i - 1]);
+            service.sendPcrCommandSync(cmd);
+        }
+
+
+        CommData.gain_mode = 0;// initialize to high gain mode, consistent with HW default
+
+        doSetV20(service, CommData.chan1_auto_v20[1], 1);
+        doSetV20(service, CommData.chan2_auto_v20[1], 2);
+        doSetV20(service, CommData.chan3_auto_v20[1], 3);
+        doSetV20(service, CommData.chan4_auto_v20[1], 4);
+
+        CommData.int_time1 = CommData.int_time2 = CommData.int_time3 = CommData.int_time4 = 1;
+
+        doSetLEDConfig(service);
+    }
+
+    private void doSetV20(CommunicationService service, int v20, int index) {
+        PcrCommand cmd = new PcrCommand();
+
+        cmd.SelSensor(index);
+        service.sendPcrCommandSync(cmd);
+
+        cmd.reset();
+        cmd.SetV20(v20);
+        service.sendPcrCommandSync(cmd);
+    }
+    private void doSetLEDConfig(CommunicationService service) {
+        PcrCommand cmd = new PcrCommand();
+        cmd.reset();
+        cmd.SetLEDConfig(1, 1, 1, 1, 1);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        cmd.reset();
+        cmd.SetLEDConfig(1, 0, 0, 0, 0);
+        service.sendPcrCommandSync(cmd);
+    }
     public void buildModeShowName() {
         StringBuilder sBuilder = new StringBuilder(mModes.get(0).getName());
         if (mModes.size() == 2) {

@@ -223,10 +223,10 @@ public class CommData {
                 String[] strs = strlist.get(0).split(" ");
 
                 //为方便调试暂时注释掉的
-                //if (strs.Length < 14) continue;
-                //cd.x = strs[13];
+                if (strs.length < 14) continue;
+                cd.x = strs[13];
 
-                cd.x = i+"";//测试用
+                //cd.x = i+"";//测试用
 
 
                 Map<Integer,List<String>> datalist=new HashMap<>();

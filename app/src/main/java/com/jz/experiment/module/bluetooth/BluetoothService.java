@@ -12,13 +12,19 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
+import com.jz.experiment.util.DataFileUtil;
+import com.wind.base.C;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class BluetoothService extends CommunicationService {
@@ -114,8 +120,10 @@ public class BluetoothService extends CommunicationService {
                 if (mConnectedThread != null) {
                     mConnectedThread.setRun(false);
                 }
-                mConnectThread.cancel();
-                mConnectThread = null;
+                if (mConnectThread != null) {
+                    mConnectThread.cancel();
+                    mConnectThread = null;
+                }
                 mConnectedThread = null;
                 //发送蓝牙已断开连接通知
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -149,6 +157,7 @@ public class BluetoothService extends CommunicationService {
 
     public void connect(BluetoothDevice device) {
         if (mBluetoothAdapter == null || device == null) {
+            broadcastUpdate(ACTION_DEVICE_CONNECT_FAILED);
             return;
         }
 
@@ -199,7 +208,11 @@ public class BluetoothService extends CommunicationService {
         }
 
     }
+
+    private boolean mSync;
+
     public byte[] sendPcrCommandSync(PcrCommand command) {
+        mSync = true;
         sendPcrCommand(command);
         try {
             //等待设备回复读取掉
@@ -209,8 +222,27 @@ public class BluetoothService extends CommunicationService {
         }
         return null;
     }
+
+    private void toByteString(PcrCommand cmd) {
+        ArrayList<Byte> bytes = cmd.getCommandList();
+        byte[] data = new byte[bytes.size()];
+        for (int i = 0; i < bytes.size(); i++) {
+            data[i] = bytes.get(i).byteValue();
+        }
+
+        StringBuilder hex = new StringBuilder(data.length * 2);
+        for (byte b : data) {
+            if ((b & 0xFF) < 0x10) hex.append("0");
+            hex.append(Integer.toHexString(b & 0xFF));
+        }
+        File file = DataFileUtil.getLogFile();
+        appendToFile("发送：" + hex.toString().toLowerCase(), file);
+        // System.out.println("发送：" + hex.toString().toLowerCase());
+    }
+
     @Override
     public int sendPcrCommand(PcrCommand command) {
+        mSync = false;
         int err = 0;
         if (isConnected()) {
             try {
@@ -219,6 +251,7 @@ public class BluetoothService extends CommunicationService {
                 for (int i = 0; i < bytes.size(); i++) {
                     data[i] = bytes.get(i).byteValue();
                 }
+                toByteString(command);
                 mConnectedThread.write(data);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -325,6 +358,8 @@ public class BluetoothService extends CommunicationService {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
         private boolean mRun;
+        private List<Byte> mReceivedBytes;
+        private List<String> mReceivedStr;
 
         public void setRun(boolean run) {
             this.mRun = run;
@@ -345,7 +380,7 @@ public class BluetoothService extends CommunicationService {
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
-
+            mReceivedBytes = new ArrayList<>();
             //可以通信了
             broadcastUpdate(ACTION_DEVICE_COMMUNICATION_ENABLED);
         }
@@ -360,17 +395,121 @@ public class BluetoothService extends CommunicationService {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
                     // Send the obtained bytes to the UI activity
-                    //有数据可读
-                    Data data = new Data(buffer, bytes);
-                    broadcastUpdate(ACTION_DATA_AVAILABLE, data);
-                  /*  new Handler().obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();*/
+
+                    StringBuilder hex = new StringBuilder(bytes * 2);
+                    for (int i = 0; i < bytes; i++) {
+                        byte b = buffer[i];
+                        if ((b & 0xFF) < 0x10) hex.append("0");
+                        hex.append(Integer.toHexString(b & 0xFF));
+                    }
+                    String rev = hex.toString().toLowerCase();
+
+                    splitAndCombine(rev,mReceivedStr);
+
                 } catch (IOException e) {
                     break;
                 }
             }
         }
 
+        private void broadcast(byte[] buffer, int bytes,String content) {
+            if (!mSync) {
+                DataFileUtil.writeFileLog("接收到：" + content);
+                //有数据可读
+                Data data = new Data(buffer, bytes);
+                broadcastUpdate(ACTION_DATA_AVAILABLE, data);
+            } else {
+                DataFileUtil.writeFileLog("同步接收到：" + content);
+            }
+        }
+        private void splitAndCombine(String rev, List<String> vals){
+            int indexOf=rev.indexOf(C.Value.DATA_PREFIX);
+            if (indexOf>0){
+                String part1=rev.substring(0,indexOf);
+                if (part1.startsWith((C.Value.DATA_PREFIX))){
+                    if (part1.endsWith(C.Value.DATA_SUFFIX))
+                    {
+                        vals.clear();
+                        //part1是一组完整的数据了
+                        //System.out.println("完整数据:"+part1);
+                        byte[] buffer=part1.getBytes();
+                        broadcast(buffer,buffer.length,part1);
+                    }else {
+                        vals.add(part1);
+                    }
+                }else if (part1.endsWith(C.Value.DATA_SUFFIX)){
+                    vals.add(part1);
+                    StringBuilder sb=new StringBuilder();
+                    for (String v:vals){
+                        sb.append(v);
+                    }
+                    vals.clear();
+                    if (sb.toString().lastIndexOf("aa")>0){
+                        splitAndCombine(sb.toString(),vals);
+                    }else {
+                        //System.out.println("完整数据:" + sb.toString());
+                        byte[] buffer=sb.toString().getBytes();
+                        broadcast(buffer,buffer.length,sb.toString());
+                    }
+                }
+                String leftPart=rev.substring(indexOf);
+                splitAndCombine(leftPart,vals);
+
+            }else if (indexOf==0){
+                //数据以aa开头
+                String leftPart=rev.substring(2);
+                indexOf=leftPart.indexOf(C.Value.DATA_PREFIX);
+                //测试是否还有aa
+                if (indexOf>0){
+                    String part1=rev.substring(0,indexOf+2);
+                    if (part1.endsWith(C.Value.DATA_SUFFIX)){
+                        vals.clear();
+                        //part1是一组完整的数据了
+                        byte[] buffer=part1.getBytes();
+                        broadcast(buffer,buffer.length,part1);
+                       // System.out.println("完整数据:"+part1);
+                    }else {
+                        vals.add(part1);
+                    }
+                    String part2=rev.substring(indexOf+2);
+                    splitAndCombine(part2,vals);
+                }else {
+                    //没有aa了
+                    if (rev.endsWith(C.Value.DATA_SUFFIX)){
+                        //一组完整的数据
+                        vals.clear();
+                        //part1是一组完整的数据了
+                        byte[] buffer=rev.getBytes();
+                        broadcast(buffer,buffer.length,rev);
+                        //System.out.println("完整数据:"+rev);
+                    }else {
+                        //以aa开头但是不是以1717结尾，数据还不完整
+                        vals.add(rev);
+                    }
+                }
+
+            }else {
+                //不存在aa
+
+                if (rev.endsWith(C.Value.DATA_SUFFIX)){
+                    vals.add(rev);
+                    StringBuilder sb=new StringBuilder();
+                    for (String v:vals){
+                        sb.append(v);
+                    }
+                    vals.clear();
+                    if (sb.toString().lastIndexOf("aa")>0){
+                        splitAndCombine(sb.toString(),vals);
+                    }else {
+                        //System.out.println("完整数据:" + sb.toString());
+                        byte[] buffer=sb.toString().getBytes();
+                        broadcast(buffer,buffer.length,sb.toString());
+                    }
+                }else {
+                    vals.add(rev);
+                }
+            }
+        }
         /* Call this from the main activity to send data to the remote device */
         public void write(byte[] bytes) throws IOException {
             mmOutStream.write(bytes);
@@ -390,5 +529,47 @@ public class BluetoothService extends CommunicationService {
     public boolean onUnbind(Intent intent) {
         unregisterReceiver(mReceiver);
         return super.onUnbind(intent);
+    }
+
+    private void appendToFile(String txt, File file) {
+     /*   String fileName=DateUtil.get(mHistoryExperiment.getMillitime(),"yyyy_MM_dd_hh_mm_ss")+".txt";
+        String filePath= C.Value.IMAGE_DATA+fileName;*/
+
+        FileOutputStream fos = null;
+        OutputStreamWriter osw = null;
+
+        try {
+            if (!file.exists()) {
+                boolean hasFile = file.createNewFile();
+               /* if (hasFile) {
+                    System.out.println("file not exists, create new file");
+                }*/
+                fos = new FileOutputStream(file);
+            } else {
+                // System.out.println("file exists");
+                fos = new FileOutputStream(file, true);
+            }
+
+            osw = new OutputStreamWriter(fos, "utf-8");
+            osw.write(txt); //写入内容
+            osw.write("\r\n");  //换行
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {   //关闭流
+            try {
+                if (osw != null) {
+                    osw.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

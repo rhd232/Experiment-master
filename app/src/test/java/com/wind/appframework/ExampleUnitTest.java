@@ -5,6 +5,7 @@ import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.util.ByteBufferUtil;
 import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.CvtUtil;
+import com.wind.base.C;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +29,99 @@ import static org.junit.Assert.assertEquals;
  */
 public class ExampleUnitTest {
 
+
+    @Test
+    public void testLastIndexOf(){
+        String rev="aa0083587357353781717aa0037573771717";
+        List<String> vals=new ArrayList<>();
+        splitAndCombine(rev, vals);
+       /* String revs[]={rev,"25421717"};
+
+        for (String r:revs) {
+            splitAndCombine(r, vals);
+        }
+*/
+        System.out.println("size:"+vals.size());
+    }
+
+    private void splitAndCombine(String rev, List<String> vals){
+        int indexOf=rev.indexOf(C.Value.DATA_PREFIX);
+        if (indexOf>0){
+            String part1=rev.substring(0,indexOf);
+            if (part1.startsWith((C.Value.DATA_PREFIX))){
+                if (part1.endsWith(C.Value.DATA_SUFFIX))
+                {
+                    vals.clear();
+                    //part1是一组完整的数据了
+                    System.out.println("完整数据:"+part1);
+                }else {
+                    vals.add(part1);
+                }
+            }else if (part1.endsWith(C.Value.DATA_SUFFIX)){
+                vals.add(part1);
+                StringBuilder sb=new StringBuilder();
+                for (String v:vals){
+                    sb.append(v);
+                }
+                vals.clear();
+                if (sb.toString().lastIndexOf("aa")>0){
+                    splitAndCombine(sb.toString(),vals);
+                }else {
+                    System.out.println("完整数据:" + sb.toString());
+                }
+            }
+            String leftPart=rev.substring(indexOf);
+            splitAndCombine(leftPart,vals);
+
+        }else if (indexOf==0){
+            //数据以aa开头
+            String leftPart=rev.substring(2);
+            indexOf=leftPart.indexOf(C.Value.DATA_PREFIX);
+            //测试是否还有aa
+            if (indexOf>0){
+                String part1=rev.substring(0,indexOf+2);
+                if (part1.endsWith(C.Value.DATA_SUFFIX)){
+                    vals.clear();
+                    //part1是一组完整的数据了
+                    System.out.println("完整数据:"+part1);
+                }else {
+                    vals.add(part1);
+                }
+                String part2=rev.substring(indexOf+2);
+                splitAndCombine(part2,vals);
+            }else {
+                //没有aa了
+                if (rev.endsWith(C.Value.DATA_SUFFIX)){
+                    //一组完整的数据
+                    vals.clear();
+                    //part1是一组完整的数据了
+                    System.out.println("完整数据:"+rev);
+                }else {
+                    //以aa开头但是不是以1717结尾，数据还不完整
+                    vals.add(rev);
+                }
+            }
+
+        }else {
+            //不存在aa
+
+            if (rev.endsWith(C.Value.DATA_SUFFIX)){
+                vals.add(rev);
+                StringBuilder sb=new StringBuilder();
+                for (String v:vals){
+                    sb.append(v);
+                }
+                vals.clear();
+                if (sb.toString().lastIndexOf("aa")>0){
+                    splitAndCombine(sb.toString(),vals);
+                }else {
+                    System.out.println("完整数据:" + sb.toString());
+                }
+            }else {
+                vals.add(rev);
+            }
+        }
+    }
     @Test
     public void sub1717(){
         String source="aa00fsi843784fjskhfsgskhfhskghskfjutu381717ksg99948848433e400000000000000000000000";

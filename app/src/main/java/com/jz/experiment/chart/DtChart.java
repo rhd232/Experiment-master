@@ -39,6 +39,7 @@ public class DtChart extends WindChart {
         InputStream ips = null;
         try {
             ips = new FileInputStream(dataFile);
+            //ips = mChart.getContext().getAssets().open("2019_02_13_04_11_17_dt.txt");
             show(ChanList, KSList, ips);
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,13 +48,7 @@ public class DtChart extends WindChart {
     }
 
     public void show(List<String> ChanList, List<String> KSList,InputStream ips) {
-       /* InputStream ips = null;
-        try {
-            ips = new FileInputStream(dataFile);
-            //ips = mChart.getContext().getAssets().open("2019_02_13_11_32_41_dt.txt");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
+
         //读取图像文件数据
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
         if (mRunning) {

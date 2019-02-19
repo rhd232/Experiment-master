@@ -107,6 +107,27 @@ public class LoginFragment extends BaseFragment {
                         }
                     }
                 });
+        /*final Subscription subscription=Observable.interval(1,TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.newThread())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        System.out.println(aLong.longValue());
+
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                });
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                subscription.unsubscribe();
+            }
+        },1500);*/
     }
 
     Subscription loginSubscription;

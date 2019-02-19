@@ -19,6 +19,7 @@ import android.util.Log;
 
 import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
+import com.jz.experiment.util.DataFileUtil;
 import com.wind.toastlib.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -284,7 +285,8 @@ public class UsbService extends CommunicationService {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
         }
-        System.out.println("发送：" + hex.toString().toLowerCase());
+        //System.out.println("发送：" + hex.toString().toLowerCase());
+        DataFileUtil.writeFileLog("发送：" + hex.toString().toLowerCase());
     }
 
     public int sendPcrCommand(PcrCommand command) {
@@ -349,6 +351,7 @@ public class UsbService extends CommunicationService {
                         hex.append(Integer.toHexString(b & 0xFF));
                     }
                     System.out.println("同步接收到:" + hex.toString().toLowerCase());
+                    DataFileUtil.writeFileLog("同步接收到：" + hex.toString().toLowerCase());
                     //Data d = new Data(buffer, bytes);
                     //broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, d);
                 }
@@ -457,12 +460,18 @@ public class UsbService extends CommunicationService {
                         int bytes = this.mmConnection.bulkTransfer(mmEndIn, buffer, 64, 500);
                         //System.out.println("mmEndIn:"+bytes);
                         if (bytes > 0) {
-                            StringBuilder hex = new StringBuilder(buffer.length * 2);
-                            for (byte b : buffer) {
+                            StringBuilder hex = new StringBuilder(bytes * 2);
+                          /*  for (byte b : buffer) {
+                                if ((b & 0xFF) < 0x10) hex.append("0");
+                                hex.append(Integer.toHexString(b & 0xFF));
+                            }*/
+                            for (int i=0;i<bytes;i++){
+                                byte b=buffer[i];
                                 if ((b & 0xFF) < 0x10) hex.append("0");
                                 hex.append(Integer.toHexString(b & 0xFF));
                             }
-                            System.out.println("接收到:" + hex.toString().toLowerCase());
+                            //System.out.println("接收到:" + hex.toString().toLowerCase());
+                            DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
                             Data data = new Data(buffer, bytes);
                             broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, data);
                         }

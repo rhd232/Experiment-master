@@ -29,6 +29,7 @@ import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.TrimReader;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.ActivityUtil;
+import com.wind.base.utils.Exiter;
 import com.wind.base.utils.Navigator;
 import com.wind.toastlib.ToastUtil;
 import com.yanzhenjie.permission.Action;
@@ -252,6 +253,11 @@ public class MainActivity extends BaseActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        Exiter.exit2Click(getActivity());
+    }
+
     private Tab tab;
 
     @Override
@@ -259,7 +265,9 @@ public class MainActivity extends BaseActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         tab = Navigator.getParcelableExtra(this);
-
+        if (tab==null){
+            return;
+        }
         if (tab.getIndex() == TAB_INDEX_DATA) {
             onViewClick(layout_data);
         } else if (tab.getIndex() == TAB_INDEX_EXPE) {

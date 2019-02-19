@@ -5,6 +5,7 @@ import android.graphics.Color;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -23,10 +24,9 @@ public class MeltingChart extends WindChart {
     public MeltingChart(LineChart chart,FactUpdater factUpdater) {
         super(chart,factUpdater);
 
-        //XAxis xAxis = chart.getXAxis();
-        //  xAxis.setLabelCount(cylingCount + 4, true);
-       // xAxis.setAxisMaximum(60);
 
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setAxisMaximum(100);
         YAxis yAxis=chart.getAxisLeft();
         yAxis.setDrawGridLines(true);
     }
@@ -37,6 +37,7 @@ public class MeltingChart extends WindChart {
         InputStream ips = null;
         try {
             ips = new FileInputStream(dataFile);
+            //ips = mChart.getContext().getAssets().open("2019_02_15_01_42_12_melting.txt");
             show(ChanList, KSList, ips);
         } catch (Exception e) {
             e.printStackTrace();

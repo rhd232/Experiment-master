@@ -118,6 +118,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     private DtChart mDtChart;
     private MeltingChart mMeltingChart;
     private FactUpdater mFactUpdater;
+
     @Override
     protected void setTitle() {
         mTitleBar.setTitle("运行");
@@ -168,7 +169,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     }
 
     private void bindService() {
-         mCommunicationService=DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
+        mCommunicationService = DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
 //        mBluetoothService = DeviceProxyHelper.getInstance(getActivity()).getBluetoothService();
 //        mUsbService = DeviceProxyHelper.getInstance(getActivity()).getUsbService();
 
@@ -203,10 +204,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         } catch (InterruptedException e) {
             e.printStackTrace();
         }*/
-       if (mCommunicationService instanceof UsbService){
-           UsbService usbService= (UsbService) mCommunicationService;
-           usbService.startReadThread();
-       }
+        if (mCommunicationService instanceof UsbService) {
+            UsbService usbService = (UsbService) mCommunicationService;
+            usbService.startReadThread();
+        }
 
         // 给设备发指令 step1
         PcrCommand cmd = new PcrCommand();
@@ -227,11 +228,11 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     }
 
     private void initChart() {
-        mFactUpdater=FactUpdater.getInstance(mCommunicationService);
+        mFactUpdater = FactUpdater.getInstance(mCommunicationService);
         mFactUpdater.SetInitData();
-        mDtChart = new DtChart(chart_dt, getCurCyclingStage().getCyclingCount(),mFactUpdater);
+        mDtChart = new DtChart(chart_dt, getCurCyclingStage().getCyclingCount(), mFactUpdater);
         mDtChart.setRunning(true);
-        mMeltingChart = new MeltingChart(chart_melt,mFactUpdater);
+        mMeltingChart = new MeltingChart(chart_melt, mFactUpdater);
         mMeltingChart.setRunning(true);
     }
 
@@ -285,28 +286,29 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
     };
 
-    private void showChart(){
+    private void showChart() {
         if (mInCycling)
             showDtChart();
         if (mInMeltCurve) {
             showMeltChart();
         }
     }
+
     private void showMeltChart() {
-        if (chart_melt.getVisibility()==View.GONE){
+        if (chart_melt.getVisibility() == View.GONE) {
             chart_melt.setVisibility(View.VISIBLE);
         }
-        if (chart_dt.getVisibility()==View.VISIBLE){
+        if (chart_dt.getVisibility() == View.VISIBLE) {
             chart_dt.setVisibility(View.GONE);
         }
         mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mHistoryExperiment));
     }
 
     private void showDtChart() {
-        if (chart_melt.getVisibility()==View.VISIBLE){
+        if (chart_melt.getVisibility() == View.VISIBLE) {
             chart_melt.setVisibility(View.GONE);
         }
-        if (chart_dt.getVisibility()==View.GONE){
+        if (chart_dt.getVisibility() == View.GONE) {
             chart_dt.setVisibility(View.VISIBLE);
         }
 
@@ -358,30 +360,33 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
-                while (mInReadingImg) {
-
-                }
-                if (mCommunicationService instanceof UsbService){
-                    UsbService usbService= (UsbService) mCommunicationService;
-                    usbService.stopReadThread();
-                }
                 try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (!mExpeFinished) {
-                    if (mHasMeltingCurve) {
-                        if (mInMeltCurve) {
-                            stopMeltingCurve();
-                        }
-                    }
-                    // if (mInCycling) {
-                    stopCycling();
-                    //}
-                }
+                    while (mInReadingImg) {
 
-                subscriber.onNext(true);
+                    }
+                    if (mCommunicationService instanceof UsbService) {
+                        UsbService usbService = (UsbService) mCommunicationService;
+                        usbService.stopReadThread();
+                    }
+
+                    Thread.sleep(100);
+
+                    if (!mExpeFinished) {
+                        if (mHasMeltingCurve) {
+                            if (mInMeltCurve) {
+                                stopMeltingCurve();
+                            }
+                        }
+                        // if (mInCycling) {
+                        stopCycling();
+                        //}
+                    }
+
+                    subscriber.onNext(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    subscriber.onError(e);
+                }
             }
         });
     }
@@ -394,7 +399,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 onBackPressed();
 
 
-               // toAnalyzePage();
+                 //toAnalyzePage();
 
                /* mHistoryExperiment.setDuring(tv_duration.getDuring());
                 mHistoryExperiment.setFinishMilliTime(System.currentTimeMillis());
@@ -508,14 +513,15 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         byte[] reveicedBytes = data.getBuffer();
         int statusIndex = 1;
         int status = hexToDecimal(reveicedBytes[statusIndex]);
+        //TODO 检查返回的包是否正确
         boolean succ = StatusChecker.checkStatus(status);
         if (!succ) {
-            AppDialogHelper.showSingleBtnDialog(getActivity(), StatusChecker.getStatusDesc(status), new AppDialogHelper.DialogOperCallback() {
+           /* AppDialogHelper.showSingleBtnDialog(getActivity(), StatusChecker.getStatusDesc(status), new AppDialogHelper.DialogOperCallback() {
                 @Override
                 public void onDialogConfirmClick() {
 
                 }
-            });
+            });*/
             return;
         }
 
@@ -723,7 +729,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         PcrCommand.TempDuringCombine predenaturationCombine = new PcrCommand.TempDuringCombine(startStage.getTemp(), startStage.getDuring());
         PcrCommand.TempDuringCombine extendCombine = new PcrCommand.TempDuringCombine(endStage.getTemp(), endStage.getDuring());
 //        LogUtil.e("Step4", "predenaturationCombine:" + predenaturationCombine.getTemp() + "-" + predenaturationCombine.getDuring());
-  //      LogUtil.e("Step4", "extendCombine:" + extendCombine.getTemp() + "-" + extendCombine.getDuring());
+        //      LogUtil.e("Step4", "extendCombine:" + extendCombine.getTemp() + "-" + extendCombine.getDuring());
 
         PcrCommand.CmdMode cmdMode = PcrCommand.CmdMode.NORMAL;
         /*if (mHistoryExperiment.getSettingSecondInfo().getModes().size()>1){
@@ -829,7 +835,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
                 mStep5Responsed = false;
                 if (step5Subscription == null) {
-                    step5Subscription = Observable.interval(1000, 1000, TimeUnit.MILLISECONDS)
+                    step5Subscription = Observable.interval(10, 1000, TimeUnit.MILLISECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(new Action1<Long>() {
@@ -844,24 +850,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                                 @Override
                                 public void call(Throwable throwable) {
                                     throwable.printStackTrace();
-                                    if (!mStep5Responsed) {
-                                        step5();
-                                    }
+                                    DataFileUtil.writeFileLog(throwable.getMessage());
                                 }
                             });
                 }
-
-               /* mExecutorService.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        step5();
-                    }
-                });*/
 
                 return;
             }
@@ -870,7 +862,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 step5Subscription = null;
             }
             if (status == 0) {//实验已经结束
-                if (!mBackPressed){
+                if (!mBackPressed) {
                     ToastUtil.showToast(getActivity(), "实验结束");
                     //TODO 自动跳转到实验数据分析页面
 
@@ -1002,47 +994,9 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             }
             if (readableIndex == -1) {
                 //图像板还未准备好,继续询问
-               /* mExecutorService.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        step6();
-                    }
-                });*/
-                //图像板还未准备好,应该询问循环状态
-               /* try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                step5();*/
-                if (step5Subscription == null) {
-                    mStep5Responsed = false;
-                    step5Subscription = Observable.interval(1000, 1000, TimeUnit.MILLISECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Action1<Long>() {
-                                @Override
-                                public void call(Long aLong) {
-                                    if (!mStep5Responsed) {
-                                        step5();
-                                    }
 
-                                }
-                            }, new Action1<Throwable>() {
-                                @Override
-                                public void call(Throwable throwable) {
-                                    throwable.printStackTrace();
-                                    if (!mStep5Responsed) {
-                                        step5();
-                                    }
-                                }
-                            });
-                }
+                //图像板还未准备好,应该询问循环状态
+                step5Subscription();
 
             } else {
                 //循环数加1
@@ -1056,6 +1010,29 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
     }
 
+    private void step5Subscription(){
+        if (step5Subscription == null) {
+            mStep5Responsed = false;
+            step5Subscription = Observable.interval(10, 1000, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<Long>() {
+                        @Override
+                        public void call(Long aLong) {
+                            if (!mStep5Responsed) {
+                                step5();
+                            }
+
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            throwable.printStackTrace();
+                            DataFileUtil.writeFileLog(throwable.getMessage());
+                        }
+                    });
+        }
+    }
     private void step7(PcrCommand.PCR_IMAGE pcr_image) {
         mInReadingImg = true;
         PcrCommand command = new PcrCommand();
@@ -1134,20 +1111,20 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             chip = "Chip#4";
         }
 
-        StringBuilder hex = new StringBuilder(reveicedBytes.length * 2);
+       /* StringBuilder hex = new StringBuilder(reveicedBytes.length * 2);
         for (byte b : reveicedBytes) {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
-        }
+        }*/
 
 
         File file = null, sourceFile = null;
         if (mInCycling) {
-            System.out.println("通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
+            // System.out.println("通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
             file = DataFileUtil.getDtImageDataFile(mHistoryExperiment);
             sourceFile = DataFileUtil.getDtImageDataSourceFile(mHistoryExperiment);
         } else if (mInMeltCurve) {
-            System.out.println("溶解曲线通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
+            //System.out.println("溶解曲线通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
             file = DataFileUtil.getMeltImageDateFile(mHistoryExperiment);
             sourceFile = DataFileUtil.getMeltImageDataSourceFile(mHistoryExperiment);
         }
@@ -1155,20 +1132,20 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         if (curRowIndex == 0) {
 
             appendToFile(chip, file);
-            sourceAppendToFile(chip, sourceFile);
+            // sourceAppendToFile(chip, sourceFile);
         }
         //保存图像板返回的原始数据到文件
         //将0x1717后面的数据抹去
-        String source=hex.toString().toLowerCase();
+      /*  String source=hex.toString().toLowerCase();
         int index=source.indexOf("1717");
         source=source.substring(0,index+4);
-        sourceAppendToFile(source, sourceFile);
-       // if (mInCycling) {
-            //TODO 循环过程数据转换待理解
-            String imageData = transferImageData(channelIndex, curRowIndex, reveicedBytes);
-            System.out.println("trim后的图像数据："+imageData);
-            //保存经过矫正图像板数据到文件
-            appendToFile(imageData, file);
+        sourceAppendToFile(source, sourceFile);*/
+        // if (mInCycling) {
+        //TODO 循环过程数据转换待理解
+        String imageData = transferImageData(channelIndex, curRowIndex, reveicedBytes);
+        //System.out.println("trim后的图像数据："+imageData);
+        //保存经过矫正图像板数据到文件
+        appendToFile(imageData, file);
         //}
         //检查本通道是否已经读取完毕
         if (readed) {
@@ -1189,22 +1166,26 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 /**
                  * 读循环状态
                  */
-                step5();
+                //step5();
+                if (step5Subscription != null && !step5Subscription.isUnsubscribed()) {
+                    step5Subscription.unsubscribe();
+                    step5Subscription=null;
+                }
+                step5Subscription();
             } else {
                 step7(mChannelStatusList.get(next).getPctImageCmd());
             }
         }
 
 
-
-}
+    }
 
     private String transferImageData(int chan, int k, byte[] reveicedBytes) {
         int count;
-        if (mInCycling){
-            count=mImageMode.getSize() + 1;
-        }else {
-            count=mImageMode.getSize()+2;
+        if (mInCycling) {
+            count = mImageMode.getSize() + 1;
+        } else {
+            count = mImageMode.getSize() + 2;
         }
         int[] txData = new int[count];
 
@@ -1222,8 +1203,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
         //当前行号
         txData[mImageMode.getSize()] = reveicedBytes[5];
-        if (mInMeltCurve){
-            if ( reveicedBytes[5]==0){
+        if (mInMeltCurve) {
+            if (reveicedBytes[5] == 0) {
                 //TODO 待验证
                 byte[] buffers = new byte[4];
                 buffers[0] = reveicedBytes[CommData.imgFrame * 2 + 6];
@@ -1231,7 +1212,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 buffers[2] = reveicedBytes[CommData.imgFrame * 2 + 8];
                 buffers[3] = reveicedBytes[CommData.imgFrame * 2 + 9];
                 //float t = BitConverter.ToSingle(buffers, 0);
-                float t =ByteUtil.getFloat(buffers);
+                float t = ByteUtil.getFloat(buffers);
                 txData[count - 1] = (int) t;
             }
         }

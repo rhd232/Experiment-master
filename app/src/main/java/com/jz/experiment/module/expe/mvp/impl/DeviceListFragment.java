@@ -31,6 +31,7 @@ import com.jz.experiment.module.expe.event.ConnectRequestEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.wind.base.bean.Config;
+import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.repo.ConfigRepo;
 import com.wind.base.utils.ActivityUtil;
@@ -311,11 +312,11 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
             } //搜索完成
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.e(TAG, "onReceive: 搜索完成");
-                if (!deviceInfoSet.contains(mConnectedDevice)){
+                /*if (!deviceInfoSet.contains(mConnectedDevice)){
                     checkbox.setActivated(false);
                     rl_connected.setVisibility(View.GONE);
                     mConnectedDevice=null;
-                }
+                }*/
             }else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)){
                 Log.e(TAG, "onReceive: 蓝牙连接成功");
             }else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)){
@@ -360,8 +361,10 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
      */
     @Subscribe
     public void onConnectRequestEvent(ConnectRequestEvent event) {
+
         DeviceInfo deviceInfo = event.getDeviceInfo();
         if (mBluetoothService!=null){
+            LoadingDialogHelper.showOpLoading(getActivity());
             mBluetoothService.connect(deviceInfo.getDevice());
         }
 
@@ -380,11 +383,15 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
 
     @Override
     public void onConnectSuccess() {
+        LoadingDialogHelper.hideOpLoading();
         ToastUtil.showToast(getActivity(),"连接成功");
 
 
         rl_connected.setVisibility(View.VISIBLE);
         mConnectedDevice=mBluetoothService.getConnectedBluetoothDevice();
+        if (mConnectedDevice==null){
+            return;
+        }
         tv_connected_dev_name.setText(mConnectedDevice.getName());
         checkbox.setActivated(true);
         DeviceInfo deviceInfo=new DeviceInfo();
@@ -402,6 +409,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
 
     @Override
     public void onConnectCancel() {
+        LoadingDialogHelper.hideOpLoading();
         AppDialogHelper.showSingleBtnDialog(getActivity(), "连接失败请重试", new AppDialogHelper.DialogOperCallback() {
             @Override
             public void onDialogConfirmClick() {

@@ -7,13 +7,23 @@ import com.wind.data.expe.bean.HistoryExperiment;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataFileUtil {
 
+
+    public static String getPdfFileName(HistoryExperiment experiment,boolean melt){
+        String name="变温扩增";
+        if (melt){
+            name="熔解曲线";
+        }
+        return DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + name+".pdf";
+    }
     public static File getDtImageDataFile(HistoryExperiment experiment) {
         String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + "_dt.txt";
         //String filePath = C.Value.IMAGE_DATA + fileName;
@@ -109,6 +119,57 @@ public class DataFileUtil {
         File dirTrim=new File(C.Value.TRIM_FOLDER);
         if (!dirTrim.exists()){
             dirTrim.mkdirs();
+        }
+    }
+    public static void  removeLogFile(){
+        File file=getLogFile();
+        if (file.exists()){
+            file.delete();
+        }
+    }
+    public static File getLogFile() {
+        String fileName ="communicate_log.txt";
+        return getOrCreateFile(fileName);
+    }
+
+    public static void writeFileLog(String txt){
+        File file=getLogFile();
+
+        FileOutputStream fos = null;
+        OutputStreamWriter osw = null;
+
+        try {
+            if (!file.exists()) {
+                boolean hasFile = file.createNewFile();
+               /* if (hasFile) {
+                    System.out.println("file not exists, create new file");
+                }*/
+                fos = new FileOutputStream(file);
+            } else {
+                // System.out.println("file exists");
+                fos = new FileOutputStream(file, true);
+            }
+
+            osw = new OutputStreamWriter(fos, "utf-8");
+            osw.write(txt); //写入内容
+            osw.write("\r\n");  //换行
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {   //关闭流
+            try {
+                if (osw != null) {
+                    osw.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

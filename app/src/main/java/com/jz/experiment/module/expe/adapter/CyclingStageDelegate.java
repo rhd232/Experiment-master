@@ -46,7 +46,24 @@ public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelega
     @Override
     protected void onBindViewHolder(@NonNull List<DisplayItem> items, final int position,
                                     @NonNull RecyclerView.ViewHolder holder, @NonNull List<Object> payloads) {
+
+
         final ViewHolder vh = (ViewHolder) holder;
+        LinearLayoutManager manager=new LinearLayoutManager(mActivity){
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+
+            @Override
+            public boolean canScrollHorizontally() {
+                return false;
+            }
+        };
+        manager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        vh.rvInner.setLayoutManager(manager);
+
+
         final CyclingStage stage = (CyclingStage) items.get(position);
 
         VernierAdapter adapter = new VernierAdapter(mActivity, R.layout.item_inner_vernier);
@@ -55,7 +72,6 @@ public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelega
         }
         adapter.setParentStage(stage);
         vh.rvInner.setAdapter(adapter);
-
         //   stage.setVernierAdapter(adapter);
         vh.iv_cycling_add.setOnClickListener(new View.OnClickListener() {
             @Override

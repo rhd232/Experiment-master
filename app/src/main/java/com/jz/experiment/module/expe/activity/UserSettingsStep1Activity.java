@@ -273,6 +273,10 @@ public class UserSettingsStep1Activity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (findSubscription!=null&& !findSubscription.isUnsubscribed()){
+            findSubscription.unsubscribe();
+        }
+        findSubscription=null;
         EventBus.getDefault().unregister(this);
     }
 }

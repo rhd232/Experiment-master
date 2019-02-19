@@ -111,7 +111,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                                     ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
                                     fragments.add(f);
 
-                                   // titles.add(expe.getName());
+                                    // titles.add(expe.getName());
 
                                 }
                                 mFragmentAdapter.setFragments(fragments);
@@ -119,6 +119,11 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                                 mFragmentAdapter.notifyDataSetChanged();
                             }
                         }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
                     }
                 })
         ;

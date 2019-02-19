@@ -55,6 +55,9 @@ public class C {
 
         //sp filename
         public static final String SP_FILENAME = "config";
+
+        public static final String DATA_PREFIX="aa";
+        public static final String DATA_SUFFIX="1717";
     }
     public static class PREF_KEY{
 

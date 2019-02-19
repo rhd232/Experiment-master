@@ -16,7 +16,7 @@ import com.wind.view.DisplayUtil;
 
 public class VernierView extends View {
 
-    private  final int LINE_OFFSET=DisplayUtil.dip2px(getContext(),30);
+    private  final int LINE_OFFSET=DisplayUtil.dip2px(getContext(),200);
     public VernierView(Context context) {
         super(context);
         init();
@@ -115,9 +115,79 @@ public class VernierView extends View {
     }
 
     boolean canDrag=false;
+
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+
+        return touchDragArea(event);
+        //return touchDragBar(event);
+    }
+
+
+
+    public boolean tryCaptureView() {
+        return canDrag;
+    }
+
+    public PointF getCurrentPosition() {
+        return mPos;
+    }
+
+    private OnViewPositionChangedListener listener;
+    public void setOnViewPositionChangedListener(OnViewPositionChangedListener listener){
+        this.listener=listener;
+    }
+    public interface OnViewPositionChangedListener{
+        void onViewPositionChanged(PointF pos);
+        void onStartScaleChanged(float startScale);
+    }
+
+    float downY;
+    private boolean touchDragArea(MotionEvent event){
+        float x=event.getX();
+        float y=event.getY();
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                downY=event.getY();
+                //判断手指是否落在粗线范围内，若在可以拖动，否则不能拖动
+                if (mBoldLineRectF.contains(x,y)){
+                    canDrag=true;
+                }else {
+                    canDrag=false;
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (canDrag){
+                    /*if (y>getHeight()){
+                        y=getHeight();
+                    }
+                    if (y<spaceTopHeight){
+                        y=spaceTopHeight;
+                    }*/
+                    float deltaY=y-downY;
+                    System.out.println("deltaY:"+deltaY);
+                    float temp=mScale+deltaY;
+                    if (temp>getHeight()){
+                        temp=getHeight();
+                    }
+                    if (temp<spaceTopHeight){
+                        temp=spaceTopHeight;
+                    }
+                    setScale(temp);
+                    downY=y;
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+                canDrag=false;
+
+                break;
+        }
+        return true;
+    }
+    private boolean touchDragBar(MotionEvent event){
         float x=event.getX();
         float y=event.getY();
         switch (event.getAction()){
@@ -147,22 +217,4 @@ public class VernierView extends View {
         }
         return true;
     }
-
-    public boolean tryCaptureView() {
-        return canDrag;
-    }
-
-    public PointF getCurrentPosition() {
-        return mPos;
-    }
-
-    private OnViewPositionChangedListener listener;
-    public void setOnViewPositionChangedListener(OnViewPositionChangedListener listener){
-        this.listener=listener;
-    }
-    public interface OnViewPositionChangedListener{
-        void onViewPositionChanged(PointF pos);
-        void onStartScaleChanged(float startScale);
-    }
-
 }

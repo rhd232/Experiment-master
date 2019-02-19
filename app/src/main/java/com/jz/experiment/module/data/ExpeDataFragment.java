@@ -27,6 +27,7 @@ import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DataFileUtil;
 import com.wind.base.bean.CyclingStage;
+import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.AppUtil;
@@ -53,6 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -236,30 +238,6 @@ public class ExpeDataFragment extends BaseFragment {
             tv_melt.setVisibility(View.GONE);
         }
 
-      /*  ChartData chartData = mExeperiment.getDtChartData();
-        List<com.wind.data.expe.bean.LineData> lineDataList = chartData.getLineDataList();
-        mDataSets = new ArrayList<>();
-        for (int i = 0; i < lineDataList.size(); i++) {//4组数据
-            com.wind.data.expe.bean.LineData lineData = lineDataList.get(i);
-            List<Entry> entries = lineData.getEntries();
-
-            LineDataSet dataSet = new LineDataSet(entries, "通道" + (i + 1));
-            dataSet.setDrawCircles(false);
-            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-            dataSet.setDrawValues(false);
-            dataSet.setColor(lineData.getColor());
-            mDataSets.add(dataSet);
-        }
-
-        setupChartStyle();
-
-        mLineData = new LineData(mDataSets);
-        // chart.setMarker(new ChartMarkerView(getActivity()));
-        chart.setTouchEnabled(false);
-        chart.setDrawBorders(false);
-        chart.setData(mLineData);
-        chart.animateX(1500);
-        chart.invalidate(); // refresh*/
     }
 
     private void getCtValue(String chan, String currks) {
@@ -352,38 +330,8 @@ public class ExpeDataFragment extends BaseFragment {
         String ctValue = format.format(val);
       //  System.out.println("ctValue:" + ctValue);
         mChannelDataAdapters[gvIndex].getItem(ksIndexInAdapter).setSampleVal(ctValue);
-
-
     }
 
-    /*private void setupChartStyle() {
-
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setEnabled(true);
-
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // 设置X轴的位置
-        xAxis.setDrawGridLines(false); // 效果如下图
-        xAxis.setDrawLabels(true);
-        xAxis.setDrawAxisLine(true);
-
-        YAxis yAxisRight = chart.getAxisRight();
-        yAxisRight.setEnabled(false);
-
-        YAxis yAxisLeft = chart.getAxisLeft();
-        yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        yAxisLeft.setDrawGridLines(false);
-
-
-        Description description = new Description();
-        description.setEnabled(false);
-        chart.setDescription(description);
-        Legend legend = chart.getLegend();
-        // legend.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
-        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
-        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-
-
-    }*/
     private ChannelDataAdapter[] mChannelDataAdapters;
 
     private void buildChannelData(GridView[] gvs, String[] titles) {
@@ -496,22 +444,50 @@ public class ExpeDataFragment extends BaseFragment {
                                         "确定要导出pdf吗？", new AppDialogHelper.DialogOperCallback() {
                                             @Override
                                             public void onDialogConfirmClick() {
-                                                //生成pdf
-                                                generatePdf()
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(new Action1<Boolean>() {
-                                                            @Override
-                                                            public void call(Boolean aboolean) {
-                                                                ToastUtil.showToast(getActivity(), "已导出");
-                                                            }
-                                                        }, new Action1<Throwable>() {
-                                                            @Override
-                                                            public void call(Throwable throwable) {
-                                                                ToastUtil.showToast(getActivity(), "导出失败");
-                                                            }
-                                                        });
-                                            }
+
+                                                LoadingDialogHelper.showOpLoading(getActivity());
+                                                    if (!tv_dt.isActivated()){
+                                                        onViewClick(tv_dt);
+                                                    }
+                                                    String pdfName=DataFileUtil.getPdfFileName(mExeperiment,false);
+                                                    //生成pdf
+                                                    generatePdf(pdfName).delay(500,TimeUnit.MILLISECONDS)
+                                                            .subscribeOn(Schedulers.io())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribe(new Action1<Boolean>() {
+                                                                @Override
+                                                                public void call(Boolean aboolean) {
+                                                                    if (mHasMeltingMode){
+                                                                        String pdfName=DataFileUtil.getPdfFileName(mExeperiment,true);
+                                                                        onViewClick(tv_melt);
+                                                                        generatePdf(pdfName).delay(500,TimeUnit.MILLISECONDS)
+                                                                                .subscribeOn(Schedulers.io())
+                                                                                .observeOn(AndroidSchedulers.mainThread())
+                                                                                .subscribe(new Action1<Boolean>() {
+                                                                                    @Override
+                                                                                    public void call(Boolean aBoolean) {
+                                                                                        LoadingDialogHelper.hideOpLoading();
+                                                                                        ToastUtil.showToast(getActivity(), "已导出");
+                                                                                    }
+                                                                                });
+                                                                    }else {
+                                                                        LoadingDialogHelper.hideOpLoading();
+                                                                        ToastUtil.showToast(getActivity(), "已导出");
+                                                                    }
+
+                                                                }
+                                                            }, new Action1<Throwable>() {
+                                                                @Override
+                                                                public void call(Throwable throwable) {
+                                                                    ToastUtil.showToast(getActivity(), "导出失败");
+                                                                }
+                                                            });
+
+                                                }
+
+
+
+
                                         });
                             }
                         }).start();
@@ -538,7 +514,7 @@ public class ExpeDataFragment extends BaseFragment {
 
     }
 
-    private Observable<Boolean> generatePdf() {
+    private Observable<Boolean> generatePdf(final String pdfName) {
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
 
             @Override
@@ -566,7 +542,7 @@ public class ExpeDataFragment extends BaseFragment {
                 gv_b.draw(page.getCanvas());*/
 
                 document.finishPage(page);
-                String pdfName = System.currentTimeMillis() + ".pdf";
+               // String pdfName = fileName + ".pdf";
                 File file = new File(DataFileUtil.getPdfFilePath(pdfName));
 
                 try {
