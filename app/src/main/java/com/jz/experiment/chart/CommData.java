@@ -178,7 +178,10 @@ public class CommData {
             if (diclist.get(chan)==null){
                 return cdlist;
             }
-            int n = diclist.get(chan).size() / imgFrame;
+            int size=diclist.get(chan).size();
+            int mode=size % imgFrame;//mode!=0说明存在丢数据
+            int n = size / imgFrame;
+
             //if (ks == 4)
             //{
             int ksindex = -1;
@@ -213,20 +216,24 @@ public class CommData {
             {
                 return cdlist;
             }
+            int skipIndex=-1;
             for (int i = 0; i < n; i++)
             {
 
-                //List<String> strlist = diclist.chan].Skip(i * imgFrame).Take(imgFrame).ToList();
                 List<String> strlist =diclist.get(chan).subList(i*imgFrame,i*imgFrame+imgFrame);
+                //检测第一条数据是否正确，不正确则跳过
+                //int lineNumber=Integer.parseInt(strlist.get(0).split(" ")[13]);
+
+
                 if (strlist.size() == 0) continue;
                 MeltChartData cd = new MeltChartData();
                 String[] strs = strlist.get(0).split(" ");
 
                 //为方便调试暂时注释掉的
                 if (strs.length < 14) continue;
-                cd.x = strs[13];
+                //cd.x = strs[13];
 
-                //cd.x = i+"";//测试用
+                cd.x = i+"";//测试用
 
 
                 Map<Integer,List<String>> datalist=new HashMap<>();

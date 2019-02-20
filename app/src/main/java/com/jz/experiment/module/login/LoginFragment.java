@@ -107,12 +107,17 @@ public class LoginFragment extends BaseFragment {
                         }
                     }
                 });
-        /*final Subscription subscription=Observable.interval(1,TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.newThread())
+      /*  final Subscription subscription=Observable.interval(1,TimeUnit.MILLISECONDS)
+               .onBackpressureLatest()
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long aLong) {
                         System.out.println(aLong.longValue());
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
 
                     }
                 }, new Action1<Throwable>() {
@@ -120,14 +125,9 @@ public class LoginFragment extends BaseFragment {
                     public void call(Throwable throwable) {
                         throwable.printStackTrace();
                     }
-                });
+                });*/
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                subscription.unsubscribe();
-            }
-        },1500);*/
+
     }
 
     Subscription loginSubscription;

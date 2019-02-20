@@ -26,6 +26,23 @@ public class DeviceProxyHelper {
         return INSTANCE;
     }
 
+    public void unbindService(Context context){
+        if (mBinding){
+            try {
+                context.getApplicationContext().unbindService(mUsbServiceConnection);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            try {
+                context.getApplicationContext().unbindService(mBluetoothServiceConnection);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+
+        }
+    }
     private DeviceProxyHelper(Context context) {
         if (mBluetoothService == null) {
             if (!mBinding) {

@@ -33,18 +33,24 @@ public class DuringView extends TextView {
         setText("00:00:00");
         mSubscription=Observable
                 .interval(1000, 1000, TimeUnit.MILLISECONDS)
+                .onBackpressureLatest()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long aLong) {
                         // String time = DateUtil.get(aLong * 1000, "HH:mm:ss");
-                        mDuring=aLong;
+                        mDuring = aLong;
                         String hh = new DecimalFormat("00").format(aLong / 3600);
                         String mm = new DecimalFormat("00").format(aLong % 3600 / 60);
                         String ss = new DecimalFormat("00").format(aLong % 60);
                         String timeFormat = new String(hh + ":" + mm + ":" + ss);
                         setText(timeFormat);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
                     }
                 });
     }

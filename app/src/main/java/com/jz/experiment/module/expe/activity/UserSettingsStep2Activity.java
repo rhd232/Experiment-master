@@ -258,13 +258,11 @@ public class UserSettingsStep2Activity extends BaseActivity {
 
     @OnClick({R.id.rl_mode_sel, R.id.tv_next, R.id.tv_start_temp, R.id.tv_end_temp})
     public void onViewClick(View v) {
+        int start=20;
+        List<IWheelVo> data=new ArrayList<>();
         switch (v.getId()) {
-            case R.id.tv_end_temp:
-                Stage stage= (Stage) mStageAdapter.getItem(mStageAdapter.getItemCount()-1);
-                int temp= (int) stage.getTemp();
-                tv_start_temp.setText( temp+"");
-                int start= (int) Math.ceil(temp);
-                List<IWheelVo> data=new ArrayList<>();
+            case R.id.tv_start_temp:
+
                 for (int i=start;i<=100;i++) {
                     WheelSimpleVo simpleVo = new WheelSimpleVo(i,i+"");
                     data.add(simpleVo);
@@ -274,7 +272,23 @@ public class UserSettingsStep2Activity extends BaseActivity {
                     public void onResult(View v, IWheelVo[] result, int[] indexs, String[] unit) {
                         tv_end_temp.setText(result[0].getLabel());
                     }
-                }, data,"℃",0);
+                }, data,"℃",30);
+                break;
+            case R.id.tv_end_temp:
+              /*  Stage stage= (Stage) mStageAdapter.getItem(mStageAdapter.getItemCount()-1);
+                int temp= (int) stage.getTemp();
+                tv_start_temp.setText( temp+"");
+                int start= (int) Math.ceil(temp);*/
+                for (int i=start;i<=100;i++) {
+                    WheelSimpleVo simpleVo = new WheelSimpleVo(i,i+"");
+                    data.add(simpleVo);
+                }
+                WheelPickerFactory.showWheelAPicker(tv_start_temp, new WheelPickerFactory.OnWheelClickListener() {
+                    @Override
+                    public void onResult(View v, IWheelVo[] result, int[] indexs, String[] unit) {
+                        tv_end_temp.setText(result[0].getLabel());
+                    }
+                }, data,"℃",50);
 
 
                 break;

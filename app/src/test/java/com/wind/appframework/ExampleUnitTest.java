@@ -29,28 +29,39 @@ import static org.junit.Assert.assertEquals;
  */
 public class ExampleUnitTest {
     @Test
+    public void testDiv(){
+        int mode=59 % 12;
+        System.out.println(mode);
+        int n= (int) Math.ceil(59/12f);
+        System.out.println(n);
+    }
+    @Test
     public void testByteToString(){
        /* Integer a=null;
         init(a);
         Assert.assertNull(a);//a为null*/
 
-        byte [] cmd=new byte[4];
+        byte [] cmd=new byte[6];
         cmd[0]= (byte) 0xaa;
         cmd[1]= (byte) 0x13;
         cmd[2]= (byte) 0x2;
         cmd[3]= (byte) 0x1;
+        cmd[4]= (byte) 0x17;
+        cmd[5]= (byte) 0x17;
 
-        StringBuilder hex = new StringBuilder(cmd.length * 2);
+        String rev=ByteUtil.getHexStr(cmd,cmd.length);
+       /* StringBuilder hex = new StringBuilder(cmd.length * 2);
         for (int i = 0; i < cmd.length; i++) {
             byte b = cmd[i];
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
         }
 
-        String rev = hex.toString().toLowerCase();
+        String rev = hex.toString().toLowerCase();*/
         System.out.println(rev);
 
-        //string 转回byte
+        byte [] result= ByteUtil.hexStringToBytes(rev,rev.length()/2);
+       /* //string 转回byte
         byte [] result=new byte[cmd.length];
         int start=0;
         for (int i=0;i< cmd.length;i++){
@@ -59,16 +70,16 @@ public class ExampleUnitTest {
             byte ret=(byte)s;
             result[i]=ret;
             start+=2;
-        }
-
+        }*/
+        String revs=ByteUtil.getHexStr(result,result.length);
         //打印出转回的byte
-        StringBuilder hexs = new StringBuilder(result.length * 2);
+      /*  StringBuilder hexs = new StringBuilder(result.length * 2);
         for (int i = 0; i < result.length; i++) {
             byte b = result[i];
             if ((b & 0xFF) < 0x10) hexs.append("0");
             hexs.append(Integer.toHexString(b & 0xFF));
         }
-        String revs = hexs.toString().toLowerCase();
+        String revs = hexs.toString().toLowerCase();*/
         System.out.println(revs);
 
     }

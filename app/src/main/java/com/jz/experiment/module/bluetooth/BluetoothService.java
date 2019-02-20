@@ -397,7 +397,7 @@ public class BluetoothService extends CommunicationService {
                     // Send the obtained bytes to the UI activity
 
                     String rev=ByteUtil.getHexStr(buffer,bytes);
-                    //System.out.println("接收到：" + rev);
+                    System.out.println("接收到原始数据：" + rev);
                     splitAndCombine(rev,mReceivedStr);
 
                 } catch (IOException e) {
@@ -428,7 +428,8 @@ public class BluetoothService extends CommunicationService {
                         vals.clear();
                         //part1是一组完整的数据了
                         //System.out.println("完整数据:"+part1);
-                        byte[] buffer=part1.getBytes();
+                        //byte[] buffer=part1.getBytes();
+                        byte[] buffer=ByteUtil.hexStringToBytes(part1,part1.length()/2);
                         broadcast(buffer,buffer.length,part1);
                     }else {
                         vals.add(part1);
@@ -440,12 +441,12 @@ public class BluetoothService extends CommunicationService {
                         sb.append(v);
                     }
                     vals.clear();
-                    if (sb.toString().lastIndexOf("aa")>0){
+                    if (sb.toString().lastIndexOf(C.Value.DATA_PREFIX)>0){
                         splitAndCombine(sb.toString(),vals);
                     }else {
                         //System.out.println("完整数据:" + sb.toString());
                         //byte[] buffer=sb.toString().getBytes();
-                        byte[] buffer=ByteUtil.hexStringToBytes(sb.toString(),sb.length());
+                        byte[] buffer=ByteUtil.hexStringToBytes(sb.toString(),sb.length()/2);
                         broadcast(buffer,buffer.length,sb.toString());
                     }
                 }
@@ -463,7 +464,7 @@ public class BluetoothService extends CommunicationService {
                         vals.clear();
                         //part1是一组完整的数据了
                         //byte[] buffer=part1.getBytes();
-                        byte[] buffer=ByteUtil.hexStringToBytes(part1,part1.length());
+                        byte[] buffer=ByteUtil.hexStringToBytes(part1,part1.length()/2);
                         broadcast(buffer,buffer.length,part1);
                        // System.out.println("完整数据:"+part1);
                     }else {
@@ -478,7 +479,7 @@ public class BluetoothService extends CommunicationService {
                         vals.clear();
                         //part1是一组完整的数据了
                       // byte[] buffer=rev.getBytes();
-                        byte[] buffer=ByteUtil.hexStringToBytes(rev,rev.length());
+                        byte[] buffer=ByteUtil.hexStringToBytes(rev,rev.length()/2);
                         broadcast(buffer,buffer.length,rev);
                         //System.out.println("完整数据:"+rev);
                     }else {
@@ -502,7 +503,7 @@ public class BluetoothService extends CommunicationService {
                     }else {
                         //System.out.println("完整数据:" + sb.toString());
                         //byte[] buffer=sb.toString().getBytes();
-                        byte[] buffer=ByteUtil.hexStringToBytes(sb.toString(),sb.length());
+                        byte[] buffer=ByteUtil.hexStringToBytes(sb.toString(),sb.length()/2);
                         broadcast(buffer,buffer.length,sb.toString());
                     }
                 }else {

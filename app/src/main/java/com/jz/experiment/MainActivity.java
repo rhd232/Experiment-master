@@ -248,6 +248,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        DeviceProxyHelper.getInstance(getApplicationContext()).unbindService(getApplicationContext());
         stopService(mServiceIntent);
         EventBus.getDefault().unregister(this);
     }

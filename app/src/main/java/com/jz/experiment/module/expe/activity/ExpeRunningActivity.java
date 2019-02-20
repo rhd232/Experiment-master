@@ -484,6 +484,9 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (tv_duration!=null){
+            tv_duration.stop();
+        }
         if (step5Subscription != null && !step5Subscription.isUnsubscribed()) {
             step5Subscription.unsubscribe();
             step5Subscription = null;
@@ -842,8 +845,9 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 mStep5Responsed = false;
                 if (step5Subscription == null) {
                     step5Subscription = Observable.interval(10, 1000, TimeUnit.MILLISECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
+                            /*.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())*/
+                            .onBackpressureLatest()
                             .subscribe(new Action1<Long>() {
                                 @Override
                                 public void call(Long aLong) {
@@ -1021,8 +1025,9 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         if (step6Subscription == null) {
             mStep6Responsed = false;
             step6Subscription = Observable.interval(10, 1000, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                   /* .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())*/
+                   .onBackpressureLatest()
                     .subscribe(new Action1<Long>() {
                         @Override
                         public void call(Long aLong) {
@@ -1044,8 +1049,9 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         if (step5Subscription == null) {
             mStep5Responsed = false;
             step5Subscription = Observable.interval(10, 1000, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                   /* .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())*/
+                   .onBackpressureLatest()
                     .subscribe(new Action1<Long>() {
                         @Override
                         public void call(Long aLong) {
@@ -1160,7 +1166,6 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
         //保存到本地文件中
         if (curRowIndex == 0) {
-
             appendToFile(chip, file);
             sourceAppendToFile(chip, sourceFile);
         }
