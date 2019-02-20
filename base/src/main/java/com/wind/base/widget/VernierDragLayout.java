@@ -172,6 +172,10 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
     private Stage mLink;
     public void setLink(Stage stage) {
         mLink=stage;
+        if (stage!=null) {
+            et_time.setText(stage.getDuring() + "");
+            tv_temperature.setText(stage.getTemp() + "");
+        }
        /* if (mLink!=null)
             mLink.setStartScale(vernier_view.getStartScale());*/
     }

@@ -29,22 +29,10 @@ public class MeltCurveReader {
         kslist.add("B4");
 
         List<String> tdlist = new ArrayList<>();//定义通道
-        if (CommData.cboChan1 == 1)
-        {
-            tdlist.add("Chip#1");
-        }
-        if (CommData.cboChan2 == 1)
-        {
-            tdlist.add("Chip#2");
-        }
-        if (CommData.cboChan3 == 1)
-        {
-            tdlist.add("Chip#3");
-        }
-        if (CommData.cboChan4 == 1)
-        {
-            tdlist.add("Chip#4");
-        }
+        tdlist.add("Chip#1");
+        tdlist.add("Chip#2");
+        tdlist.add("Chip#3");
+        tdlist.add("Chip#4");
 
         double[][] mtemp = new double[CCurveShowMet.MAX_CHAN][ CCurveShowMet.MAX_CYCL];
         int cyclenum = 0;

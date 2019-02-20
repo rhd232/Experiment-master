@@ -119,23 +119,25 @@ public class ExpeDataFragment extends BaseFragment {
         EventBus.getDefault().register(this);
         mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
         mChannelDataAdapters = new ChannelDataAdapter[2];
+
         GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
         gvs[1] = gv_b;
         String[] titles = {"A", "B"};
         buildChannelData(gvs, titles);
+        tv_dt.setActivated(true);
+        tv_melt.setActivated(false);
+        chart_melt.setVisibility(View.GONE);
 
         mExecutorService = Executors.newSingleThreadExecutor();
         init();
         inflateBase();
         inflateChart();
-        tv_dt.setActivated(true);
-        tv_melt.setActivated(false);
 
-        if (isSavedExpe()){
+        if (isSavedExpe()) {
             iv_save.setVisibility(View.GONE);
         }
-       // mExecutorService.execute(mRun);
+        // mExecutorService.execute(mRun);
 
     }
 
@@ -199,16 +201,18 @@ public class ExpeDataFragment extends BaseFragment {
     private Runnable mRun = new Runnable() {
         @Override
         public void run() {
-            if (tv_dt.isActivated())
-                mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
-            else {
-                mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
-            }
+            showChart();
         }
     };
 
 
-
+    private void showChart() {
+        if (tv_dt.isActivated()) {
+            mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
+        } else {
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
+        }
+    }
 
 
     private void inflateChart() {
@@ -247,88 +251,88 @@ public class ExpeDataFragment extends BaseFragment {
         int currChan = 0;
         int ksindex = -1;
 
-        int line=1;
+        int line = 1;
         switch (chan) {
             case "Chip#1":
                 currChan = 0;
 
-                line=1;
+                line = 1;
                 break;
             case "Chip#2":
                 currChan = 1;
-                line=2;
+                line = 2;
                 break;
             case "Chip#3":
                 currChan = 2;
-                line=3;
+                line = 3;
 
                 break;
             case "Chip#4":
                 currChan = 3;
-                line=4;
+                line = 4;
                 break;
         }
 
 
         int gvIndex = 0;
-        int ksIndexInAdapter=0;
-        int lineCount=9;//反应孔数+1
+        int ksIndexInAdapter = 0;
+        int lineCount = 9;//反应孔数+1
 
         switch (currks) {
             case "A1":
                 gvIndex = 0;
                 ksindex = 0;
 
-                ksIndexInAdapter = lineCount*line+1;
+                ksIndexInAdapter = lineCount * line + 1;
                 break;
             case "A2":
                 gvIndex = 0;
                 ksindex = 1;
 
-                ksIndexInAdapter = lineCount*line+2;
+                ksIndexInAdapter = lineCount * line + 2;
                 break;
             case "A3":
                 gvIndex = 0;
                 ksindex = 2;
 
-                ksIndexInAdapter =  lineCount*line+3;
+                ksIndexInAdapter = lineCount * line + 3;
                 break;
             case "A4":
                 gvIndex = 0;
                 ksindex = 3;
 
-                ksIndexInAdapter = lineCount*line+4;
+                ksIndexInAdapter = lineCount * line + 4;
                 break;
             case "B1":
                 gvIndex = 1;
                 ksindex = 4;
 
-                ksIndexInAdapter = lineCount*line+1;
+                ksIndexInAdapter = lineCount * line + 1;
                 break;
             case "B2":
                 gvIndex = 1;
                 ksindex = 5;
 
-                ksIndexInAdapter = lineCount*line+2;
+                ksIndexInAdapter = lineCount * line + 2;
                 break;
             case "B3":
                 gvIndex = 1;
                 ksindex = 6;
 
-                ksIndexInAdapter = lineCount*line+3;
+                ksIndexInAdapter = lineCount * line + 3;
                 break;
             case "B4":
                 gvIndex = 1;
                 ksindex = 7;
 
-                ksIndexInAdapter = lineCount*line+4;
+                ksIndexInAdapter = lineCount * line + 4;
                 break;
         }
         double[][] ctValues = CurveReader.getInstance().m_CTValue;
         double val = ctValues[currChan][ksindex];
         DecimalFormat format = new DecimalFormat("#0.00");
         String ctValue = format.format(val);
-      //  System.out.println("ctValue:" + ctValue);
+        //  System.out.println("ctValue:" + ctValue);
         mChannelDataAdapters[gvIndex].getItem(ksIndexInAdapter).setSampleVal(ctValue);
     }
 
@@ -377,58 +381,70 @@ public class ExpeDataFragment extends BaseFragment {
         return f;
 
     }
-    public HistoryExperiment getExeperiment(){
+
+    public HistoryExperiment getExeperiment() {
         return mExeperiment;
     }
+
     public boolean isSavedExpe() {
         return mExeperiment.getId() != HistoryExperiment.ID_NONE;
     }
 
+    private long time;
 
-    @OnClick({R.id.iv_pdf, R.id.iv_save,R.id.tv_dt,R.id.tv_melt})
+    @OnClick({R.id.iv_pdf, R.id.iv_save, R.id.tv_dt, R.id.tv_melt})
     public void onViewClick(View view) {
+        long now = System.currentTimeMillis();
         switch (view.getId()) {
             case R.id.tv_dt:
+
+                time = now;
                 tv_dt.setActivated(true);
                 tv_melt.setActivated(false);
 
                 chart_dt.setVisibility(View.VISIBLE);
+
                 chart_melt.setVisibility(View.GONE);
 
-                mExecutorService.execute(mRun);
+                //mExecutorService.execute(mRun);
+                showChart();
+
                 break;
             case R.id.tv_melt:
+                // if (now-time>1500) {
+                time = now;
                 tv_dt.setActivated(false);
                 tv_melt.setActivated(true);
 
                 chart_dt.setVisibility(View.GONE);
                 chart_melt.setVisibility(View.VISIBLE);
-                mExecutorService.execute(mRun);
+                showChart();
+                //mExecutorService.execute(mRun);
+                // }
                 break;
             case R.id.iv_save:
 
-                if (!isSavedExpe()&&!mSaved ){
-                    mSaved=true;
+                if (!isSavedExpe() && !mSaved) {
+                    mSaved = true;
                     saveExpe()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(new Action1<InsertExpeResponse>() {
                                 @Override
                                 public void call(InsertExpeResponse response) {
-                                    if (response.getErrCode()== BaseResponse.CODE_SUCCESS){
+                                    if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                                         EventBus.getDefault().post(new SavedExpeDataEvent());
                                         ToastUtil.showToast(getActivity(), "已保存到本地");
                                         Tab tab = new Tab();
                                         tab.setIndex(MainActivity.TAB_INDEX_EXPE);
                                         MainActivity.start(getActivity(), tab);
-                                    }else {
+                                    } else {
                                         ToastUtil.showToast(getActivity(), "保存失败");
                                     }
 
                                 }
                             });
                 }
-
 
 
                 break;
@@ -446,46 +462,46 @@ public class ExpeDataFragment extends BaseFragment {
                                             public void onDialogConfirmClick() {
 
                                                 LoadingDialogHelper.showOpLoading(getActivity());
-                                                    if (!tv_dt.isActivated()){
-                                                        onViewClick(tv_dt);
-                                                    }
-                                                    String pdfName=DataFileUtil.getPdfFileName(mExeperiment,false);
-                                                    //生成pdf
-                                                    generatePdf(pdfName).delay(500,TimeUnit.MILLISECONDS)
-                                                            .subscribeOn(Schedulers.io())
-                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                            .subscribe(new Action1<Boolean>() {
-                                                                @Override
-                                                                public void call(Boolean aboolean) {
-                                                                    if (mHasMeltingMode){
-                                                                        String pdfName=DataFileUtil.getPdfFileName(mExeperiment,true);
-                                                                        onViewClick(tv_melt);
-                                                                        generatePdf(pdfName).delay(500,TimeUnit.MILLISECONDS)
-                                                                                .subscribeOn(Schedulers.io())
-                                                                                .observeOn(AndroidSchedulers.mainThread())
-                                                                                .subscribe(new Action1<Boolean>() {
-                                                                                    @Override
-                                                                                    public void call(Boolean aBoolean) {
-                                                                                        LoadingDialogHelper.hideOpLoading();
-                                                                                        ToastUtil.showToast(getActivity(), "已导出");
-                                                                                    }
-                                                                                });
-                                                                    }else {
-                                                                        LoadingDialogHelper.hideOpLoading();
-                                                                        ToastUtil.showToast(getActivity(), "已导出");
-                                                                    }
-
-                                                                }
-                                                            }, new Action1<Throwable>() {
-                                                                @Override
-                                                                public void call(Throwable throwable) {
-                                                                    ToastUtil.showToast(getActivity(), "导出失败");
-                                                                }
-                                                            });
-
+                                                if (!tv_dt.isActivated()) {
+                                                    onViewClick(tv_dt);
                                                 }
+                                                String pdfName = DataFileUtil.getPdfFileName(mExeperiment, false);
+                                                //生成pdf
+                                                generatePdf(pdfName).delay(500, TimeUnit.MILLISECONDS)
+                                                        .subscribeOn(Schedulers.io())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribe(new Action1<Boolean>() {
+                                                            @Override
+                                                            public void call(Boolean aboolean) {
+                                                                if (mHasMeltingMode) {
+                                                                    String pdfName = DataFileUtil.getPdfFileName(mExeperiment, true);
+                                                                    onViewClick(tv_melt);
+                                                                    generatePdf(pdfName).delay(500, TimeUnit.MILLISECONDS)
+                                                                            .subscribeOn(Schedulers.io())
+                                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                                            .subscribe(new Action1<Boolean>() {
+                                                                                @Override
+                                                                                public void call(Boolean aBoolean) {
+                                                                                    LoadingDialogHelper.hideOpLoading();
+                                                                                    ToastUtil.showToast(getActivity(), "已导出");
+                                                                                }
+                                                                            });
+                                                                } else {
+                                                                    LoadingDialogHelper.hideOpLoading();
+                                                                    ToastUtil.showToast(getActivity(), "已导出");
+                                                                }
 
+                                                            }
+                                                        }, new Action1<Throwable>() {
+                                                            @Override
+                                                            public void call(Throwable throwable) {
+                                                                LoadingDialogHelper.hideOpLoading();
+                                                                throwable.printStackTrace();
+                                                                ToastUtil.showToast(getActivity(), "导出失败");
+                                                            }
+                                                        });
 
+                                            }
 
 
                                         });
@@ -542,7 +558,7 @@ public class ExpeDataFragment extends BaseFragment {
                 gv_b.draw(page.getCanvas());*/
 
                 document.finishPage(page);
-               // String pdfName = fileName + ".pdf";
+                // String pdfName = fileName + ".pdf";
                 File file = new File(DataFileUtil.getPdfFilePath(pdfName));
 
                 try {
@@ -563,15 +579,16 @@ public class ExpeDataFragment extends BaseFragment {
     }
 
     boolean mVisibleToUser;
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        mVisibleToUser=isVisibleToUser;
+        mVisibleToUser = isVisibleToUser;
     }
 
     @Subscribe
-    public void onFilterEvent(FilterEvent event){
-        if (!mVisibleToUser){
+    public void onFilterEvent(FilterEvent event) {
+        if (!mVisibleToUser) {
             return;
         }
         ChanList =
@@ -603,8 +620,10 @@ public class ExpeDataFragment extends BaseFragment {
         KSList =
                 event.getKSList();
 
-        mExecutorService.execute(mRun);
+        //mExecutorService.execute(mRun);
+        showChart();
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

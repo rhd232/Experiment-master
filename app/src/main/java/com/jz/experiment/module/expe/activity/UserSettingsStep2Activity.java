@@ -128,6 +128,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
         setContentView(R.layout.activity_user_setting_step2);
         ButterKnife.bind(this);
         mHistoryExperiment = Navigator.getParcelableExtra(getActivity());
+        mCommunicationService = DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
 
         mExpeDataStore = new ExpeDataStore(
                 ProviderModule
@@ -280,10 +281,9 @@ public class UserSettingsStep2Activity extends BaseActivity {
             case R.id.tv_next:
                 if (validate()) {
                     LoadingDialogHelper.showOpLoading(getActivity());
-                    buildExperiment();
-
                     //设置积分时间
-                    mCommunicationService = DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
+
+                    buildExperiment();
                     setIntergrationTime()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())

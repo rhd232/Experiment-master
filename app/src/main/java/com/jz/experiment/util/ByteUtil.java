@@ -110,8 +110,32 @@ public class ByteUtil
     public static String getString(byte[] bytes)  
     {  
         return getString(bytes, "GBK");  
-    }  
-  
+    }
+
+
+
+    public static byte[] hexStringToBytes(String hexStr,int length){
+        byte [] result=new byte[length];
+        int start=0;
+        for (int i=0;i< length;i++){
+            String frag=hexStr.substring(start,start+2);
+            int s=Integer.parseInt(frag,16);
+            byte ret=(byte)s;
+            result[i]=ret;
+            start+=2;
+        }
+        return result;
+    }
+    public static String getHexStr(byte [] buffer,int bytes) {
+        StringBuilder hex = new StringBuilder(bytes * 2);
+        for (int i = 0; i < bytes; i++) {
+            byte b = buffer[i];
+            if ((b & 0xFF) < 0x10) hex.append("0");
+            hex.append(Integer.toHexString(b & 0xFF));
+        }
+        String rev = hex.toString().toLowerCase();
+        return rev;
+    }
       
     public static void main(String[] args)  
     {  
@@ -142,5 +166,7 @@ public class ByteUtil
         System.out.println(getFloat(getBytes(f)));  
         System.out.println(getDouble(getBytes(d)));  
         System.out.println(getString(getBytes(string)));  
-    }  
-}  
+    }
+
+
+}

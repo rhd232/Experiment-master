@@ -59,7 +59,7 @@ public class ChartActivity extends BaseActivity {
         try {
             InputStream ips=getAssets().open("2019_02_13_04_11_17_dt.txt");
             dtChart.show(ChanList, KSList, ips);
-            InputStream ips2=getAssets().open("2019_02_19_12_02_56_melting.txt");
+            InputStream ips2=getAssets().open("2019_02_19_09_41_58_melting.txt");
             meltingChart.show(ChanList, KSList, ips2);
         } catch (Exception e) {
             e.printStackTrace();

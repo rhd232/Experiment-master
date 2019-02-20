@@ -28,8 +28,53 @@ import static org.junit.Assert.assertEquals;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
+    @Test
+    public void testByteToString(){
+       /* Integer a=null;
+        init(a);
+        Assert.assertNull(a);//a为null*/
 
+        byte [] cmd=new byte[4];
+        cmd[0]= (byte) 0xaa;
+        cmd[1]= (byte) 0x13;
+        cmd[2]= (byte) 0x2;
+        cmd[3]= (byte) 0x1;
 
+        StringBuilder hex = new StringBuilder(cmd.length * 2);
+        for (int i = 0; i < cmd.length; i++) {
+            byte b = cmd[i];
+            if ((b & 0xFF) < 0x10) hex.append("0");
+            hex.append(Integer.toHexString(b & 0xFF));
+        }
+
+        String rev = hex.toString().toLowerCase();
+        System.out.println(rev);
+
+        //string 转回byte
+        byte [] result=new byte[cmd.length];
+        int start=0;
+        for (int i=0;i< cmd.length;i++){
+            String frag=rev.substring(start,start+2);
+            int s=Integer.parseInt(frag,16);
+            byte ret=(byte)s;
+            result[i]=ret;
+            start+=2;
+        }
+
+        //打印出转回的byte
+        StringBuilder hexs = new StringBuilder(result.length * 2);
+        for (int i = 0; i < result.length; i++) {
+            byte b = result[i];
+            if ((b & 0xFF) < 0x10) hexs.append("0");
+            hexs.append(Integer.toHexString(b & 0xFF));
+        }
+        String revs = hexs.toString().toLowerCase();
+        System.out.println(revs);
+
+    }
+    private void init(Integer a){
+        a=new Integer(2);
+    }
     @Test
     public void testLastIndexOf(){
         String rev="aa0083587357353781717aa0037573771717";

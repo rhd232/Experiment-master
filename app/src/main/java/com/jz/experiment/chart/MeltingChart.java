@@ -146,8 +146,8 @@ public class MeltingChart extends WindChart {
         }
 
         List<Entry> expeData = new ArrayList<>();
-
-        for (int i=0;i<count;i++){
+        //从第三个数据开始绘制，前两个温度数据可能存在问题
+        for (int i=2;i<count;i++){
             float x=Float.parseFloat(cdlist.get(i).x);
             float y = (float) MeltCurveReader.getInstance().m_zData[currChan][ksindex][i];
             Entry entry = new Entry(x, y);

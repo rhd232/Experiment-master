@@ -94,6 +94,11 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
         mAdapter = new DeviceAdapter(getActivity(), R.layout.item_device);
         rv_devices.setAdapter(mAdapter);
 
+        registerScanReceiver();
+        mBluetoothReceiver = new BluetoothReceiver();
+        mBluetoothReceiver.setBluetoothConnectInteface(this);
+        getActivity().registerReceiver(mBluetoothReceiver,
+                makeIntentFilter());
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -116,17 +121,14 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
                 checkBluetoothPermission();
             }
 
-            registerScanReceiver();
+
 
         }
 
         bindService();
 
 
-        mBluetoothReceiver = new BluetoothReceiver();
-        mBluetoothReceiver.setBluetoothConnectInteface(this);
-        getActivity().registerReceiver(mBluetoothReceiver,
-                makeIntentFilter());
+
 
 
         checkbox.setOnClickListener(new View.OnClickListener() {
@@ -376,9 +378,14 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     public void onDestroyView() {
         super.onDestroyView();
         EventBus.getDefault().unregister(this);
-        getActivity().unregisterReceiver(mReceiver);
-        getActivity().unregisterReceiver(mBluetoothReceiver);
-        scanDevice(false);
+        if (mReceiver!=null) {
+            getActivity().unregisterReceiver(mReceiver);
+        }
+        if (mBluetoothReceiver!=null) {
+            getActivity().unregisterReceiver(mBluetoothReceiver);
+        }
+        if (mBluetoothAdapter!=null)
+            scanDevice(false);
     }
 
     @Override

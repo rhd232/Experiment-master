@@ -285,7 +285,7 @@ public class UsbService extends CommunicationService {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
         }
-        //System.out.println("发送：" + hex.toString().toLowerCase());
+        System.out.println("发送：" + hex.toString().toLowerCase());
         DataFileUtil.writeFileLog("发送：" + hex.toString().toLowerCase());
     }
 
@@ -341,12 +341,13 @@ public class UsbService extends CommunicationService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[64];
                 int bytes = this.mUsbDeviceConnection.bulkTransfer(mUsbEndpointIn, buffer, 64, 5000);
 
                 if (bytes > 0) {
                     StringBuilder hex = new StringBuilder(buffer.length * 2);
-                    for (byte b : buffer) {
+                    for (int i=0;i<bytes;i++){
+                        byte b=buffer[i];
                         if ((b & 0xFF) < 0x10) hex.append("0");
                         hex.append(Integer.toHexString(b & 0xFF));
                     }
@@ -456,7 +457,7 @@ public class UsbService extends CommunicationService {
 
                 while (mRun) {
                     try {
-                        byte[] buffer = new byte[1024];
+                        byte[] buffer = new byte[64];
                         int bytes = this.mmConnection.bulkTransfer(mmEndIn, buffer, 64, 500);
                         //System.out.println("mmEndIn:"+bytes);
                         if (bytes > 0) {
@@ -470,7 +471,7 @@ public class UsbService extends CommunicationService {
                                 if ((b & 0xFF) < 0x10) hex.append("0");
                                 hex.append(Integer.toHexString(b & 0xFF));
                             }
-                            //System.out.println("接收到:" + hex.toString().toLowerCase());
+                            System.out.println("接收到:" + hex.toString().toLowerCase());
                             DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
                             Data data = new Data(buffer, bytes);
                             broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, data);

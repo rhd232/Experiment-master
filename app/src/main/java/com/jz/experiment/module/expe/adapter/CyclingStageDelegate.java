@@ -69,6 +69,7 @@ public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelega
         VernierAdapter adapter = new VernierAdapter(mActivity, R.layout.item_inner_vernier);
         if (stage.getPartStageList().isEmpty()) {
             stage.addChildStage(0, new PartStage());
+            stage.addChildStage(1, new PartStage());
         }
         adapter.setParentStage(stage);
         vh.rvInner.setAdapter(adapter);
