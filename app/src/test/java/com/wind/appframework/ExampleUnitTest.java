@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,6 +29,55 @@ import static org.junit.Assert.assertEquals;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
+
+    @Test
+    public void testCombineString(){
+        Map<String,List<String>> mItemData=new LinkedHashMap<>();
+        List<String> chip1=new ArrayList<>();
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip1.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        mItemData.put("Chip#1",chip1 );
+
+        List<String> chip2=new ArrayList<>();
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        chip2.add("100 42 183 78 177 145 165 37 158 114 55 173 0");
+        mItemData.put("Chip#2",chip2 );
+
+        Set<Map.Entry<String,List<String>>> entries= mItemData.entrySet();
+        for (Map.Entry<String,List<String>> entry:entries){
+            String key=entry.getKey();
+            List<String> value=entry.getValue();
+            StringBuilder sBuilder=new StringBuilder();
+            sBuilder.append(key)
+                    .append("\n");
+            for (String item:value){
+                sBuilder.append(item)
+                        .append("\n");
+            }
+           System.out.println(sBuilder.toString());
+        }
+    }
+
     @Test
     public void testDiv(){
         int mode=59 % 12;
@@ -88,7 +138,7 @@ public class ExampleUnitTest {
     }
     @Test
     public void testLastIndexOf(){
-        String rev="aa0083587357353781717aa0037573771717";
+        String rev="aa0083587aa357353781717aa0037573771717";
         List<String> vals=new ArrayList<>();
         splitAndCombine(rev, vals);
        /* String revs[]={rev,"25421717"};
@@ -97,13 +147,13 @@ public class ExampleUnitTest {
             splitAndCombine(r, vals);
         }
 */
-        System.out.println("size:"+vals.size());
+       // System.out.println("size:"+vals.size());
     }
 
     private void splitAndCombine(String rev, List<String> vals){
-        int indexOf=rev.indexOf(C.Value.DATA_PREFIX);
+        int indexOf=rev.indexOf("1717aa");
         if (indexOf>0){
-            String part1=rev.substring(0,indexOf);
+            String part1=rev.substring(0,indexOf+4);
             if (part1.startsWith((C.Value.DATA_PREFIX))){
                 if (part1.endsWith(C.Value.DATA_SUFFIX))
                 {
@@ -120,22 +170,22 @@ public class ExampleUnitTest {
                     sb.append(v);
                 }
                 vals.clear();
-                if (sb.toString().lastIndexOf("aa")>0){
+                if (sb.toString().lastIndexOf("1717aa")>0){
                     splitAndCombine(sb.toString(),vals);
                 }else {
                     System.out.println("完整数据:" + sb.toString());
                 }
             }
-            String leftPart=rev.substring(indexOf);
+            String leftPart=rev.substring(indexOf+4);
             splitAndCombine(leftPart,vals);
 
         }else if (indexOf==0){
             //数据以aa开头
             String leftPart=rev.substring(2);
-            indexOf=leftPart.indexOf(C.Value.DATA_PREFIX);
+            indexOf=leftPart.indexOf("1717aa");
             //测试是否还有aa
             if (indexOf>0){
-                String part1=rev.substring(0,indexOf+2);
+                String part1=rev.substring(0,indexOf+2+4);
                 if (part1.endsWith(C.Value.DATA_SUFFIX)){
                     vals.clear();
                     //part1是一组完整的数据了
@@ -143,7 +193,7 @@ public class ExampleUnitTest {
                 }else {
                     vals.add(part1);
                 }
-                String part2=rev.substring(indexOf+2);
+                String part2=rev.substring(indexOf+2+4);
                 splitAndCombine(part2,vals);
             }else {
                 //没有aa了
@@ -168,7 +218,7 @@ public class ExampleUnitTest {
                     sb.append(v);
                 }
                 vals.clear();
-                if (sb.toString().lastIndexOf("aa")>0){
+                if (sb.toString().lastIndexOf("1717aa")>0){
                     splitAndCombine(sb.toString(),vals);
                 }else {
                     System.out.println("完整数据:" + sb.toString());

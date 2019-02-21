@@ -58,7 +58,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -172,7 +175,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         mCommunicationService = DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
 //        mBluetoothService = DeviceProxyHelper.getInstance(getActivity()).getBluetoothService();
 //        mUsbService = DeviceProxyHelper.getInstance(getActivity()).getUsbService();
-
+        mCommunicationService.setNotify(this);
         chart_dt.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -183,11 +186,14 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }, 500);
 
 
-        mBluetoothReceiver = new BluetoothReceiver();
+      /*  mBluetoothReceiver = new BluetoothReceiver();
         mBluetoothReceiver.setBluetoothConnectInteface(this);
         getActivity().registerReceiver(mBluetoothReceiver,
-                makeIntentFilter());
+                makeIntentFilter());*/
+
+
     }
+
 
     public static IntentFilter makeIntentFilter() { // 注册接收的事件
         IntentFilter intentFilter = new IntentFilter();
@@ -495,7 +501,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             step6Subscription.unsubscribe();
             step6Subscription = null;
         }
-        getActivity().unregisterReceiver(mBluetoothReceiver);
+        //getActivity().unregisterReceiver(mBluetoothReceiver);
         EventBus.getDefault().unregister(this);
     }
 
@@ -980,20 +986,26 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             int channel1 = status >> 1 & 0x1;
             int channel2 = status >> 2 & 0x1;
             int channel3 = status >> 3 & 0x1;
+            List<Channel> channels = mHistoryExperiment.getSettingsFirstInfo().getChannels();
+            //防止读出其他通道数据(设置了chip2第一条可能读出chip3，下位机bug)
+            boolean channel0Selected=TextUtils.isEmpty(channels.get(0).getValue());
+            boolean channel1Selected=TextUtils.isEmpty(channels.get(1).getValue());
+            boolean channel2Selected=TextUtils.isEmpty(channels.get(2).getValue());
+            boolean channel3Selected=TextUtils.isEmpty(channels.get(3).getValue());
             ChannelImageStatus channel0ImageStatus = new ChannelImageStatus(0, mImageMode.getSize());
-            channel0ImageStatus.setReadable(channel0 == 1);
+            channel0ImageStatus.setReadable(channel0 == 1  && channel0Selected);
             mChannelStatusList.add(channel0ImageStatus);
 
             ChannelImageStatus channel1ImageStatus = new ChannelImageStatus(1, mImageMode.getSize());
-            channel1ImageStatus.setReadable(channel1 == 1);
+            channel1ImageStatus.setReadable(channel1 == 1 && channel1Selected);
             mChannelStatusList.add(channel1ImageStatus);
 
             ChannelImageStatus channel2ImageStatus = new ChannelImageStatus(2, mImageMode.getSize());
-            channel2ImageStatus.setReadable(channel2 == 1);
+            channel2ImageStatus.setReadable(channel2 == 1 && channel2Selected);
             mChannelStatusList.add(channel2ImageStatus);
 
             ChannelImageStatus channel3ImageStatus = new ChannelImageStatus(3, mImageMode.getSize());
-            channel3ImageStatus.setReadable(channel3 == 1);
+            channel3ImageStatus.setReadable(channel3 == 1 && channel3Selected);
             mChannelStatusList.add(channel3ImageStatus);
             int readableIndex = -1;
             for (int i = 0; i < mChannelStatusList.size(); i++) {
@@ -1081,7 +1093,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
      * 是否正在读取图像数据
      */
     private boolean mInReadingImg;
-
+    //图像板返回的单次数据（包含chip1-4）
+    private Map<String,List<String>> mItemData=new LinkedHashMap<>();
     /**
      * 读取PCR数据
      * <p>
@@ -1092,7 +1105,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
      * }
      */
 
-    private void doReceiveStep7(Data data) {
+    private synchronized void doReceiveStep7(Data data) {
         /*
          *  TODO 1，解析图像数据，绘制到图表中，需要判断是扩增阶段，还是溶解阶段。
          *       2，如果没有读取到最后一行，就继续读取
@@ -1147,41 +1160,47 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             chip = "Chip#4";
         }
 
-        StringBuilder hex = new StringBuilder(reveicedBytes.length * 2);
+       /* StringBuilder hex = new StringBuilder(reveicedBytes.length * 2);
         for (byte b : reveicedBytes) {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
-        }
+        }*/
 
 
         File file = null, sourceFile = null;
         if (mInCycling) {
-             System.out.println("通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
+           //  System.out.println("通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
+            System.out.println("通道" + channelIndex + "图像数据第" + curRowIndex);
             file = DataFileUtil.getDtImageDataFile(mHistoryExperiment);
             sourceFile = DataFileUtil.getDtImageDataSourceFile(mHistoryExperiment);
         } else if (mInMeltCurve) {
-            System.out.println("溶解曲线通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
+           // System.out.println("溶解曲线通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
+            System.out.println("溶解曲线通道" + channelIndex + "图像数据第" + curRowIndex);
             file = DataFileUtil.getMeltImageDateFile(mHistoryExperiment);
             sourceFile = DataFileUtil.getMeltImageDataSourceFile(mHistoryExperiment);
         }
         //保存到本地文件中
         if (curRowIndex == 0) {
-            appendToFile(chip, file);
-            sourceAppendToFile(chip, sourceFile);
+            //appendToFile(chip, file);
+            //sourceAppendToFile(chip, sourceFile);
         }
         //保存图像板返回的原始数据到文件
         //将0x1717后面的数据抹去
-        String source=hex.toString().toLowerCase();
+      /*  String source=hex.toString().toLowerCase();
         int index=source.indexOf("1717");
         source=source.substring(0,index+4);
-        sourceAppendToFile(source, sourceFile);
+        sourceAppendToFile(source, sourceFile);*/
         // if (mInCycling) {
         //TODO 循环过程数据转换待理解
         String imageData = transferImageData(channelIndex, curRowIndex, reveicedBytes);
         //System.out.println("trim后的图像数据："+imageData);
         //保存经过矫正图像板数据到文件
-        appendToFile(imageData, file);
-        //}
+        //appendToFile(imageData, file);
+        if (mItemData.get(chip)==null){
+            mItemData.put(chip,new ArrayList<String>());
+        }
+        mItemData.get(chip).add(imageData);
+
         //检查本通道是否已经读取完毕
         if (readed) {
             //执行下一个通道的读取操作
@@ -1194,9 +1213,54 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 }
             }
             if (next == -1) {//全部通道已经全部读取完
-
-                //TODO 绘制图形
-                //mExecutorService.execute(mRun);
+                //将数据保存到文件中
+                List<Channel> channels = mHistoryExperiment.getSettingsFirstInfo().getChannels();
+                boolean channel0Selected=TextUtils.isEmpty(channels.get(0).getValue());
+                boolean channel1Selected=TextUtils.isEmpty(channels.get(1).getValue());
+                boolean channel2Selected=TextUtils.isEmpty(channels.get(2).getValue());
+                boolean channel3Selected=TextUtils.isEmpty(channels.get(3).getValue());
+                boolean needSave=true;
+                if (channel0Selected) {
+                    List<String> list=mItemData.get("Chip#1");
+                    if (list==null || list.size()!=12){
+                        needSave=false;
+                    }
+                }
+                if (channel1Selected) {
+                    List<String> list=mItemData.get("Chip#2");
+                    if (list==null || list.size()!=12){
+                        needSave=false;
+                    }
+                }
+                if (channel2Selected) {
+                    List<String> list=mItemData.get("Chip#3");
+                    if (list==null || list.size()!=12){
+                        needSave=false;
+                    }
+                }
+                if (channel3Selected) {
+                    List<String> list=mItemData.get("Chip#4");
+                    if (list==null || list.size()!=12){
+                        needSave=false;
+                    }
+                }
+                if (needSave){
+                    Set<Map.Entry<String,List<String>>> entries= mItemData.entrySet();
+                    for (Map.Entry<String,List<String>> entry:entries){
+                        String key=entry.getKey();
+                        List<String> value=entry.getValue();
+                        StringBuilder sBuilder=new StringBuilder();
+                        sBuilder.append(key)
+                                .append("\n");
+                        for (String item:value){
+                            sBuilder.append(item)
+                                    .append("\n");
+                        }
+                        DataFileUtil.writeToFile(file,sBuilder.toString());
+                    }
+                }
+                mItemData.clear();
+                // 绘制图形
                 showChart();
                 /**
                  * 读循环状态
@@ -1336,47 +1400,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
     }
 
-    private void appendToFile(String txt, File file) {
-     /*   String fileName=DateUtil.get(mHistoryExperiment.getMillitime(),"yyyy_MM_dd_hh_mm_ss")+".txt";
-        String filePath= C.Value.IMAGE_DATA+fileName;*/
 
-        FileOutputStream fos = null;
-        OutputStreamWriter osw = null;
-
-        try {
-            if (!file.exists()) {
-                boolean hasFile = file.createNewFile();
-               /* if (hasFile) {
-                    System.out.println("file not exists, create new file");
-                }*/
-                fos = new FileOutputStream(file);
-            } else {
-                // System.out.println("file exists");
-                fos = new FileOutputStream(file, true);
-            }
-
-            osw = new OutputStreamWriter(fos, "utf-8");
-            osw.write(txt); //写入内容
-            osw.write("\r\n");  //换行
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {   //关闭流
-            try {
-                if (osw != null) {
-                    osw.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     /**
      * 溶解曲线是否已经启动

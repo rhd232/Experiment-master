@@ -49,8 +49,16 @@ public class DeviceStateBar extends FrameLayout {
         if (service!=null){
             if (service.getConnectedDevice()!=null){
                 name = service.getConnectedDevice().getDeviceName();
+            }else {
+                tv_device_state.setText("未连接");
+                setActivated(true);
+                setStatusbarColor(getContext().getResources().getColor(R.color.colorD54646));
             }
 
+        }else {
+            tv_device_state.setText("未连接");
+            setActivated(true);
+            setStatusbarColor(getContext().getResources().getColor(R.color.colorD54646));
         }
 
         tv_device_name.setText(name);

@@ -387,7 +387,7 @@ public class ExpeDataFragment extends BaseFragment {
     }
 
     public boolean isSavedExpe() {
-        return mExeperiment.getId() != HistoryExperiment.ID_NONE;
+        return mExeperiment!=null&&mExeperiment.getId() != HistoryExperiment.ID_NONE;
     }
 
     private long time;

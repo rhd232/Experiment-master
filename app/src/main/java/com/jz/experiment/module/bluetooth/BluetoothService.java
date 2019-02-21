@@ -8,9 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 
+import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
@@ -91,6 +94,8 @@ public class BluetoothService extends CommunicationService {
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         //蓝牙已断开连接
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        //蓝牙状态改变
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 
         registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
     }
@@ -117,6 +122,10 @@ public class BluetoothService extends CommunicationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+
+            //蓝牙状态，开启还是关闭
+            int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                    BluetoothAdapter.ERROR);
             if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 if (mConnectedThread != null) {
                     mConnectedThread.setRun(false);
@@ -130,6 +139,25 @@ public class BluetoothService extends CommunicationService {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 EventBus.getDefault().post(new BluetoothDisConnectedEvent(device.getName()));
 
+            }else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)){
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                EventBus.getDefault().post(new BluetoothConnectedEvent(device.getName()));
+            }else if (BluetoothAdapter.STATE_OFF==state){
+                Device device=getConnectedDevice();
+                String name="";
+                if (device!=null){
+                    name=device.getDeviceName();
+                }
+                if (mConnectedThread != null) {
+                    mConnectedThread.setRun(false);
+                }
+                if (mConnectThread != null) {
+                    mConnectThread.cancel();
+                    mConnectThread = null;
+                }
+                mConnectedThread = null;
+               // BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                EventBus.getDefault().post(new BluetoothDisConnectedEvent(name));
             }
         }
     };
@@ -397,7 +425,7 @@ public class BluetoothService extends CommunicationService {
                     // Send the obtained bytes to the UI activity
 
                     String rev=ByteUtil.getHexStr(buffer,bytes);
-                    System.out.println("接收到原始数据：" + rev);
+                    //System.out.println("接收到原始数据：" + rev);
                     splitAndCombine(rev,mReceivedStr);
 
                 } catch (IOException e) {
@@ -409,19 +437,25 @@ public class BluetoothService extends CommunicationService {
         private void broadcast(byte[] buffer, int bytes,String content) {
             if (!mSync) {
                 System.out.println("接收到：" + content);
-                DataFileUtil.writeFileLog("接收到：" + content);
+
+                //DataFileUtil.writeFileLog("接收到：" + content);
                 //有数据可读
                 Data data = new Data(buffer, bytes);
-                broadcastUpdate(ACTION_DATA_AVAILABLE, data);
+                //broadcastUpdate(ACTION_DATA_AVAILABLE, data);
+                Message msg=new Message();
+                msg.what=3;
+                msg.obj=data;
+                mHandler.sendMessage(msg);
             } else {
                 System.out.println("同步接收到：" + content);
-                DataFileUtil.writeFileLog("同步接收到：" + content);
+                //DataFileUtil.writeFileLog("同步接收到：" + content);
             }
         }
         private void splitAndCombine(String rev, List<String> vals){
-            int indexOf=rev.indexOf(C.Value.DATA_PREFIX);
+            int indexOf=rev.indexOf("1717aa");
+
             if (indexOf>0){
-                String part1=rev.substring(0,indexOf);
+                String part1=rev.substring(0,indexOf+4);
                 if (part1.startsWith((C.Value.DATA_PREFIX))){
                     if (part1.endsWith(C.Value.DATA_SUFFIX))
                     {
@@ -441,7 +475,7 @@ public class BluetoothService extends CommunicationService {
                         sb.append(v);
                     }
                     vals.clear();
-                    if (sb.toString().lastIndexOf(C.Value.DATA_PREFIX)>0){
+                    if (sb.toString().lastIndexOf("1717aa")>0){
                         splitAndCombine(sb.toString(),vals);
                     }else {
                         //System.out.println("完整数据:" + sb.toString());
@@ -450,16 +484,16 @@ public class BluetoothService extends CommunicationService {
                         broadcast(buffer,buffer.length,sb.toString());
                     }
                 }
-                String leftPart=rev.substring(indexOf);
+                String leftPart=rev.substring(indexOf+4);
                 splitAndCombine(leftPart,vals);
 
             }else if (indexOf==0){
                 //数据以aa开头
                 String leftPart=rev.substring(2);
-                indexOf=leftPart.indexOf(C.Value.DATA_PREFIX);
+                indexOf=leftPart.indexOf("1717aa");
                 //测试是否还有aa
                 if (indexOf>0){
-                    String part1=rev.substring(0,indexOf+2);
+                    String part1=rev.substring(0,indexOf+2+4);
                     if (part1.endsWith(C.Value.DATA_SUFFIX)){
                         vals.clear();
                         //part1是一组完整的数据了
@@ -470,7 +504,7 @@ public class BluetoothService extends CommunicationService {
                     }else {
                         vals.add(part1);
                     }
-                    String part2=rev.substring(indexOf+2);
+                    String part2=rev.substring(indexOf+2+4);
                     splitAndCombine(part2,vals);
                 }else {
                     //没有aa了
@@ -498,7 +532,7 @@ public class BluetoothService extends CommunicationService {
                         sb.append(v);
                     }
                     vals.clear();
-                    if (sb.toString().lastIndexOf("aa")>0){
+                    if (sb.toString().lastIndexOf("1717aa")>0){
                         splitAndCombine(sb.toString(),vals);
                     }else {
                         //System.out.println("完整数据:" + sb.toString());
@@ -573,4 +607,37 @@ public class BluetoothService extends CommunicationService {
             }
         }
     }
+
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0: // 连接成功
+                    if (mListener != null) {
+                        mListener.onConnectSuccess();
+                    }
+                    break;
+                case 1: // 链接中断
+                    if (mListener != null) {
+                        mListener.onConnectCancel();
+                    }
+                    break;
+                case 2: // 可以进行数据通信
+
+                    if (mListener != null) {
+                        mListener.onDoThing();
+                    }
+                    break;
+                case 3: // 接受到数据
+
+                    if (mListener != null) {
+                        Data data= (Data) msg.obj;
+                        mListener.onReceivedData(data);
+                    }
+
+                    break;
+            }
+        }
+    };
 }

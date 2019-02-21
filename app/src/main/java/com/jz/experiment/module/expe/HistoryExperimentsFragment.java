@@ -234,7 +234,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (sDeviceProxyHelper.getCommunicationService()!=null&&sDeviceProxyHelper.getCommunicationService().isConnected()) {
+        if (sDeviceProxyHelper.getBluetoothService()!=null&&sDeviceProxyHelper.getBluetoothService().isConnected()) {
             tv_device_state.setText("设备已连接");
             tv_device_state.setActivated(true);
         } else {

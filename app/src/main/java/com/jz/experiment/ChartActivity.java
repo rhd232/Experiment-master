@@ -7,6 +7,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
+import com.jz.experiment.util.TrimReader;
 import com.wind.base.BaseActivity;
 
 import java.io.InputStream;
@@ -29,16 +30,16 @@ public class ChartActivity extends BaseActivity {
         ChanList.clear();
 
         CommData.cboChan1 = 1;
-        ChanList.add("Chip#1");
+       // ChanList.add("Chip#1");
 
         CommData.cboChan2 = 1;
         ChanList.add("Chip#2");
 
         CommData.cboChan3 = 1;
-        ChanList.add("Chip#3");
+        //ChanList.add("Chip#3");
 
         CommData.cboChan4 = 1;
-        ChanList.add("Chip#4");
+        //ChanList.add("Chip#4");
 
 
         KSList.clear();
@@ -51,16 +52,17 @@ public class ChartActivity extends BaseActivity {
         KSList.add("B2");
         KSList.add("B3");
         KSList.add("B4");
+        TrimReader.getInstance().ReadTrimFile(getActivity());
         CommData.ReadDatapositionFile(getActivity());
         MeltingChart meltingChart=new MeltingChart(chart);
         DtChart dtChart = new DtChart(chart_line_2, 13);
        /* DtChart dtChart2 = new DtChart(chart_line_2, 13);*/
 
         try {
-            InputStream ips=getAssets().open("2019_02_13_04_11_17_dt.txt");
+            InputStream ips=getAssets().open("2019_02_20_11_12_24_dt.txt");
             dtChart.show(ChanList, KSList, ips);
-            InputStream ips2=getAssets().open("2019_02_20_12_01_50_melting.txt");
-            meltingChart.show(ChanList, KSList, ips2);
+         /*   InputStream ips2=getAssets().open("2019_02_20_12_01_50_melting.txt");
+            meltingChart.show(ChanList, KSList, ips2);*/
         } catch (Exception e) {
             e.printStackTrace();
         }

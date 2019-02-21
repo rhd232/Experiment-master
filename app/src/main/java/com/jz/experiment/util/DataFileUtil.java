@@ -17,13 +17,14 @@ import java.util.List;
 public class DataFileUtil {
 
 
-    public static String getPdfFileName(HistoryExperiment experiment,boolean melt){
-        String name="变温扩增";
-        if (melt){
-            name="熔解曲线";
+    public static String getPdfFileName(HistoryExperiment experiment, boolean melt) {
+        String name = "变温扩增";
+        if (melt) {
+            name = "熔解曲线";
         }
-        return DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + name+".pdf";
+        return DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + name + ".pdf";
     }
+
     public static File getDtImageDataFile(HistoryExperiment experiment) {
         String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + "_dt.txt";
         //String filePath = C.Value.IMAGE_DATA + fileName;
@@ -45,6 +46,7 @@ public class DataFileUtil {
         String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + "_meltsource.txt";
         return getOrCreateFile(fileName);
     }
+
     public static File getOrCreateFile(String filename) {
         File file = new File(C.Value.IMAGE_DATA, filename);
         if (!file.getParentFile().exists()) {
@@ -59,7 +61,6 @@ public class DataFileUtil {
         }
         return file;
     }
-
 
 
     public static String getPdfFilePath(String pdfName) {
@@ -82,8 +83,8 @@ public class DataFileUtil {
     }
 
 
-    public  static List<String> covertToList(File file){
-        List<String> newList=new ArrayList<>();
+    public static List<String> covertToList(File file) {
+        List<String> newList = new ArrayList<>();
         try {
             //File file = new File(dataFile);
             int count = 0;
@@ -93,14 +94,14 @@ public class DataFileUtil {
                 String lineTxt = null;
                 while ((lineTxt = br.readLine()) != null) {
                     if (!"".equals(lineTxt)) {
-                     //   String reds = lineTxt.split("\\+")[0];
+                        //   String reds = lineTxt.split("\\+")[0];
                         newList.add(count, lineTxt);
                         count++;
                     }
                 }
                 isr.close();
                 br.close();
-            }else {
+            } else {
 
             }
         } catch (Exception e) {
@@ -111,29 +112,30 @@ public class DataFileUtil {
 
     public static void createAppFolder() {
         String appDir = C.Value.APP_FOLDER;
-        File dir=new File(appDir);
-        if (!dir.exists()){
+        File dir = new File(appDir);
+        if (!dir.exists()) {
             dir.mkdirs();
         }
 
-        File dirTrim=new File(C.Value.TRIM_FOLDER);
-        if (!dirTrim.exists()){
+        File dirTrim = new File(C.Value.TRIM_FOLDER);
+        if (!dirTrim.exists()) {
             dirTrim.mkdirs();
         }
     }
-    public static void  removeLogFile(){
-        File file=getLogFile();
-        if (file.exists()){
+
+    public static void removeLogFile() {
+        File file = getLogFile();
+        if (file.exists()) {
             file.delete();
         }
     }
+
     public static File getLogFile() {
-        String fileName ="communicate_log.txt";
+        String fileName = "communicate_log.txt";
         return getOrCreateFile(fileName);
     }
 
-    public static void writeFileLog(String txt){
-        File file=getLogFile();
+    public static void writeToFile(File file, String txt) {
 
         FileOutputStream fos = null;
         OutputStreamWriter osw = null;
@@ -171,5 +173,13 @@ public class DataFileUtil {
                 e.printStackTrace();
             }
         }
+
+
+    }
+
+    public static void writeFileLog(String txt) {
+        File file = getLogFile();
+        writeToFile(file, txt);
+
     }
 }
