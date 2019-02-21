@@ -19,11 +19,11 @@ CREATE TABLE expe_info(
 
 find_all:
 select *
-from expe_info order by millitime desc limit 3;
+from expe_info order by millitime desc;-- limit 3;
 
 find_all_completed:
 select *
-from expe_info where status = 1  order by millitime desc limit 3;
+from expe_info where status = 1  order by millitime desc;-- limit 3;
         --需要用到关联查询
 find_by_id:
 select * from expe_info where _id= ?;

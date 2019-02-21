@@ -14,6 +14,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -472,9 +473,15 @@ public class UsbService extends CommunicationService {
                                 hex.append(Integer.toHexString(b & 0xFF));
                             }
                             System.out.println("接收到:" + hex.toString().toLowerCase());
-                            DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
+                            //DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
+                          /*  Data data = new Data(buffer, bytes);
+                            broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, data);*/
+
                             Data data = new Data(buffer, bytes);
-                            broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, data);
+                            Message msg=new Message();
+                            msg.what=3;
+                            msg.obj=data;
+                            mHandler.sendMessage(msg);
                         }
 
                         Thread.sleep(50);

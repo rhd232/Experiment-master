@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -609,35 +608,5 @@ public class BluetoothService extends CommunicationService {
     }
 
 
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 0: // 连接成功
-                    if (mListener != null) {
-                        mListener.onConnectSuccess();
-                    }
-                    break;
-                case 1: // 链接中断
-                    if (mListener != null) {
-                        mListener.onConnectCancel();
-                    }
-                    break;
-                case 2: // 可以进行数据通信
 
-                    if (mListener != null) {
-                        mListener.onDoThing();
-                    }
-                    break;
-                case 3: // 接受到数据
-
-                    if (mListener != null) {
-                        Data data= (Data) msg.obj;
-                        mListener.onReceivedData(data);
-                    }
-
-                    break;
-            }
-        }
-    };
 }

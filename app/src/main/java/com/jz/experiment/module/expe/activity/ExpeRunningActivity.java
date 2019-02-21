@@ -988,10 +988,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             int channel3 = status >> 3 & 0x1;
             List<Channel> channels = mHistoryExperiment.getSettingsFirstInfo().getChannels();
             //防止读出其他通道数据(设置了chip2第一条可能读出chip3，下位机bug)
-            boolean channel0Selected=TextUtils.isEmpty(channels.get(0).getValue());
-            boolean channel1Selected=TextUtils.isEmpty(channels.get(1).getValue());
-            boolean channel2Selected=TextUtils.isEmpty(channels.get(2).getValue());
-            boolean channel3Selected=TextUtils.isEmpty(channels.get(3).getValue());
+            boolean channel0Selected=!TextUtils.isEmpty(channels.get(0).getValue());
+            boolean channel1Selected=!TextUtils.isEmpty(channels.get(1).getValue());
+            boolean channel2Selected=!TextUtils.isEmpty(channels.get(2).getValue());
+            boolean channel3Selected=!TextUtils.isEmpty(channels.get(3).getValue());
             ChannelImageStatus channel0ImageStatus = new ChannelImageStatus(0, mImageMode.getSize());
             channel0ImageStatus.setReadable(channel0 == 1  && channel0Selected);
             mChannelStatusList.add(channel0ImageStatus);
@@ -1215,10 +1215,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             if (next == -1) {//全部通道已经全部读取完
                 //将数据保存到文件中
                 List<Channel> channels = mHistoryExperiment.getSettingsFirstInfo().getChannels();
-                boolean channel0Selected=TextUtils.isEmpty(channels.get(0).getValue());
-                boolean channel1Selected=TextUtils.isEmpty(channels.get(1).getValue());
-                boolean channel2Selected=TextUtils.isEmpty(channels.get(2).getValue());
-                boolean channel3Selected=TextUtils.isEmpty(channels.get(3).getValue());
+                boolean channel0Selected=!TextUtils.isEmpty(channels.get(0).getValue());
+                boolean channel1Selected=!TextUtils.isEmpty(channels.get(1).getValue());
+                boolean channel2Selected=!TextUtils.isEmpty(channels.get(2).getValue());
+                boolean channel3Selected=!TextUtils.isEmpty(channels.get(3).getValue());
                 boolean needSave=true;
                 if (channel0Selected) {
                     List<String> list=mItemData.get("Chip#1");

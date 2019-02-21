@@ -270,7 +270,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
                 WheelPickerFactory.showWheelAPicker(tv_start_temp, new WheelPickerFactory.OnWheelClickListener() {
                     @Override
                     public void onResult(View v, IWheelVo[] result, int[] indexs, String[] unit) {
-                        tv_end_temp.setText(result[0].getLabel());
+                        tv_start_temp.setText(result[0].getLabel());
                     }
                 }, data,"℃",30);
                 break;
