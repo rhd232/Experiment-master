@@ -126,11 +126,13 @@ public abstract class WindChart {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            mChart.setDrawMarkers(true);
+                            if (!mRunning) {
+                                mChart.setDrawMarkers(true);
+                            }
                         }
                     },200);
-                    mChart.setDrawMarkers(true);
-                    //}
+                    //mChart.setDrawMarkers(true);
+
                     break;
             }
 

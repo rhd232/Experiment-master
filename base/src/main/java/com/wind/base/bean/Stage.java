@@ -27,7 +27,8 @@ public class Stage implements DisplayItem,Parcelable {
     public Stage(){
         startScale=-1;
         curScale=-1;
-        during=5;//默认10s
+        during=5;//默认5s
+        temp=50;
     }
 
     private int id;

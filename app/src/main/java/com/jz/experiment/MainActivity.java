@@ -84,13 +84,6 @@ public class MainActivity extends BaseActivity {
 
 
         startBluetoothService();
-        view_pager.post(new Runnable() {
-            @Override
-            public void run() {
-                //TODO bindService
-
-            }
-        });
 
        /* Config config=ConfigRepo.getInstance().get(getActivity());
         if (!TextUtils.isEmpty(config.getBluetoothDeviceAddress())){

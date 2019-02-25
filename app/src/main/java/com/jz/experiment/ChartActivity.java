@@ -30,16 +30,16 @@ public class ChartActivity extends BaseActivity {
         ChanList.clear();
 
         CommData.cboChan1 = 1;
-       // ChanList.add("Chip#1");
+        ChanList.add("Chip#1");
 
         CommData.cboChan2 = 1;
         ChanList.add("Chip#2");
 
         CommData.cboChan3 = 1;
-        //ChanList.add("Chip#3");
+        ChanList.add("Chip#3");
 
         CommData.cboChan4 = 1;
-        //ChanList.add("Chip#4");
+        ChanList.add("Chip#4");
 
 
         KSList.clear();
@@ -59,7 +59,8 @@ public class ChartActivity extends BaseActivity {
        /* DtChart dtChart2 = new DtChart(chart_line_2, 13);*/
 
         try {
-            InputStream ips=getAssets().open("2019_02_20_11_12_24_dt.txt");
+          //  String name="fluorescence_data.txt";
+            InputStream ips=getAssets().open("2019_02_25_02_42_57_dt.txt");
             dtChart.show(ChanList, KSList, ips);
          /*   InputStream ips2=getAssets().open("2019_02_20_12_01_50_melting.txt");
             meltingChart.show(ChanList, KSList, ips2);*/

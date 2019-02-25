@@ -120,7 +120,8 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:scaleType="centerInside"
-        android:src="@drawable/icon_add" />
+        android:src="@drawable/icon_add"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/iv_cycling_del"
@@ -128,5 +129,6 @@
         android:layout_height="30dp"
         android:scaleType="centerInside"
         android:layout_gravity="right"
-        android:src="@drawable/icon_minus" />
+        android:src="@drawable/icon_minus"
+        android:visibility="gone"/>
 </FrameLayout>

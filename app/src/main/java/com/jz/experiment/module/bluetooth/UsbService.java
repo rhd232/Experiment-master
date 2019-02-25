@@ -211,7 +211,7 @@ public class UsbService extends CommunicationService {
            /* byte[] bytes = name.getBytes();
             Data data = new Data(bytes, bytes.length);
             broadcastUpdate(ACTION_DEVICE_ATTACHED, data);*/
-
+            //发送设备连接成功通知
             BluetoothConnectedEvent event=new BluetoothConnectedEvent(name);
             EventBus.getDefault().post(event);
 
@@ -473,7 +473,7 @@ public class UsbService extends CommunicationService {
                                 hex.append(Integer.toHexString(b & 0xFF));
                             }
                             System.out.println("接收到:" + hex.toString().toLowerCase());
-                            //DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
+                            DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
                           /*  Data data = new Data(buffer, bytes);
                             broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, data);*/
 

@@ -37,6 +37,8 @@ public class PcrCommand {
     public static final int STEP_5_CMD=20;
     public static final int STEP_5_TYPE=21;
 
+    public static final int READ_TRIM_CMD=4;
+    public static final int READ_TRIM_TYPE=0x2d;
     public void reset() {
         commandList.clear();
     }
@@ -656,6 +658,27 @@ public class PcrCommand {
         for (int i = 0; i < command.length; i++) {
             commandList.add(Byte.valueOf(command[i]));
         }
+    }
+
+
+    public void trimData() {
+        byte[] TxData = new byte[11];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x04;		//command
+        TxData[2] = 0x02;		//data length
+        TxData[3] = 0x2d;		//data type
+        TxData[4] = 0x00;       // chan num, for qPCR it is always 0
+
+        for (int i = 1; i < 5; i++)
+            TxData[5] += TxData[i];
+
+        if (TxData[5] == 0x17)
+            TxData[5] = 0x18;
+
+        TxData[6] = 0x17;       //back code
+        TxData[7] = 0x17;		//back code
+
+        addCommand(TxData);
     }
 
     public static class TempDuringCombine {

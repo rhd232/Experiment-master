@@ -42,9 +42,10 @@ public class CurveReader {
                 for (int k = 0; k < cdlist.size(); k++)
                 {
 
-                    //double [][] factorValues=DataFileReader.getInstance().factorValue;
+
                     double factorValue=factorValues[GetChan(tdlist.get(i))][k];
                     m_yData[i][n][k] = cdlist.get(k).y /factorValue;
+                   // m_yData[i][n][k] = cdlist.get(k).y ;
                     //String t=i+"-"+n+"-"+k+"="+ cdlist.get(k).y;
                     //AppendToFile(t,file);
                 }

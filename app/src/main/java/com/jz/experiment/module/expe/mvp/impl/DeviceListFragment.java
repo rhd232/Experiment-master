@@ -390,7 +390,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
 
     @Override
     public void onConnectSuccess() {
-        LoadingDialogHelper.hideOpLoading();
+
         ToastUtil.showToast(getActivity(),"连接成功");
 
 
@@ -428,7 +428,10 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
 
     @Override
     public void onDoThing() {
-        //ToastUtil.showToast(getActivity(),"可以进行写操作了");
+        LoadingDialogHelper.hideOpLoading();
+        //连接蓝牙设备成功，并且已经建立socket通信
+
+
     }
 
     @Override

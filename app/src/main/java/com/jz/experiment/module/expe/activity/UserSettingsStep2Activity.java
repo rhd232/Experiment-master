@@ -20,7 +20,9 @@ import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.bluetooth.CommunicationService;
+import com.jz.experiment.module.bluetooth.Data;
 import com.jz.experiment.module.bluetooth.PcrCommand;
+import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.expe.adapter.StageAdapter;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
 import com.jz.experiment.module.expe.event.DelCyclingStageEvent;
@@ -29,6 +31,8 @@ import com.jz.experiment.module.expe.event.RefreshStageAdapterEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
+import com.jz.experiment.util.StatusChecker;
+import com.jz.experiment.util.TrimReader;
 import com.wind.base.BaseActivity;
 import com.wind.base.adapter.DisplayItem;
 import com.wind.base.bean.CyclingStage;
@@ -65,7 +69,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class UserSettingsStep2Activity extends BaseActivity {
+public class UserSettingsStep2Activity extends BaseActivity implements BluetoothConnectionListener {
 
     public static void start(Context context, HistoryExperiment experiment) {
 
@@ -215,9 +219,9 @@ public class UserSettingsStep2Activity extends BaseActivity {
 
     private void buildExperiment() {
         ExpeSettingSecondInfo secondInfo = mHistoryExperiment.getSettingSecondInfo();
-        String deviceName="未知设备";
-        if (mCommunicationService!=null && mCommunicationService.getConnectedDevice()!=null) {
-            deviceName=mCommunicationService.getConnectedDevice().getDeviceName();
+        String deviceName = "未知设备";
+        if (mCommunicationService != null && mCommunicationService.getConnectedDevice() != null) {
+            deviceName = mCommunicationService.getConnectedDevice().getDeviceName();
         }
 
         mHistoryExperiment.setDevice(deviceName);
@@ -258,13 +262,13 @@ public class UserSettingsStep2Activity extends BaseActivity {
 
     @OnClick({R.id.rl_mode_sel, R.id.tv_next, R.id.tv_start_temp, R.id.tv_end_temp})
     public void onViewClick(View v) {
-        int start=20;
-        List<IWheelVo> data=new ArrayList<>();
+        int start = 20;
+        List<IWheelVo> data = new ArrayList<>();
         switch (v.getId()) {
             case R.id.tv_start_temp:
 
-                for (int i=start;i<=100;i++) {
-                    WheelSimpleVo simpleVo = new WheelSimpleVo(i,i+"");
+                for (int i = start; i <= 100; i++) {
+                    WheelSimpleVo simpleVo = new WheelSimpleVo(i, i + "");
                     data.add(simpleVo);
                 }
                 WheelPickerFactory.showWheelAPicker(tv_start_temp, new WheelPickerFactory.OnWheelClickListener() {
@@ -272,15 +276,15 @@ public class UserSettingsStep2Activity extends BaseActivity {
                     public void onResult(View v, IWheelVo[] result, int[] indexs, String[] unit) {
                         tv_start_temp.setText(result[0].getLabel());
                     }
-                }, data,"℃",30);
+                }, data, "℃", 30);
                 break;
             case R.id.tv_end_temp:
               /*  Stage stage= (Stage) mStageAdapter.getItem(mStageAdapter.getItemCount()-1);
                 int temp= (int) stage.getTemp();
                 tv_start_temp.setText( temp+"");
                 int start= (int) Math.ceil(temp);*/
-                for (int i=start;i<=100;i++) {
-                    WheelSimpleVo simpleVo = new WheelSimpleVo(i,i+"");
+                for (int i = start; i <= 100; i++) {
+                    WheelSimpleVo simpleVo = new WheelSimpleVo(i, i + "");
                     data.add(simpleVo);
                 }
                 WheelPickerFactory.showWheelAPicker(tv_start_temp, new WheelPickerFactory.OnWheelClickListener() {
@@ -288,7 +292,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
                     public void onResult(View v, IWheelVo[] result, int[] indexs, String[] unit) {
                         tv_end_temp.setText(result[0].getLabel());
                     }
-                }, data,"℃",50);
+                }, data, "℃", 50);
 
 
                 break;
@@ -296,8 +300,8 @@ public class UserSettingsStep2Activity extends BaseActivity {
                 if (validate()) {
                     LoadingDialogHelper.showOpLoading(getActivity());
                     //设置积分时间
-
                     buildExperiment();
+
                     setIntergrationTime()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -322,16 +326,21 @@ public class UserSettingsStep2Activity extends BaseActivity {
                     @Override
                     public void onModeSelected(List<Mode> modes) {
                         mModes = modes;
-                        if(modes.size()>1){
-                            Stage stage= (Stage) mStageAdapter.getItem(mStageAdapter.getItemCount()-1);
-                            int temp= (int) stage.getTemp();
-                            tv_start_temp.setText( temp+"");
+                        if (modes.size() > 1) {
+                            Stage stage = (Stage) mStageAdapter.getItem(mStageAdapter.getItemCount() - 1);
+                            int temp = (int) stage.getTemp();
+                            tv_start_temp.setText(temp + "");
                         }
                         buildModeShowName();
                     }
                 });
                 break;
         }
+    }
+
+    private void readTrimDataFromInstrument() {
+        mCommunicationService.setNotify(this);
+        TrimReader.getInstance().ReadTrimDataFromInstrument(mCommunicationService);
     }
 
     public Observable<Boolean> setIntergrationTime() {
@@ -348,8 +357,8 @@ public class UserSettingsStep2Activity extends BaseActivity {
 
                 FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
                 factUpdater.SetInitData();
-                int integrationTime=mHistoryExperiment.getIntegrationTime();
-                if (integrationTime>0) {
+                int integrationTime = mHistoryExperiment.getIntegrationTime();
+                if (integrationTime > 0) {
                     //获取积分时间
                     factUpdater.int_time_1 = mHistoryExperiment.getIntegrationTime();
                     factUpdater.int_time_2 = mHistoryExperiment.getIntegrationTime();
@@ -375,8 +384,8 @@ public class UserSettingsStep2Activity extends BaseActivity {
     }
 
     private void resetTrim() {
-        CommunicationService service=mCommunicationService;
-        if (service==null){
+        CommunicationService service = mCommunicationService;
+        if (service == null) {
             return;
         }
         PcrCommand cmd = new PcrCommand();
@@ -444,6 +453,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
         cmd.SetV20(v20);
         service.sendPcrCommandSync(cmd);
     }
+
     private void doSetLEDConfig(CommunicationService service) {
         PcrCommand cmd = new PcrCommand();
         cmd.reset();
@@ -457,6 +467,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
         cmd.SetLEDConfig(1, 0, 0, 0, 0);
         service.sendPcrCommandSync(cmd);
     }
+
     public void buildModeShowName() {
         StringBuilder sBuilder = new StringBuilder(mModes.get(0).getName());
         if (mModes.size() == 2) {
@@ -475,11 +486,11 @@ public class UserSettingsStep2Activity extends BaseActivity {
             return false;
         }
 
-        if (mModes.size()>1){
+        if (mModes.size() > 1) {
             //温度必须填写
-            String startTemp=tv_start_temp.getText().toString();
-            String endTemp=tv_end_temp.getText().toString();
-            if (TextUtils.isEmpty(endTemp)){
+            String startTemp = tv_start_temp.getText().toString();
+            String endTemp = tv_end_temp.getText().toString();
+            if (TextUtils.isEmpty(endTemp)) {
                 ToastUtil.showToast(getActivity(), "请输入溶解曲线结束温度");
                 return false;
             }
@@ -492,4 +503,47 @@ public class UserSettingsStep2Activity extends BaseActivity {
         ActivityUtil.finish(getActivity());
     }
 
+    @Override
+    public void onConnectSuccess() {
+
+    }
+
+    @Override
+    public void onConnectCancel() {
+
+    }
+
+    @Override
+    public void onDoThing() {
+
+    }
+
+    @Override
+    public void onReceivedData(Data data) {
+        //TODO 读取trim数据和dataposition数据
+        byte[] reveicedBytes = data.getBuffer();
+        int statusIndex = 1;
+        int status = reveicedBytes[statusIndex];
+        //TODO 检查返回的包是否正确
+        boolean succ = StatusChecker.checkStatus(status);
+        if (!succ) {
+            return;
+        }
+        int cmdIndex = 2;
+        int cmd = reveicedBytes[cmdIndex];
+        int typeIndex = 4;
+        int type =(reveicedBytes[typeIndex]);
+        if (cmd==PcrCommand.READ_TRIM_CMD && type==PcrCommand.READ_TRIM_TYPE){
+            int channelIndex = reveicedBytes[5];    //通道index
+            //接收到数据
+            int index = reveicedBytes[7];        // 当前是index个回复包，  0 -（npages-1）
+            int npages = reveicedBytes[6];    //总共有多少个回复包
+
+
+        }
+
+
+
+
+    }
 }

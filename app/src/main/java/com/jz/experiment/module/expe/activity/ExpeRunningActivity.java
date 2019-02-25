@@ -493,6 +493,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         if (tv_duration!=null){
             tv_duration.stop();
         }
+        if (step4Subscription != null && !step4Subscription.isUnsubscribed()) {
+            step4Subscription.unsubscribe();
+            step4Subscription = null;
+        }
         if (step5Subscription != null && !step5Subscription.isUnsubscribed()) {
             step5Subscription.unsubscribe();
             step5Subscription = null;
@@ -537,6 +541,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
                 }
             });*/
+            DataFileUtil.writeFileLog("返回错误："+ByteUtil.getHexStr(reveicedBytes,reveicedBytes.length));
             return;
         }
 
@@ -652,6 +657,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             PcrCommand.TempDuringCombine combine = new PcrCommand.TempDuringCombine(partStage.getTemp(),
                     partStage.getDuring());
             combines.add(combine);
+            StringBuilder sBuilder=new StringBuilder();
+            sBuilder.append("温度+"+i+":"+partStage.getTemp()+"时间:"+partStage.getDuring());
+            System.out.println(sBuilder.toString());
+            DataFileUtil.writeFileLog(sBuilder.toString());
         }
 
         int rsvd = 0;
@@ -674,22 +683,27 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             case PcrCommand.STEP_3_TYPE:
                 //检查循环是否已经启动
                 if (!mCyclingRun) {
+
                     //启动循环
                     startCycling();
-                } /*else {
-                    delayAskTriggerStatus();
-                }*/
+                    //step4Subscription();
+                }
 
                 break;
             case PcrCommand.STEP_4_TYPE:
                 //启动循环返回，查询循环状态
                 //askIfContinuePolling();
-                step5();
-
+                mStep4Responsed=true;
+                if (step4Subscription!=null&& !step4Subscription.isUnsubscribed()){
+                    step4Subscription.unsubscribe();
+                    step4Subscription=null;
+                }
+                 step5();
+                //step5Subscription();
                 break;
             case PcrCommand.STEP_MELTING_TYPE:
                 //启动溶解曲线返回，查询查询循环状态
-                step5();
+                //step5();/
                 break;
         }
     }
@@ -750,6 +764,11 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         /*if (mHistoryExperiment.getSettingSecondInfo().getModes().size()>1){
             cmdMode=PcrCommand.CmdMode.CONTINU;
         }*/
+        StringBuilder sBuilder=new StringBuilder();
+        sBuilder.append("预变性温度："+startStage.getTemp()+"时间："+startStage.getDuring())
+                .append("结束温度："+endStage.getTemp()+"时间："+endStage.getDuring());
+        System.out.println(sBuilder.toString());
+        DataFileUtil.writeFileLog(sBuilder.toString());
         command.step4(PcrCommand.Control.START, cyclingCount, cmdMode,
                 predenaturationCombine, extendCombine);
 
@@ -1057,6 +1076,31 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     });
         }
     }
+
+    Subscription step4Subscription;
+    boolean mStep4Responsed;
+    private void step4Subscription(){
+        if (step4Subscription == null) {
+            mStep4Responsed = false;
+            step4Subscription = Observable.interval(10, 1000, TimeUnit.MILLISECONDS)
+                    .onBackpressureLatest()
+                    .subscribe(new Action1<Long>() {
+                        @Override
+                        public void call(Long aLong) {
+                            if (!mStep4Responsed) {
+                               startCycling();
+                            }
+
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            throwable.printStackTrace();
+                           // DataFileUtil.writeFileLog(throwable.getMessage());
+                        }
+                    });
+        }
+    }
     private void step5Subscription(){
         if (step5Subscription == null) {
             mStep5Responsed = false;
@@ -1175,7 +1219,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             sourceFile = DataFileUtil.getDtImageDataSourceFile(mHistoryExperiment);
         } else if (mInMeltCurve) {
            // System.out.println("溶解曲线通道" + channelIndex + "图像数据第" + curRowIndex + ":" + hex.toString().toLowerCase());
-            System.out.println("溶解曲线通道" + channelIndex + "图像数据第" + curRowIndex);
+            System.out.println("熔解曲线通道" + channelIndex + "图像数据第" + curRowIndex);
             file = DataFileUtil.getMeltImageDateFile(mHistoryExperiment);
             sourceFile = DataFileUtil.getMeltImageDataSourceFile(mHistoryExperiment);
         }
@@ -1212,7 +1256,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     break;
                 }
             }
-            if (next == -1) {//全部通道已经全部读取完
+            if (next == -1) {
+                //全部通道已经全部读取完
                 //将数据保存到文件中
                 List<Channel> channels = mHistoryExperiment.getSettingsFirstInfo().getChannels();
                 boolean channel0Selected=!TextUtils.isEmpty(channels.get(0).getValue());
@@ -1414,7 +1459,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         float endT = Float.parseFloat(mHistoryExperiment.getSettingSecondInfo().getEndTemperature());
         float speed = 1;
         command.meltingCurve(PcrCommand.Control.START, startT, endT, speed);
-
+        System.out.println("熔解曲线温度startT："+startT+" endT:"+endT);
+        DataFileUtil.writeFileLog("熔解曲线温度startT："+startT+" endT:"+endT);
         mCommunicationService.sendPcrCommandSync(command);
         //mUsbService.sendPcrCommandSync(command);
 

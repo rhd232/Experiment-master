@@ -11,8 +11,8 @@ public class CCurveShow {
     public static int MAX_WELL = 8;
     public static int MAX_CYCL = 61;//400
     int numWells = 4;
-    int MIN_CT = 12;//之前15 // minimal allowed CT
-    int CT_TH_MULTI = 6;// 6 instead of 10, this is pre calc of Ct anyway
+    int MIN_CT = 13;//之前15 // minimal allowed CT
+    int CT_TH_MULTI = 8;// 6 instead of 10, this is pre calc of Ct anyway
 
     //float log_threshold = 0.11f;
     float cheat_factor = 0.06f;
@@ -35,7 +35,7 @@ public class CCurveShow {
     public double[][] ifactor = new double[MAX_CHAN][MAX_CYCL];
 
 
-    float[] log_threshold = new float[]{0.11f, 0.11f, 0.11f, 0.11f};
+    float[] log_threshold = new float[]{0.12f, 0.12f, 0.12f, 0.12f};
     //float[] log_threshold = new float[] { 11f, 11f, 11f, 11f };
 
     float[] ct_offset = new float[4];
@@ -72,7 +72,15 @@ public class CCurveShow {
         for (i = 0; i < 4; i++) {
             ct_offset[i] = (float) Math.log(1 / log_threshold[i] - 1);
         }
-        ran = new Random(1);
+        m_zData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
+        m_yData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
+        ifactor = new double[MAX_CHAN][MAX_CYCL];
+        x = new double[MAX_CYCL];
+         y = new double[MAX_CYCL];
+         k = new double[MAX_WELL][4];
+         r = new double[MAX_WELL][4];
+         t = new double[MAX_WELL][4];
+        ran = new Random();
     }
 
     public void UpdateAllcurve() {
@@ -357,8 +365,10 @@ public class CCurveShow {
 
 
                 for (int v = 0; v < tempData.size(); v++) {
-                    if (tempData.get(v) - mean > 2 * stdev || tempData.get(v) - mean < -2 * stdev)
+                    if (tempData.get(v) - mean > 2.5 * stdev || tempData.get(v) - mean < -2.5 * stdev) {
                         tempData.set(v, mean);
+                        yData[v+3]=mean;
+                    }
 
                 }
 

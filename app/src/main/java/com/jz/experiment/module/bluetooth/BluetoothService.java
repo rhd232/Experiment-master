@@ -240,8 +240,8 @@ public class BluetoothService extends CommunicationService {
     private boolean mSync;
 
     public byte[] sendPcrCommandSync(PcrCommand command) {
-        mSync = true;
         sendPcrCommand(command);
+        mSync = true;
         try {
             //等待设备回复读取掉
             Thread.sleep(100);
@@ -263,8 +263,7 @@ public class BluetoothService extends CommunicationService {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
         }
-        File file = DataFileUtil.getLogFile();
-        appendToFile("发送：" + hex.toString().toLowerCase(), file);
+        DataFileUtil.writeFileLog("发送：" + hex.toString().toLowerCase());
         System.out.println("发送：" + hex.toString().toLowerCase());
     }
 
@@ -437,7 +436,7 @@ public class BluetoothService extends CommunicationService {
             if (!mSync) {
                 System.out.println("接收到：" + content);
 
-                //DataFileUtil.writeFileLog("接收到：" + content);
+                DataFileUtil.writeFileLog("接收到：" + content);
                 //有数据可读
                 Data data = new Data(buffer, bytes);
                 //broadcastUpdate(ACTION_DATA_AVAILABLE, data);
@@ -447,7 +446,7 @@ public class BluetoothService extends CommunicationService {
                 mHandler.sendMessage(msg);
             } else {
                 System.out.println("同步接收到：" + content);
-                //DataFileUtil.writeFileLog("同步接收到：" + content);
+                DataFileUtil.writeFileLog("同步接收到：" + content);
             }
         }
         private void splitAndCombine(String rev, List<String> vals){

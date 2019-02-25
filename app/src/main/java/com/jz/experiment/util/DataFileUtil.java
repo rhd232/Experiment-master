@@ -176,8 +176,11 @@ public class DataFileUtil {
 
 
     }
-
+    public static boolean sDebug;
     public static void writeFileLog(String txt) {
+        if (!sDebug){
+            return;
+        }
         File file = getLogFile();
         writeToFile(file, txt);
 

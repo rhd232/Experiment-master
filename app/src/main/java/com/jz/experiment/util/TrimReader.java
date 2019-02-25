@@ -4,6 +4,8 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.jz.experiment.chart.CommData;
+import com.jz.experiment.module.bluetooth.CommunicationService;
+import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.wind.base.C;
 import com.wind.base.utils.LogUtil;
 
@@ -39,6 +41,16 @@ public class TrimReader {
     }
 
     public TrimReader() {
+    }
+
+    /**
+     * 从仪器中读取trim data
+     */
+    public void ReadTrimDataFromInstrument(CommunicationService service){
+        PcrCommand cmd=new PcrCommand();
+        cmd.trimData();
+        service.sendPcrCommand(cmd);
+
     }
 
     public void ReadTrimFile(Context context){

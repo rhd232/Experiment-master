@@ -328,7 +328,7 @@ public class CommData {
                     datalist.put(k, list);
 
                 }
-
+                //int factori=Integer.parseInt(datalist.get(11).get(12));
                 String ss = positionlist.get(chan).get(ksindex);
                 String[] newstrs = ss.split("\\+");
                 int value = 0;
@@ -345,6 +345,10 @@ public class CommData {
                     }
                 }
 
+
+              /*  double vf=(double) value;
+                vf/=GetFactor(factori);
+                value=(int) vf;*/
                 cd.y = value;
                 cdlist.add(cd);
                 if (i == 0) {
