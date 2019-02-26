@@ -42,7 +42,7 @@ public class HistoryExperimentDelegate extends BaseAdapterDelegate<HistoryExperi
         final HistoryExperiment experiment= (HistoryExperiment) items.get(position);
         ViewHolder vh= (ViewHolder) holder;
         vh.tv_expe_name.setText(experiment.getName());
-        vh.tv_expe_device.setText(experiment.getDevice());
+        vh.tv_expe_device.setText("-"+experiment.getDevice());
         String date=DateUtil.get(experiment.getMillitime(),"yy-MM-dd HH:mm:ss");
         vh.tv_expe_time.setText(date);
         vh.tv_expe_status.setText(experiment.getStatus().getDesc());

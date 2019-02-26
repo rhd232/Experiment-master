@@ -12,7 +12,9 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.jz.experiment.widget.ChartMarkerView;
 import com.wind.data.expe.bean.ColorfulEntry;
 
@@ -122,17 +124,28 @@ public abstract class WindChart {
                     mChart.setAutoScaleMinMaxEnabled(true);
                     mLineData.notifyDataChanged();
                     mChart.notifyDataSetChanged(); // let the chart know it's data changed
+
                     mChart.invalidate(); // refresh
-                    mHandler.postDelayed(new Runnable() {
+                   /* mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             if (!mRunning) {
                                 mChart.setDrawMarkers(true);
                             }
                         }
-                    },200);
-                    //mChart.setDrawMarkers(true);
+                    },200);*/
 
+                    mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                        @Override
+                        public void onValueSelected(Entry e, Highlight h) {
+                            mChart.setDrawMarkers(true);
+                        }
+
+                        @Override
+                        public void onNothingSelected() {
+
+                        }
+                    });
                     break;
             }
 
@@ -143,4 +156,7 @@ public abstract class WindChart {
         this.mRunning=running;
     }
     public abstract void show(List<String> ChanList, List<String> KSList,File dataFile);
+
+
+
 }

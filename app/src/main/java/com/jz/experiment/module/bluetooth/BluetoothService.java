@@ -244,7 +244,7 @@ public class BluetoothService extends CommunicationService {
         mSync = true;
         try {
             //等待设备回复读取掉
-            Thread.sleep(100);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

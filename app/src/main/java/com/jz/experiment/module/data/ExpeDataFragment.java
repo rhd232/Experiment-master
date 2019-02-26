@@ -620,6 +620,8 @@ public class ExpeDataFragment extends BaseFragment {
         KSList =
                 event.getKSList();
 
+
+
         //mExecutorService.execute(mRun);
         showChart();
     }

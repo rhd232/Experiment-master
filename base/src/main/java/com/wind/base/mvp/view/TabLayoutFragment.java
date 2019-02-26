@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,9 +59,9 @@ public abstract class TabLayoutFragment
             public void run() {
                 setUpIndicatorWidth(layout_tab, 0, 0);
             }
-        });
-        layout_tab.setTabMode(TabLayout.MODE_SCROLLABLE);*/
-        layout_tab.setTabMode(TabLayout.MODE_FIXED);
+        });*/
+        layout_tab.setTabMode(TabLayout.MODE_SCROLLABLE);
+       // layout_tab.setTabMode(TabLayout.MODE_FIXED);
     }
 
     protected abstract List<Fragment> getFragments();
@@ -70,7 +70,7 @@ public abstract class TabLayoutFragment
         return null;
     }
 
-    public static class ContainerPagerAdapter extends FragmentPagerAdapter {
+    public static class ContainerPagerAdapter extends FragmentStatePagerAdapter {
 
         public List<Fragment> fragments;
         private List<String> titles;

@@ -42,6 +42,7 @@ import com.wind.base.bean.StartStage;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.ActivityUtil;
+import com.wind.base.utils.LogUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.DbOpenHelper;
 import com.wind.data.expe.bean.DtMode;
@@ -298,10 +299,40 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                 break;
             case R.id.tv_next:
                 if (validate()) {
+                    //readTrimDataFromInstrument();
+                  /*  String r="aa0004392d001600780000040406090602060306040702070307040802080308040906060607060807060707070808060807080809020202030204038b0b1717\n" +
+                             "aa0004392d00160102030303040402040304040902060207020803060307030804060407040809060206030604070207030704080208030804090606ff801717\n" +
+                             "aa0004392d00160206070608070607070708080608070808090202020302040302030303040402040304040902060207020803060307030804060407088a1717\n" +
+                             "aa0004392d0016030408090402040304040602060306040502050305040904070408040905070508050906070608060909080208030804090209030925a81717\n" +
+                             "aa0004392d001604040a020a030a04090807080808090907090809090a070a080a09090403040404050503050405050603060406050904070408040954d81717\n" +
+                             "aa0004392d001605050705080509060706080609090803080408050903090409050a030a040a05090807080808090907090809090a070a080a09000071f61717\n" +
+                             "aa0004392d001606313838f6ea01f0f89400880171048f18f6f9fe2439f81e017e035d0189fc68fcacfa1d016c0300e49cfa1fdfdfff600188fe7d3df67c1717\n" +
+                             "aa0004392d001607f3f39a51cadc5e015c032a3354ec7b378de54b00d606031f3bf3671e14f8e70173018e27cfe7d827efe548011d04dd3000e2c037e86f1717\n" +
+                             "aa0004392d0016080ad70d0184066605a2f4f30a3d0621016effed1b64f74f23b6ef99016e064615e30cb4147b18b7017400b70084009d00e000f80052da1717\n" +
+                             "aa0004392d001609a900c000a000b7012d0143009500ae008b00a300b600cf008d00a60084009b008700a0011f01357c0f080a060ec000000000000068f11717\n" +
+                             "aa0004392d00160a31383826c8ffb63b22f48c0124029b2147ee0e2687e32c010004c445c2d8b85395c66000ce0202dd500c36e7f0088b012103ac16038d1717\n" +
+                             "aa0004392d00160bc9ebff2b85e69e012b0442278dffef21ca13d3015e010a2a7fe9f03c49d28d015304954062f3135353d864012804a25eb8e310705be61717\n" +
+                             "aa0004392d00160c20ca0100e1074a1831ee4c1f7de4f200e10516226e00a42c08017501830032451ed66e5168c4dc0138000000bc00cb004d005e000d991717\n" +
+                             "aa0004392d00160d4d005f0065007600e300f300b900ca00be00d100f40100007e009200a600b700bb00ce006b007c870f080a090ec00000a8794e002fbc1717\n" +
+                             "aa0004392d00160e313838c72b1ef2d107182901dbfeb6bbe81af9c45b234e01ecfd8acba61f61c9581f9d01e2fd09c4bd16c7ca1d169a01d4029cd4f9871717\n" +
+                             "aa0004392d00160f3a2936d6a82a79020a0000da5ffc88e4bdfa3a01d30312cc4a16f1daa01d8501e3ff7be127fd4af894f23501790363eae118faf58c1b1717\n" +
+                             "aa0004392d0016101f13cb01eaf95dd3541080e12712d3019dfd68f1060c85045a0805019307e7db650b7beac1094e01870000012b013e013e015401aa3a1717\n" +
+                             "aa0004392d0016112f014300c100d90177018f00d600ec01410156011a01300167017c013f015201430158010a011fa00f080a0a0ec000000000000095261717\n" +
+                             "aa0004392d001612313838edf40765edf4080b01f80784ebe8fc03f0c5089b020afead0333054204bc10ba021405df23b6fd412604ef72019907a2ef1cae1717\n" +
+                             "aa0004392d001613dfffb8fc4a036102080ce0dfdf0085e5c30d5001f702c5049cf7821666eb1c01dc07dd0810e8060db2e64901ce086bf93700cd05d2651717\n" +
+                             "aa0004392d001614e30a00021105faee3511aff45a193e01cf04d3f000f890ef5cf6b501f407d3e6871f4ddc292d84021d0000008a00a300b200ca00c2561717\n" +
+                             "aa0004392d001615cb00e4007a009600ac00ca00ae00c600d100eb006b008600b800d300c000d9004b006500ad00c5840f080a070ec000000000000117ac1717";
+                    String[] ss=r.split("\n");
+                    for (String s:ss){
+                        if(!TextUtils.isEmpty(s)){
+                            Data data1=new Data(ByteUtil.hexStringToBytes(s,s.length()/2),s.length()*2);
+                            onReceivedData(data1);
+                        }
+                    }*/
+
                     LoadingDialogHelper.showOpLoading(getActivity());
                     //设置积分时间
                     buildExperiment();
-
                     setIntergrationTime()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -531,19 +562,123 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         }
         int cmdIndex = 2;
         int cmd = reveicedBytes[cmdIndex];
+
         int typeIndex = 4;
-        int type =(reveicedBytes[typeIndex]);
-        if (cmd==PcrCommand.READ_TRIM_CMD && type==PcrCommand.READ_TRIM_TYPE){
+        int type = (reveicedBytes[typeIndex]);
+        if (cmd == PcrCommand.READ_TRIM_CMD && type == PcrCommand.READ_TRIM_TYPE) {
             int channelIndex = reveicedBytes[5];    //通道index
             //接收到数据
-            int index = reveicedBytes[7];        // 当前是index个回复包，  0 -（npages-1）
-            int npages = reveicedBytes[6];    //总共有多少个回复包
+            int length = reveicedBytes[3];
+            int chanIndex = reveicedBytes[5];
+            int curIndex = reveicedBytes[7];        // 当前是index个回复包，  0 -（npages-1）
+            int total = reveicedBytes[6];    //总共有多少个回复包
+            MoveToEEPBuffer(reveicedBytes,curIndex);
+            //header status   cmd  length   type  cIndex  total   curIndex
+            //aa      00      04     39      2d    00      16       00     780000040406090602060306040702070307040802080308040906060607060807060707070808060807080809020202030204038b0b1717
+            //aa0004392d00160102030303040402040304040902060207020803060307030804060407040809060206030604070207030704080208030804090606ff801717
+            //aa0004392d00160206070608070607070708080608070808090202020302040302030303040402040304040902060207020803060307030804060407088a1717
+            //aa0004392d0016030408090402040304040602060306040502050305040904070408040905070508050906070608060909080208030804090209030925a81717
+            //aa0004392d001604040a020a030a04090807080808090907090809090a070a080a09090403040404050503050405050603060406050904070408040954d81717
+            //aa0004392d001605050705080509060706080609090803080408050903090409050a030a040a05090807080808090907090809090a070a080a09000071f61717
+            //aa0004392d001606313838f6ea01f0f89400880171048f18f6f9fe2439f81e017e035d0189fc68fcacfa1d016c0300e49cfa1fdfdfff600188fe7d3df67c1717
+            //aa0004392d001607f3f39a51cadc5e015c032a3354ec7b378de54b00d606031f3bf3671e14f8e70173018e27cfe7d827efe548011d04dd3000e2c037e86f1717
+            //aa0004392d0016080ad70d0184066605a2f4f30a3d0621016effed1b64f74f23b6ef99016e064615e30cb4147b18b7017400b70084009d00e000f80052da1717
+            //aa0004392d001609a900c000a000b7012d0143009500ae008b00a300b600cf008d00a60084009b008700a0011f01357c0f080a060ec000000000000068f11717
+            //aa0004392d00160a31383826c8ffb63b22f48c0124029b2147ee0e2687e32c010004c445c2d8b85395c66000ce0202dd500c36e7f0088b012103ac16038d1717
+            //aa0004392d00160bc9ebff2b85e69e012b0442278dffef21ca13d3015e010a2a7fe9f03c49d28d015304954062f3135353d864012804a25eb8e310705be61717
+            //aa0004392d00160c20ca0100e1074a1831ee4c1f7de4f200e10516226e00a42c08017501830032451ed66e5168c4dc0138000000bc00cb004d005e000d991717
+            //aa0004392d00160d4d005f0065007600e300f300b900ca00be00d100f40100007e009200a600b700bb00ce006b007c870f080a090ec00000a8794e002fbc1717
+            //aa0004392d00160e313838c72b1ef2d107182901dbfeb6bbe81af9c45b234e01ecfd8acba61f61c9581f9d01e2fd09c4bd16c7ca1d169a01d4029cd4f9871717
+            //aa0004392d00160f3a2936d6a82a79020a0000da5ffc88e4bdfa3a01d30312cc4a16f1daa01d8501e3ff7be127fd4af894f23501790363eae118faf58c1b1717
+            //aa0004392d0016101f13cb01eaf95dd3541080e12712d3019dfd68f1060c85045a0805019307e7db650b7beac1094e01870000012b013e013e015401aa3a1717
+            //aa0004392d0016112f014300c100d90177018f00d600ec01410156011a01300167017c013f015201430158010a011fa00f080a0a0ec000000000000095261717
+            //aa0004392d001612313838edf40765edf4080b01f80784ebe8fc03f0c5089b020afead0333054204bc10ba021405df23b6fd412604ef72019907a2ef1cae1717
+            //aa0004392d001613dfffb8fc4a036102080ce0dfdf0085e5c30d5001f702c5049cf7821666eb1c01dc07dd0810e8060db2e64901ce086bf93700cd05d2651717
+            //aa0004392d001614e30a00021105faee3511aff45a193e01cf04d3f000f890ef5cf6b501f407d3e6871f4ddc292d84021d0000008a00a300b200ca00c2561717
+            //aa0004392d001615cb00e4007a009600ac00ca00ae00c600d100eb006b008600b800d300c000d9004b006500ad00c5840f080a070ec000000000000117ac1717
+
+
+            List<Integer> rlist = new ArrayList<>();      // row index
+            List<Integer> clist = new ArrayList<>();      // col index
+            int EPKT_SZ = 52;
+            int NUM_EPKT = 4;
+
+            //byte[][]EepromBuff = new byte[8 + 4 * NUM_EPKT][EPKT_SZ + 1];
+
+
+            byte[] trim_buff = new byte[1024];
+
+            for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
+                trim_buff[j] = EepromBuff[0][j];        // copy first page
+            }
+
+            int k = 0;
+
+            char version = (char) trim_buff[k];
+            k++;
+            int sn1 = trim_buff[k];
+            k++;
+            int sn2 = trim_buff[k];
+            k++;
+
+            int num_channels = trim_buff[k];
+            k++;
+            int num_wells = trim_buff[k];
+            k++;
+            int num_pages = trim_buff[k];
+            k++;
+
+            for (int i = 1; i < num_pages; i++) {
+                for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
+                    trim_buff[i * EPKT_SZ + j] = EepromBuff[i][ j];
+                }
+            }
+
+            for (int i = 0; i < num_channels; i++) {
+                for (int j = 0; j < num_wells; j++) {
+                    int n = trim_buff[k];
+                    k++;
+                    rlist.clear();
+                    clist.clear();
+                    for (int l = 0; l < n; l++) {
+                        int row = trim_buff[k++]; // k++;
+                        int col = trim_buff[k];
+                        k++;
+
+                        rlist.add(row);
+                        clist.add(col);
+                    }
+                  //  CommData.row_index[i, j] =new List<int>(rlist);
+                    //CommData.col_index[i, j] =new List<int>(clist);
+                }
+            }
+
 
 
         }
 
 
+    }
+    int EPKT_SZ = 52;
+    int NUM_EPKT = 4;
+    byte[][] EepromBuff = new byte[8 + 4 * NUM_EPKT][ EPKT_SZ + 1];
 
+    private void MoveToEEPBuffer(byte[] inputdatas, int index)
+    {
+        byte eeprom_parity = 0;
 
+        for (int i = 0; i < EPKT_SZ + 1; i++) {
+            EepromBuff[index][i] = inputdatas[8 + i];
+
+            if (i < EPKT_SZ) {
+                eeprom_parity += inputdatas[8 + i];
+            } else {
+                if (eeprom_parity != inputdatas[8 + i]) {
+                    LogUtil.e("Packet parity error!");
+                } else {
+                    int imok = 1;
+                }
+            }
+        }
     }
 }

@@ -138,9 +138,8 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     @Override
     protected List<Fragment> getFragments() {
-       return null;
+        return null;
     }
-
 
 
     public void setExpe(HistoryExperiment expe) {
@@ -148,32 +147,34 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         //增加一个tab显示本实验
         ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
         List<Fragment> fragments = mFragmentAdapter.getFragments();
-        List<String> titles=mFragmentAdapter.getTitles();
+        List<String> titles = mFragmentAdapter.getTitles();
         if (fragments == null) {
             fragments = new ArrayList<>();
-            titles=new ArrayList<>();
+            titles = new ArrayList<>();
             mFragmentAdapter.setFragments(fragments);
             mFragmentAdapter.setTitles(titles);
         } else {
-            int lastIndex=fragments.size()-1;
+            /*int lastIndex=fragments.size()-1;
             ExpeDataFragment expeDataFragment= (ExpeDataFragment) fragments.get(lastIndex);
             if (!expeDataFragment.isSavedExpe()){
-                //fragments.remove(lastIndex);
-                //titles.remove(lastIndex);
                 titles.remove(lastIndex);
                 titles.add("历史实验");
-            }
+            }*/
+            ExpeDataFragment expeDataFragment = (ExpeDataFragment) fragments.get(0);
+            titles.remove(0);
+            titles.add(0, "历史实验");
 
 
         }
 
-        titles.add("本次实验");
-        fragments.add(f);
+        titles.add(0, "本次实验");
+        fragments.add(0, f);
         mFragmentAdapter.notifyDataSetChanged();
-        view_pager.setCurrentItem(fragments.size()-1, false);
+        //view_pager.setCurrentItem(fragments.size()-1, false);
+        view_pager.setCurrentItem(0, false);
 
 
-        if (fragments.size()>4){
+        if (fragments.size() > 4) {
             layout_tab.setTabMode(TabLayout.MODE_SCROLLABLE);
         }
 
@@ -181,7 +182,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     }
 
     @Subscribe
-    public void onSavedExpeDataEvent(SavedExpeDataEvent event){
+    public void onSavedExpeDataEvent(SavedExpeDataEvent event) {
         loadExpe();
     }
 

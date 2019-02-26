@@ -1204,11 +1204,11 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             chip = "Chip#4";
         }
 
-       /* StringBuilder hex = new StringBuilder(reveicedBytes.length * 2);
+        StringBuilder hex = new StringBuilder(reveicedBytes.length * 2);
         for (byte b : reveicedBytes) {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
-        }*/
+        }
 
 
         File file = null, sourceFile = null;
@@ -1226,14 +1226,14 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         //保存到本地文件中
         if (curRowIndex == 0) {
             //appendToFile(chip, file);
-            //sourceAppendToFile(chip, sourceFile);
+            sourceAppendToFile(chip, sourceFile);
         }
         //保存图像板返回的原始数据到文件
         //将0x1717后面的数据抹去
-      /*  String source=hex.toString().toLowerCase();
+        String source=hex.toString().toLowerCase();
         int index=source.indexOf("1717");
         source=source.substring(0,index+4);
-        sourceAppendToFile(source, sourceFile);*/
+        sourceAppendToFile(source, sourceFile);
         // if (mInCycling) {
         //TODO 循环过程数据转换待理解
         String imageData = transferImageData(channelIndex, curRowIndex, reveicedBytes);
