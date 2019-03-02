@@ -22,28 +22,28 @@ public class DataFileUtil {
         if (melt) {
             name = "熔解曲线";
         }
-        return DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + name + ".pdf";
+        return DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + name + ".pdf";
     }
 
     public static File getDtImageDataFile(HistoryExperiment experiment) {
-        String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + "_dt.txt";
+        String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + "_dt.txt";
         //String filePath = C.Value.IMAGE_DATA + fileName;
         return getOrCreateFile(fileName);
     }
 
     public static File getMeltImageDateFile(HistoryExperiment experiment) {
-        String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + "_melting.txt";
+        String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + "_melting.txt";
         //String filePath = C.Value.IMAGE_DATA + fileName;
         return getOrCreateFile(fileName);
     }
 
     public static File getDtImageDataSourceFile(HistoryExperiment experiment) {
-        String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + "_dtsource.txt";
+        String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + "_dtsource.txt";
         return getOrCreateFile(fileName);
     }
 
     public static File getMeltImageDataSourceFile(HistoryExperiment experiment) {
-        String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_hh_mm_ss") + "_meltsource.txt";
+        String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + "_meltsource.txt";
         return getOrCreateFile(fileName);
     }
 

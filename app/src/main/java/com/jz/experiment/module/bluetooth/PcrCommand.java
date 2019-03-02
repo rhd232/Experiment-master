@@ -156,8 +156,32 @@ public class PcrCommand {
      * @param channelOp  数组长度为4  取值0|1   	0 关闭 1开启
      */
     public void step1(int[] channelOp) {
+        int PCRMask = 0;
+        int ck1 = 1;
+        int ck2 = 1;
+        int ck3 = 1;
+        int ck4 = 1;
 
-        int header=0xaa;
+        PCRMask = (ck4 << 3) | (ck3 << 2) | (ck2 << 1) | ck1;
+        byte[] TxData = new byte[11];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command  TXC
+        TxData[2] = 0x05;		//data length
+        TxData[3] = 0x24;		//data type
+        TxData[4] = (byte)PCRMask;
+        TxData[5] = 0x00;
+        TxData[6] = 0x00;
+        TxData[7] = 0x00;
+        for (int i = 1; i < 8; i++)
+            TxData[8] += TxData[i];
+        if (TxData[8] == 0x17)
+            TxData[8] = 0x18;
+        else
+            TxData[8] = TxData[8];
+        TxData[9] = 0x17;
+        TxData[10] = 0x17;
+        addCommand(TxData);
+      /*  int header=0xaa;
         int command=0x1;
         int length=0x2;
         int type=0x24;
@@ -172,7 +196,7 @@ public class PcrCommand {
 
         addCommonBytes(bytes);
         byte[] cmd = listToByteArray(bytes);
-        addCommand(cmd);
+        addCommand(cmd);*/
     }
 
     /**
@@ -251,11 +275,11 @@ public class PcrCommand {
         //  byte [] cmd=new byte[]{19,length,3,cyclingCount,cur_cycling,picAndSteps};
         List<Byte> bytes = new ArrayList<>();
         bytes.add((byte) 0xaa);
-        bytes.add((byte) 19);
+        bytes.add((byte) 0x13);
         bytes.add((byte) length);
-        bytes.add((byte) 3);
+        bytes.add((byte) 0x03);
 
-        bytes.add((byte) 0);//rsvd固定为0
+        bytes.add((byte) rsvd);//
         bytes.add((byte) 1);//固定为1
         bytes.add((byte) steps);//总阶段
 
@@ -276,7 +300,61 @@ public class PcrCommand {
 
     }
 
+    /**
+     * 多个预变性温度
+     * @param control
+     * @param cyclingCount
+     * @param cmdMode
+     * @param predenaturationCombines
+     * @param extendCombine
+     */
+    public void step4(Control control, int cyclingCount, CmdMode cmdMode, List<TempDuringCombine> predenaturationCombines,
+                      TempDuringCombine extendCombine) {
+        int length;
+        int cfg;
+        if (predenaturationCombines.size()==1){
+            length=3+(4+2)*2+1;
+            cfg = cmdMode.getValue() << 4 ;//initial_mode值为0，所以不用设置
+        }else {
+            length=3+(4+2)*3+1;
+            cfg = cmdMode.getValue() << 4 | 1;//initial_mode值为0，所以不用设置
+        }
 
+
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte)0xaa);
+        bytes.add((byte)19);
+        bytes.add((byte)length);
+        bytes.add((byte)4);
+
+        bytes.add((byte)control.getValue());
+        bytes.add((byte)cyclingCount);
+        bytes.add((byte)cfg);
+        for (TempDuringCombine predenaturationCombine:predenaturationCombines) {
+            //设置预变性目标温度时间
+            byte[] tempBytes = ByteBufferUtil.getBytes(predenaturationCombine.getTemp(), ByteOrder.LITTLE_ENDIAN);
+            for (int i = 0; i < tempBytes.length; i++) {
+                bytes.add(tempBytes[i]);
+            }
+            byte[] duringBytes = ByteBufferUtil.getBytes(predenaturationCombine.getDuring(),ByteOrder.BIG_ENDIAN);
+            for (int i = 0; i < duringBytes.length; i++) {
+                bytes.add(duringBytes[i]);
+            }
+        }
+
+        //设置延伸目标温度时间
+        byte[] exTempBytes = ByteBufferUtil.getBytes(extendCombine.getTemp(),ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < exTempBytes.length; i++) {
+            bytes.add(exTempBytes[i]);
+        }
+        byte[] exDuringBytes = ByteBufferUtil.getBytes(extendCombine.getDuring(),ByteOrder.BIG_ENDIAN);
+        for (int i = 0; i < exDuringBytes.length; i++) {
+            bytes.add(exDuringBytes[i]);
+        }
+        addCommonBytes(bytes);
+        byte[] cmd = listToByteArray(bytes);
+        addCommand(cmd);
+    }
     /**
      *      循环启动/停止
      *               command  type
@@ -294,7 +372,7 @@ public class PcrCommand {
      *                               1--mode  1 （两个预变性阶段）		"命令格式会增加一个预变性阶段：
      *                               预变性1温度 ，预变性1时间， 预变性2温度，预变性2时间，hold温度，hold保持时间"
      */
-    public void step4(Control control, int cyclingCount, CmdMode cmdMode, TempDuringCombine predenaturationCombine,
+    /*public void step4(Control control, int cyclingCount, CmdMode cmdMode, TempDuringCombine predenaturationCombine,
                       TempDuringCombine extendCombine) {
         int length=3+(4+2)*2+1;
         int cfg = cmdMode.getValue() << 4;//initial_mode值为0，所以不用设置
@@ -329,7 +407,7 @@ public class PcrCommand {
         addCommonBytes(bytes);
         byte[] cmd = listToByteArray(bytes);
         addCommand(cmd);
-    }
+    }*/
 
 
     /**
@@ -393,6 +471,18 @@ public class PcrCommand {
         addCommand(listToByteArray(bytes));
     }
 
+    public void getCyclingInfo(){
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) 0xaa);
+        bytes.add((byte) 0x14);
+        bytes.add((byte) 2);
+        bytes.add((byte) 0x01);
+        bytes.add((byte) 0);
+        addCommonBytes(bytes);
+        addCommand(listToByteArray(bytes));
+    }
+
+
     /**
      * 溶解曲线开启/停止
      * command	length	type	control byte	data
@@ -440,9 +530,9 @@ public class PcrCommand {
      *    header     cmd   length   type   data
      *    0xaa      0x13             0x04
      */
-    public void stopCycling(int cyclingCount, CmdMode cmdMode, TempDuringCombine predenaturationCombine,
+    public void stopCycling(int cyclingCount, CmdMode cmdMode, List<TempDuringCombine> predenaturationCombines,
                             TempDuringCombine extendCombine){
-       step4(Control.STOP,cyclingCount,cmdMode,predenaturationCombine,extendCombine);
+       step4(Control.STOP,cyclingCount,cmdMode,predenaturationCombines,extendCombine);
     }
 
     /**
@@ -678,6 +768,27 @@ public class PcrCommand {
         TxData[6] = 0x17;       //back code
         TxData[7] = 0x17;		//back code
 
+        addCommand(TxData);
+    }
+
+    public void setChan() {
+
+        byte[] TxData = new byte[9];
+        TxData[0] = (byte) 0xaa;		//preamble code
+        TxData[1] = 0x01;		//command
+        TxData[2] = 0x0C;		//data length
+        TxData[3] = 0x23;		//data type, date edit first byte
+        TxData[4] = (byte)0x80;		//real data
+        TxData[5] = 0x00;		//预留位
+
+        for (int i = 1; i < 6; i++)
+            TxData[6] += TxData[i];
+        if (TxData[6] == 0x17)
+            TxData[6] = 0x18;
+        else
+            TxData[6] = TxData[6];
+        TxData[7] = 0x17;		//back code
+        TxData[8] = 0x17;		//back code
         addCommand(TxData);
     }
 

@@ -77,6 +77,10 @@ public class SplashActivity extends BaseActivity {
             }
         }, 500);
 
+
+
+
+
     }
     Subscription expeSubscription;
     public void testInsertExpe(){

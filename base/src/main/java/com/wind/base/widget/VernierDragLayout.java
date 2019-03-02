@@ -181,5 +181,11 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
     }
 
 
+    public void resetStartScale() {
+        vernier_view.resetStartScale();
+    }
 
+    public void resetCurScale() {
+        vernier_view.resetCurScale();
+    }
 }

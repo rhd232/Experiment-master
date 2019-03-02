@@ -459,23 +459,18 @@ public class UsbService extends CommunicationService {
                 while (mRun) {
                     try {
                         byte[] buffer = new byte[64];
-                        int bytes = this.mmConnection.bulkTransfer(mmEndIn, buffer, 64, 500);
+                        int bytes = this.mmConnection.bulkTransfer(mmEndIn, buffer, 64, 5000);
                         //System.out.println("mmEndIn:"+bytes);
                         if (bytes > 0) {
-                            StringBuilder hex = new StringBuilder(bytes * 2);
-                          /*  for (byte b : buffer) {
-                                if ((b & 0xFF) < 0x10) hex.append("0");
-                                hex.append(Integer.toHexString(b & 0xFF));
-                            }*/
+                           /* StringBuilder hex = new StringBuilder(bytes * 2);
+
                             for (int i=0;i<bytes;i++){
                                 byte b=buffer[i];
                                 if ((b & 0xFF) < 0x10) hex.append("0");
                                 hex.append(Integer.toHexString(b & 0xFF));
                             }
                             System.out.println("接收到:" + hex.toString().toLowerCase());
-                            DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
-                          /*  Data data = new Data(buffer, bytes);
-                            broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, data);*/
+                            DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());*/
 
                             Data data = new Data(buffer, bytes);
                             Message msg=new Message();
@@ -484,7 +479,7 @@ public class UsbService extends CommunicationService {
                             mHandler.sendMessage(msg);
                         }
 
-                        Thread.sleep(50);
+                        Thread.sleep(10);
                     } catch (InterruptedException var5) {
                         // UsbPort.this.connectionLost();
 

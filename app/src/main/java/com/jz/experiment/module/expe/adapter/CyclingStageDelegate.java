@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.widget.RxTextView;
 import com.jz.experiment.R;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
 import com.jz.experiment.module.expe.event.DelCyclingStageEvent;
@@ -23,9 +25,8 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
-import rx.functions.Action1;
-
-public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelegate.ViewHolder> {
+public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelegate.ViewHolder> implements
+View.OnFocusChangeListener{
 
 
     public CyclingStageDelegate(Activity activity, int layoutRes) {
@@ -42,12 +43,12 @@ public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelega
     protected boolean isForViewType(@NonNull List<DisplayItem> items, int position) {
         return items.get(position) instanceof CyclingStage;
     }
-
+    private List<DisplayItem> items;
     @Override
     protected void onBindViewHolder(@NonNull List<DisplayItem> items, final int position,
                                     @NonNull RecyclerView.ViewHolder holder, @NonNull List<Object> payloads) {
 
-
+        this.items=items;
         final ViewHolder vh = (ViewHolder) holder;
         LinearLayoutManager manager=new LinearLayoutManager(mActivity){
             @Override
@@ -121,12 +122,23 @@ public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelega
                 });
             }
         });
-        int count=stage.getCyclingCount();
-        if (count==0){
-            count=1;
+        vh.et_cycling_cnt.setTag(position);
+        if (selectedEditTextPosition != -1 && position == selectedEditTextPosition) { // 保证每个时刻只有一个EditText能获取到焦点
+            vh.et_cycling_cnt.requestFocus();
+        } else {
+            vh.et_cycling_cnt.clearFocus();
         }
+
+
+        int count=stage.getCyclingCount();
+
         vh.et_cycling_cnt.setText(count+ "");
-        RxTextView.textChanges(vh.et_cycling_cnt).subscribe(new Action1<CharSequence>() {
+        vh.et_cycling_cnt.setSelection(vh.et_cycling_cnt.length());
+      //  vh.et_cycling_cnt.setOnTouchListener(this); // 正确写法
+        vh.et_cycling_cnt.setOnFocusChangeListener(this);
+
+
+       /* RxTextView.textChanges(vh.et_cycling_cnt).subscribe(new Action1<CharSequence>() {
             @Override
             public void call(CharSequence charSequence) {
                 String s = charSequence.toString().trim();
@@ -142,9 +154,61 @@ public class CyclingStageDelegate extends BaseAdapterDelegate<CyclingStageDelega
                 int count = Integer.parseInt(s);
                 stage.setCyclingCount(count);
             }
-        });
+        });*/
 
     }
+
+  /*  @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            EditText editText = (EditText) v;
+            selectedEditTextPosition = (int) editText.getTag();
+        }
+        return false;
+    }
+*/
+  private int selectedEditTextPosition=-1;
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        EditText editText = (EditText) v;
+        if (hasFocus) {
+            selectedEditTextPosition=(int) editText.getTag();
+            editText.addTextChangedListener(mTextWatcher);
+        } else {
+            editText.removeTextChangedListener(mTextWatcher);
+        }
+    }
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (selectedEditTextPosition != -1) {
+                Log.w("MyEditAdapter", "onTextPosiotion " + selectedEditTextPosition);
+               /* ItemBean itemTest = (ItemBean) getItem(selectedEditTextPosition);
+                itemTest.setText(s.toString());*/
+                CyclingStage stage= (CyclingStage) items.get(selectedEditTextPosition);
+                String ss = s.toString().trim();
+                if (TextUtils.isEmpty(ss)) {
+                    ss = "1";
+                }
+
+
+                int v = Integer.parseInt(ss);
+                stage.setCyclingCount(v);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
 
 
     static class ViewHolder extends RecyclerView.ViewHolder {

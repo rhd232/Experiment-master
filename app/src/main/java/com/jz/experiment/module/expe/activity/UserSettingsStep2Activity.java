@@ -18,6 +18,7 @@ import com.aigestudio.wheelpicker.widget.WheelSimpleVo;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.FactUpdater;
+import com.jz.experiment.chart.FlashData;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.Data;
@@ -25,10 +26,13 @@ import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.expe.adapter.StageAdapter;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
+import com.jz.experiment.module.expe.event.AddStartStageEvent;
 import com.jz.experiment.module.expe.event.DelCyclingStageEvent;
+import com.jz.experiment.module.expe.event.DelStartStageEvent;
 import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.module.expe.event.RefreshStageAdapterEvent;
 import com.jz.experiment.util.AppDialogHelper;
+import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.StatusChecker;
@@ -178,7 +182,34 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
     }
 
+    @Subscribe
+    public void onAddStartStageEvent(AddStartStageEvent event){
+        //判断预变性温度，最多只能有两个
+        Stage stage= (Stage) mStageAdapter.getItems().get(1);
+        if (stage instanceof StartStage){
+            ToastUtil.showToast(getActivity(),"最多两个预变性阶段");
+            return;
+        }
+        mStageAdapter.add(event.getPosition(), new StartStage());
+        buildLink();
+        Log.i("StartStage", "onAddStartStageEvent");
+    }
 
+    @Subscribe
+    public void onDelStartStageEvent(DelStartStageEvent event){
+        //判断预变性温度，最少有一个
+        Stage stage= (Stage) mStageAdapter.getItems().get(1);
+        if (stage instanceof StartStage){
+            mStageAdapter.remove(event.getPosition());
+            buildLink();
+            Log.i("ChangeStage", "onDelStartStageEvent");
+        }else {
+            ToastUtil.showToast(getActivity(), "最少一个预变性阶段");
+            return;
+        }
+
+
+    }
     @Subscribe
     public void onRefreshStageAdapterEvent(RefreshStageAdapterEvent event) {
         mStageAdapter.notifyDataSetChanged();
@@ -469,7 +500,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         doSetV20(service, CommData.chan3_auto_v20[1], 3);
         doSetV20(service, CommData.chan4_auto_v20[1], 4);
 
-        CommData.int_time1 = CommData.int_time2 = CommData.int_time3 = CommData.int_time4 = 1;
+        CommData.int_time1 = CommData.int_time2 = CommData.int_time3 = CommData.int_time4 = 10;
 
         doSetLEDConfig(service);
     }
@@ -489,6 +520,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         PcrCommand cmd = new PcrCommand();
         cmd.reset();
         cmd.SetLEDConfig(1, 1, 1, 1, 1);
+        service.sendPcrCommandSync(cmd);
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -551,6 +583,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
     @Override
     public void onReceivedData(Data data) {
+
         //TODO 读取trim数据和dataposition数据
         byte[] reveicedBytes = data.getBuffer();
         int statusIndex = 1;
@@ -566,105 +599,152 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         int typeIndex = 4;
         int type = (reveicedBytes[typeIndex]);
         if (cmd == PcrCommand.READ_TRIM_CMD && type == PcrCommand.READ_TRIM_TYPE) {
-            int channelIndex = reveicedBytes[5];    //通道index
+
             //接收到数据
             int length = reveicedBytes[3];
             int chanIndex = reveicedBytes[5];
-            int curIndex = reveicedBytes[7];        // 当前是index个回复包，  0 -（npages-1）
+            int curIndex = reveicedBytes[7];        // 当前是index个回复包，  0 -（total-1）
             int total = reveicedBytes[6];    //总共有多少个回复包
-            MoveToEEPBuffer(reveicedBytes,curIndex);
+            MoveToEEPBuffer(reveicedBytes, curIndex);
             //header status   cmd  length   type  cIndex  total   curIndex
             //aa      00      04     39      2d    00      16       00     780000040406090602060306040702070307040802080308040906060607060807060707070808060807080809020202030204038b0b1717
-            //aa0004392d00160102030303040402040304040902060207020803060307030804060407040809060206030604070207030704080208030804090606ff801717
-            //aa0004392d00160206070608070607070708080608070808090202020302040302030303040402040304040902060207020803060307030804060407088a1717
-            //aa0004392d0016030408090402040304040602060306040502050305040904070408040905070508050906070608060909080208030804090209030925a81717
-            //aa0004392d001604040a020a030a04090807080808090907090809090a070a080a09090403040404050503050405050603060406050904070408040954d81717
-            //aa0004392d001605050705080509060706080609090803080408050903090409050a030a040a05090807080808090907090809090a070a080a09000071f61717
-            //aa0004392d001606313838f6ea01f0f89400880171048f18f6f9fe2439f81e017e035d0189fc68fcacfa1d016c0300e49cfa1fdfdfff600188fe7d3df67c1717
-            //aa0004392d001607f3f39a51cadc5e015c032a3354ec7b378de54b00d606031f3bf3671e14f8e70173018e27cfe7d827efe548011d04dd3000e2c037e86f1717
-            //aa0004392d0016080ad70d0184066605a2f4f30a3d0621016effed1b64f74f23b6ef99016e064615e30cb4147b18b7017400b70084009d00e000f80052da1717
-            //aa0004392d001609a900c000a000b7012d0143009500ae008b00a300b600cf008d00a60084009b008700a0011f01357c0f080a060ec000000000000068f11717
-            //aa0004392d00160a31383826c8ffb63b22f48c0124029b2147ee0e2687e32c010004c445c2d8b85395c66000ce0202dd500c36e7f0088b012103ac16038d1717
-            //aa0004392d00160bc9ebff2b85e69e012b0442278dffef21ca13d3015e010a2a7fe9f03c49d28d015304954062f3135353d864012804a25eb8e310705be61717
-            //aa0004392d00160c20ca0100e1074a1831ee4c1f7de4f200e10516226e00a42c08017501830032451ed66e5168c4dc0138000000bc00cb004d005e000d991717
-            //aa0004392d00160d4d005f0065007600e300f300b900ca00be00d100f40100007e009200a600b700bb00ce006b007c870f080a090ec00000a8794e002fbc1717
-            //aa0004392d00160e313838c72b1ef2d107182901dbfeb6bbe81af9c45b234e01ecfd8acba61f61c9581f9d01e2fd09c4bd16c7ca1d169a01d4029cd4f9871717
-            //aa0004392d00160f3a2936d6a82a79020a0000da5ffc88e4bdfa3a01d30312cc4a16f1daa01d8501e3ff7be127fd4af894f23501790363eae118faf58c1b1717
-            //aa0004392d0016101f13cb01eaf95dd3541080e12712d3019dfd68f1060c85045a0805019307e7db650b7beac1094e01870000012b013e013e015401aa3a1717
-            //aa0004392d0016112f014300c100d90177018f00d600ec01410156011a01300167017c013f015201430158010a011fa00f080a0a0ec000000000000095261717
-            //aa0004392d001612313838edf40765edf4080b01f80784ebe8fc03f0c5089b020afead0333054204bc10ba021405df23b6fd412604ef72019907a2ef1cae1717
-            //aa0004392d001613dfffb8fc4a036102080ce0dfdf0085e5c30d5001f702c5049cf7821666eb1c01dc07dd0810e8060db2e64901ce086bf93700cd05d2651717
-            //aa0004392d001614e30a00021105faee3511aff45a193e01cf04d3f000f890ef5cf6b501f407d3e6871f4ddc292d84021d0000008a00a300b200ca00c2561717
-            //aa0004392d001615cb00e4007a009600ac00ca00ae00c600d100eb006b008600b800d300c000d9004b006500ad00c5840f080a070ec000000000000117ac1717
+            //判断是否读取完毕
+            if (curIndex == (total - 1)) {
+                List<Integer> rlist = new ArrayList<>();      // row index
+                List<Integer> clist = new ArrayList<>();      // col index
 
+                byte[] trim_buff = new byte[1024];
 
-            List<Integer> rlist = new ArrayList<>();      // row index
-            List<Integer> clist = new ArrayList<>();      // col index
-            int EPKT_SZ = 52;
-            int NUM_EPKT = 4;
-
-            //byte[][]EepromBuff = new byte[8 + 4 * NUM_EPKT][EPKT_SZ + 1];
-
-
-            byte[] trim_buff = new byte[1024];
-
-            for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
-                trim_buff[j] = EepromBuff[0][j];        // copy first page
-            }
-
-            int k = 0;
-
-            char version = (char) trim_buff[k];
-            k++;
-            int sn1 = trim_buff[k];
-            k++;
-            int sn2 = trim_buff[k];
-            k++;
-
-            int num_channels = trim_buff[k];
-            k++;
-            int num_wells = trim_buff[k];
-            k++;
-            int num_pages = trim_buff[k];
-            k++;
-
-            for (int i = 1; i < num_pages; i++) {
                 for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
-                    trim_buff[i * EPKT_SZ + j] = EepromBuff[i][ j];
+                    trim_buff[j] = EepromBuff[0][j];        // copy first page
                 }
-            }
 
-            for (int i = 0; i < num_channels; i++) {
-                for (int j = 0; j < num_wells; j++) {
-                    int n = trim_buff[k];
-                    k++;
-                    rlist.clear();
-                    clist.clear();
-                    for (int l = 0; l < n; l++) {
-                        int row = trim_buff[k++]; // k++;
-                        int col = trim_buff[k];
-                        k++;
+                int k = 0;
 
-                        rlist.add(row);
-                        clist.add(col);
+                char version = (char) trim_buff[k];
+                k++;
+                int sn1 = trim_buff[k];
+                k++;
+                int sn2 = trim_buff[k];
+                k++;
+
+                int num_channels = trim_buff[k];
+                k++;
+                int num_wells = trim_buff[k];
+                k++;
+                int num_pages = trim_buff[k];
+                k++;
+
+                CommData.KsIndex = num_wells;
+
+                for (int i = 1; i < num_pages; i++) {
+                    for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
+                        trim_buff[i * EPKT_SZ + j] = EepromBuff[i][j];
                     }
-                  //  CommData.row_index[i, j] =new List<int>(rlist);
-                    //CommData.col_index[i, j] =new List<int>(clist);
                 }
+
+                for (int i = 0; i < num_channels; i++) {
+                    for (int j = 0; j < num_wells; j++) {
+                        int n = trim_buff[k];
+                        k++;
+                        rlist.clear();
+                        clist.clear();
+                        for (int l = 0; l < n; l++) {
+                            int row = trim_buff[k++]; // k++;
+                            int col = trim_buff[k];
+                            k++;
+
+                            rlist.add(row);
+                            clist.add(col);
+                        }
+                        FlashData.row_index[i][j] = new ArrayList<>(rlist);
+                        FlashData.col_index[i][j] = new ArrayList<>(clist);
+                    }
+                }
+
+                for (int ci = 0; ci < num_channels; ci++) {
+                    int index_start = num_pages + ci * NUM_EPKT;
+                    k = 0;
+
+                    for (int i = 0; i < NUM_EPKT; i++) {
+                        for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
+                            trim_buff[i * EPKT_SZ + j] = EepromBuff[i + index_start][j];
+                        }
+                    }
+
+                    byte b0 = trim_buff[k];
+                    k++;        // Extract chip name
+                    byte b1 = trim_buff[k];
+                    k++;
+                    byte b2 = trim_buff[k];
+                    k++;
+
+                    for (int i = 0; i < TRIM_IMAGER_SIZE; i++) {
+                        for (int j = 0; j < 6; j++) {
+                            FlashData.kbi[ci][i][j] = Buf2Int(trim_buff, k);
+                            k += 2;
+                        }
+                    }
+
+                    for (int i = 0; i < TRIM_IMAGER_SIZE; i++) {
+                        FlashData.fpni[ci][0][i] = Buf2Int(trim_buff, k);
+                        k += 2;
+                        FlashData.fpni[ci][1][i] = Buf2Int(trim_buff, k);
+                        k += 2;
+                    }
+
+                    FlashData.rampgen[ci] = trim_buff[k];
+                    k++;
+                    FlashData.range[ci] = trim_buff[k];
+                    k++;
+                    FlashData.auto_v20[ci][0] = trim_buff[k];
+                    k++;
+                    FlashData.auto_v20[ci][1] = trim_buff[k];
+                    k++;
+                    FlashData.auto_v15[ci] = trim_buff[k];
+                    k++;
+                }
+
+                CommData.chan1_rampgen=  FlashData.rampgen[0];
+                CommData.chan2_rampgen=  FlashData.rampgen[1];
+                CommData.chan3_rampgen=  FlashData.rampgen[2];
+                CommData.chan4_rampgen=  FlashData.rampgen[3];
+
+                CommData.chan1_auto_v15=FlashData.auto_v15[0];
+                CommData.chan2_auto_v15=FlashData.auto_v15[1];
+                CommData.chan3_auto_v15=FlashData.auto_v15[2];
+                CommData.chan4_auto_v15=FlashData.auto_v15[3];
+
+                CommData.chan1_auto_v20=FlashData.auto_v20[0];
+                CommData.chan2_auto_v20=FlashData.auto_v20[1];
+                CommData.chan3_auto_v20=FlashData.auto_v20[2];
+                CommData.chan4_auto_v20=FlashData.auto_v20[3];
+
+                CommData.chan1_range=FlashData.range[0];
+                CommData.chan2_range=FlashData.range[1];
+                CommData.chan3_range=FlashData.range[2];
+                CommData.chan4_range=FlashData.range[3];
+                FlashData.flash_loaded = true;
+
             }
-
-
-
         }
-
-
     }
+
+    private int Buf2Int(byte[] buff, int k) {
+        byte[] x = {buff[k + 1],
+                buff[k]};
+        int y = ByteUtil.getShort(x);
+        //int y = (int) BitConverter.ToInt16(x, 0);
+
+        return y;
+    }
+
     int EPKT_SZ = 52;
     int NUM_EPKT = 4;
-    byte[][] EepromBuff = new byte[8 + 4 * NUM_EPKT][ EPKT_SZ + 1];
+    int TRIM_IMAGER_SIZE = 12;
+    byte[][] EepromBuff = new byte[8 + 4 * NUM_EPKT][EPKT_SZ + 1];
 
-    private void MoveToEEPBuffer(byte[] inputdatas, int index)
-    {
+    private void MoveToEEPBuffer(byte[] inputdatas, int index) {
         byte eeprom_parity = 0;
 
         for (int i = 0; i < EPKT_SZ + 1; i++) {

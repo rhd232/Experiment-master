@@ -35,6 +35,9 @@ public class CommData {
     public static int KsIndex = 0;
 
 
+
+
+
     public static int Cycle = 0;
     public static int imgFrame = 12;
     public static Map<String, List<String>> diclist = new HashMap<>();
@@ -53,6 +56,7 @@ public class CommData {
     public static double[][] chan1_fpn = new double[2][12];
     public static double[] chan1_tempcal = new double[12];
     public static int chan1_rampgen = 0;
+    public static int chan1_range =0;
     public static int[] chan1_auto_v20 = new int[2];
     public static int chan1_auto_v15 = 0;
 
@@ -60,6 +64,7 @@ public class CommData {
     public static double[][] chan2_fpn = new double[2][12];
     public static double[] chan2_tempcal = new double[12];
     public static int chan2_rampgen = 0;
+    public static int chan2_range =0;
     public static int[] chan2_auto_v20 = new int[2];
     public static int chan2_auto_v15 = 0;
 
@@ -67,6 +72,7 @@ public class CommData {
     public static double[][] chan3_fpn = new double[2][12];
     public static double[] chan3_tempcal = new double[12];
     public static int chan3_rampgen = 0;
+    public static int chan3_range =0;
     public static int[] chan3_auto_v20 = new int[2];
     public static int chan3_auto_v15 = 0;
 
@@ -74,11 +80,13 @@ public class CommData {
     public static double[][] chan4_fpn = new double[2][12];
     public static double[] chan4_tempcal = new double[12];
     public static int chan4_rampgen = 0;
+    public static int chan4_range =0;
     public static int[] chan4_auto_v20 = new int[2];
     public static int chan4_auto_v15 = 0;
    // public static double[][] m_factorData = new double[4][100];
     public static double[][] m_factorData = new double[4][400];
     public static int IFMet = 0;//0普通实验1溶解曲线
+
 
 
     public static void ReadDatapositionFile(Context context) {
@@ -244,24 +252,37 @@ public class CommData {
                     datalist.put(k, list);
                    // datalist[k] = strlist[k].Split(' ').ToList();
                 }
-
-                String ss = positionlist.get(chan).get(ksindex);
-                String[] newstrs = ss.split("\\+");
                 int value = 0;
-                for (String item : newstrs)
-                {
-                    String[] nstrs = item.split("-");
+                int cindex = GetChanIndex(chan);
 
-                    if (nstrs.length > 1)
+                if (FlashData.flash_loaded){
+                    int npoint = FlashData.row_index[cindex][ ksindex].size();
+
+                    for (int j = 0; j < npoint; j++)
                     {
-                        int j =  Integer.parseInt(nstrs[0]);
-                        int k =  Integer.parseInt(nstrs[1]);
-                        int val=Integer.parseInt(datalist.get(k).get(j));
+                        int row = FlashData.row_index[cindex][ ksindex].get(j);
+                        int col = FlashData.col_index[cindex][ ksindex].get(j);
+                        int val=Integer.parseInt(datalist.get(row).get(col));
                         int v = val - 100;
                         value += v;
                     }
-                }
+                }else {
 
+                    String ss = positionlist.get(chan).get(ksindex);
+                    String[] newstrs = ss.split("\\+");
+
+                    for (String item : newstrs) {
+                        String[] nstrs = item.split("-");
+
+                        if (nstrs.length > 1) {
+                            int j = Integer.parseInt(nstrs[0]);
+                            int k = Integer.parseInt(nstrs[1]);
+                            int val = Integer.parseInt(datalist.get(k).get(j));
+                            int v = val - 100;
+                            value += v;
+                        }
+                    }
+                }
                 cd.y = value+"";
                 cdlist.add(cd);
             }
@@ -276,7 +297,28 @@ public class CommData {
         return cdlist;
     }
 
+    public static int GetChanIndex(String chan){
+        int cindex = -1;
 
+        switch (chan)
+        {
+            case "Chip#1":
+                cindex = 0;
+                break;
+            case "Chip#2":
+                cindex = 1;
+                break;
+            case "Chip#3":
+                cindex = 2;
+                break;
+            case "Chip#4":
+                cindex = 3;
+                break;
+            default:
+                break;
+        }
+        return cindex;
+    }
     public static List<ChartData> GetChartData(final String chan, int ks, String currks) {
         final List<ChartData> cdlist = new ArrayList<>();
         try {
@@ -329,22 +371,39 @@ public class CommData {
 
                 }
                 //int factori=Integer.parseInt(datalist.get(11).get(12));
-                String ss = positionlist.get(chan).get(ksindex);
-                String[] newstrs = ss.split("\\+");
-                int value = 0;
-                for (String item : newstrs) {
-                    String[] nstrs = item.split("-");
 
-                    if (nstrs.length > 1) {
-                        int j = Integer.parseInt(nstrs[0]);
-                        int k = Integer.parseInt(nstrs[1]);
-                      //  int v = Integer.parseInt(datalist.get(k).get(j)) - 100;
-                        int val=Integer.parseInt(datalist.get(k).get(j));
-                        int v = val- 100;
+                int value = 0;
+                int cindex = GetChanIndex(chan);
+
+                if (FlashData.flash_loaded){
+                    int npoint = FlashData.row_index[cindex][ ksindex].size();
+
+                    for (int j = 0; j < npoint; j++)
+                    {
+                        int row = FlashData.row_index[cindex][ ksindex].get(j);
+                        int col = FlashData.col_index[cindex][ ksindex].get(j);
+                        int val=Integer.parseInt(datalist.get(row).get(col));
+                        int v = val - 100;
                         value += v;
                     }
-                }
+                }else {
 
+                    String ss = positionlist.get(chan).get(ksindex);
+                    String[] newstrs = ss.split("\\+");
+
+                    for (String item : newstrs) {
+                        String[] nstrs = item.split("-");
+
+                        if (nstrs.length > 1) {
+                            int j = Integer.parseInt(nstrs[0]);
+                            int k = Integer.parseInt(nstrs[1]);
+                            //  int v = Integer.parseInt(datalist.get(k).get(j)) - 100;
+                            int val = Integer.parseInt(datalist.get(k).get(j));
+                            int v = val - 100;
+                            value += v;
+                        }
+                    }
+                }
 
               /*  double vf=(double) value;
                 vf/=GetFactor(factori);

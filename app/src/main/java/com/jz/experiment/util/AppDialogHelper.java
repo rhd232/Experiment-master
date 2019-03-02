@@ -171,6 +171,7 @@ public class AppDialogHelper {
         alertDialog.findViewById(R.id.tv_confirm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ChannelMaterial selectedChannelMaterial=null;
                 //TODO 保存通道数据
                 for (int i = 0; i < adapter.getData().size(); i++) {
 
@@ -178,10 +179,12 @@ public class AppDialogHelper {
                     if (channelMaterial.isSelected()) {
                         String remark = et_remark.getText().toString().trim();
                         channelMaterial.setRemark(remark);
-                        listener.onChannelSelected(position, channelMaterial);
+                        selectedChannelMaterial=channelMaterial;
+                       // listener.onChannelSelected(position, channelMaterial);
                         break;
                     }
                 }
+                listener.onChannelSelected(position, selectedChannelMaterial);
                 alertDialog.dismiss();
 
             }

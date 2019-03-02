@@ -22,7 +22,7 @@
         android:id="@+id/tv_device_state"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="设备未连接"
+        android:text="未连接"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:drawableLeft="@drawable/selector_bluetooth"

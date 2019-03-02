@@ -96,6 +96,7 @@ public class VernierView extends View {
 
     private float startScale;
     public void setStartScale(float startScale) {
+
         this.startScale = startScale;
         invalidate();
         if (listener!=null){
@@ -139,6 +140,16 @@ public class VernierView extends View {
     public void setOnViewPositionChangedListener(OnViewPositionChangedListener listener){
         this.listener=listener;
     }
+
+    public void resetStartScale() {
+        float startScale=getDragHeight() / 2f+spaceTopHeight;
+        setStartScale(startScale);
+    }
+
+    public void resetCurScale() {
+        setScale(getDragHeight() / 2f+spaceTopHeight);
+    }
+
     public interface OnViewPositionChangedListener{
         void onViewPositionChanged(PointF pos);
         void onStartScaleChanged(float startScale);

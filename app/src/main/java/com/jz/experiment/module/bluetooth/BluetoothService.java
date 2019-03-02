@@ -244,9 +244,12 @@ public class BluetoothService extends CommunicationService {
         mSync = true;
         try {
             //等待设备回复读取掉
-            Thread.sleep(50);
+            Thread.sleep(80);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+        if (mConnectedThread!=null){
+            return mConnectedThread.mSyncReceivedBytes;
         }
         return null;
     }
@@ -386,7 +389,7 @@ public class BluetoothService extends CommunicationService {
         private final OutputStream mmOutStream;
         private boolean mRun;
         private List<String> mReceivedStr;
-
+        public byte[] mSyncReceivedBytes;
         public void setRun(boolean run) {
             this.mRun = run;
         }
@@ -412,7 +415,7 @@ public class BluetoothService extends CommunicationService {
         }
 
         public void run() {
-            byte[] buffer = new byte[1024];  // buffer store for the stream
+            byte[] buffer = new byte[64];  // buffer store for the stream
             int bytes; // bytes returned from read()
 
             // Keep listening to the InputStream until an exception occurs
@@ -424,6 +427,7 @@ public class BluetoothService extends CommunicationService {
 
                     String rev=ByteUtil.getHexStr(buffer,bytes);
                     //System.out.println("接收到原始数据：" + rev);
+                    DataFileUtil.writeFileLog("接收到原始数据:"+rev);
                     splitAndCombine(rev,mReceivedStr);
 
                 } catch (IOException e) {
@@ -434,9 +438,10 @@ public class BluetoothService extends CommunicationService {
 
         private void broadcast(byte[] buffer, int bytes,String content) {
             if (!mSync) {
+                mSyncReceivedBytes=null;
                 System.out.println("接收到：" + content);
 
-                DataFileUtil.writeFileLog("接收到：" + content);
+               // DataFileUtil.writeFileLog("接收到：" + content);
                 //有数据可读
                 Data data = new Data(buffer, bytes);
                 //broadcastUpdate(ACTION_DATA_AVAILABLE, data);
@@ -445,6 +450,7 @@ public class BluetoothService extends CommunicationService {
                 msg.obj=data;
                 mHandler.sendMessage(msg);
             } else {
+                mSyncReceivedBytes=buffer;
                 System.out.println("同步接收到：" + content);
                 DataFileUtil.writeFileLog("同步接收到：" + content);
             }

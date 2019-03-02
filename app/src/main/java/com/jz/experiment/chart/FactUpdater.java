@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.PcrCommand;
+import com.jz.experiment.util.DataFileUtil;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -172,10 +173,13 @@ public class FactUpdater {
         PcrCommand cmd=new PcrCommand();
         cmd.setSensor(c);
         byte[] rev_bytes=mCommunicationService.sendPcrCommandSync(cmd);
-        if (rev_bytes[0]>0)
+        /*if (rev_bytes[0]>0)
         {
             SetIntergrationTime(InTime);
-        }
+        }*/
+        SetIntergrationTime(InTime);
+        String txt="通道"+(c+1)+"积分时间："+InTime;
+        DataFileUtil.writeFileLog(txt);
         return rev_bytes;
     }
     private byte[] SetIntergrationTime(float InTime)
@@ -192,7 +196,9 @@ public class FactUpdater {
         {
             int max = list.get(0);
             int last_max = list.get(1);
-            if (max + (max - last_max) > 3300)
+            boolean big=max + (max - last_max) > 3300;
+            DataFileUtil.writeFileLog("max + (max - last_max)="+(max + (max - last_max))+" > 3300:"+big);
+            if (big)
             {
                 m_dynIntTime[PCRNum - 1] = true;
             }
@@ -238,7 +244,8 @@ public class FactUpdater {
             List<Integer> listOne = new ArrayList<>();
           /*  List<String> strlist = CommData.diclist.get(chip)
                     .Skip(n * CommData.imgFrame).Take(CommData.imgFrame).ToList();*/
-            List<String> strlist = CommData.diclist.get(chip).subList(n * CommData.imgFrame,n * CommData.imgFrame+CommData.imgFrame);
+            List<String> strlist = CommData.diclist.get(chip)
+                    .subList(n * CommData.imgFrame,n * CommData.imgFrame+CommData.imgFrame);
             for (int k = 0; k < strlist.size(); k++)
             {
                 String[] datalis = strlist.get(k).split(" ");
@@ -259,6 +266,8 @@ public class FactUpdater {
         }
         catch (Exception ex)
         {
+            ex.printStackTrace();
+            DataFileUtil.writeFileLog(ex.getMessage());
             return 0;
         }
 

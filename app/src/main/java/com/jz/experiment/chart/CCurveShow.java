@@ -41,18 +41,18 @@ public class CCurveShow {
     float[] ct_offset = new float[4];
     Random ran;
 
-    private static CCurveShow INSTANCE=new CCurveShow();
+    private static CCurveShow INSTANCE = new CCurveShow();
 
-    public static CCurveShow getInstance(){
+    public static CCurveShow getInstance() {
         return INSTANCE;
     }
 
-    private CCurveShow(){
+    private CCurveShow() {
     }
 
     public void InitData() {
         numWells = CommData.KsIndex;//读取dataposition文件
-      //  System.out.println("numWells:"+numWells);
+        //  System.out.println("numWells:"+numWells);
         int i, j;
         for (i = 0; i < MAX_CHAN; i++) {
             for (j = 0; j < numWells; j++) {
@@ -76,10 +76,10 @@ public class CCurveShow {
         m_yData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         ifactor = new double[MAX_CHAN][MAX_CYCL];
         x = new double[MAX_CYCL];
-         y = new double[MAX_CYCL];
-         k = new double[MAX_WELL][4];
-         r = new double[MAX_WELL][4];
-         t = new double[MAX_WELL][4];
+        y = new double[MAX_CYCL];
+        k = new double[MAX_WELL][4];
+        r = new double[MAX_WELL][4];
+        t = new double[MAX_WELL][4];
         ran = new Random();
     }
 
@@ -137,7 +137,7 @@ public class CCurveShow {
         double[] cyc = new double[MAX_CYCL];
 
         double mean = 0;
-        double ct=0;
+        double ct = 0;
 
         for (int iy = 0; iy < MAX_CHAN; iy++) {
 
@@ -367,7 +367,7 @@ public class CCurveShow {
                 for (int v = 0; v < tempData.size(); v++) {
                     if (tempData.get(v) - mean > 2.5 * stdev || tempData.get(v) - mean < -2.5 * stdev) {
                         tempData.set(v, mean);
-                        yData[v+3]=mean;
+                        yData[v + 3] = mean;
                     }
 
                 }

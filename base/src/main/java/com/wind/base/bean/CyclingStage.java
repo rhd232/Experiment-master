@@ -14,6 +14,7 @@ public class CyclingStage extends Stage {
     public CyclingStage() {
         setType(TYPE_CYCLING);
         partStageList = new ArrayList<>();
+        cyclingCount=1;
     }
 
     public CyclingStage(Parcel in){

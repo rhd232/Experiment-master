@@ -11,11 +11,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
+import com.jz.experiment.chart.CommData;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.expe.adapter.ChannelAdapter;
 import com.jz.experiment.module.expe.adapter.SampleAdapter;
 import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.util.AppDialogHelper;
+import com.jz.experiment.util.TrimReader;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.DateUtil;
@@ -137,6 +139,10 @@ public class UserSettingsStep1Activity extends BaseActivity {
                     });
         }
 
+
+        CommData.ReadDatapositionFile(getActivity());
+        TrimReader.getInstance().ReadTrimFile(getActivity());
+
     }
 
 
@@ -171,8 +177,14 @@ public class UserSettingsStep1Activity extends BaseActivity {
             AppDialogHelper.showChannelSelectDialog(getActivity(), position , new AppDialogHelper.OnChannelSelectListener() {
                 @Override
                 public void onChannelSelected(int position, ChannelMaterial material) {
-                    mChannelAdapter.getItem(position).setValue(material.getName());
-                    mChannelAdapter.getItem(position).setRemark(material.getRemark());
+                    String name="";
+                    String remark="";
+                    if (material!=null){
+                        name=material.getName();
+                        remark=material.getRemark();
+                    }
+                    mChannelAdapter.getItem(position).setValue(name);
+                    mChannelAdapter.getItem(position).setRemark(remark);
                     mChannelAdapter.notifyDataSetChanged();
 
                 }

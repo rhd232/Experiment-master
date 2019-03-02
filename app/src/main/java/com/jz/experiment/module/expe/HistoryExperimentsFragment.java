@@ -1,10 +1,8 @@
 package com.jz.experiment.module.expe;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -22,7 +20,6 @@ import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
 import com.jz.experiment.util.DeviceProxyHelper;
-import com.jz.experiment.util.TrimReader;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.recyclerview.decoration.VerticalSpacesItemDecoration;
@@ -235,10 +232,10 @@ public class HistoryExperimentsFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         if (sDeviceProxyHelper.getBluetoothService()!=null&&sDeviceProxyHelper.getBluetoothService().isConnected()) {
-            tv_device_state.setText("设备已连接");
+            tv_device_state.setText("已连接");
             tv_device_state.setActivated(true);
         } else {
-            tv_device_state.setText("设备未连接");
+            tv_device_state.setText("未连接");
             tv_device_state.setActivated(false);
         }
 
@@ -252,7 +249,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onBluetoothDisConnectedEvent(BluetoothDisConnectedEvent event) {
-        tv_device_state.setText("设备未连接");
+        tv_device_state.setText("未连接");
         tv_device_state.setActivated(false);
     }
 
@@ -310,11 +307,11 @@ public class HistoryExperimentsFragment extends BaseFragment {
      */
     @Subscribe
     public void onToExpeSettingsEvent(final ToExpeSettingsEvent event) {
-        mNeedReadTrimFile=false;
+        /*mNeedReadTrimFile=false;
         if (ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 !=PackageManager.PERMISSION_GRANTED) {//没有sd卡读取权限
             mNeedReadTrimFile=true;
-        }
+        }*/
 
 
         //判断是否已经连接设备
@@ -324,20 +321,14 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
-                        if (mNeedReadTrimFile) {
+                        /*if (mNeedReadTrimFile) {
                             //读取dataposition文件
                             CommData.ReadDatapositionFile(getActivity());
                             //trim文件读取到CommonData中
                             TrimReader.getInstance().ReadTrimFile(getActivity());
                             mNeedReadTrimFile=false;
-                        }
-                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
-                      /*  if (sDeviceProxyHelper.getUsbService().hasPermission()){
-                            UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
-                        }else {
-                            sDeviceProxyHelper.getUsbService().requestPermission();
                         }*/
-
+                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
 
                     }
                 })

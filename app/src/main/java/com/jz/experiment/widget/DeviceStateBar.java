@@ -43,6 +43,7 @@ public class DeviceStateBar extends FrameLayout {
         inflate(getContext(),R.layout.layout_device_state_bar,this);
         tv_device_name=findViewById(R.id.tv_device_name);
         tv_device_state=findViewById(R.id.tv_device_state);
+        setBackgroundResource(R.drawable.selector_device_state_bar);
        // BluetoothService service=DeviceProxyHelper.getInstance(getContext()).getBluetoothService();
         CommunicationService service=DeviceProxyHelper.getInstance(getContext()).getCommunicationService();
         String name="";
@@ -62,7 +63,7 @@ public class DeviceStateBar extends FrameLayout {
         }
 
         tv_device_name.setText(name);
-        setBackgroundResource(R.drawable.selector_device_state_bar);
+
     }
 
     @Override
@@ -84,7 +85,7 @@ public class DeviceStateBar extends FrameLayout {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onBluetoothConnectedEvent(BluetoothConnectedEvent event){
         tv_device_name.setText(event.getDeviceName());
-        tv_device_state.setText("连接中");
+        tv_device_state.setText("已连接");
         setActivated(false);
         setStatusbarColor(getContext().getResources().getColor(R.color.color1F4E99));
     }

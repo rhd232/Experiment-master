@@ -6,10 +6,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.jz.experiment.R;
-import com.wind.base.bean.StartStage;
-import com.wind.base.widget.VernierDragLayout;
+import com.jz.experiment.module.expe.event.AddStartStageEvent;
+import com.jz.experiment.module.expe.event.DelStartStageEvent;
 import com.wind.base.adapter.BaseAdapterDelegate;
 import com.wind.base.adapter.DisplayItem;
+import com.wind.base.bean.StartStage;
+import com.wind.base.widget.VernierDragLayout;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -32,26 +36,63 @@ public class StartStageDelegate extends BaseAdapterDelegate<StartStageDelegate.V
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull List<DisplayItem> items, int position, @NonNull RecyclerView.ViewHolder holder, @NonNull List<Object> payloads) {
-        ViewHolder vh= (ViewHolder) holder;
+    protected void onBindViewHolder(@NonNull List<DisplayItem> items,final int position, @NonNull RecyclerView.ViewHolder holder, @NonNull List<Object> payloads) {
+        final ViewHolder vh= (ViewHolder) holder;
         StartStage startStage= (StartStage) items.get(position);
         startStage.setStepName("step 1");
-        float startScale=startStage.getStartScale();
-        float curScale=startStage.getCurScale();
-        vh.vernier_drag_layout.setLink(null);
+        final float startScale=startStage.getStartScale();
+       /* if (position==0){
+            startScale=-1;
+        }*/
+        final float curScale=startStage.getCurScale();
+        System.out.println("curScale:"+curScale);
+       // vh.vernier_drag_layout.setLink(null);
+        vh.vernier_drag_layout.setLink(startStage);
         vh.vernier_drag_layout.setStartScale(startScale);
         vh.vernier_drag_layout.setCurScale(curScale);
 
         startStage.setLayout(vh.vernier_drag_layout);
 
-        vh.vernier_drag_layout.setLink(startStage);
+        if (position==0){
+
+            vh.vernier_drag_layout.post(new Runnable() {
+                @Override
+                public void run() {
+
+                    vh.vernier_drag_layout.resetStartScale();
+
+
+                    if (curScale==-1){
+                        vh.vernier_drag_layout.resetCurScale();
+                    }
+                }
+            });
+        }
+
+        vh.iv_start_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new AddStartStageEvent(position));
+            }
+        });
+        vh.iv_start_del.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new DelStartStageEvent(position));
+            }
+        });
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         VernierDragLayout vernier_drag_layout;
+
+        View iv_start_add;
+        View iv_start_del;
         public ViewHolder(View itemView) {
             super(itemView);
             vernier_drag_layout=itemView.findViewById(R.id.vernier_drag_layout);
+            iv_start_add=itemView.findViewById(R.id.iv_start_add);
+            iv_start_del=itemView.findViewById(R.id.iv_start_del);
         }
     }
 }
