@@ -106,12 +106,12 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                                 List<Fragment> fragments = new ArrayList<>();
                                 List<String> titles = new ArrayList<>();
                                 for (int i = 0; i < experiments.size(); i++) {
-                                    titles.add("历史实验");
+
                                     HistoryExperiment expe = experiments.get(i);
                                     ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
                                     fragments.add(f);
+                                    titles.add(expe.getName());
 
-                                    // titles.add(expe.getName());
 
                                 }
                                 mFragmentAdapter.setFragments(fragments);
@@ -154,20 +154,15 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
             mFragmentAdapter.setFragments(fragments);
             mFragmentAdapter.setTitles(titles);
         } else {
-            /*int lastIndex=fragments.size()-1;
-            ExpeDataFragment expeDataFragment= (ExpeDataFragment) fragments.get(lastIndex);
-            if (!expeDataFragment.isSavedExpe()){
-                titles.remove(lastIndex);
-                titles.add("历史实验");
-            }*/
-            ExpeDataFragment expeDataFragment = (ExpeDataFragment) fragments.get(0);
+
+           /* ExpeDataFragment expeDataFragment = (ExpeDataFragment) fragments.get(0);
             titles.remove(0);
-            titles.add(0, "历史实验");
+            titles.add(0, "历史实验");*/
 
 
         }
 
-        titles.add(0, "本次实验");
+        titles.add(0, expe.getName());
         fragments.add(0, f);
         mFragmentAdapter.notifyDataSetChanged();
         //view_pager.setCurrentItem(fragments.size()-1, false);

@@ -244,7 +244,7 @@ public class BluetoothService extends CommunicationService {
         mSync = true;
         try {
             //等待设备回复读取掉
-            Thread.sleep(80);
+            Thread.sleep(120);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -426,7 +426,7 @@ public class BluetoothService extends CommunicationService {
                     // Send the obtained bytes to the UI activity
 
                     String rev=ByteUtil.getHexStr(buffer,bytes);
-                    //System.out.println("接收到原始数据：" + rev);
+                    System.out.println("接收到原始数据：" + rev);
                     DataFileUtil.writeFileLog("接收到原始数据:"+rev);
                     splitAndCombine(rev,mReceivedStr);
 

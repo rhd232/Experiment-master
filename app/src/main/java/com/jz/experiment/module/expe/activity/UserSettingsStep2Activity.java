@@ -74,6 +74,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+import static com.jz.experiment.util.ThreadUtil.sleep;
+
 public class UserSettingsStep2Activity extends BaseActivity implements BluetoothConnectionListener {
 
     public static void start(Context context, HistoryExperiment experiment) {
@@ -279,10 +281,12 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     }
 
     public void setSensorAndInTime(int c, float inTime) {
+        sleep(50);
         PcrCommand sensorCmd = new PcrCommand();
         sensorCmd.setSensor(c);
         mCommunicationService.sendPcrCommandSync(sensorCmd);
 
+        sleep(50);
         PcrCommand inTimeCmd = new PcrCommand();
         inTimeCmd.setIntergrationTime(inTime);
         mCommunicationService.sendPcrCommandSync(inTimeCmd);
@@ -428,6 +432,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                     factUpdater.int_time_4 = mHistoryExperiment.getIntegrationTime();
                 }
                 if (mCommunicationService != null) {
+                    sleep(50);
                     PcrCommand gainCmd = new PcrCommand();
                     gainCmd.setGainMode();
                     mCommunicationService.sendPcrCommandSync(gainCmd);
@@ -445,6 +450,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         });
     }
 
+
     private void resetTrim() {
         CommunicationService service = mCommunicationService;
         if (service == null) {
@@ -455,9 +461,11 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             cmd.reset();
             cmd.SelSensor(i);
             service.sendPcrCommandSync(cmd);
+            sleep(50);
             cmd.reset();
             cmd.ResetParams();
             service.sendPcrCommandSync(cmd);
+            sleep(50);
         }
         int[] chan_campgen = {
                 CommData.chan1_rampgen,
@@ -474,35 +482,41 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             cmd.reset();
             cmd.SelSensor(i);
             service.sendPcrCommandSync(cmd);
+            sleep(50);
 
             cmd.reset();
             cmd.SetRampgen(chan_campgen[i - 1]);
             service.sendPcrCommandSync(cmd);
+            sleep(50);
 
             cmd.reset();
             cmd.SetTXbin((byte) 0xf);
             service.sendPcrCommandSync(cmd);
+            sleep(50);
 
             cmd.reset();
             cmd.SetRange((byte) 0x0f);
             service.sendPcrCommandSync(cmd);
+            sleep(50);
 
             cmd.reset();
             cmd.SetV15(v15[i - 1]);
             service.sendPcrCommandSync(cmd);
+            sleep(50);
         }
 
 
         CommData.gain_mode = 0;// initialize to high gain mode, consistent with HW default
-
+        sleep(50);
         doSetV20(service, CommData.chan1_auto_v20[1], 1);
         doSetV20(service, CommData.chan2_auto_v20[1], 2);
         doSetV20(service, CommData.chan3_auto_v20[1], 3);
         doSetV20(service, CommData.chan4_auto_v20[1], 4);
 
         CommData.int_time1 = CommData.int_time2 = CommData.int_time3 = CommData.int_time4 = 10;
-
+        sleep(50);
         doSetLEDConfig(service);
+        sleep(50);
     }
 
     private void doSetV20(CommunicationService service, int v20, int index) {
@@ -510,10 +524,11 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
         cmd.SelSensor(index);
         service.sendPcrCommandSync(cmd);
-
+        sleep(50);
         cmd.reset();
         cmd.SetV20(v20);
         service.sendPcrCommandSync(cmd);
+        sleep(50);
     }
 
     private void doSetLEDConfig(CommunicationService service) {
@@ -521,11 +536,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         cmd.reset();
         cmd.SetLEDConfig(1, 1, 1, 1, 1);
         service.sendPcrCommandSync(cmd);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(50);
         cmd.reset();
         cmd.SetLEDConfig(1, 0, 0, 0, 0);
         service.sendPcrCommandSync(cmd);

@@ -34,6 +34,7 @@ import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.StatusChecker;
+import com.jz.experiment.util.ThreadUtil;
 import com.jz.experiment.util.TrimReader;
 import com.jz.experiment.widget.DuringView;
 import com.wind.base.BaseActivity;
@@ -238,11 +239,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         PcrCommand cmd = new PcrCommand();
         cmd.setChan();
         mCommunicationService.sendPcrCommandSync(cmd);
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ThreadUtil.sleep(50);
     }
 
 
@@ -438,9 +435,9 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                                 stopMeltingCurve();
                             }
                         }
-                        // if (mInCycling) {
+
                         stopCycling();
-                        //}
+
                     }
 
                     subscriber.onNext(true);
@@ -1334,7 +1331,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             chip = "Chip#4";
         }
 
-      /*  StringBuilder hex = new StringBuilder(reveicedBytes.length * 2);
+        /*StringBuilder hex = new StringBuilder(reveicedBytes.length * 2);
         for (byte b : reveicedBytes) {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
@@ -1359,7 +1356,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
         //保存图像板返回的原始数据到文件
         //将0x1717后面的数据抹去
-       /* String source=hex.toString().toLowerCase();
+      /*  String source=hex.toString().toLowerCase();
         int index=source.indexOf("1717");
         source=source.substring(0,index+4);
         sourceAppendToFile(source, sourceFile);*/
@@ -1601,10 +1598,26 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         float endT = Float.parseFloat(mHistoryExperiment.getSettingSecondInfo().getEndTemperature());
         float speed = 1;
         command.stopMelting(startT, endT, speed);
-        mCommunicationService.sendPcrCommandSync(command);
-        //mUsbService.sendPcrCommandSync(command);
-    }
+        doStopMelting(command);
 
+    }
+    public void doStopMelting(PcrCommand command){
+        byte[] bytes=mCommunicationService.sendPcrCommandSync(command);
+        while (bytes==null){
+            mStopMeltingRunNum++;
+            bytes=mCommunicationService.sendPcrCommandSync(command);
+            if (mStopMeltingRunNum>5){
+                return;
+            }
+        }
+        int cmd=bytes[2];
+        int type=bytes[4];
+        if (cmd==0x13 && type==0xb){
+            //结束成功
+        }else {
+            doStopMelting(command);
+        }
+    }
     private void stopCycling() {
         PcrCommand command = new PcrCommand();
         List<Stage> cyclingSteps = mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
@@ -1626,9 +1639,29 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
 
         command.stopCycling(cyclingCount, PcrCommand.CmdMode.NORMAL, predenaturationCombines, extendCombine);
-        mCommunicationService.sendPcrCommandSync(command);
-    }
+        doStopCycling(command);
 
+    }
+    private int mStopCyclingRunNum;
+    private int mStopMeltingRunNum;
+    public void doStopCycling(PcrCommand command){
+
+        byte[] bytes=mCommunicationService.sendPcrCommandSync(command);
+        while (bytes==null){
+            mStopCyclingRunNum++;
+            bytes=mCommunicationService.sendPcrCommandSync(command);
+            if (mStopCyclingRunNum>5){
+                return;
+            }
+        }
+        int cmd=bytes[2];
+        int type=bytes[4];
+        if (cmd==0x13 && type==0x4){
+            //结束成功
+        }else {
+            doStopCycling(command);
+        }
+    }
     private List<Stage> getCyclingSteps() {
         return mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
     }
