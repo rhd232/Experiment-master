@@ -271,7 +271,12 @@ public class PcrCommand {
      */
     public void step3(int rsvd,int picStep, int steps, List<TempDuringCombine> combineList) {
         int length = combineList.size()*(4+2)+3+1;
+        if (picStep==steps){
+            //拍照阶段为最后一个阶段，这是默认的拍照阶段
+            picStep=0;
+        }
         int picAndSteps = picStep << 4 | steps;//[7-4]为拍照阶段，[3:0]为区间内阶段数
+       // System.out.println("picAndSteps:"+picAndSteps);
         //  byte [] cmd=new byte[]{19,length,3,cyclingCount,cur_cycling,picAndSteps};
         List<Byte> bytes = new ArrayList<>();
         bytes.add((byte) 0xaa);
@@ -280,8 +285,8 @@ public class PcrCommand {
         bytes.add((byte) 0x03);
 
         bytes.add((byte) rsvd);//
-        bytes.add((byte) 1);//固定为1
-        bytes.add((byte) steps);//总阶段
+        bytes.add((byte) 0x01);//固定为1
+        bytes.add((byte) picAndSteps);//总阶段
 
 
         for (TempDuringCombine combine : combineList) {

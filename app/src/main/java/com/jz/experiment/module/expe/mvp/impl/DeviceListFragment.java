@@ -314,6 +314,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
             } //搜索完成
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.e(TAG, "onReceive: 搜索完成");
+                layout_loading.showContent();
                 /*if (!deviceInfoSet.contains(mConnectedDevice)){
                     checkbox.setActivated(false);
                     rl_connected.setVisibility(View.GONE);
@@ -349,7 +350,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_ENABLE_BT) {
-            if (requestCode == Activity.RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
                 //蓝牙开启成功
                 checkBluetoothPermission();
             }

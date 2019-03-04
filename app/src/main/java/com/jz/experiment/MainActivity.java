@@ -17,7 +17,6 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 
 import com.jz.experiment.chart.CommData;
-import com.jz.experiment.module.bluetooth.BluetoothService;
 import com.jz.experiment.module.bluetooth.DeviceRepo;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
@@ -83,7 +82,7 @@ public class MainActivity extends BaseActivity {
         onViewClick(layout_expe);
 
 
-        startBluetoothService();
+       // startBluetoothService();
 
        /* Config config=ConfigRepo.getInstance().get(getActivity());
         if (!TextUtils.isEmpty(config.getBluetoothDeviceAddress())){
@@ -161,13 +160,13 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    Intent mServiceIntent;
+    /*Intent mServiceIntent;
 
     private void startBluetoothService() {
         mServiceIntent = new Intent(this, BluetoothService.class);
         startService(mServiceIntent);
 
-    }
+    }*/
 
 
     @Override
@@ -242,7 +241,7 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         DeviceProxyHelper.getInstance(getApplicationContext()).unbindService(getApplicationContext());
-        stopService(mServiceIntent);
+       // stopService(mServiceIntent);
         EventBus.getDefault().unregister(this);
     }
 

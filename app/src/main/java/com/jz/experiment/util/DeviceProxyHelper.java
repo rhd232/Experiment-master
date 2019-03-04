@@ -30,12 +30,14 @@ public class DeviceProxyHelper {
         if (mBinding){
             try {
                 context.getApplicationContext().unbindService(mUsbServiceConnection);
+                mUsbServiceConnection=null;
             }catch (Exception e){
                 e.printStackTrace();
             }
 
             try {
                 context.getApplicationContext().unbindService(mBluetoothServiceConnection);
+                mBluetoothServiceConnection=null;
             }catch (Exception e){
                 e.printStackTrace();
             }

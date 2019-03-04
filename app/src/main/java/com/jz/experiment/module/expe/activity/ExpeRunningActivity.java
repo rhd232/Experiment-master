@@ -43,6 +43,7 @@ import com.wind.base.bean.EndStage;
 import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
+import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.expe.bean.Channel;
@@ -392,14 +393,14 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
                 @Override
                 public void onDialogConfirmClick() {
-                    //  LoadingDialogHelper.showOpLoading(getActivity());
+                      LoadingDialogHelper.showOpLoading(getActivity());
 
                     closeDevice()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean aBoolean) {
-                            //  LoadingDialogHelper.hideOpLoading();
+                            LoadingDialogHelper.hideOpLoading();
                             EventBus.getDefault().post(new ExpeNormalFinishEvent());
                             ActivityUtil.finish(getActivity());
                         }
@@ -419,6 +420,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
                 try {
+                    stopSubscription();
                     while (mInReadingImg) {
 
                     }
@@ -536,13 +538,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         showChart();
         //mExecutorService.execute(mRun);
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (tv_duration != null) {
-            tv_duration.stop();
-        }
+    private void stopSubscription(){
         if (step4Subscription != null && !step4Subscription.isUnsubscribed()) {
             step4Subscription.unsubscribe();
             step4Subscription = null;
@@ -555,6 +551,14 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             step6Subscription.unsubscribe();
             step6Subscription = null;
         }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (tv_duration != null) {
+            tv_duration.stop();
+        }
+        stopSubscription();
         //getActivity().unregisterReceiver(mBluetoothReceiver);
         EventBus.getDefault().unregister(this);
     }
@@ -1638,8 +1642,17 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             predenaturationCombines.add(predenaturationCombine2);
         }
 
-        command.stopCycling(cyclingCount, PcrCommand.CmdMode.NORMAL, predenaturationCombines, extendCombine);
-        doStopCycling(command);
+        PcrCommand.CmdMode cmdMode = PcrCommand.CmdMode.NORMAL;
+        if (cyclingSteps.size() > 1) {
+            cmdMode = PcrCommand.CmdMode.CONTINU;
+        }
+        command.stopCycling(cyclingCount, cmdMode, predenaturationCombines, extendCombine);
+        if (mCommunicationService instanceof UsbService){
+            mCommunicationService.sendPcrCommand(command);
+        }else {
+            doStopCycling(command);
+        }
+
 
     }
     private int mStopCyclingRunNum;
@@ -1658,6 +1671,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         int type=bytes[4];
         if (cmd==0x13 && type==0x4){
             //结束成功
+            return;
         }else {
             doStopCycling(command);
         }

@@ -462,7 +462,7 @@ public class UsbService extends CommunicationService {
                         int bytes = this.mmConnection.bulkTransfer(mmEndIn, buffer, 64, 5000);
                         //System.out.println("mmEndIn:"+bytes);
                         if (bytes > 0) {
-                           /* StringBuilder hex = new StringBuilder(bytes * 2);
+                            StringBuilder hex = new StringBuilder(bytes * 2);
 
                             for (int i=0;i<bytes;i++){
                                 byte b=buffer[i];
@@ -470,7 +470,7 @@ public class UsbService extends CommunicationService {
                                 hex.append(Integer.toHexString(b & 0xFF));
                             }
                             System.out.println("接收到:" + hex.toString().toLowerCase());
-                            DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());*/
+                            DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
 
                             Data data = new Data(buffer, bytes);
                             Message msg=new Message();
