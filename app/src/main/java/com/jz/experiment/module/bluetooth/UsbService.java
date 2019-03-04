@@ -92,18 +92,20 @@ public class UsbService extends CommunicationService {
 
 
     private UsbDevice mTargetDevice;
+
     @Override
-    public Device getConnectedDevice(){
-        if (mTargetDevice==null){
+    public Device getConnectedDevice() {
+        if (mTargetDevice == null) {
             return null;
         }
         String name = "HID";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             name = mTargetDevice.getProductName();
         }
-        Device device=new Device(name,"");
+        Device device = new Device(name, "");
         return device;
     }
+
     public void connect(String deviceName) {
         HashMap<String, UsbDevice> deviceMap = mUsbManager.getDeviceList();
         Iterator<UsbDevice> iterator = deviceMap.values().iterator();
@@ -139,9 +141,10 @@ public class UsbService extends CommunicationService {
         if (mTargetDevice != null)
             mUsbManager.requestPermission(mTargetDevice, mRequestPermissionPendingIntent);
         else {
-            ToastUtil.showSystemToast(getApplicationContext(),"请插入HID设备");
+            ToastUtil.showSystemToast(getApplicationContext(), "请插入HID设备");
         }
     }
+
     @Override
     public boolean isConnected() {
         return hasPermission();
@@ -212,7 +215,7 @@ public class UsbService extends CommunicationService {
             Data data = new Data(bytes, bytes.length);
             broadcastUpdate(ACTION_DEVICE_ATTACHED, data);*/
             //发送设备连接成功通知
-            BluetoothConnectedEvent event=new BluetoothConnectedEvent(name);
+            BluetoothConnectedEvent event = new BluetoothConnectedEvent(name);
             EventBus.getDefault().post(event);
 
         }
@@ -347,8 +350,8 @@ public class UsbService extends CommunicationService {
 
                 if (bytes > 0) {
                     StringBuilder hex = new StringBuilder(buffer.length * 2);
-                    for (int i=0;i<bytes;i++){
-                        byte b=buffer[i];
+                    for (int i = 0; i < bytes; i++) {
+                        byte b = buffer[i];
                         if ((b & 0xFF) < 0x10) hex.append("0");
                         hex.append(Integer.toHexString(b & 0xFF));
                     }
@@ -464,8 +467,8 @@ public class UsbService extends CommunicationService {
                         if (bytes > 0) {
                             StringBuilder hex = new StringBuilder(bytes * 2);
 
-                            for (int i=0;i<bytes;i++){
-                                byte b=buffer[i];
+                            for (int i = 0; i < bytes; i++) {
+                                byte b = buffer[i];
                                 if ((b & 0xFF) < 0x10) hex.append("0");
                                 hex.append(Integer.toHexString(b & 0xFF));
                             }
@@ -473,9 +476,9 @@ public class UsbService extends CommunicationService {
                             DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
 
                             Data data = new Data(buffer, bytes);
-                            Message msg=new Message();
-                            msg.what=3;
-                            msg.obj=data;
+                            Message msg = new Message();
+                            msg.what = 3;
+                            msg.obj = data;
                             mHandler.sendMessage(msg);
                         }
 
@@ -499,8 +502,18 @@ public class UsbService extends CommunicationService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mUsbEventReceiver);
-        unregisterReceiver(mUsbPermissionReceiver);
+        try {
+            unregisterReceiver(mUsbEventReceiver);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            unregisterReceiver(mUsbPermissionReceiver);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
     }
 
     private final BroadcastReceiver mUsbEventReceiver = new BroadcastReceiver() {
@@ -518,7 +531,7 @@ public class UsbService extends CommunicationService {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     name = device.getProductName();
                 }
-                BluetoothDisConnectedEvent event= new BluetoothDisConnectedEvent(name);
+                BluetoothDisConnectedEvent event = new BluetoothDisConnectedEvent(name);
                 EventBus.getDefault().post(event);
             }
         }

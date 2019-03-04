@@ -13,17 +13,17 @@ import com.jz.experiment.module.bluetooth.UsbService;
 public class DeviceProxyHelper {
 
     private boolean mBinding;//是否正在bindService
-    private static DeviceProxyHelper INSTANCE = null;
+    private static DeviceProxyHelper sInstance = null;
 
     public static DeviceProxyHelper getInstance(Context context) {
-        if (INSTANCE == null) {
+        if (sInstance == null) {
             synchronized (DeviceProxyHelper.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new DeviceProxyHelper(context);
+                if (sInstance == null) {
+                    sInstance = new DeviceProxyHelper(context);
                 }
             }
         }
-        return INSTANCE;
+        return sInstance;
     }
 
     public void unbindService(Context context){
@@ -42,8 +42,22 @@ public class DeviceProxyHelper {
                 e.printStackTrace();
             }
 
-
+            onDestroy();
         }
+    }
+
+    public void onDestroy(){
+        if (mUsbService!=null){
+            mUsbService.stopReadThread();
+            mUsbService.onDestroy();
+            mUsbService=null;
+        }
+
+        if (mBluetoothService!=null){
+            mBluetoothService.cancel();
+            mBluetoothService=null;
+        }
+        sInstance=null;
     }
     private DeviceProxyHelper(Context context) {
         if (mBluetoothService == null) {
@@ -97,10 +111,19 @@ public class DeviceProxyHelper {
 
     public CommunicationService getCommunicationService(){
         if (mBluetoothService!=null&& mBluetoothService.isConnected()){
+            if (mUsbService!=null){
+                mUsbService.stopReadThread();
+                mUsbService.onDestroy();
+                mUsbService=null;
+            }
             return mBluetoothService;
         }
 
         if (mUsbService!=null&&mUsbService.isConnected()){
+            if (mBluetoothService!=null){
+                mBluetoothService.cancel();
+                mBluetoothService=null;
+            }
             return mUsbService;
         }
 
