@@ -18,6 +18,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:text="连接中"
+        android:text="已连接"
         android:textSize="10sp"/>
 </LinearLayout>

@@ -705,7 +705,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         CyclingStage cyclingStage = getCurCyclingStage();
         //int cyclingCount = cyclingStage.getCyclingCount();
 
-        int picIndex = 1;
+        int picIndex = cyclingStage.getPartStageList().size();//默认最后一个阶段
         List<PcrCommand.TempDuringCombine> combines = new ArrayList<>();
         for (int i = 0; i < cyclingStage.getPartStageList().size(); i++) {
             PartStage partStage = cyclingStage.getPartStageList().get(i);

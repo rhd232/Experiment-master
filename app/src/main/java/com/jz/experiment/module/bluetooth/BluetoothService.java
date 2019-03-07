@@ -455,6 +455,15 @@ public class BluetoothService extends CommunicationService {
                 DataFileUtil.writeFileLog("同步接收到：" + content);
             }
         }
+
+        private boolean checkLength(byte[] buffer) {
+            if (buffer.length >= 4) {
+                int length = buffer[3];
+                return buffer.length - 7 == length;
+            }
+            return false;
+
+        }
         private void splitAndCombine(String rev, List<String> vals){
             int indexOf=rev.indexOf("1717aa");
 
@@ -463,16 +472,30 @@ public class BluetoothService extends CommunicationService {
                 if (part1.startsWith((C.Value.DATA_PREFIX))){
                     if (part1.endsWith(C.Value.DATA_SUFFIX))
                     {
-                        vals.clear();
-                        //part1是一组完整的数据了
-                        //System.out.println("完整数据:"+part1);
-                        //byte[] buffer=part1.getBytes();
+
+                        //计算校验和，因为收到了如下数据，中间部分出现了1717
+                        /*
+                        接收到原始数据:aa0002200200881717
+                        接收到原始数据:1418128519b0186e1960164614461b8b1d5219fd0e0020a84200005e1717
+                         */
+                        //compareCheckSum();
+                        //获取part1中的长度字段
                         byte[] buffer=ByteUtil.hexStringToBytes(part1,part1.length()/2);
-                        broadcast(buffer,buffer.length,part1);
+
+                        if (!checkLength(buffer)){//数据还未终止
+
+                            vals.add(part1);
+                        }else {
+                            vals.clear();
+                            //part1是一组完整的数据了
+                            broadcast(buffer, buffer.length, part1);
+                        }
                     }else {
                         vals.add(part1);
                     }
                 }else if (part1.endsWith(C.Value.DATA_SUFFIX)){
+
+
                     vals.add(part1);
                     StringBuilder sb=new StringBuilder();
                     for (String v:vals){
@@ -499,12 +522,17 @@ public class BluetoothService extends CommunicationService {
                 if (indexOf>0){
                     String part1=rev.substring(0,indexOf+2+4);
                     if (part1.endsWith(C.Value.DATA_SUFFIX)){
-                        vals.clear();
-                        //part1是一组完整的数据了
-                        //byte[] buffer=part1.getBytes();
+
                         byte[] buffer=ByteUtil.hexStringToBytes(part1,part1.length()/2);
-                        broadcast(buffer,buffer.length,part1);
-                       // System.out.println("完整数据:"+part1);
+                        if (!checkLength(buffer)) {//数据还未终止
+                            vals.add(part1);
+                        }else {
+                            vals.clear();
+                            //part1是一组完整的数据了
+                            broadcast(buffer,buffer.length,part1);
+                        }
+
+
                     }else {
                         vals.add(part1);
                     }
@@ -513,13 +541,14 @@ public class BluetoothService extends CommunicationService {
                 }else {
                     //没有aa了
                     if (rev.endsWith(C.Value.DATA_SUFFIX)){
-                        //一组完整的数据
-                        vals.clear();
-                        //part1是一组完整的数据了
-                      // byte[] buffer=rev.getBytes();
                         byte[] buffer=ByteUtil.hexStringToBytes(rev,rev.length()/2);
-                        broadcast(buffer,buffer.length,rev);
-                        //System.out.println("完整数据:"+rev);
+                        if (!checkLength(buffer)) {//数据还未终止
+                            vals.add(rev);
+                        }else {
+                            //一组完整的数据
+                            vals.clear();
+                            broadcast(buffer,buffer.length,rev);
+                        }
                     }else {
                         //以aa开头但是不是以1717结尾，数据还不完整
                         vals.add(rev);
@@ -529,7 +558,35 @@ public class BluetoothService extends CommunicationService {
             }else {
                 //不存在aa
 
-                if (rev.endsWith(C.Value.DATA_SUFFIX)){
+                if (rev.startsWith(C.Value.DATA_PREFIX)) {
+                    //检测vals是否有数据
+                    if (vals.isEmpty()) {
+                        byte[] buffer = ByteUtil.hexStringToBytes(rev, rev.length() / 2);
+                        if (!checkLength(buffer)) {//数据还未终止
+                            vals.add(rev);
+                        } else {
+                            //一组完整的数据
+                            vals.clear();
+                           // System.out.println("完整数据:" + rev);
+                            broadcast(buffer,buffer.length,rev);
+                        }
+                    } else {
+                        if (rev.endsWith(C.Value.DATA_SUFFIX)) {
+                            vals.add(rev);
+                            StringBuilder sb = new StringBuilder();
+                            for (String v : vals) {
+                                sb.append(v);
+                            }
+                            vals.clear();
+                            //System.out.println("完整数据:" + sb.toString());
+                            byte[] buffer=ByteUtil.hexStringToBytes(sb.toString(),sb.length()/2);
+                            broadcast(buffer,buffer.length,sb.toString());
+
+                        } else {
+                            vals.add(rev);
+                        }
+                    }
+                } else if (rev.endsWith(C.Value.DATA_SUFFIX)){
                     vals.add(rev);
                     StringBuilder sb=new StringBuilder();
                     for (String v:vals){
