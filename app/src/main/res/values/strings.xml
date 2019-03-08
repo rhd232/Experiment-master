@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">anitoa</string>
-
     <string name="channel_select_title">请选择通道%1$s染料</string>
 
+
+    <array name="spinner_values">
+        <item>扩增曲线</item>
+        <item>熔解曲线</item>
+    </array>
 </resources>

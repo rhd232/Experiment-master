@@ -17,6 +17,7 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 
 import com.jz.experiment.chart.CommData;
+import com.jz.experiment.module.analyze.AnalyzeFragment;
 import com.jz.experiment.module.bluetooth.DeviceRepo;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
@@ -47,6 +48,7 @@ import butterknife.OnClick;
 public class MainActivity extends BaseActivity {
     public static final int TAB_INDEX_EXPE = 0;
     public static final int TAB_INDEX_DATA = 1;
+    public static final int TAB_INDEX_ANALYZE = 2;
     @BindView(R.id.view_pager)
     ViewPager view_pager;
     MainPagerAdapter mAdapter;
@@ -54,16 +56,16 @@ public class MainActivity extends BaseActivity {
     View layout_expe;
     @BindView(R.id.layout_data)
     View layout_data;
+
+    @BindView(R.id.layout_analyze)
+    View layout_analyze;
     Fragment[] fragments;
     public static void start(Context context) {
         Navigator.navigate(context, MainActivity.class);
     }
 
     public static void start(Context context, Tab tab) {
-
         Navigator.navigate(context, MainActivity.class, tab);
-
-
     }
 
     @Override
@@ -73,9 +75,10 @@ public class MainActivity extends BaseActivity {
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
 
-        fragments = new Fragment[2];
+        fragments = new Fragment[3];
         fragments[0] = new HistoryExperimentsFragment();
         fragments[1] = new ExpeDataTabFragment();
+        fragments[2] = new AnalyzeFragment();
 
         mAdapter = new MainPagerAdapter(getSupportFragmentManager(), fragments);
         view_pager.setAdapter(mAdapter);
@@ -174,7 +177,7 @@ public class MainActivity extends BaseActivity {
         return getResources().getColor(R.color.color686868);
     }
 
-    @OnClick({R.id.layout_expe, R.id.layout_data})
+    @OnClick({R.id.layout_expe, R.id.layout_data,R.id.layout_analyze})
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.layout_expe:
@@ -199,6 +202,11 @@ public class MainActivity extends BaseActivity {
                     tab = null;
                 }
                 break;
+            case R.id.layout_analyze:
+                resetBottomBar();
+                layout_analyze.setActivated(true);
+                view_pager.setCurrentItem(TAB_INDEX_ANALYZE, false);
+                break;
 
         }
     }
@@ -207,6 +215,7 @@ public class MainActivity extends BaseActivity {
 
         layout_expe.setActivated(false);
         layout_data.setActivated(false);
+        layout_analyze.setActivated(false);
 
 
     }

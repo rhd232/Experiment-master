@@ -151,6 +151,7 @@ public class ImageUtil {
                         split = docId.split(":");
                         type = split[0];
                         Uri contentUri = null;
+
                         if("image".equals(type)) {
                             contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                         } else if("video".equals(type)) {

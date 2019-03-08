@@ -36,6 +36,7 @@ public abstract class WindChart {
     }
     public WindChart(LineChart chart,FactUpdater factUpdater){
         this.mChart=chart;
+        mChart.setNoDataText("");
         this.mFactUpdater=factUpdater;
         mDataSets = new ArrayList<>();
         mLineColors = new ArrayList<>();

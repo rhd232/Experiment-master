@@ -21,8 +21,6 @@ public class DtChart extends WindChart {
 
     public DtChart(LineChart chart,int cylingCount) {
         this(chart,cylingCount,null);
-
-
     }
     public DtChart(LineChart chart,int cylingCount,FactUpdater factUpdater) {
         super(chart,factUpdater);
