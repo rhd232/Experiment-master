@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.jz.experiment.device.Well;
 import com.wind.base.C;
 
 import java.io.BufferedReader;
@@ -190,9 +191,8 @@ public class CommData {
             int mode=size % imgFrame;//mode!=0说明存在丢数据
             int n = size / imgFrame;
 
-            //if (ks == 4)
-            //{
-            int ksindex = -1;
+            int ksindex= Well.getWell().getWellIndex(currks);
+           /* int ksindex = -1;
             switch (currks)
             {
                 case "A1":
@@ -219,7 +219,7 @@ public class CommData {
                 case "B4":
                     ksindex = 7;
                     break;
-            }
+            }*/
             if (ksindex == -1)
             {
                 return cdlist;
@@ -327,7 +327,7 @@ public class CommData {
             }
             int n = (diclist.get(chan).size() / imgFrame);
             Log.e("ChartData","n:"+n);
-            int ksindex = -1;
+           /* int ksindex = -1;
             switch (currks) {
                 case "A1":
                     ksindex = 0;
@@ -353,7 +353,8 @@ public class CommData {
                 case "B4":
                     ksindex = 7;
                     break;
-            }
+            }*/
+            int ksindex= Well.getWell().getWellIndex(currks);
             if (ksindex == -1) {
                 return cdlist;
             }

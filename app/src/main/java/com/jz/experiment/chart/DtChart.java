@@ -9,6 +9,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.jz.experiment.device.Well;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -113,8 +114,8 @@ public class DtChart extends WindChart {
 
 
 
-
-        switch (currks) {
+        ksindex= Well.getWell().getWellIndex(currks);
+       /* switch (currks) {
             case "A1":
                 ksindex = 0;
                 break;
@@ -139,7 +140,7 @@ public class DtChart extends WindChart {
             case "B4":
                 ksindex = 7;
                 break;
-        }
+        }*/
         List<String> lineData=chanMap.get(currChan).get(ksindex);
 
         List<Entry> expeData = new ArrayList<>();
@@ -226,8 +227,8 @@ public class DtChart extends WindChart {
 
 
 
-
-        switch (currks) {
+        ksindex= Well.getWell().getWellIndex(currks);
+        /*switch (currks) {
             case "A1":
                 ksindex = 0;
                 break;
@@ -252,7 +253,7 @@ public class DtChart extends WindChart {
             case "B4":
                 ksindex = 7;
                 break;
-        }
+        }*/
         List<Entry> expeData = new ArrayList<>();
 
         int count = cdlist.size();

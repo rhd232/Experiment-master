@@ -60,10 +60,10 @@ public class ChartActivity extends BaseActivity {
 
         try {
           //  String name="fluorescence_data.txt";
-            InputStream ips=getAssets().open("2019_02_25_02_42_57_dt.txt");
-            dtChart.show(ChanList, KSList, ips);
-         /*   InputStream ips2=getAssets().open("2019_02_20_12_01_50_melting.txt");
-            meltingChart.show(ChanList, KSList, ips2);*/
+          /*  InputStream ips=getAssets().open("2019_02_25_02_42_57_dt.txt");
+            dtChart.show(ChanList, KSList, ips);*/
+            InputStream ips2=getAssets().open("2019_03_08_18_22_18_melting.txt");
+            meltingChart.show(ChanList, KSList, ips2);
         } catch (Exception e) {
             e.printStackTrace();
         }

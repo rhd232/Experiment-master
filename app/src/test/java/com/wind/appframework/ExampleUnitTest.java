@@ -33,6 +33,35 @@ import static org.junit.Assert.assertEquals;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
+   /* static class Outer {
+        public int num = 10;
+        class Inner {
+            public int num = 20;
+            public void show() {
+                int num = 30;
+                System.out.println(num);    //填入合适的代码
+                System.out.println(this.num);
+                System.out.println(Outer.this.num);
+            }
+        }
+    }*/
+    @Test
+    public void testI(){
+        Outer.method().show();
+    }
+    interface Inter {
+        public void show();
+    }
+    static class Outer {
+        //补齐代码
+         static Inter method(){
+            return new Inter(){
+                public void show(){
+                    System.out.println("Hello World");
+                }
+            };
+        }
+    }
 
     @Test
     public void testTransfer() {

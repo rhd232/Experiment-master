@@ -14,13 +14,14 @@ import android.widget.Spinner;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.R;
+import com.jz.experiment.chart.CCurveShow;
+import com.jz.experiment.chart.CCurveShowMet;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.WindChart;
 import com.jz.experiment.module.data.FilterActivity;
 import com.jz.experiment.module.expe.event.FilterEvent;
-import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.utils.FileUtil;
 import com.wind.toastlib.ToastUtil;
 import com.wind.view.TitleBar;
@@ -32,9 +33,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnalyzeFragment extends BaseFragment {
+public class AnalyzeFragment extends CtFragment {
 
     public static final int REQUEST_CODE_FILE = 1234;
+
 
     LineChart chart_line;
     Spinner spinner;
@@ -66,6 +68,7 @@ public class AnalyzeFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         EventBus.getDefault().register(this);
         chart_line = view.findViewById(R.id.chart_line);
         chart_line.setNoDataText("");
@@ -112,7 +115,7 @@ public class AnalyzeFragment extends BaseFragment {
     public void selectDataFile(View view) {
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/txt");
+        intent.setType("text/plain");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         try {
@@ -141,13 +144,24 @@ public class AnalyzeFragment extends BaseFragment {
                     mOpenedFile = new File(path);
                     String item = (String) spinner.getSelectedItem();
 
+                    double [][] ctValues;
                     if ("熔解曲线".equals(item)) {
                         mChart = new MeltingChart(chart_line);
+                        ctValues=CCurveShowMet.getInstance().m_CTValue;
                     } else {
                         //获取类型，是扩增曲线还是熔解曲线
                         mChart = new DtChart(chart_line, 40);
+                        ctValues=CCurveShow.getInstance().m_CTValue;
                     }
                     mChart.show(ChanList, KSList, mOpenedFile);
+
+
+                    for (String chan : ChanList) {
+                        for (String ks : KSList) {
+                            getCtValue(chan, ks,ctValues);
+                        }
+                    }
+                    notifyCtChanged();
 
                 }
             }

@@ -9,6 +9,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.jz.experiment.device.Well;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -111,7 +112,8 @@ public class MeltingChart extends WindChart {
 
 
         }
-        switch (currks)
+        ksindex= Well.getWell().getWellIndex(currks);
+      /*  switch (currks)
         {
             case "A1":
                 ksindex = 0;
@@ -137,7 +139,7 @@ public class MeltingChart extends WindChart {
             case "B4":
                 ksindex = 7;
                 break;
-        }
+        }*/
 
         List<MeltChartData> cdlist = CommData.GetChartDataByRJQX(chan, 0, currks);
 

@@ -322,7 +322,7 @@ public class PcrCommand {
             cfg = cmdMode.getValue() << 4 ;//initial_mode值为0，所以不用设置
         }else {
             length=3+(4+2)*3+1;
-            cfg = cmdMode.getValue() << 4 | 1;//initial_mode值为0，所以不用设置
+            cfg = cmdMode.getValue() << 4 | 1;
         }
 
 

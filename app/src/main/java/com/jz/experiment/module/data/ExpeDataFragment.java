@@ -8,19 +8,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.GridView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
+import com.jz.experiment.chart.CCurveShow;
+import com.jz.experiment.chart.CCurveShowMet;
 import com.jz.experiment.chart.CommData;
-import com.jz.experiment.chart.CurveReader;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.module.data.adapter.ChannelDataAdapter;
+import com.jz.experiment.module.analyze.CtFragment;
 import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
@@ -28,12 +28,10 @@ import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DataFileUtil;
 import com.wind.base.bean.CyclingStage;
 import com.wind.base.dialog.LoadingDialogHelper;
-import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.AppUtil;
 import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.Channel;
-import com.wind.data.expe.bean.ChannelData;
 import com.wind.data.expe.bean.ExperimentStatus;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.datastore.ExpeDataStore;
@@ -57,7 +55,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscriber;
@@ -65,7 +62,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class ExpeDataFragment extends BaseFragment {
+public class ExpeDataFragment extends CtFragment {
 
     public static final String ARGS_KEY_EXPE = "args_key_expe";
     @BindView(R.id.tv_dt)
@@ -82,11 +79,11 @@ public class ExpeDataFragment extends BaseFragment {
     @BindView(R.id.tv_elapsed_time)
     TextView tv_elapsed_time;
 
-    @BindView(R.id.gv_a)
+   /* @BindView(R.id.gv_a)
     GridView gv_a;
 
     @BindView(R.id.gv_b)
-    GridView gv_b;
+    GridView gv_b;*/
 
     @BindView(R.id.chart_dt)
     LineChart chart_dt;
@@ -115,16 +112,16 @@ public class ExpeDataFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
+      //  ButterKnife.bind(this, view);
         EventBus.getDefault().register(this);
         mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
-        mChannelDataAdapters = new ChannelDataAdapter[2];
 
-        GridView[] gvs = new GridView[2];
+
+      /*  GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
         gvs[1] = gv_b;
         String[] titles = {"A", "B"};
-        buildChannelData(gvs, titles);
+        buildChannelData(gvs, titles);*/
         tv_dt.setActivated(true);
         tv_melt.setActivated(false);
         chart_melt.setVisibility(View.GONE);
@@ -207,11 +204,21 @@ public class ExpeDataFragment extends BaseFragment {
 
 
     private void showChart() {
+        double [][] ctValues;
         if (tv_dt.isActivated()) {
             mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
+            ctValues=CCurveShow.getInstance().m_CTValue;
         } else {
             mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
+            ctValues=CCurveShowMet.getInstance().m_CTValue;
         }
+
+        for (String chan : ChanList) {
+            for (String ks : KSList) {
+                getCtValue(chan, ks,ctValues);
+            }
+        }
+        notifyCtChanged();
     }
 
 
@@ -225,11 +232,14 @@ public class ExpeDataFragment extends BaseFragment {
 
         //获取CT value
 
+
+
         for (String chan : ChanList) {
             for (String ks : KSList) {
-                getCtValue(chan, ks);
+                getCtValue(chan, ks,CCurveShow.getInstance().m_CTValue);
             }
         }
+
         mChannelDataAdapters[0].notifyDataSetChanged();
         mChannelDataAdapters[1].notifyDataSetChanged();
 
@@ -244,133 +254,10 @@ public class ExpeDataFragment extends BaseFragment {
 
     }
 
-    private void getCtValue(String chan, String currks) {
-        if (!CommData.diclist.keySet().contains(chan) || CommData.diclist.get(chan).size() == 0)
-            return;
-
-        int currChan = 0;
-        int ksindex = -1;
-
-        int line = 1;
-        switch (chan) {
-            case "Chip#1":
-                currChan = 0;
-
-                line = 1;
-                break;
-            case "Chip#2":
-                currChan = 1;
-                line = 2;
-                break;
-            case "Chip#3":
-                currChan = 2;
-                line = 3;
-
-                break;
-            case "Chip#4":
-                currChan = 3;
-                line = 4;
-                break;
-        }
 
 
-        int gvIndex = 0;
-        int ksIndexInAdapter = 0;
-        int lineCount = 9;//反应孔数+1
 
-        switch (currks) {
-            case "A1":
-                gvIndex = 0;
-                ksindex = 0;
 
-                ksIndexInAdapter = lineCount * line + 1;
-                break;
-            case "A2":
-                gvIndex = 0;
-                ksindex = 1;
-
-                ksIndexInAdapter = lineCount * line + 2;
-                break;
-            case "A3":
-                gvIndex = 0;
-                ksindex = 2;
-
-                ksIndexInAdapter = lineCount * line + 3;
-                break;
-            case "A4":
-                gvIndex = 0;
-                ksindex = 3;
-
-                ksIndexInAdapter = lineCount * line + 4;
-                break;
-            case "B1":
-                gvIndex = 1;
-                ksindex = 4;
-
-                ksIndexInAdapter = lineCount * line + 1;
-                break;
-            case "B2":
-                gvIndex = 1;
-                ksindex = 5;
-
-                ksIndexInAdapter = lineCount * line + 2;
-                break;
-            case "B3":
-                gvIndex = 1;
-                ksindex = 6;
-
-                ksIndexInAdapter = lineCount * line + 3;
-                break;
-            case "B4":
-                gvIndex = 1;
-                ksindex = 7;
-
-                ksIndexInAdapter = lineCount * line + 4;
-                break;
-        }
-        double[][] ctValues = CurveReader.getInstance().m_CTValue;
-        double val = ctValues[currChan][ksindex];
-        DecimalFormat format = new DecimalFormat("#0.00");
-        String ctValue = format.format(val);
-        //  System.out.println("ctValue:" + ctValue);
-        mChannelDataAdapters[gvIndex].getItem(ksIndexInAdapter).setSampleVal(ctValue);
-    }
-
-    private ChannelDataAdapter[] mChannelDataAdapters;
-
-    private void buildChannelData(GridView[] gvs, String[] titles) {
-        for (int k = 0; k < gvs.length; k++) {
-            mChannelDataAdapters[k] = new ChannelDataAdapter(getActivity(), R.layout.item_channel_data);
-            gvs[k].setAdapter(mChannelDataAdapters[k]);
-            List<ChannelData> channelDataAList = new ArrayList<>();
-            for (int j = 0; j < 5; j++) {
-                for (int i = 0; i < 9; i++) {
-
-                    String channelName = "";
-                    switch (j) {
-                        case 0:
-                            channelName = titles[k];
-                            break;
-                        case 1:
-                            channelName = "通道1";
-                            break;
-                        case 2:
-                            channelName = "通道2";
-                            break;
-                        case 3:
-                            channelName = "通道3";
-                            break;
-                        case 4:
-                            channelName = "通道4";
-                            break;
-                    }
-                    ChannelData channelData = new ChannelData(channelName, i, "");
-                    channelDataAList.add(channelData);
-                }
-            }
-            mChannelDataAdapters[k].replaceAll(channelDataAList);
-        }
-    }
 
 
     public static ExpeDataFragment newInstance(HistoryExperiment experiment) {

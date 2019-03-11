@@ -754,11 +754,11 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             case PcrCommand.STEP_4_TYPE:
                 //启动循环返回，查询循环状态
                 //askIfContinuePolling();
-                mStep4Responsed = true;
+              /*  mStep4Responsed = true;
                 if (step4Subscription != null && !step4Subscription.isUnsubscribed()) {
                     step4Subscription.unsubscribe();
                     step4Subscription = null;
-                }
+                }*/
                 step5();
                 //step5Subscription();
                 break;
