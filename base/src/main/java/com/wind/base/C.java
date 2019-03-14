@@ -48,6 +48,7 @@ public class C {
         public static final String IMAGE_DATA=APP_FOLDER+"imageData/";
         public static final String REPORT_FOLDER=APP_FOLDER+"report/";
         public static final String TRIM_FOLDER=APP_FOLDER+"trim/";
+        public static final String TEMP_FOLDER=APP_FOLDER+".temp/";
         public static final int MAX_PHOTO_COUNT = 9;
 
         public static final int REQUEST_CODE_GALLERY=100;

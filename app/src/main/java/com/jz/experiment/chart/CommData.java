@@ -239,9 +239,9 @@ public class CommData {
 
                 //为方便调试暂时注释掉的
                 if (strs.length < 14) continue;
-                cd.x = strs[13];
+                cd.x = strs[13];//横坐标为温度
 
-                //cd.x = i+"";//测试用
+                //cd.x = i+"";//测试用//横坐标为循环次数
 
 
                 Map<Integer,List<String>> datalist=new HashMap<>();

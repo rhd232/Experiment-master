@@ -15,7 +15,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MeltingChart extends WindChart {
 
@@ -28,6 +32,7 @@ public class MeltingChart extends WindChart {
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setAxisMaximum(100);
+
         YAxis yAxis=chart.getAxisLeft();
         yAxis.setDrawGridLines(true);
     }
@@ -113,35 +118,11 @@ public class MeltingChart extends WindChart {
 
         }
         ksindex= Well.getWell().getWellIndex(currks);
-      /*  switch (currks)
-        {
-            case "A1":
-                ksindex = 0;
-                break;
-            case "A2":
-                ksindex = 1;
-                break;
-            case "A3":
-                ksindex = 2;
-                break;
-            case "A4":
-                ksindex = 3;
-                break;
-            case "B1":
-                ksindex = 4;
-                break;
-            case "B2":
-                ksindex = 5;
-                break;
-            case "B3":
-                ksindex = 6;
-                break;
-            case "B4":
-                ksindex = 7;
-                break;
-        }*/
+
 
         List<MeltChartData> cdlist = CommData.GetChartDataByRJQX(chan, 0, currks);
+        //cdlist=avgDuplicate(cdlist);
+
 
         int count =cdlist.size();
         if (count==0){
@@ -150,26 +131,30 @@ public class MeltingChart extends WindChart {
 
         List<Entry> expeData = new ArrayList<>();
         //从第三个数据开始绘制，前两个温度数据可能存在问题
+        Set<String> xSet=new HashSet<>();//排除横坐标一样的数据
         for (int i=2;i<count;i++){
-            float x=Float.parseFloat(cdlist.get(i).x);
+            String xV=cdlist.get(i).x;
 
-            float y = (float) MeltCurveReader.getInstance().m_zData[currChan][ksindex][i];
-           /* if (!mRunning){
-                y = (float) MeltCurveReader.getInstance().m_zData[currChan][ksindex][i];
-            }else {
-                y=Float.parseFloat(cdlist.get(i).y);
-            }*/
+            if (!xSet.contains(xV)) {
+                xSet.add(xV);
+                Float x = Float.parseFloat(xV);
+                //  float y = (float) MeltCurveReader.getInstance().m_zData[currChan][ksindex][i];
+                float y = (float) MeltCurveReader.getInstance().m_zdData[currChan][ksindex][i];
 
-            Entry entry = new Entry(x, y);
-            expeData.add(entry);
+
+                Entry entry = new Entry(x, y);
+                expeData.add(entry);
+            }
         }
 
 
         LineDataSet dataSet = new LineDataSet(expeData, "通道" + (currChan + 1));
         dataSet.setColor(color);
         dataSet.setDrawCircles(false);
-        // dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        //dataSet.setCubicIntensity();
+        //dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setDrawValues(false);
+
         mLineColors.add(color);
         mDataSets.add(dataSet);
 
@@ -185,5 +170,29 @@ public class MeltingChart extends WindChart {
             }
         }
         return contains;
+    }
+
+    public List<MeltChartData> avgDuplicate(List<MeltChartData> cdlist ){
+        Map<String, List<String>> map=new LinkedHashMap<>();
+        for (int k=0;k<cdlist.size();k++){
+            String t=cdlist.get(k).x;
+            if (!map.containsKey(t)){
+                map.put(t,new ArrayList<String>());
+            }
+            map.get(t).add(cdlist.get(k).y);
+        }
+        List<MeltChartData> noDuplicateList =new ArrayList<>();
+        for (Map.Entry<String,List<String>> entry:map.entrySet()){
+            double sum = 0;
+            for (int s = 0; s < entry.getValue().size(); s++) {
+                sum += Double.parseDouble(entry.getValue().get(s));
+            }
+            double avg=sum/entry.getValue().size();
+            MeltChartData meltChartData=new MeltChartData();
+            meltChartData.x=entry.getKey();
+            meltChartData.y=avg+"";
+            noDuplicateList.add(meltChartData);
+        }
+        return noDuplicateList;
     }
 }

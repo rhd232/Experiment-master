@@ -43,7 +43,7 @@ public class MeltCurveReader {
 
 
                 List<MeltChartData> cdlist = CommData.GetChartDataByRJQX(tdlist.get(i), 0, kslist.get(n));
-                //List<ChartData> cdlist = CommData.GetChartData(tdlist[i], 0, kslist[n]);//获取选点值
+
                 for (int k = 0; k < cdlist.size(); k++)
                 {
                     mtemp[i][ k] = Double.parseDouble(cdlist.get(k).x);
@@ -74,13 +74,7 @@ public class MeltCurveReader {
             m_zData = cCurveShowMet.m_zData;
             m_zdData = cCurveShowMet.m_zdData;
             m_CTValue = cCurveShowMet.m_CTValue;
-            /*for (int i = 0; i < tdlist.size(); i++)
-            {
-                for (int n = 0; n < kslist.size(); n++)
-                {
-                    DeawLine(tdlist[i], kslist[n]);
-                }
-            }*/
+
         }
         catch (Exception ex)
         {

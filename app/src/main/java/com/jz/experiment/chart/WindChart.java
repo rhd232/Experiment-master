@@ -110,7 +110,6 @@ public abstract class WindChart {
         chart.setScaleEnabled(false);
         chart.setDrawBorders(false);
         chart.setData(mLineData);
-
         chart.invalidate(); // refresh
     }
     public static final int WHAT_REFRESH_CHART = 1234;
@@ -159,5 +158,8 @@ public abstract class WindChart {
     public abstract void show(List<String> ChanList, List<String> KSList,File dataFile);
 
 
-
+    public  void setAxisMinimum(float start){
+        XAxis xAxis = mChart.getXAxis();
+        xAxis.setAxisMinimum(start);
+    }
 }

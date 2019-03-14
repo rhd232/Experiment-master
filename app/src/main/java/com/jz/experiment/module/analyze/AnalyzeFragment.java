@@ -148,6 +148,8 @@ public class AnalyzeFragment extends CtFragment {
                     if ("熔解曲线".equals(item)) {
                         mChart = new MeltingChart(chart_line);
                         ctValues=CCurveShowMet.getInstance().m_CTValue;
+                      /*  float f=Float.parseFloat(String.format("%f",40f));
+                        mChart.setAxisMinimum(f);*/
                     } else {
                         //获取类型，是扩增曲线还是熔解曲线
                         mChart = new DtChart(chart_line, 40);

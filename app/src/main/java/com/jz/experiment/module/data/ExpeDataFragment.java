@@ -4,6 +4,7 @@ import android.Manifest;
 import android.graphics.Canvas;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -52,7 +53,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -209,6 +209,9 @@ public class ExpeDataFragment extends CtFragment {
             mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
             ctValues=CCurveShow.getInstance().m_CTValue;
         } else {
+          /*  float t=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
+            float f=Float.parseFloat(String.format("%f",t));
+            mMeltingChart.setAxisMinimum(f);*/
             mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
             ctValues=CCurveShowMet.getInstance().m_CTValue;
         }
@@ -278,7 +281,7 @@ public class ExpeDataFragment extends CtFragment {
     }
 
     private long time;
-
+    private Handler mHandler=new Handler();
     @OnClick({R.id.iv_pdf, R.id.iv_save, R.id.tv_dt, R.id.tv_melt})
     public void onViewClick(View view) {
         long now = System.currentTimeMillis();
@@ -330,6 +333,12 @@ public class ExpeDataFragment extends CtFragment {
                                     }
 
                                 }
+                            }, new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable throwable) {
+                                    throwable.printStackTrace();
+                                    ToastUtil.showToast(getActivity(), "请重试");
+                                }
                             });
                 }
 
@@ -352,41 +361,61 @@ public class ExpeDataFragment extends CtFragment {
                                                 if (!tv_dt.isActivated()) {
                                                     onViewClick(tv_dt);
                                                 }
-                                                String pdfName = DataFileUtil.getPdfFileName(mExeperiment, false);
-                                                //生成pdf
-                                                generatePdf(pdfName).delay(500, TimeUnit.MILLISECONDS)
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(new Action1<Boolean>() {
-                                                            @Override
-                                                            public void call(Boolean aboolean) {
-                                                                if (mHasMeltingMode) {
-                                                                    String pdfName = DataFileUtil.getPdfFileName(mExeperiment, true);
-                                                                    onViewClick(tv_melt);
-                                                                    generatePdf(pdfName).delay(500, TimeUnit.MILLISECONDS)
-                                                                            .subscribeOn(Schedulers.io())
-                                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                                            .subscribe(new Action1<Boolean>() {
+                                                mHandler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        String pdfName = DataFileUtil.getPdfFileName(mExeperiment, false);
+                                                        //生成pdf
+                                                        generatePdf(pdfName)
+                                                                .subscribeOn(Schedulers.io())
+                                                                .observeOn(AndroidSchedulers.mainThread())
+                                                                .subscribe(new Action1<Boolean>() {
+                                                                    @Override
+                                                                    public void call(Boolean aboolean) {
+                                                                        if (mHasMeltingMode) {
+                                                                            onViewClick(tv_melt);
+                                                                            new Handler().postDelayed(new Runnable() {
                                                                                 @Override
-                                                                                public void call(Boolean aBoolean) {
-                                                                                    LoadingDialogHelper.hideOpLoading();
-                                                                                    ToastUtil.showToast(getActivity(), "已导出");
-                                                                                }
-                                                                            });
-                                                                } else {
-                                                                    LoadingDialogHelper.hideOpLoading();
-                                                                    ToastUtil.showToast(getActivity(), "已导出");
-                                                                }
+                                                                                public void run() {
+                                                                                    String pdfName = DataFileUtil.getPdfFileName(mExeperiment, true);
 
-                                                            }
-                                                        }, new Action1<Throwable>() {
-                                                            @Override
-                                                            public void call(Throwable throwable) {
-                                                                LoadingDialogHelper.hideOpLoading();
-                                                                throwable.printStackTrace();
-                                                                ToastUtil.showToast(getActivity(), "导出失败");
-                                                            }
-                                                        });
+                                                                                    generatePdf(pdfName)
+                                                                                            .subscribeOn(Schedulers.io())
+                                                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                                                            .subscribe(new Action1<Boolean>() {
+                                                                                                @Override
+                                                                                                public void call(Boolean aBoolean) {
+                                                                                                    LoadingDialogHelper.hideOpLoading();
+                                                                                                    ToastUtil.showToast(getActivity(), "已导出");
+                                                                                                }
+                                                                                            }, new Action1<Throwable>() {
+                                                                                                @Override
+                                                                                                public void call(Throwable throwable) {
+                                                                                                    throwable.printStackTrace();
+                                                                                                    LoadingDialogHelper.hideOpLoading();
+                                                                                                    ToastUtil.showToast(getActivity(), "请重试");
+                                                                                                }
+                                                                                            });
+                                                                                }
+                                                                            },3000);
+
+                                                                        } else {
+                                                                            LoadingDialogHelper.hideOpLoading();
+                                                                            ToastUtil.showToast(getActivity(), "已导出");
+                                                                        }
+
+                                                                    }
+                                                                }, new Action1<Throwable>() {
+                                                                    @Override
+                                                                    public void call(Throwable throwable) {
+                                                                        LoadingDialogHelper.hideOpLoading();
+                                                                        throwable.printStackTrace();
+                                                                        ToastUtil.showToast(getActivity(), "导出失败");
+                                                                    }
+                                                                });
+                                                    }
+                                                },3000);
+
 
                                             }
 
