@@ -15,6 +15,7 @@ import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.chart.MeltingChart;
+import com.jz.experiment.device.Well;
 import com.jz.experiment.module.bluetooth.BluetoothReceiver;
 import com.jz.experiment.module.bluetooth.BluetoothService;
 import com.jz.experiment.module.bluetooth.CommunicationService;
@@ -324,7 +325,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
 
         KSList.clear();
-        KSList.add("A1");
+       /* KSList.add("A1");
         KSList.add("A2");
         KSList.add("A3");
         KSList.add("A4");
@@ -332,7 +333,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         KSList.add("B1");
         KSList.add("B2");
         KSList.add("B3");
-        KSList.add("B4");
+        KSList.add("B4");*/
+       KSList=Well.getWell().getKsList();
     }
 
 

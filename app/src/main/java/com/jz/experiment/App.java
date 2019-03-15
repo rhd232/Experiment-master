@@ -22,6 +22,7 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
     @Override
     public void onCreate() {
         super.onCreate();
+
         sInstance = this;
         CaocConfig.Builder.create()
                 .errorActivity(DefaultErrorActivity.class)

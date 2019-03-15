@@ -64,12 +64,14 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -98,7 +100,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     private Handler handler = new Handler();
     private HistoryExperiment mHistoryExperiment;
     private ExpeDataStore mExpeDataStore;
-
+    Subscription mReadTrimSubscription;
     @Override
     protected void setTitle() {
         mTitleBar.setTitle("用户设置2");
@@ -248,6 +250,12 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mReadTrimSubscription!=null){
+            if (!mReadTrimSubscription.isUnsubscribed()){
+                mReadTrimSubscription.unsubscribe();
+            }
+        }
+        mReadTrimSubscription=null;
         EventBus.getDefault().unregister(this);
     }
 
@@ -366,18 +374,27 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                     }*/
 
                     LoadingDialogHelper.showOpLoading(getActivity());
-                    //设置积分时间
                     buildExperiment();
-                    setIntergrationTime()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Action1<Boolean>() {
-                                @Override
-                                public void call(Boolean aBoolean) {
-                                    LoadingDialogHelper.hideOpLoading();
-                                    ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
-                                }
-                            });
+
+                    if (CommData.sTrimFromFile){
+                        FlashData.flash_loaded=false;
+                        //设置积分时间
+                        setIntergrationTime()
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Action1<Boolean>() {
+                                    @Override
+                                    public void call(Boolean aBoolean) {
+                                        LoadingDialogHelper.hideOpLoading();
+                                        ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
+                                    }
+                                });
+                    }else {
+                        readTrimDataFromInstrument();
+                    }
+
+
+
 
 
                 }
@@ -405,8 +422,16 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     }
 
     private void readTrimDataFromInstrument() {
-        mCommunicationService.setNotify(this);
-        TrimReader.getInstance().ReadTrimDataFromInstrument(mCommunicationService);
+         mReadTrimSubscription=Observable.interval(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+
+                        mCommunicationService.setNotify(UserSettingsStep2Activity.this);
+                        TrimReader.getInstance().ReadTrimDataFromInstrument(mCommunicationService);
+                    }
+                });
+
     }
 
     public Observable<Boolean> setIntergrationTime() {
@@ -414,42 +439,44 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
 
-                //删除日志文件
-                DataFileUtil.removeLogFile();
 
-                //初始化设备
-                resetTrim();
-
-
-                FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
-                factUpdater.SetInitData();
-                int integrationTime = mHistoryExperiment.getIntegrationTime();
-                if (integrationTime > 0) {
-                    //获取积分时间
-                    factUpdater.int_time_1 = mHistoryExperiment.getIntegrationTime();
-                    factUpdater.int_time_2 = mHistoryExperiment.getIntegrationTime();
-                    factUpdater.int_time_3 = mHistoryExperiment.getIntegrationTime();
-                    factUpdater.int_time_4 = mHistoryExperiment.getIntegrationTime();
-                }
-                if (mCommunicationService != null) {
-                    sleep(50);
-                    PcrCommand gainCmd = new PcrCommand();
-                    gainCmd.setGainMode();
-                    mCommunicationService.sendPcrCommandSync(gainCmd);
-
-                    setSensorAndInTime(0, factUpdater.int_time_1);
-                    setSensorAndInTime(1, factUpdater.int_time_2);
-                    setSensorAndInTime(2, factUpdater.int_time_3);
-                    setSensorAndInTime(3, factUpdater.int_time_4);
-
-                }
-
+                doSetIntergrationTime();
                 subscriber.onNext(true);
                 subscriber.onCompleted();
             }
         });
     }
+    private void doSetIntergrationTime(){
+        //删除日志文件
+        DataFileUtil.removeLogFile();
 
+        //初始化设备
+        resetTrim();
+
+
+        FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
+        factUpdater.SetInitData();
+        int integrationTime = mHistoryExperiment.getIntegrationTime();
+        if (integrationTime > 0) {
+            //获取积分时间
+            factUpdater.int_time_1 = mHistoryExperiment.getIntegrationTime();
+            factUpdater.int_time_2 = mHistoryExperiment.getIntegrationTime();
+            factUpdater.int_time_3 = mHistoryExperiment.getIntegrationTime();
+            factUpdater.int_time_4 = mHistoryExperiment.getIntegrationTime();
+        }
+        if (mCommunicationService != null) {
+            sleep(50);
+            PcrCommand gainCmd = new PcrCommand();
+            gainCmd.setGainMode();
+            mCommunicationService.sendPcrCommandSync(gainCmd);
+
+            setSensorAndInTime(0, factUpdater.int_time_1);
+            setSensorAndInTime(1, factUpdater.int_time_2);
+            setSensorAndInTime(2, factUpdater.int_time_3);
+            setSensorAndInTime(3, factUpdater.int_time_4);
+
+        }
+    }
 
     private void resetTrim() {
         CommunicationService service = mCommunicationService;
@@ -594,7 +621,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
     @Override
     public void onReceivedData(Data data) {
-
+        mReadTrimSubscription.unsubscribe();
         //TODO 读取trim数据和dataposition数据
         byte[] reveicedBytes = data.getBuffer();
         int statusIndex = 1;
@@ -736,6 +763,20 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                 CommData.chan3_range=FlashData.range[2];
                 CommData.chan4_range=FlashData.range[3];
                 FlashData.flash_loaded = true;
+
+
+                //读取trim和dataposition成功
+                setIntergrationTime()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<Boolean>() {
+                            @Override
+                            public void call(Boolean aBoolean) {
+                                LoadingDialogHelper.hideOpLoading();
+                                ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
+                            }
+                        });
+
 
             }
         }

@@ -1,5 +1,8 @@
 package com.jz.experiment.device;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EightWell extends Well {
 
     public EightWell() {
@@ -38,5 +41,21 @@ public class EightWell extends Well {
         }
 
         return ksindex;
+    }
+
+    @Override
+    public List<String> getKsList() {
+        List<String> KSList=new ArrayList<>();
+        KSList.add("A1");
+        KSList.add("A2");
+        KSList.add("A3");
+        KSList.add("A4");
+
+        KSList.add("B1");
+        KSList.add("B2");
+        KSList.add("B3");
+        KSList.add("B4");
+
+        return KSList;
     }
 }

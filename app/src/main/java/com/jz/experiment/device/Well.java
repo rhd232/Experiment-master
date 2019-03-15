@@ -2,6 +2,8 @@ package com.jz.experiment.device;
 
 import com.jz.experiment.chart.CommData;
 
+import java.util.List;
+
 public abstract class Well {
 
     /**
@@ -20,6 +22,7 @@ public abstract class Well {
      */
     public abstract int getWellIndex(String wellName);
 
+    public abstract List<String>  getKsList();
 
     public static Well getWell() {
         Well well=null;
@@ -40,5 +43,7 @@ public abstract class Well {
         }
         return well;
     }
+
+
 
 }

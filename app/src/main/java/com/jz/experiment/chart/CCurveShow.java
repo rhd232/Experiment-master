@@ -8,7 +8,7 @@ public class CCurveShow {
     public static boolean ALL_SEL = false;
     public static boolean GD_MOMENTUM = true;
     public static int MAX_CHAN = 4;
-    public static int MAX_WELL = 8;
+    public static int MAX_WELL = 16;//之前是8;
     public static int MAX_CYCL = 61;//400
     int numWells = 4;
     int MIN_CT = 13;//之前15 // minimal allowed CT

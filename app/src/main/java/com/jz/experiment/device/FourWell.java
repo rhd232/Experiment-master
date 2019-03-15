@@ -1,5 +1,8 @@
 package com.jz.experiment.device;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FourWell extends Well {
 
     public FourWell() {
@@ -9,8 +12,7 @@ public class FourWell extends Well {
     @Override
     public int getWellIndex(String wellName) {
         int ksindex = -1;
-        switch (wellName)
-        {
+        switch (wellName) {
             case "A1":
                 ksindex = 0;
                 break;
@@ -28,5 +30,17 @@ public class FourWell extends Well {
         }
 
         return ksindex;
+    }
+
+    public List<String> getKsList() {
+        List<String> KSList = new ArrayList<>();
+
+        KSList.add("A1");
+        KSList.add("A2");
+        KSList.add("B1");
+        KSList.add("B2");
+
+
+        return KSList;
     }
 }

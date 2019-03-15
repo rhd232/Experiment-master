@@ -21,6 +21,7 @@ import java.util.Map;
 
 public class CommData {
 
+    public static boolean sTrimFromFile;
 
     public static int cboChan1 = 0;
     public static int cboChan2 = 0;
@@ -103,8 +104,13 @@ public class CommData {
             if (dataPositionFile.exists()){
                 ips=new FileInputStream(dataPositionFile);
             }else {
-                ips = context.getAssets().open("dataposition.ini");
+                return;
             }
+
+
+            /*else {
+                ips = context.getAssets().open("dataposition.ini");
+            }*/
 
             //判断相应月份文件夹是否存在，没有则创建
             reader = new BufferedReader(new InputStreamReader(ips));
@@ -144,7 +150,8 @@ public class CommData {
             e.printStackTrace();
         } finally {
             try {
-                reader.close();
+                if (reader!=null)
+                    reader.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

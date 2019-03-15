@@ -12,7 +12,7 @@ public class CCurveShowMet {
     boolean hide_org = true;
 
     public static int MAX_CHAN = 4;
-    public static int MAX_WELL = 8;
+    public static int MAX_WELL = 16;//之前是8;
     public static int MAX_CYCL = 301;//400
     public double[][][] m_yData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
     public double[][][] m_zData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];

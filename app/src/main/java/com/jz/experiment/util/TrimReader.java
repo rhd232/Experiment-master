@@ -58,11 +58,15 @@ public class TrimReader {
             File trimFile = new File(C.Value.TRIM_FOLDER, "trim.dat");
             if (trimFile.exists()) {
                 ips = new FileInputStream(trimFile);
+                ReadTrimFile(ips);
+                CommData.sTrimFromFile=true;
             } else {
-                ips = context.getAssets().open("trim.dat");
+                CommData.sTrimFromFile=false;
             }
+             /*else {
+                ips = context.getAssets().open("trim.dat");
+            }*/
 
-            ReadTrimFile(ips);
         } catch (Exception e) {
             e.printStackTrace();
         }

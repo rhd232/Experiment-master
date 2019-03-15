@@ -20,6 +20,7 @@ import com.jz.experiment.chart.CCurveShowMet;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
+import com.jz.experiment.device.Well;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.analyze.CtFragment;
 import com.jz.experiment.module.expe.bean.Tab;
@@ -181,15 +182,9 @@ public class ExpeDataFragment extends CtFragment {
         }
 
         KSList.clear();
-        KSList.add("A1");
-        KSList.add("A2");
-        KSList.add("A3");
-        KSList.add("A4");
 
-        KSList.add("B1");
-        KSList.add("B2");
-        KSList.add("B3");
-        KSList.add("B4");
+        KSList=Well.getWell().getKsList();
+
     }
 
     private boolean mHasMeltingMode;
