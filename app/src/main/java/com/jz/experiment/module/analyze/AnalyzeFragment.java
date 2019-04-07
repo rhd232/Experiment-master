@@ -20,6 +20,8 @@ import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.WindChart;
+import com.jz.experiment.device.UnsupportedDeviceException;
+import com.jz.experiment.device.Well;
 import com.jz.experiment.module.data.FilterActivity;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.wind.base.utils.FileUtil;
@@ -96,15 +98,30 @@ public class AnalyzeFragment extends CtFragment {
         ChanList.add("Chip#2");
         ChanList.add("Chip#3");
         ChanList.add("Chip#4");
-        KSList.add("A1");
-        KSList.add("A2");
-        KSList.add("A3");
-        KSList.add("A4");
+        try {
+            KSList=Well.getWell().getKsList();
+        }catch (UnsupportedDeviceException e){
+            //第一次安装，没有文件读取权限导致
+            e.printStackTrace();
+            KSList.add("A1");
+            KSList.add("A2");
+            KSList.add("A3");
+            KSList.add("A4");
+            KSList.add("A5");
+            KSList.add("A6");
+            KSList.add("A7");
+            KSList.add("A8");
 
-        KSList.add("B1");
-        KSList.add("B2");
-        KSList.add("B3");
-        KSList.add("B4");
+            KSList.add("B1");
+            KSList.add("B2");
+            KSList.add("B3");
+            KSList.add("B4");
+            KSList.add("B5");
+            KSList.add("B6");
+            KSList.add("B7");
+            KSList.add("B8");
+        }
+
     }
 
     /**

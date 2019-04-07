@@ -20,6 +20,7 @@ import com.jz.experiment.chart.CCurveShowMet;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
+import com.jz.experiment.device.UnsupportedDeviceException;
 import com.jz.experiment.device.Well;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.analyze.CtFragment;
@@ -183,7 +184,29 @@ public class ExpeDataFragment extends CtFragment {
 
         KSList.clear();
 
-        KSList=Well.getWell().getKsList();
+        try {
+            KSList=Well.getWell().getKsList();
+        }catch (UnsupportedDeviceException e){
+            //第一次安装，没有文件读取权限导致
+            e.printStackTrace();
+            KSList.add("A1");
+            KSList.add("A2");
+            KSList.add("A3");
+            KSList.add("A4");
+            KSList.add("A5");
+            KSList.add("A6");
+            KSList.add("A7");
+            KSList.add("A8");
+
+            KSList.add("B1");
+            KSList.add("B2");
+            KSList.add("B3");
+            KSList.add("B4");
+            KSList.add("B5");
+            KSList.add("B6");
+            KSList.add("B7");
+            KSList.add("B8");
+        }
 
     }
 

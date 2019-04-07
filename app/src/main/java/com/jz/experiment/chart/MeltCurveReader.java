@@ -1,5 +1,7 @@
 package com.jz.experiment.chart;
 
+import com.jz.experiment.device.Well;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,15 +20,9 @@ public class MeltCurveReader {
         double [][][]m_yData = new double[CCurveShowMet.MAX_CHAN][CCurveShowMet.MAX_WELL][ CCurveShowMet.MAX_CYCL];
         CCurveShowMet cCurveShowMet = CCurveShowMet.getInstance();
         cCurveShowMet.InitData();
-        List<String> kslist = new ArrayList<>();//定义孔数
-        kslist.add("A1");
-        kslist.add("A2");
-        kslist.add("A3");
-        kslist.add("A4");
-        kslist.add("B1");
-        kslist.add("B2");
-        kslist.add("B3");
-        kslist.add("B4");
+       // List<String> kslist;//定义孔数
+
+        List<String> kslist=Well.getWell().getKsList();
 
         List<String> tdlist = new ArrayList<>();//定义通道
         tdlist.add("Chip#1");

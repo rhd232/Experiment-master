@@ -184,7 +184,7 @@ public class DtChart extends WindChart {
             }
         }).y;*/
         int currChan = 0;
-        int ksindex = -1;
+        int ksindex;
 
 
         int color = 0;
@@ -226,34 +226,8 @@ public class DtChart extends WindChart {
         }
 
 
-
         ksindex= Well.getWell().getWellIndex(currks);
-        /*switch (currks) {
-            case "A1":
-                ksindex = 0;
-                break;
-            case "A2":
-                ksindex = 1;
-                break;
-            case "A3":
-                ksindex = 2;
-                break;
-            case "A4":
-                ksindex = 3;
-                break;
-            case "B1":
-                ksindex = 4;
-                break;
-            case "B2":
-                ksindex = 5;
-                break;
-            case "B3":
-                ksindex = 6;
-                break;
-            case "B4":
-                ksindex = 7;
-                break;
-        }*/
+
         List<Entry> expeData = new ArrayList<>();
 
         int count = cdlist.size();

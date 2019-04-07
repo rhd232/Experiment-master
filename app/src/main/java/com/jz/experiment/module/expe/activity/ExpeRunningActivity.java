@@ -325,15 +325,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
 
         KSList.clear();
-       /* KSList.add("A1");
-        KSList.add("A2");
-        KSList.add("A3");
-        KSList.add("A4");
 
-        KSList.add("B1");
-        KSList.add("B2");
-        KSList.add("B3");
-        KSList.add("B4");*/
        KSList=Well.getWell().getKsList();
     }
 
