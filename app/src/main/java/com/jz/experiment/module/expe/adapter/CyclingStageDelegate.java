@@ -95,7 +95,6 @@ View.OnFocusChangeListener{
         PartStage picStage = null;
         int i=1;
         for (PartStage partStage : stage.getPartStageList()) {
-
             if (partStage.isTakePic()) {
                 partStage.setStepName("step "+i);//step name没有报存数据库，所以设置一下
                 picStage = partStage;
