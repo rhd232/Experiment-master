@@ -62,6 +62,7 @@ import com.wind.toastlib.ToastUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -343,7 +344,6 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             case R.id.tv_next:
                 if (validate()) {
 
-
                     LoadingDialogHelper.showOpLoading(getActivity());
                     buildExperiment();
 
@@ -411,6 +411,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             public void call(Subscriber<? super Boolean> subscriber) {
 
 
+
                 doSetIntergrationTime();
                 subscriber.onNext(true);
                 subscriber.onCompleted();
@@ -420,7 +421,16 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     private void doSetIntergrationTime(){
         //删除日志文件
         DataFileUtil.removeLogFile();
-
+        if (!TextUtils.isEmpty(dp_str)) {
+            //生成数据文件，插入dp_str
+            File file = DataFileUtil.getDtImageDataFile(mHistoryExperiment);
+            DataFileUtil.writeToFile(file, dp_str);
+            boolean hasMelting = mHistoryExperiment.getSettingSecondInfo().getModes().size() == 2;
+            if (hasMelting) {
+                File meltFile = DataFileUtil.getMeltImageDateFile(mHistoryExperiment);
+                DataFileUtil.writeToFile(meltFile, dp_str);
+            }
+        }
         //初始化设备
         resetTrim();
 
@@ -589,7 +599,8 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     public void onDoThing() {
 
     }
-
+    //dataposition.dat文件内容
+    private String dp_str;
     @Override
     public void onReceivedData(Data data) {
         mReadTrimSubscription.unsubscribe();
@@ -622,7 +633,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                 List<Integer> rlist = new ArrayList<>();      // row index
                 List<Integer> clist = new ArrayList<>();      // col index
 
-                byte[] trim_buff = new byte[1024];
+                byte[] trim_buff = new byte[2048];
 
                 for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
                     trim_buff[j] = EepromBuff[0][j];        // copy first page
@@ -646,6 +657,9 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
                 CommData.KsIndex = num_wells;
 
+                //4.13新增
+                CommData.sn1 = sn1;
+                CommData.sn2 = sn2;
                 for (int i = 1; i < num_pages; i++) {
                     for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
                         trim_buff[i * EPKT_SZ + j] = EepromBuff[i][j];
@@ -670,7 +684,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                         FlashData.col_index[i][j] = new ArrayList<>(clist);
                     }
                 }
-
+                dp_str = Buf2String(trim_buff, k);
                 for (int ci = 0; ci < num_channels; ci++) {
                     int index_start = num_pages + ci * NUM_EPKT;
                     k = 0;
@@ -736,6 +750,10 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                 FlashData.flash_loaded = true;
 
 
+
+
+
+
                 //读取trim和dataposition成功
                 setIntergrationTime()
                         .subscribeOn(Schedulers.io())
@@ -778,10 +796,25 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             } else {
                 if (eeprom_parity != inputdatas[8 + i]) {
                     LogUtil.e("Packet parity error!");
-                } else {
-                    int imok = 1;
                 }
             }
         }
+    }
+
+    private String Buf2String(byte[] buff, int size)
+    {
+        //String rstr;
+        StringBuilder sBuilder=new StringBuilder();
+        //rstr = "Chipdp\r\n";
+        sBuilder.append("Chipdp\r\n");
+        for (int i = 0; i < size; i++)
+        {
+            sBuilder.append(buff[i]+" ");
+            //String str = String.format("{0} ", buff[i]);
+            //rstr += str;
+        }
+        // rstr += "\r\n";
+        sBuilder.append("\r\n");
+        return sBuilder.toString();
     }
 }

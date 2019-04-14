@@ -47,6 +47,41 @@ public class PcrCommand {
         return commandList;
     }
 
+
+    /**
+     *
+     * @param temperature
+     */
+    public static PcrCommand readTemperatureCmd(Temperature temperature){
+
+        int header=0xaa;
+        int command=0x10;
+        int length=0x02;
+        int type=0x02;
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) header);
+        bytes.add((byte) command);
+        bytes.add((byte) length);
+        bytes.add((byte) type);
+        bytes.add((byte) temperature.value);
+
+        PcrCommand cmd=new PcrCommand();
+        cmd.addCommonBytes(bytes);
+        cmd.addCommand(listToByteArray(bytes));
+
+        return cmd;
+
+    }
+
+    public enum Temperature{
+        LID(1),PELTIER(2);
+
+        int value;
+        Temperature(int value){
+            this.value=value;
+        }
+    }
+
     public void setGainMode(){
 
         byte[] TxData = new byte[18];
@@ -742,7 +777,7 @@ public class PcrCommand {
         addCommand(TxData);
     }
 
-    private byte[] listToByteArray(List<Byte> bytes){
+    private static byte[] listToByteArray(List<Byte> bytes){
         byte[] cmd = new byte[bytes.size()];
         for (int i=0;i<bytes.size();i++) {
             cmd[i]=bytes.get(i);

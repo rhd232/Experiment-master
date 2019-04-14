@@ -138,7 +138,12 @@ public abstract class WindChart {
                     mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                         @Override
                         public void onValueSelected(Entry e, Highlight h) {
-                            mChart.setDrawMarkers(true);
+                            if (thisChart() instanceof TempChart){
+                                mChart.setDrawMarkers(false);
+                            }else {
+                                mChart.setDrawMarkers(true);
+                            }
+
                         }
 
                         @Override
@@ -151,6 +156,10 @@ public abstract class WindChart {
 
         }
     };
+
+    private WindChart thisChart(){
+        return this;
+    }
     protected boolean mRunning;
     public void setRunning(boolean running){
         this.mRunning=running;

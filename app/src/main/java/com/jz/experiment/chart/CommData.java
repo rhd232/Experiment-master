@@ -36,7 +36,8 @@ public class CommData {
     public static int CurrPZJD = 3;
     public static int KsIndex = 0;
 
-
+    public static int sn1=0;
+    public static int sn2=0;
 
 
 
@@ -199,34 +200,7 @@ public class CommData {
             int n = size / imgFrame;
 
             int ksindex= Well.getWell().getWellIndex(currks);
-           /* int ksindex = -1;
-            switch (currks)
-            {
-                case "A1":
-                    ksindex = 0;
-                    break;
-                case "A2":
-                    ksindex = 1;
-                    break;
-                case "A3":
-                    ksindex = 2;
-                    break;
-                case "A4":
-                    ksindex = 3;
-                    break;
-                case "B1":
-                    ksindex = 4;
-                    break;
-                case "B2":
-                    ksindex = 5;
-                    break;
-                case "B3":
-                    ksindex = 6;
-                    break;
-                case "B4":
-                    ksindex = 7;
-                    break;
-            }*/
+
             if (ksindex == -1)
             {
                 return cdlist;
@@ -334,33 +308,7 @@ public class CommData {
             }
             int n = (diclist.get(chan).size() / imgFrame);
             Log.e("ChartData","n:"+n);
-           /* int ksindex = -1;
-            switch (currks) {
-                case "A1":
-                    ksindex = 0;
-                    break;
-                case "A2":
-                    ksindex = 1;
-                    break;
-                case "A3":
-                    ksindex = 2;
-                    break;
-                case "A4":
-                    ksindex = 3;
-                    break;
-                case "B1":
-                    ksindex = 4;
-                    break;
-                case "B2":
-                    ksindex = 5;
-                    break;
-                case "B3":
-                    ksindex = 6;
-                    break;
-                case "B4":
-                    ksindex = 7;
-                    break;
-            }*/
+
             int ksindex= Well.getWell().getWellIndex(currks);
             if (ksindex == -1) {
                 return cdlist;

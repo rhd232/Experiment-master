@@ -84,12 +84,8 @@ public class ExampleUnitTest {
         System.out.println(ret_1);
 
 
-     /*   String ret_2=transferImageData(2, 1, bytes);
-        System.out.println(ret_2);
-        String ret_3=transferImageData(3, 1, bytes);
-        System.out.println(ret_3);
-        String ret_4=transferImageData(4, 1, bytes);
-        System.out.println(ret_4);*/
+
+
 
     }
 

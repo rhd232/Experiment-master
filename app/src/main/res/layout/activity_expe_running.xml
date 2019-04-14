@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorF5F5F5"
-    android:orientation="vertical"
-    android:keepScreenOn="true">
+    android:keepScreenOn="true"
+    android:orientation="vertical">
 
     <com.jz.experiment.widget.DeviceStateBar
         android:layout_width="match_parent"
@@ -20,10 +20,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:paddingTop="10dp"
         android:paddingLeft="10dp"
+        android:paddingTop="10dp"
         android:text="当前模式："
         android:textColor="@color/color333333" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="44dp"
@@ -35,20 +36,22 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/tv_cycling_desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:textColor="@color/color333333"
-                android:text="循环："/>
+                android:text="循环："
+                android:textColor="@color/color333333" />
+
             <TextView
                 android:id="@+id/tv_cycling"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:textColor="@color/color333333"
-                android:text="1/40"/>
+                android:text="1/40"
+                android:textColor="@color/color333333" />
         </LinearLayout>
 
         <LinearLayout
@@ -73,22 +76,36 @@
 
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart_dt"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@color/white"
-      />
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart_melt"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@color/white"
-        android:visibility="gone"
-        />
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart_dt"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart_melt"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:layout_weight="1"
+            android:visibility="gone" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart_temp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/tv_stop"
         android:layout_width="match_parent"
