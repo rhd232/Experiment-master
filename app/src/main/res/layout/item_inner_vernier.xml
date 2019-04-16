@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:gravity="center"
-                android:text="Step 1"
+                android:text="@string/step"
                 android:textColor="@color/color333333" />
 
             <View

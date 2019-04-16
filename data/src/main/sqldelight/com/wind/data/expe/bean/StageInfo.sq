@@ -12,6 +12,7 @@ CREATE TABLE stage_info(
     part_takepic INTEGER,--partStage是否需要拍照
     cycling_id INTEGER,--part对应的cyclingstage
 
+    during INTEGER,--4.15增加
     --next_id INTEGER,
     --外键
     expe_id INTEGER NOT NULL,

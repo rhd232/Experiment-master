@@ -49,10 +49,28 @@ public class DbOpenHelper extends SQLiteOpenHelper {
         db.execSQL(ChannelInfo.CREATE_TABLE);
         db.execSQL(SampleInfo.CREATE_TABLE);
         db.execSQL(StageInfo.CREATE_TABLE);
+
+        //int FIRST_VERSION=1;
+       // onUpgrade(db,FIRST_VERSION,VERSION);
     }
 
-    @Override
+  @Override
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-        // no impl
+        /*for (int i = oldVersion; i < newVersion; i++) {
+            switch (i) {
+                case 1:
+                    //version为2 时stage_info表新增了一个字段during
+                    upgradeToVersion2(db);
+                    break;
+                default:
+                    break;
+            }
+        }*/
+
     }
+
+    /*  private void upgradeToVersion2(SQLiteDatabase db) {
+        String sql = "ALTER TABLE "+StageInfo.TABLE_NAME+" ADD COLUMN during INTEGER";
+        db.execSQL(sql);
+    }*/
 }

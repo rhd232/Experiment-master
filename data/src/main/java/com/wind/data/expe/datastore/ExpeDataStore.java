@@ -209,6 +209,7 @@ public class ExpeDataStore {
                                         .curScale((double) partStage.getCurScale())
                                         .serialNumber((long) partStage.getSerialNumber())
                                         .cycling_id(cycling_id)
+                                        .during((long) partStage.getDuring())
                                         .part_takepic(takePic)
                                         .asContentValues();
                                 mBriteDb.insert(StageInfo.TABLE_NAME, stageValues);
@@ -219,6 +220,7 @@ public class ExpeDataStore {
                                     .type((long) stage.getType())
                                     .startScale((double) stage.getStartScale())
                                     .curScale((double) stage.getCurScale())
+                                    .during((long) stage.getDuring())
                                     .asContentValues();
                             mBriteDb.insert(StageInfo.TABLE_NAME, stageValues);
                         }
@@ -337,17 +339,21 @@ public class ExpeDataStore {
                                     serialNumber=stageInfo.serialNumber();
                                 }
 
+                                long during=0;
+                                if (stageInfo.during()!=null){
+                                    during=stageInfo.during();
+                                }
                                 switch ((int) type) {
                                     case Stage.TYPE_END:
                                         endStage.setStartScale((float) startScale);
                                         endStage.setCurScale((float) curScale);
-
+                                        endStage.setDuring((short) during);
                                         break;
                                     case Stage.TYPE_START:
 
                                         startStage.setStartScale((float) startScale);
                                         startStage.setCurScale((float) curScale);
-
+                                        startStage.setDuring((short) during);
                                         break;
                                     case Stage.TYPE_CYCLING:
                                         long count=stageInfo.cycling_count();
@@ -369,7 +375,7 @@ public class ExpeDataStore {
                                         partStage.setSerialNumber((int) serialNumber);
                                         partStage.setCyclingId((int) cyclingId);
                                         partStage.setTakePic(takepic==1?true:false);
-
+                                        partStage.setDuring((short) during);
                                         partStageList.add(partStage);
                                         break;
                                 }
@@ -569,18 +575,21 @@ public class ExpeDataStore {
                                 if (stageInfo.serialNumber()!=null){
                                      serialNumber=stageInfo.serialNumber();
                                 }
-
+                                long during=0;
+                                if (stageInfo.during()!=null){
+                                    during=stageInfo.during();
+                                }
                                 switch ((int) type) {
                                     case Stage.TYPE_END:
                                         endStage.setStartScale((float) startScale);
                                         endStage.setCurScale((float) curScale);
-
+                                        endStage.setDuring((short) during);
                                         break;
                                     case Stage.TYPE_START:
 
                                         startStage.setStartScale((float) startScale);
                                         startStage.setCurScale((float) curScale);
-
+                                        startStage.setDuring((short) during);
                                         break;
                                     case Stage.TYPE_CYCLING:
                                         long count=stageInfo.cycling_count();
@@ -602,7 +611,7 @@ public class ExpeDataStore {
                                         partStage.setSerialNumber((int) serialNumber);
                                         partStage.setCyclingId((int) cyclingId);
                                         partStage.setTakePic(takepic==1?true:false);
-
+                                        partStage.setDuring((short) during);
                                         partStageList.add(partStage);
                                         break;
                                 }

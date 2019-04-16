@@ -8,6 +8,10 @@ import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.CvtUtil;
 import com.jz.experiment.util.TrimReader;
 import com.wind.base.C;
+import com.wind.base.bean.CyclingStage;
+import com.wind.base.bean.EndStage;
+import com.wind.base.bean.Stage;
+import com.wind.base.bean.StartStage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,7 +66,20 @@ public class ExampleUnitTest {
             };
         }
     }
+    @Test
+    public void testListAdd(){
+        List<Stage> steps=new ArrayList<>();
+        steps.add(new StartStage());
+        steps.add(new CyclingStage());
+        steps.add(new EndStage());
 
+        List<Stage> cyclingStageList=new ArrayList<>();
+        cyclingStageList.addAll(steps);
+        cyclingStageList.remove(0);
+
+        System.out.println(cyclingStageList.size());
+        System.out.println(steps.size());
+    }
     @Test
     public void testTransfer() {
 

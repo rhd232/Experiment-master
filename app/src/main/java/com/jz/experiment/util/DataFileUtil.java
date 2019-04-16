@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class DataFileUtil {
 
@@ -177,12 +178,28 @@ public class DataFileUtil {
 
     }
     public static boolean sDebug;
-    public static void writeFileLog(String txt) {
+
+
+    public static void writeFileLog(final String txt, ExecutorService executorService) {
         if (!sDebug){
             return;
         }
-        File file = getLogFile();
-        writeToFile(file, txt);
+        if (executorService==null) {
+            File file = getLogFile();
+            writeToFile(file, txt);
+        }else {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    File file = getLogFile();
+                    writeToFile(file, txt);
+                }
+            });
+        }
+
+    }
+    public static void writeFileLog(String txt) {
+        writeFileLog(txt,null);
 
     }
 }

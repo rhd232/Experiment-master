@@ -210,6 +210,8 @@ public class ExpeDataFragment extends CtFragment {
 
     }
 
+
+
     private boolean mHasMeltingMode;
 
 
@@ -251,10 +253,11 @@ public class ExpeDataFragment extends CtFragment {
         mDtChart = new DtChart(chart_dt, cyclingStage.getCyclingCount());
         mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
 
+        //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
+        KSList.clear();
+        KSList=Well.getWell().getKsList();
+
         //获取CT value
-
-
-
         for (String chan : ChanList) {
             for (String ks : KSList) {
                 getCtValue(chan, ks,CCurveShow.getInstance().m_CTValue);
@@ -518,6 +521,7 @@ public class ExpeDataFragment extends CtFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         mVisibleToUser = isVisibleToUser;
+
     }
 
     @Subscribe

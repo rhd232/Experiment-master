@@ -40,7 +40,8 @@ public class VernierAdapter extends BaseRecyclerAdapter<PartStage,VernierAdapter
         partStage.setStepName("step "+(position+1));
       //  partStage.setPosition(position);
 
-        holder.tv_step_name.setText("step "+(position+1));
+        String step=mActivity.getString(R.string.step,(position+1)+"");
+        holder.tv_step_name.setText(step);
         float startScale=partStage.getStartScale();
         float curScale=partStage.getCurScale();
      //   holder.vernier_drag_layout.setLink(null);

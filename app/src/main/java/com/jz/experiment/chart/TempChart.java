@@ -80,10 +80,10 @@ public class TempChart extends WindChart {
 
         if (mLegendEntries == null || mLegendEntries.isEmpty()) {
             mLegendEntries = new ArrayList<>();
-            LegendEntry lidlegendEntry = new LegendEntry("LID温度", Legend.LegendForm.LINE,
+            LegendEntry lidlegendEntry = new LegendEntry("热盖温度", Legend.LegendForm.LINE,
                     20, 4, null, Color.BLUE);
             mLegendEntries.add(lidlegendEntry);
-            LegendEntry plegendEntry = new LegendEntry("PELTIER温度", Legend.LegendForm.LINE,
+            LegendEntry plegendEntry = new LegendEntry("加热器温度", Legend.LegendForm.LINE,
                     20, 4, null, Color.RED);
             mLegendEntries.add(plegendEntry);
 

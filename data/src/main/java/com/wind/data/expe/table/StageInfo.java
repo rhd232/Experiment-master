@@ -14,8 +14,8 @@ public abstract class StageInfo  implements StageInfoModel {
                                 @Nullable Double startScale,
                                 @Nullable Double curScale, @Nullable String stepName,
                                 @Nullable Long serialNumber, @Nullable Long cycling_count,
-                                @Nullable Long part_takepic, @Nullable Long cycling_id, long expe_id) {
-            return new AutoValue_StageInfo(_id,type,startScale,curScale,stepName,serialNumber,cycling_count,part_takepic,cycling_id,expe_id);
+                                @Nullable Long part_takepic, @Nullable Long cycling_id, Long during,long expe_id) {
+            return new AutoValue_StageInfo(_id,type,startScale,curScale,stepName,serialNumber,cycling_count,part_takepic,cycling_id,during,expe_id);
         }
 
 

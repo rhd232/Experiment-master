@@ -3,10 +3,10 @@
     <string name="channel_select_title">请选择通道%1$s染料</string>
 
 
-    <string name="holding_stage">Holding Stage</string>
-    <string name="cycling_stage">Cycling Stage</string>
-    <string name="step">Step %1$s</string>
-    <string name="step_first">Step1</string>
+    <string name="holding_stage">保持阶段</string>
+    <string name="cycling_stage">循环阶段</string>
+    <string name="step">步骤%1$s</string>
+    <string name="step_first">步骤1</string>
 
     <array name="spinner_values">
         <item>扩增曲线</item>

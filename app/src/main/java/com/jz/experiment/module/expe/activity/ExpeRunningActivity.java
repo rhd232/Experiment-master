@@ -179,12 +179,49 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         init();
 
 
-        mExecutorService = Executors.newSingleThreadExecutor();
+        mExecutorService = Executors.newCachedThreadPool();
 
         //mDtChart.show(ChanList,KSList,null);
        /* Thread thread = new Thread(mRun);
         thread.start();*/
 
+       mExecutorService.execute(new Runnable() {
+           @Override
+           public void run() {
+               List<Stage> cyclingSteps=mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
+               StringBuilder sb=new StringBuilder();
+               sb.append("=========================\n");
+               for (int j=0;j<cyclingSteps.size();j++){
+
+                   CyclingStage c= (CyclingStage) cyclingSteps.get(j);
+                   sb.append("循环阶段"+(j+1));
+                   sb.append(" ");
+                   sb.append("循环数："+c.getCyclingCount());
+                   sb.append(" ");
+                   int picIndex=-1;
+                   for (int i = 0; i < c.getPartStageList().size(); i++) {
+                       PartStage partStage = c.getPartStageList().get(i);
+                       sb.append("阶段"+(i+1));
+                       sb.append(" ");
+                       sb.append("温度："+  partStage.getTemp());
+                       sb.append(" ");
+                       sb.append("持续时间："+  partStage.getDuring());
+                       sb.append(" ");
+                       if (partStage.isTakePic()){
+                           picIndex=(i+1);
+                       }
+                   }
+                   if (picIndex==-1){
+                       sb.append("拍照阶段：无");
+                   }else {
+                       sb.append("拍照阶段：" + picIndex);
+                   }
+                   sb.append("\n");
+               }
+               sb.append("=========================\n");
+               DataFileUtil.writeFileLog(sb.toString());
+           }
+       });
 
     }
 
@@ -598,14 +635,17 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         //TODO 检查返回的包是否正确
         boolean succ = StatusChecker.checkStatus(status);
         if (!succ) {
-            AppDialogHelper.showSingleBtnDialog(getActivity(), StatusChecker.getStatusDesc(status), new AppDialogHelper.DialogOperCallback() {
-                @Override
-                public void onDialogConfirmClick() {
+            if (!ActivityUtil.isFinish(getActivity())) {
+                AppDialogHelper.showSingleBtnDialog(getActivity(), StatusChecker.getStatusDesc(status), new AppDialogHelper.DialogOperCallback() {
+                    @Override
+                    public void onDialogConfirmClick() {
 
-                }
-            });
-            DataFileUtil.writeFileLog("返回错误：" + ByteUtil.getHexStr(reveicedBytes, reveicedBytes.length));
+                    }
+                });
+                DataFileUtil.writeFileLog("返回错误：" + ByteUtil.getHexStr(reveicedBytes, reveicedBytes.length));
+            }
             return;
+
         }
 
         int cmdIndex = 2;
@@ -962,7 +1002,6 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         byte[] reveicedBytes = data.getBuffer();
         int type = hexToDecimal(reveicedBytes[typeIndex]);
 
-
         readTemperature();
 
         if (type == PcrCommand.STEP_5_TYPE) {
@@ -979,22 +1018,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     tv_cycling.setText("");
                     break;
                 case 2://CYCLING
-                    /*if (mInCycling == false) {
-                        mCurCycling = 0;
-                    }
-                    int cyclingCount = getCurCyclingStage().getCyclingCount();
-                    if (mCyclingStageCount > 1) {
-                        int step = mCyclingStageIndex;
-                        String stepDesc = "阶段" + step + "循环：";
-                        tv_cycling_desc.setText(stepDesc);
 
-                    } else {
-                        tv_cycling_desc.setText("循环：");
-                    }
-                    if (mCurCycling > cyclingCount) {
-                        mCurCycling = cyclingCount;
-                    }
-                    tv_cycling.setText(mCurCycling + "/" + cyclingCount);*/
                     mInCycling = true;
                     PcrCommand cyclingInfoCmd = new PcrCommand();
                     cyclingInfoCmd.getCyclingInfo();
@@ -1009,45 +1033,16 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                             int cyclingStep = bytes[6];
                             System.out.println("cyclingStep:" + cyclingStep + " cyclingNum:" + cyclingNum);
 
-
-                            if (cyclingNum == 0) {
+                            mRunningCyclingStageIndex= bytes[7];
+                            /*if (cyclingNum == 0) {//只有一个循环时会出问题
                                 if (mStartCyclingNum) {
                                     mRunningCyclingStageIndex++;
                                     mStartCyclingNum = false;
-
-                                   /* List<Stage> stageList = getCyclingSteps();
-                                    CyclingStage cyclingStage = (CyclingStage) stageList.get(mRunningCyclingStageIndex);
-                                    //寻找拍照阶段
-                                    int picIndex=-1;
-                                    for (int i=0;i<cyclingStage.getPartStageList().size();i++){
-                                        PartStage partStage=cyclingStage.getPartStageList().get(i);
-                                        if (partStage.isTakePic()){
-                                            picIndex=i;
-                                            break;
-                                        }
-                                    }
-
-                                    //TODO 该循环是否需要拍照
-                                    int []channelOp=new int[4];
-                                    if (picIndex!=-1){
-                                        for (int i = 0; i < 4; i++) {
-                                            channelOp[i] = 1;
-                                        }
-                                    }else {
-                                        for (int i = 0; i < 4; i++) {
-                                            channelOp[i] = 0;
-                                        }
-                                    }
-
-                                    PcrCommand cmd=new PcrCommand();
-                                    cmd.step1(channelOp);
-                                    mCommunicationService.sendPcrCommandSync(cmd);
-                                    ThreadUtil.sleep(50);*/
                                 }
 
                             } else {
                                 mStartCyclingNum = true;
-                            }
+                            }*/
                             if (mCyclingStageCount > 1) {
                                 String stepDesc = "阶段" + (mRunningCyclingStageIndex + 1) + "循环：";
                                 tv_cycling_desc.setText(stepDesc);
@@ -1056,18 +1051,18 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                                 tv_cycling_desc.setText("循环：");
                             }
 
+                        /*    StringBuilder sBuilder=new StringBuilder();
+                            sBuilder.append("====================\n");
+                            sBuilder.append("下位机返回的cyclingNum："+cyclingNum+"\n");
+                            sBuilder.append("下位机返回的cyclingStep："+cyclingStep+"\n");
+                            sBuilder.append("计算得到的当前阶段"+(mRunningCyclingStageIndex + 1)+"\n");
+                            sBuilder.append("====================\n");
+                            DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);*/
+
                             List<Stage> stageList = getCyclingSteps();
                             CyclingStage cyclingStage = (CyclingStage) stageList.get(mRunningCyclingStageIndex);
                             tv_cycling.setText((cyclingNum + 1) + "/" + cyclingStage.getCyclingCount());
-                            /*if (mCyclingStageCount > 1) {
-                                String stepDesc = "阶段" + cyclingStep + "循环：";
-                                tv_cycling_desc.setText(stepDesc);
 
-                            } else {
-                                tv_cycling_desc.setText("循环：");
-                            }
-
-                            tv_cycling.setText(cyclingNum + "/" + cyclingCount);*/
                         }
                     }
                     break;
@@ -1414,8 +1409,11 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         int length = hexToDecimal(reveicedBytes[lengthIndex]);
         //int total = reveicedBytes[dataStartIndex++];
         int curRowIndex = reveicedBytes[dataStartIndex++];//从0开始
-        System.out.println("curRowIndex:" + curRowIndex);
-
+       /* System.out.println("curRowIndex:" + curRowIndex);
+        if (curRowIndex<0|| curRowIndex>11){
+            String error="========= errorCurRowIndex:"+curRowIndex+" =========";
+            DataFileUtil.writeFileLog(error);
+        }*/
        /* byte pixs[] = new byte[mImageMode.getSize() * 2];//每个图像像素有2个字节组成
         for (int i = 0; i < mImageMode.getSize() * 2; i++) {
             pixs[i] = reveicedBytes[dataStartIndex++];

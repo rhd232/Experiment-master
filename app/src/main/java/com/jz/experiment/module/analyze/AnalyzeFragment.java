@@ -173,8 +173,8 @@ public class AnalyzeFragment extends CtFragment {
                         ctValues=CCurveShow.getInstance().m_CTValue;
                     }
                     mChart.show(ChanList, KSList, mOpenedFile);
-
-
+                    KSList.clear();
+                    KSList=Well.getWell().getKsList();
                     for (String chan : ChanList) {
                         for (String ks : KSList) {
                             getCtValue(chan, ks,ctValues);
