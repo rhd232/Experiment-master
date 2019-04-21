@@ -8,6 +8,7 @@ import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.jz.experiment.widget.CtParamInputLayout;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class TempChart extends WindChart {
     }
 
     @Override
-    public void show(List<String> ChanList, List<String> KSList, File dataFile) {
+    public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam) {
 
 
     }

@@ -1,6 +1,7 @@
 package com.jz.experiment.chart;
 
 import com.jz.experiment.device.Well;
+import com.jz.experiment.widget.CtParamInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +15,25 @@ public class CurveReader {
     public static CurveReader getInstance(){
         return INSTANCE;
     }
-    public void readCurve(/*List<String> tdlist,List<String> kslist*/double[][] factorValues){
+    public void readCurve(/*List<String> tdlist,List<String> kslist*/double[][] factorValues, CtParamInputLayout.CtParam ctParam){
         double[][][]  m_yData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
         CCurveShow cCurveShow =  CCurveShow.getInstance();
+        int minCt=13;
+        int threshold=12;
+        if (ctParam!=null){
+            minCt=ctParam.ctMin;
+            if (minCt < 5) minCt = 5;
+            else if (minCt > 18) minCt = 25;
+
+            if (threshold < 8) threshold = 8;
+            else if (threshold > 50) threshold = 50;
+        }
+        cCurveShow.log_threshold[0] = (float)(threshold * 0.01);
+        cCurveShow.log_threshold[1] = (float)(threshold * 0.01);
+        cCurveShow.log_threshold[2] = (float)(threshold * 0.01);
+        cCurveShow.log_threshold[3] = (float)(threshold * 0.01);
+        cCurveShow.MIN_CT=minCt;
+
         cCurveShow.InitData();
         //List<String> kslist = new ArrayList<>();//定义孔数
         List<String> kslist=Well.getWell().getKsList();

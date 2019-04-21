@@ -218,6 +218,10 @@ public class UsbService extends CommunicationService {
             BluetoothConnectedEvent event = new BluetoothConnectedEvent(name);
             EventBus.getDefault().post(event);
 
+
+            if(mListener!=null){
+                mListener.onConnectSuccess();
+            }
         }
 
 

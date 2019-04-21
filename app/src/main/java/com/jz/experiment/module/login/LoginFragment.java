@@ -1,6 +1,7 @@
 package com.jz.experiment.module.login;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -11,12 +12,20 @@ import android.widget.TextView;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.bluetooth.CommunicationService;
+import com.jz.experiment.module.bluetooth.Data;
+import com.jz.experiment.module.bluetooth.PcrCommand;
+import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.util.DataFileUtil;
+import com.jz.experiment.util.DeviceProxyHelper;
+import com.jz.experiment.util.StatusChecker;
+import com.jz.experiment.util.UsbManagerHelper;
 import com.wind.base.C;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.ActivityUtil;
+import com.wind.base.utils.AppUtil;
 import com.wind.data.DbOpenHelper;
 import com.wind.data.base.datastore.UserDataStore;
 import com.wind.data.base.request.FindUserRequest;
@@ -52,7 +61,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
-public class LoginFragment extends BaseFragment {
+public class LoginFragment extends BaseFragment implements BluetoothConnectionListener {
 
 
 
@@ -66,8 +75,22 @@ public class LoginFragment extends BaseFragment {
 
     @BindView(R.id.tv_msg)
     TextView tv_msg;
+    @BindView(R.id.tv_app_version)
+    TextView tv_app_version;
+
+    @BindView(R.id.tv_lower_computer_host_version)
+    TextView tv_lower_computer_host_version;
+
+    @BindView(R.id.tv_lower_computer_img_version)
+    TextView tv_lower_computer_img_version;
+
+    @BindView(R.id.tv_lower_computer_temp_version)
+    TextView tv_lower_computer_temp_version;
+
     UserDataStore mUserDataStore;
     Subscription findSubscription;
+    private DeviceProxyHelper sDeviceProxyHelper;
+    private Handler mHandler=new Handler();
     @Override
     protected int getLayoutRes() {
         return R.layout.activity_login;
@@ -107,28 +130,35 @@ public class LoginFragment extends BaseFragment {
                         }
                     }
                 });
-      /*  final Subscription subscription=Observable.interval(1,TimeUnit.MILLISECONDS)
-               .onBackpressureLatest()
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(Long aLong) {
-                        System.out.println(aLong.longValue());
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                    }
-                });*/
+        //绑定service
+        sDeviceProxyHelper = DeviceProxyHelper
+                .getInstance(getActivity());
 
 
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                CommunicationService service=sDeviceProxyHelper.getCommunicationService();
+                if (service!=null){
+                    service.setNotify(LoginFragment.this);
+                    UsbManagerHelper.connectUsbDevice(getActivity());
+                }
 
+            }
+        }, 1000);
+
+        String appVersion=AppUtil.getAppVersionName(getActivity());
+        tv_app_version.setText("App版本："+appVersion);
+        /*mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                CommunicationService service=sDeviceProxyHelper.getCommunicationService();
+                if (service!=null){
+                    service.setNotify(LoginFragment.this);
+                    service.sendPcrCommand(PcrCommand.ofVersionCmd());
+                }
+            }
+        },1500);*/
 
     }
 
@@ -273,5 +303,60 @@ public class LoginFragment extends BaseFragment {
 
 
                 }
+    }
+
+    @Override
+    public void onConnectSuccess() {
+        if(sDeviceProxyHelper!=null) {
+            CommunicationService service = sDeviceProxyHelper.getCommunicationService();
+            if (service != null)
+                service.sendPcrCommand(PcrCommand.ofVersionCmd());
+        }
+    }
+
+    @Override
+    public void onConnectCancel() {
+
+    }
+
+    @Override
+    public void onDoThing() {
+
+    }
+
+    @Override
+    public void onReceivedData(Data data) {
+        byte[] buffer = data.getBuffer();
+
+        int statusIndex = 1;
+        int status =buffer[statusIndex];
+        int dataIndex=5;
+        //TODO 检查返回的包是否正确
+        boolean succ = StatusChecker.checkStatus(status);
+        if (succ){
+
+
+            //host型号
+            int model=buffer[dataIndex++];
+            int majorVersion=buffer[dataIndex++];
+            int minorVersion=buffer[dataIndex++];
+            dataIndex++;
+            dataIndex++;
+            dataIndex++;
+            //IMG型号
+            int imgModel=buffer[dataIndex++];
+            int imgMajorVersion=buffer[dataIndex++];
+            int imgMinorVersion=buffer[dataIndex++];
+            dataIndex++;
+            dataIndex++;
+            dataIndex++;
+            //TEMP型号
+            int tempModel=buffer[dataIndex++];
+            int tempMajorVersion=buffer[dataIndex++];
+            int tempMinorVersion=buffer[dataIndex++];
+            tv_lower_computer_host_version.setText("下位机HOST版本："+majorVersion+"."+minorVersion);
+            tv_lower_computer_img_version.setText("下位机IMG版本："+imgMajorVersion+"."+imgMinorVersion);
+            tv_lower_computer_temp_version.setText("下位机TEMP版本："+tempMajorVersion+"."+tempMinorVersion);
+        }
     }
 }

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:text="Ct 下限："
+        android:textColor="@color/color333333"/>
+
+    <EditText
+        android:id="@+id/et_ct_min"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="40dp"
+        android:maxLength="2"
+        android:inputType="number"
+        android:textColor="@color/color333333"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Ct 阈值(%)："
+        android:textColor="@color/color333333"/>
+
+    <EditText
+        android:id="@+id/et_ct_threshold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="40dp"
+        android:inputType="number"
+        android:maxLength="2"
+        android:textColor="@color/color333333"/>
+
+    <ImageView
+        android:id="@+id/btn_refresh"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+
+        android:src="@drawable/icon_refresh"
+        android:layout_marginLeft="20dp"/>
+   <!-- <TextView
+        android:id="@+id/btn_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="刷新"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:textColor="@color/white"
+        android:background="@color/color333333"
+        android:layout_marginLeft="16dp"
+        />-->
+</LinearLayout>

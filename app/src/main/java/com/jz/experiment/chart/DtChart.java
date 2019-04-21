@@ -10,6 +10,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.jz.experiment.device.Well;
+import com.jz.experiment.widget.CtParamInputLayout;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,19 +36,19 @@ public class DtChart extends WindChart {
         yAxis.setDrawGridLines(true);
     }
 
-    public void show(List<String> ChanList, List<String> KSList,File dataFile){
+    public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam){
         InputStream ips = null;
         try {
             ips = new FileInputStream(dataFile);
             //ips = mChart.getContext().getAssets().open("2019_02_13_04_11_17_dt.txt");
-            show(ChanList, KSList, ips);
+            show(ChanList, KSList, ips,ctParam);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    public void show(List<String> ChanList, List<String> KSList,InputStream ips) {
+    public void show(List<String> ChanList, List<String> KSList,InputStream ips,CtParamInputLayout.CtParam ctParam) {
 
         //读取图像文件数据
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
@@ -56,7 +57,7 @@ public class DtChart extends WindChart {
         }else {
             CommData.m_factorData=DataFileReader.getInstance().factorValue;
         }
-        CurveReader.getInstance().readCurve(CommData.m_factorData);
+        CurveReader.getInstance().readCurve(CommData.m_factorData,ctParam);
 
         // Map<Integer,List<List<String>>> chanMap= DataParser.parseDtData(dataFile);
         //请求服务器，解析图像版返回的原始数据

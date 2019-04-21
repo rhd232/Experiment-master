@@ -398,7 +398,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         if (chart_dt.getVisibility() == View.VISIBLE) {
             chart_dt.setVisibility(View.GONE);
         }
-        mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mHistoryExperiment));
+        mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mHistoryExperiment),null);
     }
 
     private void showDtChart() {
@@ -409,7 +409,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             chart_dt.setVisibility(View.VISIBLE);
         }
 
-        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mHistoryExperiment));
+        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mHistoryExperiment),null);
 
     }
 

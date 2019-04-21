@@ -3,10 +3,6 @@ package com.jz.experiment;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.usb.UsbConstants;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbInterface;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -18,15 +14,14 @@ import android.view.View;
 
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.module.analyze.AnalyzeFragment;
-import com.jz.experiment.module.bluetooth.DeviceRepo;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
 import com.jz.experiment.module.expe.bean.Tab;
-import com.jz.experiment.module.expe.bean.UsbDeviceInfo;
 import com.jz.experiment.module.settings.event.LogoutEvent;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.TrimReader;
+import com.jz.experiment.util.UsbManagerHelper;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Exiter;
@@ -38,7 +33,6 @@ import com.yanzhenjie.permission.AndPermission;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -128,40 +122,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void connectUsbDevice() {
-        UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        List<String> printerList = new ArrayList<>();
-        int printerCount = 0;//打印机台数
-        String[] strDev = new String[usbManager.getDeviceList().size()];
-        for (UsbDevice device : usbManager.getDeviceList().values()) {
-            for (int i = 0; i < device.getInterfaceCount(); i++) {
-                UsbInterface usbInterface = device.getInterface(i);
-                if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_HID) {
-                    printerCount++;
-                    printerList.add(device.getDeviceName());
-                }
-            }
-        }
-        strDev = new String[printerCount];
-        for (int i = 0; i < printerCount; i++) {
-            strDev[i] = printerList.get(i);
-
-        }
-
-        if (printerCount == 1) {
-            for (UsbDevice device : usbManager.getDeviceList().values()) {
-                for (int i = 0; i < device.getInterfaceCount(); i++) {
-                    UsbInterface usbInterface = device.getInterface(i);
-
-                    UsbDeviceInfo info = new UsbDeviceInfo();
-                    info.setDeviceName(device.getDeviceName());
-                    DeviceRepo.getInstance().store(getActivity(), info);
-                    DeviceProxyHelper.getInstance(getActivity()).getUsbService().connect(device.getDeviceName());
-                    // PrinterHelper.getInstance(getActivity()).connectDevice(device.getDeviceName());
-                    break;
-
-                }
-            }
-        }
+        UsbManagerHelper.connectUsbDevice(this);
     }
 
     /*Intent mServiceIntent;

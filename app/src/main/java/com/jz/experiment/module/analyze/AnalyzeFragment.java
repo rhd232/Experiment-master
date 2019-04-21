@@ -1,15 +1,20 @@
 package com.jz.experiment.module.analyze;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -24,18 +29,36 @@ import com.jz.experiment.device.UnsupportedDeviceException;
 import com.jz.experiment.device.Well;
 import com.jz.experiment.module.data.FilterActivity;
 import com.jz.experiment.module.expe.event.FilterEvent;
+import com.jz.experiment.util.AppDialogHelper;
+import com.jz.experiment.util.DataFileUtil;
+import com.jz.experiment.widget.CtParamInputLayout;
+import com.wind.base.dialog.LoadingDialogHelper;
+import com.wind.base.utils.AppUtil;
 import com.wind.base.utils.FileUtil;
 import com.wind.toastlib.ToastUtil;
 import com.wind.view.TitleBar;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class AnalyzeFragment extends CtFragment {
+import butterknife.OnClick;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
+public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.OnCtParamChangeListener {
 
     public static final int REQUEST_CODE_FILE = 1234;
 
@@ -47,6 +70,15 @@ public class AnalyzeFragment extends CtFragment {
     TitleBar mTitleBar;
     WindChart mChart;
     File mOpenedFile;
+
+    CtParamInputLayout layout_ctparam_input;
+    ExecutorService mExecutorService;
+
+
+    ScrollView sv_pdf;
+
+    Handler mHandler = new Handler();
+
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_analyze;
@@ -70,8 +102,11 @@ public class AnalyzeFragment extends CtFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        mExecutorService = Executors.newSingleThreadExecutor();
         EventBus.getDefault().register(this);
+        layout_ctparam_input = view.findViewById(R.id.layout_ctparam_input);
+        sv_pdf=view.findViewById(R.id.sv_pdf);
+        layout_ctparam_input.setOnCtParamChangeListener(this);
         chart_line = view.findViewById(R.id.chart_line);
         chart_line.setNoDataText("");
         mTitleBar = view.findViewById(R.id.title_bar);
@@ -99,8 +134,8 @@ public class AnalyzeFragment extends CtFragment {
         ChanList.add("Chip#3");
         ChanList.add("Chip#4");
         try {
-            KSList=Well.getWell().getKsList();
-        }catch (UnsupportedDeviceException e){
+            KSList = Well.getWell().getKsList();
+        } catch (UnsupportedDeviceException e) {
             //第一次安装，没有文件读取权限导致
             e.printStackTrace();
             KSList.add("A1");
@@ -161,23 +196,23 @@ public class AnalyzeFragment extends CtFragment {
                     mOpenedFile = new File(path);
                     String item = (String) spinner.getSelectedItem();
 
-                    double [][] ctValues;
+                    double[][] ctValues;
                     if ("熔解曲线".equals(item)) {
                         mChart = new MeltingChart(chart_line);
-                        ctValues=CCurveShowMet.getInstance().m_CTValue;
+                        ctValues = CCurveShowMet.getInstance().m_CTValue;
                       /*  float f=Float.parseFloat(String.format("%f",40f));
                         mChart.setAxisMinimum(f);*/
                     } else {
                         //获取类型，是扩增曲线还是熔解曲线
                         mChart = new DtChart(chart_line, 40);
-                        ctValues=CCurveShow.getInstance().m_CTValue;
+                        ctValues = CCurveShow.getInstance().m_CTValue;
                     }
-                    mChart.show(ChanList, KSList, mOpenedFile);
+                    mChart.show(ChanList, KSList, mOpenedFile, null);
                     KSList.clear();
-                    KSList=Well.getWell().getKsList();
+                    KSList = Well.getWell().getKsList();
                     for (String chan : ChanList) {
                         for (String ks : KSList) {
-                            getCtValue(chan, ks,ctValues);
+                            getCtValue(chan, ks, ctValues);
                         }
                     }
                     notifyCtChanged();
@@ -188,11 +223,13 @@ public class AnalyzeFragment extends CtFragment {
     }
 
     boolean mVisibleToUser;
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         mVisibleToUser = isVisibleToUser;
     }
+
     @Subscribe
     public void onFilterEvent(FilterEvent event) {
         if (!mVisibleToUser) {
@@ -231,13 +268,156 @@ public class AnalyzeFragment extends CtFragment {
     }
 
     private void showChart() {
-        if (mOpenedFile!=null && mChart!=null)
-            mChart.show(ChanList, KSList, mOpenedFile);
+        if (mOpenedFile != null && mChart != null)
+            mChart.show(ChanList, KSList, mOpenedFile, null);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onCtParamChanged(final CtParamInputLayout.CtParam ctParam) {
+
+        if (mOpenedFile != null && mChart != null && mChart instanceof DtChart) {
+            mExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    mChart.show(ChanList, KSList, mOpenedFile, ctParam);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            double[][] ctValues = CCurveShow.getInstance().m_CTValue;
+                            KSList.clear();
+                            KSList = Well.getWell().getKsList();
+                            for (String chan : ChanList) {
+                                for (String ks : KSList) {
+                                    getCtValue(chan, ks, ctValues);
+                                }
+                            }
+                            notifyCtChanged();
+                        }
+                    });
+
+                }
+            });
+
+        }
+    }
+
+    @OnClick(R.id.iv_pdf)
+    public void onViewClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_pdf:
+                AndPermission.with(this)
+                        .runtime()
+                        .permission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE})
+                        .onGranted(new Action<List<String>>() {
+                            @Override
+                            public void onAction(List<String> data) {
+                                AppDialogHelper.showNormalDialog(getActivity(),
+                                        "确定要导出pdf吗？", new AppDialogHelper.DialogOperCallback() {
+                                            @Override
+                                            public void onDialogConfirmClick() {
+
+                                                LoadingDialogHelper.showOpLoading(getActivity());
+
+                                                mHandler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        StringBuilder sPdfNameBuilder=new StringBuilder();
+                                                        sPdfNameBuilder.append(mOpenedFile.getName().replace(".txt",""));
+;                                                        if (mChart instanceof DtChart){
+                                                            sPdfNameBuilder.append("变温扩增");
+                                                        }else {
+                                                            sPdfNameBuilder.append("熔解曲线");
+                                                        }
+                                                        sPdfNameBuilder.append(".pdf");
+                                                        String pdfName = sPdfNameBuilder.toString();
+                                                        //DataFileUtil.getPdfFileName(mExeperiment, false);
+                                                        //生成pdf
+                                                        generatePdf(pdfName)
+                                                                .subscribeOn(Schedulers.io())
+                                                                .observeOn(AndroidSchedulers.mainThread())
+                                                                .subscribe(new Action1<Boolean>() {
+                                                                    @Override
+                                                                    public void call(Boolean aboolean) {
+
+                                                                        LoadingDialogHelper.hideOpLoading();
+                                                                        ToastUtil.showToast(getActivity(), "已导出");
+
+                                                                    }
+                                                                }, new Action1<Throwable>() {
+                                                                    @Override
+                                                                    public void call(Throwable throwable) {
+                                                                        LoadingDialogHelper.hideOpLoading();
+                                                                        throwable.printStackTrace();
+                                                                        ToastUtil.showToast(getActivity(), "导出失败");
+                                                                    }
+                                                                });
+                                                    }
+                                                }, 3000);
+
+
+                                            }
+
+
+                                        });
+                            }
+                        }).start();
+                break;
+        }
+    }
+
+
+    private Observable<Boolean> generatePdf(final String pdfName) {
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                PdfDocument document = new PdfDocument();
+                int width = AppUtil.getScreenWidth(getActivity());
+                int height = 0;// AppUtil.getScreenHeight(getActivity());
+                //计算scrollview的高度
+                for (int i = 0; i < sv_pdf.getChildCount(); i++) {
+                    height += sv_pdf.getChildAt(i).getHeight();
+                }
+
+                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo
+                        .Builder(width, height, 1)
+                        .create();
+
+                PdfDocument.Page page = document.startPage(pageInfo);
+                Canvas canvas = page.getCanvas();
+                sv_pdf.draw(canvas);
+              /*  chart.draw(canvas);
+                canvas.translate(0, chart.getHeight());
+
+                gv_a.draw(canvas);
+                canvas.translate(0, gv_a.getHeight());
+                gv_b.draw(page.getCanvas());*/
+
+                document.finishPage(page);
+                // String pdfName = fileName + ".pdf";
+                File file = new File(DataFileUtil.getPdfFilePath(pdfName));
+
+                try {
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    document.writeTo(outputStream);
+                    subscriber.onNext(true);
+                    subscriber.onCompleted();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    subscriber.onError(e);
+                }
+                document.close();
+
+            }
+        });
+
+
     }
 }

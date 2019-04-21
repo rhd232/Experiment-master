@@ -20,6 +20,7 @@ import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
 import com.jz.experiment.util.DeviceProxyHelper;
+import com.jz.experiment.util.StatusChecker;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.recyclerview.decoration.VerticalSpacesItemDecoration;
@@ -328,7 +329,31 @@ public class HistoryExperimentsFragment extends BaseFragment {
                             TrimReader.getInstance().ReadTrimFile(getActivity());
                             mNeedReadTrimFile=false;
                         }*/
-                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+
+                        //读取下位机是否插入了电源以及热盖的开闭
+                        PcrCommand cmd=PcrCommand.ofLidAndApaptorStatusCmd();
+                        byte [] reveicedBytes=sDeviceProxyHelper.getCommunicationService().sendPcrCommandSync(cmd);
+                        int statusIndex = 1;
+                        int status =reveicedBytes[statusIndex];
+                        //TODO 检查返回的包是否正确
+                        boolean succ = StatusChecker.checkStatus(status);
+                        if (succ){
+                            //检查
+                            int lidAndStatusByte=reveicedBytes[5];
+                            int lidStatus=lidAndStatusByte & 0x1;
+                            int adaptorStatus=(lidAndStatusByte>>1) & 0x1;
+                            if (lidStatus==1){
+                                ToastUtil.showToast(getActivity(),"请先关闭热盖");
+                                return;
+                            }
+                            if (adaptorStatus==1){
+                                ToastUtil.showToast(getActivity(),"请先插入电源适配器");
+                                return;
+                            }
+
+                            UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                        }
+
 
                     }
                 })

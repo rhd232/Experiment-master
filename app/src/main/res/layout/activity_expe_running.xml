@@ -82,6 +82,8 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
+
+
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart_dt"
             android:layout_width="match_parent"
@@ -93,8 +95,8 @@
             android:id="@+id/chart_melt"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@color/white"
             android:layout_weight="1"
+            android:background="@color/white"
             android:visibility="gone" />
 
         <com.github.mikephil.charting.charts.LineChart
@@ -102,8 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/white"
-            />
+            android:background="@color/white" />
     </LinearLayout>
 
     <TextView

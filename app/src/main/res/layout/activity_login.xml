@@ -95,4 +95,30 @@
         android:text="登录"
         android:textColor="@color/white"
         android:gravity="center"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color999999"
+        android:id="@+id/tv_app_version"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color999999"
+        android:id="@+id/tv_lower_computer_host_version"
+        android:layout_marginTop="10dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color999999"
+        android:id="@+id/tv_lower_computer_img_version"
+        android:layout_marginTop="10dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color999999"
+        android:id="@+id/tv_lower_computer_temp_version"
+        android:layout_marginTop="10dp"/>
 </LinearLayout>

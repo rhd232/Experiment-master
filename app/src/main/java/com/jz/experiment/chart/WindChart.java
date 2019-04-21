@@ -16,6 +16,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.jz.experiment.widget.ChartMarkerView;
+import com.jz.experiment.widget.CtParamInputLayout;
 import com.wind.data.expe.bean.ColorfulEntry;
 
 import java.io.File;
@@ -164,7 +165,7 @@ public abstract class WindChart {
     public void setRunning(boolean running){
         this.mRunning=running;
     }
-    public abstract void show(List<String> ChanList, List<String> KSList,File dataFile);
+    public abstract void show(List<String> ChanList, List<String> KSList,File dataFile, CtParamInputLayout.CtParam ctParam);
 
 
     public  void setAxisMinimum(float start){

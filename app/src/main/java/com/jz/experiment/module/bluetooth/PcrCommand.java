@@ -39,12 +39,52 @@ public class PcrCommand {
 
     public static final int READ_TRIM_CMD=4;
     public static final int READ_TRIM_TYPE=0x2d;
+
+
+
     public void reset() {
         commandList.clear();
     }
 
     public ArrayList<Byte> getCommandList() {
         return commandList;
+    }
+    public static PcrCommand ofVersionCmd() {
+
+        int header=0xaa;
+        int command=0x4;
+        int length=0x01;
+        int type=0x27;
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) header);
+        bytes.add((byte) command);
+        bytes.add((byte) length);
+        bytes.add((byte) type);
+
+        PcrCommand cmd=new PcrCommand();
+        cmd.addCommonBytes(bytes);
+        cmd.addCommand(listToByteArray(bytes));
+
+        return cmd;
+    }
+
+
+    public static PcrCommand ofLidAndApaptorStatusCmd() {
+        int header=0xaa;
+        int command=0x17;
+        int length=0x01;
+        int type=0x01;
+        List<Byte> bytes = new ArrayList<>();
+        bytes.add((byte) header);
+        bytes.add((byte) command);
+        bytes.add((byte) length);
+        bytes.add((byte) type);
+
+        PcrCommand cmd=new PcrCommand();
+        cmd.addCommonBytes(bytes);
+        cmd.addCommand(listToByteArray(bytes));
+
+        return cmd;
     }
 
 

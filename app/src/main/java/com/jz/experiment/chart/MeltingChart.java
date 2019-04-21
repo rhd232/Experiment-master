@@ -10,6 +10,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.jz.experiment.device.Well;
+import com.jz.experiment.widget.CtParamInputLayout;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +39,7 @@ public class MeltingChart extends WindChart {
     }
 
     @Override
-    public void show(List<String> ChanList, List<String> KSList, File dataFile) {
+    public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam) {
 
         InputStream ips = null;
         try {

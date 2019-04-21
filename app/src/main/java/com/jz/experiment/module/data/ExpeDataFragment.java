@@ -29,6 +29,7 @@ import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DataFileUtil;
+import com.jz.experiment.widget.CtParamInputLayout;
 import com.wind.base.bean.CyclingStage;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.response.BaseResponse;
@@ -64,7 +65,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class ExpeDataFragment extends CtFragment {
+public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.OnCtParamChangeListener {
 
     public static final String ARGS_KEY_EXPE = "args_key_expe";
     @BindView(R.id.tv_dt)
@@ -100,6 +101,9 @@ public class ExpeDataFragment extends CtFragment {
    /* LineData mLineData;
     ArrayList<ILineDataSet> mDataSets;*/
 
+   @BindView(R.id.layout_ctparam_input)
+   CtParamInputLayout layout_ctparam_input;
+
     DtChart mDtChart;
     MeltingChart mMeltingChart;
     ExecutorService mExecutorService;
@@ -118,7 +122,7 @@ public class ExpeDataFragment extends CtFragment {
         EventBus.getDefault().register(this);
         mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
 
-
+        layout_ctparam_input.setOnCtParamChangeListener(this);
       /*  GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
         gvs[1] = gv_b;
@@ -223,16 +227,18 @@ public class ExpeDataFragment extends CtFragment {
     };
 
 
+
     private void showChart() {
         double [][] ctValues;
         if (tv_dt.isActivated()) {
-            mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
+
+            mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment),layout_ctparam_input.getCtParam());
             ctValues=CCurveShow.getInstance().m_CTValue;
         } else {
           /*  float t=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
             float f=Float.parseFloat(String.format("%f",t));
             mMeltingChart.setAxisMinimum(f);*/
-            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment),layout_ctparam_input.getCtParam());
             ctValues=CCurveShowMet.getInstance().m_CTValue;
         }
 
@@ -251,7 +257,7 @@ public class ExpeDataFragment extends CtFragment {
         }
         CyclingStage cyclingStage = (CyclingStage) mExeperiment.getSettingSecondInfo().getCyclingSteps().get(0);
         mDtChart = new DtChart(chart_dt, cyclingStage.getCyclingCount());
-        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment));
+        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment),layout_ctparam_input.getCtParam());
 
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
         KSList.clear();
@@ -271,7 +277,7 @@ public class ExpeDataFragment extends CtFragment {
         if (mHasMeltingMode) {
             //tv_melt.setVisibility(View.VISIBLE);
             mMeltingChart = new MeltingChart(chart_melt);
-            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment));
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment),layout_ctparam_input.getCtParam());
         } else {
             tv_melt.setVisibility(View.GONE);
         }
@@ -568,5 +574,10 @@ public class ExpeDataFragment extends CtFragment {
     public void onDestroyView() {
         super.onDestroyView();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onCtParamChanged(CtParamInputLayout.CtParam ctParam) {
+        showChart();
     }
 }
