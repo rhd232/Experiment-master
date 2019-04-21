@@ -17,6 +17,7 @@ import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.TempChart;
 import com.jz.experiment.device.Well;
+import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.bluetooth.BluetoothReceiver;
 import com.jz.experiment.module.bluetooth.BluetoothService;
 import com.jz.experiment.module.bluetooth.CommunicationService;
@@ -50,8 +51,12 @@ import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.ExpeSettingSecondInfo;
+import com.wind.data.expe.bean.ExperimentStatus;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.bean.Mode;
+import com.wind.data.expe.datastore.ExpeDataStore;
+import com.wind.data.expe.request.InsertExpeRequest;
+import com.wind.data.expe.response.InsertExpeResponse;
 import com.wind.toastlib.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -937,7 +942,6 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 return;
             }
             mTempChart.addTemp(lidTemp, peltierTemp);
-
         }
 
 
@@ -1154,26 +1158,56 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     private void toAnalyzePage() {
         mHistoryExperiment.setDuring(tv_duration.getDuring());
         mHistoryExperiment.setFinishMilliTime(System.currentTimeMillis());
-        //数据
-        //变增扩温曲线数据
-        //TODO 溶解曲线曲线数据
-       /* ChartData chartData = new ChartData();
-        List<com.wind.data.expe.bean.LineData> lineDataList = new ArrayList<>();
-        for (int i = 0; i < mDataSets.size(); i++) {
-            LineDataSet lineDataSet = (LineDataSet) mDataSets.get(i);
-            List<Entry> entries = lineDataSet.getValues();
-            com.wind.data.expe.bean.LineData lineData = new com.wind.data.expe.bean.LineData();
-            lineData.setEntries(entries);
-            lineData.setColor(mLineColors.get(i));
-            lineDataList.add(lineData);
 
-        }
-        chartData.setLineDataList(lineDataList);
-        mHistoryExperiment.setDtChartData(chartData);*/
+        //TODO 下个版本直接保存实验
+      /*  saveExpe(mHistoryExperiment).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<InsertExpeResponse>() {
+                    @Override
+                    public void call(InsertExpeResponse response) {
+                        if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
+                            EventBus.getDefault().post(new SavedExpeDataEvent());
+                           // ToastUtil.showToast(getActivity(), "已保存到本地");
+                            Tab tab = new Tab();
+                            tab.setIndex(MainActivity.TAB_INDEX_DATA);
+                            tab.setExtra(mHistoryExperiment);
+                            MainActivity.start(getActivity(), tab);
+                        } else {
+                            ToastUtil.showToast(getActivity(), "保存失败");
+                        }
+
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
+                        ToastUtil.showToast(getActivity(), "保存失败,请重试");
+                    }
+                });*/
+
         Tab tab = new Tab();
         tab.setIndex(MainActivity.TAB_INDEX_DATA);
         tab.setExtra(mHistoryExperiment);
         MainActivity.start(getActivity(), tab);
+
+    }
+
+
+    private Observable<InsertExpeResponse> saveExpe(HistoryExperiment experiment) {
+        ExperimentStatus status = new ExperimentStatus();
+        status.setStatus(ExperimentStatus.STATUS_COMPLETED);
+        status.setDesc("已完成");
+        experiment.setStatus(status);
+        //新插入一条数据
+        experiment.setId(HistoryExperiment.ID_NONE);
+
+        InsertExpeRequest request = new InsertExpeRequest();
+        request.setExperiment(experiment);
+        //TODO 保存实验数据
+        return ExpeDataStore
+                .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))
+                .insertExpe(request);
+
     }
 
     private void checkHasNewParam(byte[] reveicedBytes) {

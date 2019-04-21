@@ -341,33 +341,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 break;
             case R.id.iv_save:
 
-                if (!isSavedExpe() && !mSaved) {
-                    mSaved = true;
-                    saveExpe()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Action1<InsertExpeResponse>() {
-                                @Override
-                                public void call(InsertExpeResponse response) {
-                                    if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
-                                        EventBus.getDefault().post(new SavedExpeDataEvent());
-                                        ToastUtil.showToast(getActivity(), "已保存到本地");
-                                        Tab tab = new Tab();
-                                        tab.setIndex(MainActivity.TAB_INDEX_EXPE);
-                                        MainActivity.start(getActivity(), tab);
-                                    } else {
-                                        ToastUtil.showToast(getActivity(), "保存失败");
-                                    }
 
-                                }
-                            }, new Action1<Throwable>() {
-                                @Override
-                                public void call(Throwable throwable) {
-                                    throwable.printStackTrace();
-                                    ToastUtil.showToast(getActivity(), "请重试");
-                                }
-                            });
-                }
+
+               doSaveExpe();
 
 
                 break;
@@ -455,7 +431,35 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 break;
         }
     }
+    private void doSaveExpe() {
+        if (!isSavedExpe() && !mSaved) {
+            mSaved = true;
+            saveExpe()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<InsertExpeResponse>() {
+                        @Override
+                        public void call(InsertExpeResponse response) {
+                            if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
+                                EventBus.getDefault().post(new SavedExpeDataEvent());
+                                ToastUtil.showToast(getActivity(), "已保存到本地");
+                                Tab tab = new Tab();
+                                tab.setIndex(MainActivity.TAB_INDEX_EXPE);
+                                MainActivity.start(getActivity(), tab);
+                            } else {
+                                ToastUtil.showToast(getActivity(), "保存失败");
+                            }
 
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            throwable.printStackTrace();
+                            ToastUtil.showToast(getActivity(), "保存失败,请重试");
+                        }
+                    });
+        }
+    }
     private Observable<InsertExpeResponse> saveExpe() {
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_COMPLETED);

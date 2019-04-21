@@ -153,13 +153,6 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
             titles = new ArrayList<>();
             mFragmentAdapter.setFragments(fragments);
             mFragmentAdapter.setTitles(titles);
-        } else {
-
-           /* ExpeDataFragment expeDataFragment = (ExpeDataFragment) fragments.get(0);
-            titles.remove(0);
-            titles.add(0, "历史实验");*/
-
-
         }
 
         titles.add(0, expe.getName());
@@ -185,6 +178,10 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     public void onDestroyView() {
         super.onDestroyView();
         EventBus.getDefault().unregister(this);
+    }
+
+    public void reload() {
+        loadExpe();
     }
 }
 
