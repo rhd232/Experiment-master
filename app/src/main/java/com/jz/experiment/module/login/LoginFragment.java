@@ -138,10 +138,12 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                CommunicationService service=sDeviceProxyHelper.getCommunicationService();
-                if (service!=null){
-                    service.setNotify(LoginFragment.this);
-                    UsbManagerHelper.connectUsbDevice(getActivity());
+                if (!ActivityUtil.isFinish(getActivity())) {
+                    CommunicationService service = sDeviceProxyHelper.getCommunicationService();
+                    if (service != null) {
+                        service.setNotify(LoginFragment.this);
+                        UsbManagerHelper.connectUsbDevice(getActivity());
+                    }
                 }
 
             }
@@ -355,8 +357,20 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
             int tempMajorVersion=buffer[dataIndex++];
             int tempMinorVersion=buffer[dataIndex++];
             tv_lower_computer_host_version.setText("下位机HOST版本："+majorVersion+"."+minorVersion);
-            tv_lower_computer_temp_version.setText("下位机IMG版本："+imgMajorVersion+"."+imgMinorVersion);
-            tv_lower_computer_img_version.setText("下位机TEMP版本："+tempMajorVersion+"."+tempMinorVersion);
+            tv_lower_computer_img_version.setText("下位机IMG版本："+imgMajorVersion+"."+imgMinorVersion);
+            tv_lower_computer_temp_version.setText("下位机TEMP版本："+tempMajorVersion+"."+tempMinorVersion);
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (sDeviceProxyHelper!=null) {
+            CommunicationService service = sDeviceProxyHelper.getCommunicationService();
+            if (service != null) {
+                service.setNotify(null);
+            }
         }
     }
 }

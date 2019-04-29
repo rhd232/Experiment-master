@@ -445,7 +445,7 @@ public class BluetoothService extends CommunicationService {
                 //有数据可读
                 Data data = new Data(buffer, bytes);
                 //broadcastUpdate(ACTION_DATA_AVAILABLE, data);
-                Message msg=new Message();
+                Message msg=Message.obtain();
                 msg.what=3;
                 msg.obj=data;
                 mHandler.sendMessage(msg);

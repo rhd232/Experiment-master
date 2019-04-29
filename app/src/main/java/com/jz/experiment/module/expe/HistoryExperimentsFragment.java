@@ -42,6 +42,8 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,7 +75,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     TextView tv_device_state;
 
     private DeviceProxyHelper sDeviceProxyHelper;
-
+    private ExecutorService mExecutorService;
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_hostory_experiments;
@@ -84,6 +86,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         EventBus.getDefault().register(this);
+        mExecutorService= Executors.newSingleThreadExecutor();
         layout_loading.setEmpty(R.layout.layout_expe_empty);
         layout_loading.setOnEmptyInflateListener(new LoadingLayout.OnInflateListener() {
             @Override
@@ -299,7 +302,45 @@ public class HistoryExperimentsFragment extends BaseFragment {
         }
     }
 
+    private Observable<Integer> readLid(){
+        return Observable.create(new Observable.OnSubscribe<Integer>() {
 
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                PcrCommand cmd=PcrCommand.ofLidAndApaptorStatusCmd();
+                byte [] reveicedBytes=sDeviceProxyHelper.getCommunicationService().sendPcrCommandSync(cmd);
+                if (reveicedBytes==null || reveicedBytes[0]==0){
+                    subscriber.onNext(CODE_NOT_CONECTED);
+                    return;
+                }
+                int statusIndex = 1;
+                int status =reveicedBytes[statusIndex];
+                //TODO 检查返回的包是否正确
+                boolean succ = StatusChecker.checkStatus(status);
+                if (succ){
+                    //检查
+                    int lidAndStatusByte=reveicedBytes[5];
+                    int lidStatus=lidAndStatusByte & 0x1;
+                    int adaptorStatus=(lidAndStatusByte>>1) & 0x1;
+                    if (lidStatus==1){
+                        subscriber.onNext(CODE_LID_ERROR);
+                        return;
+                    }
+                    if (adaptorStatus==1){
+                        subscriber.onNext(CODE_ADAPTOR_ERROR);
+                        return;
+                    }
+                    subscriber.onNext(CODE_SUCCESS);
+                }else {
+                    subscriber.onNext(CODE_NOT_CONECTED);
+                }
+            }
+        });
+    }
+    public static final int CODE_NOT_CONECTED=-1;
+    public static final int CODE_SUCCESS=0;
+    public static final int CODE_LID_ERROR=1;
+    public static final int CODE_ADAPTOR_ERROR=2;
     private boolean mNeedReadTrimFile;
     /**
      * 去实验设置页面
@@ -313,7 +354,6 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 !=PackageManager.PERMISSION_GRANTED) {//没有sd卡读取权限
             mNeedReadTrimFile=true;
         }*/
-
 
         //判断是否已经连接设备
         AndPermission.with(getActivity())
@@ -329,30 +369,31 @@ public class HistoryExperimentsFragment extends BaseFragment {
                             TrimReader.getInstance().ReadTrimFile(getActivity());
                             mNeedReadTrimFile=false;
                         }*/
-
+                        LoadingDialogHelper.showOpLoading(getActivity());
                         //读取下位机是否插入了电源以及热盖的开闭
-                        PcrCommand cmd=PcrCommand.ofLidAndApaptorStatusCmd();
-                        byte [] reveicedBytes=sDeviceProxyHelper.getCommunicationService().sendPcrCommandSync(cmd);
-                        int statusIndex = 1;
-                        int status =reveicedBytes[statusIndex];
-                        //TODO 检查返回的包是否正确
-                        boolean succ = StatusChecker.checkStatus(status);
-                        if (succ){
-                            //检查
-                            int lidAndStatusByte=reveicedBytes[5];
-                            int lidStatus=lidAndStatusByte & 0x1;
-                            int adaptorStatus=(lidAndStatusByte>>1) & 0x1;
-                            if (lidStatus==1){
-                                ToastUtil.showToast(getActivity(),"请先关闭热盖");
-                                return;
-                            }
-                            if (adaptorStatus==1){
-                                ToastUtil.showToast(getActivity(),"请先插入电源适配器");
-                                return;
-                            }
+                        readLid().subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<Integer>() {
+                            @Override
+                            public void call(Integer status) {
+                                LoadingDialogHelper.hideOpLoading();
+                                switch (status){
+                                    case CODE_SUCCESS:
+                                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                                        break;
 
-                            UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
-                        }
+                                    case CODE_LID_ERROR:
+                                        ToastUtil.showToast(getActivity(),"请先关闭热盖");
+                                        break;
+                                    case CODE_ADAPTOR_ERROR:
+                                        ToastUtil.showToast(getActivity(),"请先插入电源适配器");
+                                        break;
+                                    case CODE_NOT_CONECTED:
+                                        ToastUtil.showToast(getActivity(),"请检查HID设备是否已连接");
+                                        break;
+                                }
+                            }
+                        });
 
 
                     }
@@ -407,6 +448,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
         EventBus.getDefault().unregister(this);
     }
 }

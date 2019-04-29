@@ -251,6 +251,10 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mCommunicationService!=null){
+            mCommunicationService.setNotify(null);
+        }
+
         if (mReadTrimSubscription!=null){
             if (!mReadTrimSubscription.isUnsubscribed()){
                 mReadTrimSubscription.unsubscribe();
@@ -392,17 +396,66 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         }
     }
 
+    private int mReadTrimCount;
     private void readTrimDataFromInstrument() {
          mReadTrimSubscription=Observable.interval(1000,TimeUnit.MILLISECONDS)
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long aLong) {
+                        if (mReadTrimCount==3){
+                            showConnectionTip();
+                            return;
+                        }
+                        if (mReadTrimCount>=2){
+                            mReadTrimSubscription.unsubscribe();
+                            verifyConnection();
+                        }else {
+                            mReadTrimCount++;
+                            mCommunicationService.setNotify(UserSettingsStep2Activity.this);
+                            TrimReader.getInstance().ReadTrimDataFromInstrument(mCommunicationService);
+                        }
 
-                        mCommunicationService.setNotify(UserSettingsStep2Activity.this);
-                        TrimReader.getInstance().ReadTrimDataFromInstrument(mCommunicationService);
                     }
                 });
 
+    }
+
+    private void verifyConnection() {
+        PcrCommand cmd=PcrCommand.ofLidAndApaptorStatusCmd();
+        byte [] reveicedBytes=mCommunicationService.sendPcrCommandSync(cmd);
+        if (reveicedBytes!=null) {
+            try{
+                int statusIndex = 1;
+                int status = reveicedBytes[statusIndex];
+                //TODO 检查返回的包是否正确
+                boolean succ = StatusChecker.checkStatus(status);
+                if (succ){
+                    readTrimDataFromInstrument();
+                }else {
+                    showConnectionTip();
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                showConnectionTip();
+            }
+
+        }else {
+            showConnectionTip();
+        }
+    }
+
+    private void showConnectionTip(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AppDialogHelper.showNormalDialog(getActivity(), "请检查HID设备连接情况", new AppDialogHelper.DialogOperCallback() {
+                    @Override
+                    public void onDialogConfirmClick() {
+
+                    }
+                });
+            }
+        });
     }
 
     public Observable<Boolean> setIntergrationTime() {
@@ -464,6 +517,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         if (service == null) {
             return;
         }
+
         PcrCommand cmd = new PcrCommand();
         for (int i = 1; i <= 4; i++) {
             cmd.reset();
@@ -603,6 +657,9 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     private String dp_str;
     @Override
     public void onReceivedData(Data data) {
+        if (mReadTrimSubscription==null){
+            return;
+        }
         mReadTrimSubscription.unsubscribe();
         //TODO 读取trim数据和dataposition数据
         byte[] reveicedBytes = data.getBuffer();

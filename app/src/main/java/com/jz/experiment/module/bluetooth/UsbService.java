@@ -20,6 +20,7 @@ import android.util.Log;
 
 import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
+import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
 import com.wind.toastlib.ToastUtil;
 
@@ -287,14 +288,14 @@ public class UsbService extends CommunicationService {
         for (int i = 0; i < bytes.size(); i++) {
             data[i] = bytes.get(i).byteValue();
         }
-
-        StringBuilder hex = new StringBuilder(data.length * 2);
+        String hex = ByteUtil.getHexStr(data,data.length);
+       /* StringBuilder hex = new StringBuilder(data.length * 2);
         for (byte b : data) {
             if ((b & 0xFF) < 0x10) hex.append("0");
             hex.append(Integer.toHexString(b & 0xFF));
-        }
-        System.out.println("发送：" + hex.toString().toLowerCase());
-        DataFileUtil.writeFileLog("发送：" + hex.toString().toLowerCase());
+        }*/
+        System.out.println("发送：" + hex);
+        DataFileUtil.writeFileLog("发送：" + hex);
     }
 
     public int sendPcrCommand(PcrCommand command) {
@@ -341,6 +342,7 @@ public class UsbService extends CommunicationService {
             for (int i = 0; i < command.size(); i++) {
                 data[i] = command.get(i).byteValue();
             }
+
             //超时时间需要设置的长一点，不然很可能打印卡住，返回-1。
             int ret = mUsbDeviceConnection.bulkTransfer(mUsbEndpointOut, data, data.length, 5000);
             if (ret >= 0) {
@@ -383,6 +385,7 @@ public class UsbService extends CommunicationService {
             for (int i = 0; i < command.size(); i++) {
                 data[i] = command.get(i).byteValue();
             }
+
             //超时时间需要设置的长一点，不然很可能打印卡住，返回-1。
             int ret = mUsbDeviceConnection.bulkTransfer(mUsbEndpointOut, data, data.length, 5000);
             if (ret >= 0) {
@@ -480,7 +483,7 @@ public class UsbService extends CommunicationService {
                             DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
 
                             Data data = new Data(buffer, bytes);
-                            Message msg = new Message();
+                            Message msg = Message.obtain();
                             msg.what = 3;
                             msg.obj = data;
                             mHandler.sendMessage(msg);

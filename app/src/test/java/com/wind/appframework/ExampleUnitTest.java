@@ -912,7 +912,7 @@ public class ExampleUnitTest {
 
     @Test
     public void testByteToString() {
-        byte[] cmd = new byte[6];
+       /* byte[] cmd = new byte[6];
         cmd[0] = (byte) 0xaa;
         cmd[1] = (byte) 0x13;
         cmd[2] = (byte) 0x2;
@@ -922,9 +922,15 @@ public class ExampleUnitTest {
         for (int i = 0; i < cmd.length; i++) {
             System.out.print(cmd[i] + " ");
         }
-        System.out.println();
+        System.out.println();*/
 
-        String rev = ByteUtil.getHexStr(cmd, cmd.length);
+       PcrCommand cmd=new PcrCommand();
+       cmd.trimData();
+        byte[] cmdBytes = new byte[cmd.getCommandList().size()];
+        for (int i = 0; i < cmd.getCommandList().size(); i++) {
+            cmdBytes[i]=cmd.getCommandList().get(i);
+        }
+        String rev = ByteUtil.getHexStr(cmdBytes, cmdBytes.length);
         System.out.println(rev);
         byte[] result = ByteUtil.hexStringToBytes(rev, rev.length() / 2);
         for (int i = 0; i < result.length; i++) {

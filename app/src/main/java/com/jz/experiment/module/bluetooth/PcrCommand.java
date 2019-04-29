@@ -49,10 +49,15 @@ public class PcrCommand {
     public ArrayList<Byte> getCommandList() {
         return commandList;
     }
+
+    /**
+     * 读取版本号
+     * @return
+     */
     public static PcrCommand ofVersionCmd() {
 
         int header=0xaa;
-        int command=0x4;
+        int command=0x04;
         int length=0x01;
         int type=0x27;
         List<Byte> bytes = new ArrayList<>();
