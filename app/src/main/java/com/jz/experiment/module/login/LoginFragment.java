@@ -356,9 +356,10 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
             int tempModel=buffer[dataIndex++];
             int tempMajorVersion=buffer[dataIndex++];
             int tempMinorVersion=buffer[dataIndex++];
+            //host1.35-temp1.29-img1.42
             tv_lower_computer_host_version.setText("下位机HOST版本："+majorVersion+"."+minorVersion);
-            tv_lower_computer_img_version.setText("下位机IMG版本："+imgMajorVersion+"."+imgMinorVersion);
-            tv_lower_computer_temp_version.setText("下位机TEMP版本："+tempMajorVersion+"."+tempMinorVersion);
+            tv_lower_computer_img_version.setText("下位机TEMP版本："+imgMajorVersion+"."+imgMinorVersion);
+            tv_lower_computer_temp_version.setText("下位机IMG版本："+tempMajorVersion+"."+tempMinorVersion);
         }
     }
 

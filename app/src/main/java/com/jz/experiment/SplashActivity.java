@@ -1,5 +1,6 @@
 package com.jz.experiment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -59,7 +60,12 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
+        //安装器中打开会有这个flag，导致每次app进入后台再重新打开app都会出现闪屏页
+        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)> 0) {
+            /**为了防止重复启动多个闪屏页面**/
+            finish();
+            return;
+        }
         mUserDataStore = new UserDataStore(
                 ProviderModule
                         .getInstance()

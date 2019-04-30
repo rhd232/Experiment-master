@@ -4,6 +4,7 @@ import android.app.Service;
 import android.os.Handler;
 import android.os.Message;
 
+import com.jz.experiment.chart.FlashData;
 import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 
 public abstract class CommunicationService extends Service {
@@ -15,7 +16,20 @@ public abstract class CommunicationService extends Service {
     public abstract int sendPcrCommand(PcrCommand command);
     public abstract byte[] sendPcrCommandSync(PcrCommand command);
 
+    /**
+     * 设备连接成功时调用
+     */
+    public void onDeviceConnected(){
 
+    }
+
+    /**
+     * 设备断开连接时调用
+     */
+    public void onDeviceDisconnected(){
+        //设备断开连接后必须重新读取下位机的trim数据
+        FlashData.flash_inited=false;
+    }
     public void setNotify(BluetoothConnectionListener listener){
         this.mListener=listener;
     }

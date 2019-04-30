@@ -138,6 +138,7 @@ public class BluetoothService extends CommunicationService {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 EventBus.getDefault().post(new BluetoothDisConnectedEvent(device.getName()));
 
+                onDeviceDisconnected();
             }else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)){
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 EventBus.getDefault().post(new BluetoothConnectedEvent(device.getName()));
@@ -157,6 +158,8 @@ public class BluetoothService extends CommunicationService {
                 mConnectedThread = null;
                // BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 EventBus.getDefault().post(new BluetoothDisConnectedEvent(name));
+
+                onDeviceDisconnected();
             }
         }
     };
@@ -412,6 +415,7 @@ public class BluetoothService extends CommunicationService {
             mReceivedStr=new ArrayList<>();
             //可以通信了
             broadcastUpdate(ACTION_DEVICE_COMMUNICATION_ENABLED);
+            onDeviceConnected();
         }
 
         public void run() {

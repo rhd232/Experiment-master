@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.module.analyze.AnalyzeFragment;
+import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
 import com.jz.experiment.module.expe.bean.Tab;
@@ -96,7 +97,19 @@ public class MainActivity extends BaseActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                connectUsbDevice();
+                if (!ActivityUtil.isFinish(getActivity())) {
+                    //判断是否已经连接
+                    CommunicationService service = DeviceProxyHelper.getInstance(getActivity())
+                            .getCommunicationService();
+                    if (!service.isConnected()) {
+                        connectUsbDevice();
+                    }else {
+                        //读取trim，最好再缓存到本地文件，以便下次可以直接读取
+
+
+                    }
+                }
+
             }
         }, 1000);
 

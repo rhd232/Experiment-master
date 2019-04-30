@@ -40,6 +40,28 @@ public class FlashData {
     public static int[] range = new int[4];
     public static int[][] auto_v20 = new int[4][2];
     public static int[] auto_v15 = new int[4];
-
+    /**
+     * 标识处理数据是否用下位机的trim数据
+     */
     public static boolean flash_loaded = false;
+
+    /**
+     * 下位机通道数
+     */
+    public static int NUM_CHANNELS;
+    /**
+     * 下位机反应孔数
+     */
+    public static int NUM_WELLS;
+
+    /**
+     * 下位机trim数据 字符串形式，需要写到实验数据文件中的开头部位
+     */
+    public static String DATA_DEVICE_TRIM;
+
+    /**
+     * 当连接到下位机后需要读取下位机的trim数据。断开连接后需要置为false,需要重新进行读取。
+     */
+    public static boolean flash_inited=false;
+
 }

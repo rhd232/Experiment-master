@@ -147,6 +147,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
 
 
     private void inflateData() {
+        //TODO 根据下位机通道数和孔数进行设置，多余的通道和孔位需要置灰，不可点。
         mChannelAdapter = new ChannelAdapter(getActivity(), R.layout.item_channel);
         mChannelAdapter.replaceAll(mExperiment.getSettingsFirstInfo().getChannels());
         lv_channel.setAdapter(mChannelAdapter);

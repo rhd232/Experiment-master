@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
+import com.jz.experiment.chart.FlashData;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.module.expe.activity.DeviceListActivity;
@@ -20,6 +20,7 @@ import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
 import com.jz.experiment.util.DeviceProxyHelper;
+import com.jz.experiment.util.FlashTrimReader;
 import com.jz.experiment.util.StatusChecker;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
@@ -76,6 +77,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
     private DeviceProxyHelper sDeviceProxyHelper;
     private ExecutorService mExecutorService;
+    private FlashTrimReader mFlashTrimReader;
+
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_hostory_experiments;
@@ -86,7 +89,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         EventBus.getDefault().register(this);
-        mExecutorService= Executors.newSingleThreadExecutor();
+
+        mExecutorService = Executors.newSingleThreadExecutor();
         layout_loading.setEmpty(R.layout.layout_expe_empty);
         layout_loading.setOnEmptyInflateListener(new LoadingLayout.OnInflateListener() {
             @Override
@@ -114,128 +118,14 @@ public class HistoryExperimentsFragment extends BaseFragment {
         sDeviceProxyHelper = DeviceProxyHelper
                 .getInstance(getActivity());
 
-       /* */
-    }
-
-    /**
-     * 下位机复位
-     */
-    public void resetTrim() {
-        CommunicationService service = sDeviceProxyHelper.getCommunicationService();
-        if (service.getConnectedDevice() != null &&
-                service.isConnected()) {
-            LoadingDialogHelper.showOpLoading(getActivity());
-            doResetTrim(service)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<Boolean>() {
-                        @Override
-                        public void call(Boolean aBoolean) {
-                            LoadingDialogHelper.hideOpLoading();
-                        }
-                    });
-        }else {
-            ToastUtil.showToast(getActivity(),"未连接设备");
-        }
-    }
-
-    private Observable<Boolean> doResetTrim(final CommunicationService service) {
-        return Observable.create(new Observable.OnSubscribe<Boolean>() {
-
-            @Override
-            public void call(Subscriber<? super Boolean> subscriber) {
-
-                PcrCommand cmd = new PcrCommand();
-                for (int i = 1; i <= 4; i++) {
-                    cmd.reset();
-                    cmd.SelSensor(i);
-                    service.sendPcrCommandSync(cmd);
-                    cmd.reset();
-                    cmd.ResetParams();
-                    service.sendPcrCommandSync(cmd);
-                }
-                int[] chan_campgen = {
-                        CommData.chan1_rampgen,
-                        CommData.chan2_rampgen,
-                        CommData.chan3_rampgen,
-                        CommData.chan4_rampgen};
-
-                int[] v15 = {
-                        CommData.chan1_auto_v15,
-                        CommData.chan2_auto_v15,
-                        CommData.chan3_auto_v15,
-                        CommData.chan4_auto_v15};
-                for (int i = 1; i <= 4; i++) {
-                    cmd.reset();
-                    cmd.SelSensor(i);
-                    service.sendPcrCommandSync(cmd);
-
-                    cmd.reset();
-                    cmd.SetRampgen(chan_campgen[i - 1]);
-                    service.sendPcrCommandSync(cmd);
-
-                    cmd.reset();
-                    cmd.SetTXbin((byte) 0xf);
-                    service.sendPcrCommandSync(cmd);
-
-                    cmd.reset();
-                    cmd.SetRange((byte) 0x0f);
-                    service.sendPcrCommandSync(cmd);
-
-                    cmd.reset();
-                    cmd.SetV15(v15[i - 1]);
-                    service.sendPcrCommandSync(cmd);
-                }
-
-
-                CommData.gain_mode = 0;// initialize to high gain mode, consistent with HW default
-
-                doSetV20(service, CommData.chan1_auto_v20[1], 1);
-                doSetV20(service, CommData.chan2_auto_v20[1], 2);
-                doSetV20(service, CommData.chan3_auto_v20[1], 3);
-                doSetV20(service, CommData.chan4_auto_v20[1], 4);
-
-                CommData.int_time1 = CommData.int_time2 = CommData.int_time3 = CommData.int_time4 = 1;
-
-                doSetLEDConfig(service);
-
-                subscriber.onNext(true);
-                subscriber.onCompleted();
-            }
-        });
-
 
     }
 
-    private void doSetLEDConfig(CommunicationService service) {
-        PcrCommand cmd = new PcrCommand();
-        cmd.reset();
-        cmd.SetLEDConfig(1, 1, 1, 1, 1);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        cmd.reset();
-        cmd.SetLEDConfig(1, 0, 0, 0, 0);
-        service.sendPcrCommandSync(cmd);
-    }
-
-    private void doSetV20(CommunicationService service, int v20, int index) {
-        PcrCommand cmd = new PcrCommand();
-
-        cmd.SelSensor(index);
-        service.sendPcrCommandSync(cmd);
-
-        cmd.reset();
-        cmd.SetV20(v20);
-        service.sendPcrCommandSync(cmd);
-    }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (sDeviceProxyHelper.getBluetoothService()!=null&&sDeviceProxyHelper.getBluetoothService().isConnected()) {
+        if (sDeviceProxyHelper.getBluetoothService() != null && sDeviceProxyHelper.getBluetoothService().isConnected()) {
             tv_device_state.setText("已连接");
             tv_device_state.setActivated(true);
         } else {
@@ -291,7 +181,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.tv_reset_device:
-                resetTrim();
+                // resetTrim();
                 break;
             case R.id.tv_user:
                 UserSettingsActivity.start(getActivity());
@@ -302,46 +192,48 @@ public class HistoryExperimentsFragment extends BaseFragment {
         }
     }
 
-    private Observable<Integer> readLid(){
+    private Observable<Integer> readLid() {
         return Observable.create(new Observable.OnSubscribe<Integer>() {
 
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                PcrCommand cmd=PcrCommand.ofLidAndApaptorStatusCmd();
-                byte [] reveicedBytes=sDeviceProxyHelper.getCommunicationService().sendPcrCommandSync(cmd);
-                if (reveicedBytes==null || reveicedBytes[0]==0){
+                PcrCommand cmd = PcrCommand.ofLidAndApaptorStatusCmd();
+                byte[] reveicedBytes = sDeviceProxyHelper.getCommunicationService().sendPcrCommandSync(cmd);
+                if (reveicedBytes == null || reveicedBytes[0] == 0) {
                     subscriber.onNext(CODE_NOT_CONECTED);
                     return;
                 }
                 int statusIndex = 1;
-                int status =reveicedBytes[statusIndex];
+                int status = reveicedBytes[statusIndex];
                 //TODO 检查返回的包是否正确
                 boolean succ = StatusChecker.checkStatus(status);
-                if (succ){
+                if (succ) {
                     //检查
-                    int lidAndStatusByte=reveicedBytes[5];
-                    int lidStatus=lidAndStatusByte & 0x1;
-                    int adaptorStatus=(lidAndStatusByte>>1) & 0x1;
-                    if (lidStatus==1){
+                    int lidAndStatusByte = reveicedBytes[5];
+                    int lidStatus = lidAndStatusByte & 0x1;
+                    int adaptorStatus = (lidAndStatusByte >> 1) & 0x1;
+                    if (lidStatus == 1) {
                         subscriber.onNext(CODE_LID_ERROR);
                         return;
                     }
-                    if (adaptorStatus==1){
+                    if (adaptorStatus == 1) {
                         subscriber.onNext(CODE_ADAPTOR_ERROR);
                         return;
                     }
                     subscriber.onNext(CODE_SUCCESS);
-                }else {
+                } else {
                     subscriber.onNext(CODE_NOT_CONECTED);
                 }
             }
         });
     }
-    public static final int CODE_NOT_CONECTED=-1;
-    public static final int CODE_SUCCESS=0;
-    public static final int CODE_LID_ERROR=1;
-    public static final int CODE_ADAPTOR_ERROR=2;
+
+    public static final int CODE_NOT_CONECTED = -1;
+    public static final int CODE_SUCCESS = 0;
+    public static final int CODE_LID_ERROR = 1;
+    public static final int CODE_ADAPTOR_ERROR = 2;
     private boolean mNeedReadTrimFile;
+
     /**
      * 去实验设置页面
      *
@@ -349,11 +241,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
      */
     @Subscribe
     public void onToExpeSettingsEvent(final ToExpeSettingsEvent event) {
-        /*mNeedReadTrimFile=false;
-        if (ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                !=PackageManager.PERMISSION_GRANTED) {//没有sd卡读取权限
-            mNeedReadTrimFile=true;
-        }*/
+
 
         //判断是否已经连接设备
         AndPermission.with(getActivity())
@@ -373,27 +261,13 @@ public class HistoryExperimentsFragment extends BaseFragment {
                         //读取下位机是否插入了电源以及热盖的开闭
                         readLid().subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Action1<Integer>() {
-                            @Override
-                            public void call(Integer status) {
-                                LoadingDialogHelper.hideOpLoading();
-                                switch (status){
-                                    case CODE_SUCCESS:
-                                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
-                                        break;
+                                .subscribe(new Action1<Integer>() {
+                                    @Override
+                                    public void call(Integer status) {
+                                        doNextByStatus(status, event);
 
-                                    case CODE_LID_ERROR:
-                                        ToastUtil.showToast(getActivity(),"请先关闭热盖");
-                                        break;
-                                    case CODE_ADAPTOR_ERROR:
-                                        ToastUtil.showToast(getActivity(),"请先插入电源适配器");
-                                        break;
-                                    case CODE_NOT_CONECTED:
-                                        ToastUtil.showToast(getActivity(),"请检查HID设备是否已连接");
-                                        break;
-                                }
-                            }
-                        });
+                                    }
+                                });
 
 
                     }
@@ -406,42 +280,54 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
                     }
                 }).start();
-      /*  if (sDeviceProxyHelper.isConnected(DeviceProxyHelper.ConnectMode.USB)){
-
-            AndPermission.with(getActivity())
-                    .runtime()
-                    .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    .onGranted(new Action<List<String>>() {
-                        @Override
-                        public void onAction(List<String> data) {
-                            UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
-                      *//*  if (sDeviceProxyHelper.getUsbService().hasPermission()){
-                            UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
-                        }else {
-                            sDeviceProxyHelper.getUsbService().requestPermission();
-                        }*//*
 
 
-                        }
-                    })
-                    .onDenied(new Action<List<String>>() {
-                        @Override
-                        public void onAction(List<String> data) {
+    }
 
-                            ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
+    private void doNextByStatus(Integer status, ToExpeSettingsEvent event) {
+        switch (status) {
+            case CODE_SUCCESS:
 
-                        }
-                    }).start();
-        }else {
+                //TODO 判断是否读取了下位机的trim
+                if (CommData.sTrimFromFile) {
+                    UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                } else {
+                    if (FlashData.flash_inited) {
+                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                    } else {
+                        readTrimDataFromInstrument(event);
+                    }
+                }
+                break;
 
-            sDeviceProxyHelper.getUsbService().requestPermission();
-        }*/
-       /* if (sDeviceProxyHelper.isConnected()){
-            UserSettingsStep1Activity.start(getActivity(),event.getExperiment());
-        }else {
-            ToastUtil.showToast(getActivity(),"请先连接设备");
-        }*/
+            case CODE_LID_ERROR:
+                LoadingDialogHelper.hideOpLoading();
+                ToastUtil.showToast(getActivity(), "请先关闭热盖");
+                break;
+            case CODE_ADAPTOR_ERROR:
+                LoadingDialogHelper.hideOpLoading();
+                ToastUtil.showToast(getActivity(), "请先插入电源适配器");
+                break;
+            case CODE_NOT_CONECTED:
+                LoadingDialogHelper.hideOpLoading();
+                ToastUtil.showToast(getActivity(), "请检查HID设备是否已连接");
+                break;
+        }
+    }
 
+    private void readTrimDataFromInstrument(final ToExpeSettingsEvent event) {
+
+        FlashTrimReader reader = new
+                FlashTrimReader(getActivity(),
+                sDeviceProxyHelper.getCommunicationService());
+        reader.setOnReadFlashListener(new FlashTrimReader.OnReadFlashListener() {
+            //读取flash成功返回
+            @Override
+            public void onReadFlashSuccess() {
+                UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+            }
+        });
+        reader.readTrimDataFromInstrument();
 
     }
 

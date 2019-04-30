@@ -223,65 +223,13 @@ public class UsbService extends CommunicationService {
             if(mListener!=null){
                 mListener.onConnectSuccess();
             }
+
+            onDeviceConnected();
         }
 
-
-       /* List<UsbSerialPort> result = new ArrayList<>();
-
-        for (final UsbSerialDriver driver : mAllAvailableDrivers) {
-            final List<UsbSerialPort> ports = driver.getPorts();
-            result.addAll(ports);
-        }
-        UsbDeviceConnection usbDeviceConnection = mUsbManager.openDevice(device);
-        try {
-            mUsbSerialPort = result.get(0);
-            mUsbSerialPort.open(usbDeviceConnection);
-            mUsbSerialPort.setParameters(9600, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-
-            onDeviceStateChange();
-            UsbInterface anInterface = device.getInterface(0);
-            if (anInterface == null) {
-                Toast.makeText(this, "初始化失败", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            for (int i = 0; i < anInterface.getEndpointCount(); i++) {
-                UsbEndpoint endpoint = anInterface.getEndpoint(i);
-                if (endpoint.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK) {
-                    if (endpoint.getDirection() == UsbConstants.USB_DIR_IN) {
-                        mUsbEndpointIn = endpoint;
-                    } else if (endpoint.getDirection() == UsbConstants.USB_DIR_OUT) {
-                        mUsbEndpointOut = endpoint;
-                    }
-
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 
-    /*private void onDeviceStateChange() {
-        stopIoManager();
-        startIoManager();
-    }*/
 
-    /*private void stopIoManager() {
-        if (mSerialIoManager != null) {
-            //Log.i(TAG, "Stopping io manager ..");
-            mSerialIoManager.stop();
-            mSerialIoManager = null;
-        }
-    }
-
-    private void startIoManager() {
-        if (mUsbSerialPort != null) {
-           // Log.i(TAG, "Starting io manager ..");
-            mSerialIoManager = new SerialInputOutputManager(mUsbSerialPort, mListener);
-            mExecutorService.submit(mSerialIoManager);
-        }
-    }
-*/
     private void toByteString(PcrCommand cmd) {
         ArrayList<Byte> bytes = cmd.getCommandList();
         byte[] data = new byte[bytes.size()];
@@ -389,24 +337,6 @@ public class UsbService extends CommunicationService {
             //超时时间需要设置的长一点，不然很可能打印卡住，返回-1。
             int ret = mUsbDeviceConnection.bulkTransfer(mUsbEndpointOut, data, data.length, 5000);
             if (ret >= 0) {
-               /* try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                byte[] buffer = new byte[1024];
-                int bytes = this.mUsbDeviceConnection.bulkTransfer(mUsbEndpointIn, buffer, 64, 5000);
-                //System.out.println("mmEndIn:"+bytes);
-                if (bytes > 0) {
-                    StringBuilder hex = new StringBuilder(buffer.length * 2);
-                    for (byte b : buffer) {
-                        if ((b & 0xFF) < 0x10) hex.append("0");
-                        hex.append(Integer.toHexString(b & 0xFF));
-                    }
-                    System.out.println("接收到:"+hex.toString().toLowerCase());
-                    Data d = new Data(buffer, bytes);
-                    broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, d);
-                }*/
                 return 0;
             }
 
@@ -540,6 +470,10 @@ public class UsbService extends CommunicationService {
                 }
                 BluetoothDisConnectedEvent event = new BluetoothDisConnectedEvent(name);
                 EventBus.getDefault().post(event);
+
+
+                //TODO 清除从下位机读取的trim
+                onDeviceDisconnected();
             }
         }
     };

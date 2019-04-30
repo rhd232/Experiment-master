@@ -403,6 +403,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                     @Override
                     public void call(Long aLong) {
                         if (mReadTrimCount==3){
+                            mReadTrimSubscription.unsubscribe();
                             showConnectionTip();
                             return;
                         }
@@ -448,6 +449,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                LoadingDialogHelper.hideOpLoading();
                 AppDialogHelper.showNormalDialog(getActivity(), "请检查HID设备连接情况", new AppDialogHelper.DialogOperCallback() {
                     @Override
                     public void onDialogConfirmClick() {
@@ -705,9 +707,9 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                 int sn2 = trim_buff[k];
                 k++;
 
-                int num_channels = trim_buff[k];
+                int num_channels = trim_buff[k];//通道数
                 k++;
-                int num_wells = trim_buff[k];
+                int num_wells = trim_buff[k];//孔数
                 k++;
                 int num_pages = trim_buff[k];
                 k++;
