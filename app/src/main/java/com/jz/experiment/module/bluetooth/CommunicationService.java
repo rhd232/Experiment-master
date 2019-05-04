@@ -15,7 +15,7 @@ public abstract class CommunicationService extends Service {
     public abstract boolean isConnected();
     public abstract int sendPcrCommand(PcrCommand command);
     public abstract byte[] sendPcrCommandSync(PcrCommand command);
-
+    public abstract void stopReadThread();
     /**
      * 设备连接成功时调用
      */
@@ -65,4 +65,6 @@ public abstract class CommunicationService extends Service {
             }
         }
     };
+
+
 }

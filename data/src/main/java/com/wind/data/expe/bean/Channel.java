@@ -8,26 +8,16 @@ public class Channel implements Parcelable {
     private String name;
     private String value;
     private String remark;//备注
+    private boolean enabled;//是否可用
 
     public Channel(){}
+
     protected Channel(Parcel in) {
         id = in.readLong();
         name = in.readString();
         value = in.readString();
         remark = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(id);
-        dest.writeString(name);
-        dest.writeString(value);
-        dest.writeString(remark);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        enabled = in.readByte() != 0;
     }
 
     public static final Creator<Channel> CREATOR = new Creator<Channel>() {
@@ -72,5 +62,27 @@ public class Channel implements Parcelable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(name);
+        dest.writeString(value);
+        dest.writeString(remark);
+        dest.writeByte((byte) (enabled ? 1 : 0));
     }
 }

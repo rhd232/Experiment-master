@@ -34,7 +34,7 @@ public class CommData {
     public static boolean isImport = false;
     public static int currCycleNum = 0;//当前循环数
     public static int CurrPZJD = 3;
-    public static int KsIndex = 0;
+    public static int KsIndex = 0;//孔数
 
     public static int sn1=0;
     public static int sn2=0;

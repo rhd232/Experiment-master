@@ -64,7 +64,6 @@ import rx.schedulers.Schedulers;
 public class LoginFragment extends BaseFragment implements BluetoothConnectionListener {
 
 
-
     @BindView(R.id.iv_pwd_toggle)
     ImageView iv_pwd_toggle;
 
@@ -90,7 +89,9 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
     UserDataStore mUserDataStore;
     Subscription findSubscription;
     private DeviceProxyHelper sDeviceProxyHelper;
-    private Handler mHandler=new Handler();
+    private Handler mHandler = new Handler();
+    CommunicationService mCommunicationService;
+
     @Override
     protected int getLayoutRes() {
         return R.layout.activity_login;
@@ -100,7 +101,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
 
         //读取第一个用户，自动填充到文本框
         mUserDataStore = new UserDataStore(
@@ -112,7 +113,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
         final FindUserRequest request = new FindUserRequest();
         request.setUsername(C.Config.DEFAULT_USERNAME);
         request.setPwd(C.Config.DEFAULT_PWD);
-        findSubscription=mUserDataStore.findUserByUsername(request)
+        findSubscription = mUserDataStore.findUserByUsername(request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<FindUserResponse>() {
@@ -121,8 +122,8 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
                         findSubscription.unsubscribe();
                         if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                             if (response.getUser() != null) {
-                                String username=response.getUser().username();
-                                String password=response.getUser().password();
+                                String username = response.getUser().username();
+                                String password = response.getUser().password();
                                 et_username.setText(username);
                                 et_pwd.setText(password);
 
@@ -139,18 +140,18 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
             @Override
             public void run() {
                 if (!ActivityUtil.isFinish(getActivity())) {
-                    CommunicationService service = sDeviceProxyHelper.getCommunicationService();
-                    if (service != null) {
-                        service.setNotify(LoginFragment.this);
+                    mCommunicationService = sDeviceProxyHelper.getCommunicationService();
+                    if (mCommunicationService != null) {
+                        setNofity(LoginFragment.this);
                         UsbManagerHelper.connectUsbDevice(getActivity());
                     }
                 }
 
             }
-        }, 1000);
+        }, 500);
 
-        String appVersion=AppUtil.getAppVersionName(getActivity());
-        tv_app_version.setText("App版本："+appVersion);
+        String appVersion = AppUtil.getAppVersionName(getActivity());
+        tv_app_version.setText("App版本：" + appVersion);
         /*mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -165,12 +166,12 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
     }
 
     Subscription loginSubscription;
+
     @OnClick({R.id.iv_pwd_toggle, R.id.tv_login})
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.tv_login:
 
-               // TrimReader.getInstance(getActivity());
                 login();
                 break;
             case R.id.iv_pwd_toggle:
@@ -187,15 +188,16 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
         }
     }
 
-    private void login(){
+    private void login() {
         if (validate()) {
+            setNofity(null);
             LoadingDialogHelper.showOpLoading(getActivity());
             String username = et_username.getText().toString().trim();
             String pwd = et_pwd.getText().toString().trim();
             final FindUserRequest request = new FindUserRequest();
             request.setUsername(username);
             request.setPwd(pwd);
-            loginSubscription=UserDataStore
+            loginSubscription = UserDataStore
                     .getInstance(ProviderModule.getInstance()
                             .getBriteDb(getActivity().getApplicationContext()))
                     .findUserByUsernameAndPwd(request)
@@ -206,17 +208,18 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
                         public void call(FindUserResponse response) {
                             loginSubscription.unsubscribe();
                             LoadingDialogHelper.hideOpLoading();
-                            if (response.getErrCode()==BaseResponse.CODE_SUCCESS){
+                            if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                                 //登录成功
                                 MainActivity.start(getActivity());
                                 ActivityUtil.finish(getActivity());
-                            }else {
+                            } else {
                                 tv_msg.setText("用户不存在或密码错误");
                             }
                         }
                     });
         }
     }
+
     private boolean validate() {
         if (!et_username.validate()) {
             tv_msg.setText("输入用户名");
@@ -230,14 +233,14 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
     }
 
 
-    public void testServer(){
-        String filePath= C.Value.IMAGE_DATA+"2019_01_29_03_22_23_source.txt";
-        File file=new File(filePath);
+    public void testServer() {
+        String filePath = C.Value.IMAGE_DATA + "2019_01_29_03_22_23_source.txt";
+        File file = new File(filePath);
         List<String> data = DataFileUtil.covertToList(file);
         Map<String, List<String>> dataMap = new HashMap<>();
         dataMap.put("data", data);
         JSONObject jsonObject = new JSONObject(dataMap);
-        String url="http://114.215.195.137:55500/data";
+        String url = "http://114.215.195.137:55500/data";
         OkHttpClient okHttpClient = new OkHttpClient();
         RequestBody requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8")
                 , jsonObject.toString());
@@ -254,65 +257,75 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String ret=response.body().string();
-                System.out.println("返回数据："+ret);
+                String ret = response.body().string();
+                System.out.println("返回数据：" + ret);
             }
         });
     }
 
-    public void testJson(){
-           String json="[[\n" +
-                        "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0],\n" +
-                        "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0]\n" +
-                        "]\n" +
-                        ",[\n" +
-                        "[30.54448441, 31.0617958, -16.75278455, 0.0, 0.0,0.0],\n" +
-                        "[20.54448441, 61.0617958, -16.75278455, 0.0, 0.0,0.0]\n" +
-                        "]\n" +
-                        "]";
-                Map<Integer,List<List<Double>>> chanMap=new LinkedHashMap<>();
-                try {
-                    JSONArray jsonArray=new JSONArray(json);
-                    int length=jsonArray.length();
-                    for (int i=0;i<length;i++){
-                        List<List<Double>> listList=new ArrayList<>();
-                        JSONArray subJSONArray=jsonArray.getJSONArray(i);
-                        for (int j=0;j<subJSONArray.length();j++){
-                            JSONArray subSubJSONArray=subJSONArray.getJSONArray(j);
-                            List<Double> yVals=new ArrayList<>();
-                            for (int k=0;k<subSubJSONArray.length();k++){
-                                double y=subSubJSONArray.getDouble(k);
-                                yVals.add(y);
-                            }
-                            listList.add(yVals);
-                        }
-                        chanMap.put(i,listList);
+    public void testJson() {
+        String json = "[[\n" +
+                "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0],\n" +
+                "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0]\n" +
+                "]\n" +
+                ",[\n" +
+                "[30.54448441, 31.0617958, -16.75278455, 0.0, 0.0,0.0],\n" +
+                "[20.54448441, 61.0617958, -16.75278455, 0.0, 0.0,0.0]\n" +
+                "]\n" +
+                "]";
+        Map<Integer, List<List<Double>>> chanMap = new LinkedHashMap<>();
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            int length = jsonArray.length();
+            for (int i = 0; i < length; i++) {
+                List<List<Double>> listList = new ArrayList<>();
+                JSONArray subJSONArray = jsonArray.getJSONArray(i);
+                for (int j = 0; j < subJSONArray.length(); j++) {
+                    JSONArray subSubJSONArray = subJSONArray.getJSONArray(j);
+                    List<Double> yVals = new ArrayList<>();
+                    for (int k = 0; k < subSubJSONArray.length(); k++) {
+                        double y = subSubJSONArray.getDouble(k);
+                        yVals.add(y);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    listList.add(yVals);
                 }
+                chanMap.put(i, listList);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-                int size=chanMap.size();
-                for (int i=0;i<size;i++){
-                    List<List<Double>> listList=chanMap.get(i);
-                    for (int j=0;j<listList.size();j++){
-                        List<Double> vals=listList.get(j);
-                        for (int k=0;k<vals.size();k++){
-                            System.out.print(vals.get(k)+" ");
-                        }
-                        System.out.println();
-                    }
-
-
+        int size = chanMap.size();
+        for (int i = 0; i < size; i++) {
+            List<List<Double>> listList = chanMap.get(i);
+            for (int j = 0; j < listList.size(); j++) {
+                List<Double> vals = listList.get(j);
+                for (int k = 0; k < vals.size(); k++) {
+                    System.out.print(vals.get(k) + " ");
                 }
+                System.out.println();
+            }
+
+
+        }
+    }
+
+
+    private void setNofity(BluetoothConnectionListener listener) {
+        if (mCommunicationService != null) {
+            mCommunicationService.setNotify(listener);
+        }
     }
 
     @Override
     public void onConnectSuccess() {
-        if(sDeviceProxyHelper!=null) {
-            CommunicationService service = sDeviceProxyHelper.getCommunicationService();
+        if (sDeviceProxyHelper != null) {
+            if (mCommunicationService!=null){
+                mCommunicationService.sendPcrCommand(PcrCommand.ofVersionCmd());
+            }
+          /*  CommunicationService service = sDeviceProxyHelper.getCommunicationService();
             if (service != null)
-                service.sendPcrCommand(PcrCommand.ofVersionCmd());
+                service.sendPcrCommand(PcrCommand.ofVersionCmd());*/
         }
     }
 
@@ -331,35 +344,35 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
         byte[] buffer = data.getBuffer();
 
         int statusIndex = 1;
-        int status =buffer[statusIndex];
-        int dataIndex=5;
+        int status = buffer[statusIndex];
+        int dataIndex = 5;
         //TODO 检查返回的包是否正确
         boolean succ = StatusChecker.checkStatus(status);
-        if (succ){
+        if (succ) {
 
 
             //host型号
-            int model=buffer[dataIndex++];
-            int majorVersion=buffer[dataIndex++];
-            int minorVersion=buffer[dataIndex++];
+            int model = buffer[dataIndex++];
+            int majorVersion = buffer[dataIndex++];
+            int minorVersion = buffer[dataIndex++];
             dataIndex++;
             dataIndex++;
             dataIndex++;
             //IMG型号
-            int imgModel=buffer[dataIndex++];
-            int imgMajorVersion=buffer[dataIndex++];
-            int imgMinorVersion=buffer[dataIndex++];
+            int imgModel = buffer[dataIndex++];
+            int imgMajorVersion = buffer[dataIndex++];
+            int imgMinorVersion = buffer[dataIndex++];
             dataIndex++;
             dataIndex++;
             dataIndex++;
             //TEMP型号
-            int tempModel=buffer[dataIndex++];
-            int tempMajorVersion=buffer[dataIndex++];
-            int tempMinorVersion=buffer[dataIndex++];
+            int tempModel = buffer[dataIndex++];
+            int tempMajorVersion = buffer[dataIndex++];
+            int tempMinorVersion = buffer[dataIndex++];
             //host1.35-temp1.29-img1.42
-            tv_lower_computer_host_version.setText("下位机HOST版本："+majorVersion+"."+minorVersion);
-            tv_lower_computer_img_version.setText("下位机TEMP版本："+imgMajorVersion+"."+imgMinorVersion);
-            tv_lower_computer_temp_version.setText("下位机IMG版本："+tempMajorVersion+"."+tempMinorVersion);
+            tv_lower_computer_host_version.setText("下位机HOST版本：" + majorVersion + "." + minorVersion);
+            tv_lower_computer_img_version.setText("下位机TEMP版本：" + imgMajorVersion + "." + imgMinorVersion);
+            tv_lower_computer_temp_version.setText("下位机IMG版本：" + tempMajorVersion + "." + tempMinorVersion);
         }
     }
 
@@ -367,11 +380,6 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (sDeviceProxyHelper!=null) {
-            CommunicationService service = sDeviceProxyHelper.getCommunicationService();
-            if (service != null) {
-                service.setNotify(null);
-            }
-        }
+        setNofity(null);
     }
 }

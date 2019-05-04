@@ -10,6 +10,7 @@ public class Sample implements Serializable {
 
     private String name;
     private int type;//样本类型，
+    private boolean enabled;
     public String getName() {
         return name;
     }
@@ -32,5 +33,13 @@ public class Sample implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

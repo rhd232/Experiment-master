@@ -121,7 +121,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("onItemSelected:" + position);
+                //System.out.println("onItemSelected:" + position);
             }
 
             @Override
@@ -157,6 +157,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
             KSList.add("B8");
         }
 
+        System.out.println("AnalyzeFragment onViewCreated");
     }
 
     /**

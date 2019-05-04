@@ -3,8 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="44dp"
-    android:background="@color/white">
-
+    android:background="@drawable/selector_ffffff_e8e8e8">
+    <TextView
+        android:id="@+id/tv_diseabled"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
     <EditText
         android:id="@+id/tv_sample_name"
         android:layout_width="match_parent"

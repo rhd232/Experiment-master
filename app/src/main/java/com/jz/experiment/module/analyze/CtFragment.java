@@ -3,14 +3,19 @@ package com.jz.experiment.module.analyze;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.GridView;
 
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
+import com.jz.experiment.module.data.ExpeDataFragment;
 import com.jz.experiment.module.data.adapter.ChannelDataAdapter;
 import com.wind.base.mvp.view.BaseFragment;
+import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.ChannelData;
+import com.wind.data.expe.bean.HistoryExperiment;
+import com.wind.data.expe.bean.Sample;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -26,10 +31,14 @@ public abstract class CtFragment extends BaseFragment {
     @BindView(R.id.gv_b)
     GridView gv_b;
     protected ChannelDataAdapter[] mChannelDataAdapters;
+    protected HistoryExperiment mExeperiment;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this,view);
+        if (getArguments()!=null) {
+            mExeperiment = getArguments().getParcelable(ExpeDataFragment.ARGS_KEY_EXPE);
+        }
         mChannelDataAdapters = new ChannelDataAdapter[2];
         GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
@@ -40,20 +49,71 @@ public abstract class CtFragment extends BaseFragment {
 
     }
     private void buildChannelData(GridView[] gvs, String[] titles) {
+        String [] channelAlias=new String[4];
+        String [][] sampleAlias=new String[2][8];
+
+        if (mExeperiment!=null){
+            List<Channel> channels=mExeperiment.getSettingsFirstInfo().getChannels();
+            for (int i=0;i<channels.size();i++){
+                String val=channels.get(i).getValue();
+                if (TextUtils.isEmpty(val)){
+                    val=channels.get(i).getName();
+                }else {
+                    val+=channels.get(i).getRemark();
+                }
+                channelAlias[i]=val;
+            }
+
+            List<Sample> sampleAs=mExeperiment.getSettingsFirstInfo().getSamplesA();
+            for (int i=0;i<sampleAs.size();i++){
+                String val=sampleAs.get(i).getName();
+                if (TextUtils.isEmpty(val)){
+                    val=i+"";
+                }
+                sampleAlias[0][i]=val;
+            }
+            List<Sample> sampleBs=mExeperiment.getSettingsFirstInfo().getSamplesB();
+            for (int i=0;i<sampleBs.size();i++){
+                String val=sampleBs.get(i).getName();
+                if (TextUtils.isEmpty(val)){
+                    val=i+"";
+                }
+                sampleAlias[1][i]=val;
+            }
+        }else {
+            for (int i=0;i<4;i++){
+                channelAlias[i]="通道"+(i+1);
+            }
+            for (int i=0;i<8;i++){
+                String val=i+"";
+                sampleAlias[0][i]=val;
+            }
+            for (int i=0;i<8;i++){
+                String val=i+"";
+                sampleAlias[1][i]=val;
+            }
+        }
+
         for (int k = 0; k < gvs.length; k++) {
             mChannelDataAdapters[k] = new ChannelDataAdapter(getActivity(), R.layout.item_channel_data);
             gvs[k].setAdapter(mChannelDataAdapters[k]);
             List<ChannelData> channelDataAList = new ArrayList<>();
+            String [] sampleAlias_=sampleAlias[k];
             for (int j = 0; j < 5; j++) {
                 for (int i = 0; i < 9; i++) {
 
-                    String channelName = "";
-                    switch (j) {
+                    String channelName;
+                    if (j==0){
+                        channelName = titles[k];
+                    }else {
+                        channelName = channelAlias[j-1];
+                    }
+                    /*switch (j) {
                         case 0:
                             channelName = titles[k];
                             break;
                         case 1:
-                            channelName = "通道1";
+                            channelName = channelAlias[0];
                             break;
                         case 2:
                             channelName = "通道2";
@@ -64,8 +124,14 @@ public abstract class CtFragment extends BaseFragment {
                         case 4:
                             channelName = "通道4";
                             break;
+                    }*/
+                    String sAlias;
+                    if (i==0){
+                        sAlias="";
+                    }else {
+                        sAlias=sampleAlias_[i-1];
                     }
-                    ChannelData channelData = new ChannelData(channelName, i, "");
+                    ChannelData channelData = new ChannelData(channelName, i, sAlias,"");
                     channelDataAList.add(channelData);
                 }
             }

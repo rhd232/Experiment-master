@@ -12,6 +12,7 @@ import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.FlashData;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.module.expe.activity.DeviceListActivity;
@@ -19,6 +20,8 @@ import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
 import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
+import com.jz.experiment.util.ByteUtil;
+import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.FlashTrimReader;
 import com.jz.experiment.util.StatusChecker;
@@ -119,12 +122,14 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 .getInstance(getActivity());
 
 
+        System.out.println("HistoryExperimentFragment onViewCreated");
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
+
         if (sDeviceProxyHelper.getBluetoothService() != null && sDeviceProxyHelper.getBluetoothService().isConnected()) {
             tv_device_state.setText("已连接");
             tv_device_state.setActivated(true);
@@ -198,7 +203,19 @@ public class HistoryExperimentsFragment extends BaseFragment {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 PcrCommand cmd = PcrCommand.ofLidAndApaptorStatusCmd();
-                byte[] reveicedBytes = sDeviceProxyHelper.getCommunicationService().sendPcrCommandSync(cmd);
+                mCommunicationService.stopReadThread();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                byte[] reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
+                while (reveicedBytes==null || reveicedBytes[0]==0){
+                    reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
+                }
+                String lid=ByteUtil.getHexStr(reveicedBytes,reveicedBytes.length);
+                DataFileUtil.writeFileLog(lid);
+
                 if (reveicedBytes == null || reveicedBytes[0] == 0) {
                     subscriber.onNext(CODE_NOT_CONECTED);
                     return;
@@ -233,7 +250,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     public static final int CODE_LID_ERROR = 1;
     public static final int CODE_ADAPTOR_ERROR = 2;
     private boolean mNeedReadTrimFile;
-
+    private CommunicationService mCommunicationService;
     /**
      * 去实验设置页面
      *
@@ -241,7 +258,9 @@ public class HistoryExperimentsFragment extends BaseFragment {
      */
     @Subscribe
     public void onToExpeSettingsEvent(final ToExpeSettingsEvent event) {
-
+        if (mCommunicationService==null){
+            mCommunicationService=sDeviceProxyHelper.getCommunicationService();
+        }
 
         //判断是否已经连接设备
         AndPermission.with(getActivity())
@@ -319,11 +338,12 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
         FlashTrimReader reader = new
                 FlashTrimReader(getActivity(),
-                sDeviceProxyHelper.getCommunicationService());
+                mCommunicationService);
         reader.setOnReadFlashListener(new FlashTrimReader.OnReadFlashListener() {
             //读取flash成功返回
             @Override
             public void onReadFlashSuccess() {
+
                 UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
             }
         });

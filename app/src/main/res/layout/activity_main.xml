@@ -7,6 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
     <com.jz.experiment.widget.DeviceStateBar
+        android:id="@+id/main_device_state_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />

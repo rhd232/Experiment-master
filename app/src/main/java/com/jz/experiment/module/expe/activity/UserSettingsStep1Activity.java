@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
+import com.jz.experiment.chart.FlashData;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.expe.adapter.ChannelAdapter;
 import com.jz.experiment.module.expe.adapter.SampleAdapter;
@@ -105,17 +106,29 @@ public class UserSettingsStep1Activity extends BaseActivity {
                 channel.setName("通道" + (i + 1));
                 channels.add(channel);
             }
+            int wellNum=CommData.KsIndex;//反应井个数
+            int halfWellNum=wellNum/2;
             List<Sample> samplesA = new ArrayList<>();
             firstInfo.setSamplesA(samplesA);
             for (int i = 0; i < 8; i++) {
                 Sample sample = new Sample();
                 samplesA.add(sample);
+                if (halfWellNum>(i)){
+                    sample.setEnabled(true);
+                }else {
+                    sample.setEnabled(false);
+                }
             }
             List<Sample> samplesB = new ArrayList<>();
             firstInfo.setSamplesB(samplesB);
             for (int i = 0; i < 8; i++) {
                 Sample sample = new Sample();
                 samplesB.add(sample);
+                if (halfWellNum>(i)){
+                    sample.setEnabled(true);
+                }else {
+                    sample.setEnabled(false);
+                }
             }
             inflateData();
         } else {
@@ -149,7 +162,13 @@ public class UserSettingsStep1Activity extends BaseActivity {
     private void inflateData() {
         //TODO 根据下位机通道数和孔数进行设置，多余的通道和孔位需要置灰，不可点。
         mChannelAdapter = new ChannelAdapter(getActivity(), R.layout.item_channel);
-        mChannelAdapter.replaceAll(mExperiment.getSettingsFirstInfo().getChannels());
+        List<Channel> channels=mExperiment.getSettingsFirstInfo().getChannels();
+        int enabledChannels=FlashData.NUM_CHANNELS;
+        for (int i=0;i<enabledChannels;i++){
+            channels.get(i).setEnabled(true);
+        }
+
+        mChannelAdapter.replaceAll(channels);
         lv_channel.setAdapter(mChannelAdapter);
         lv_channel.setOnItemClickListener(mOnItemClickListener);
 
@@ -175,6 +194,12 @@ public class UserSettingsStep1Activity extends BaseActivity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            if (!mChannelAdapter.getItem(position).isEnabled()){
+                ToastUtil.showToast(getActivity(),"当前机器该通道不可用");
+                return;
+            }
+
             AppDialogHelper.showChannelSelectDialog(getActivity(), position , new AppDialogHelper.OnChannelSelectListener() {
                 @Override
                 public void onChannelSelected(int position, ChannelMaterial material) {

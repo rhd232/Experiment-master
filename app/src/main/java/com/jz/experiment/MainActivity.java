@@ -15,6 +15,7 @@ import android.view.View;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.module.analyze.AnalyzeFragment;
 import com.jz.experiment.module.bluetooth.CommunicationService;
+import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
 import com.jz.experiment.module.expe.bean.Tab;
@@ -23,6 +24,7 @@ import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.TrimReader;
 import com.jz.experiment.util.UsbManagerHelper;
+import com.jz.experiment.widget.DeviceStateBar;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Exiter;
@@ -51,7 +53,8 @@ public class MainActivity extends BaseActivity {
     View layout_expe;
     @BindView(R.id.layout_data)
     View layout_data;
-
+    @BindView(R.id.main_device_state_bar)
+    DeviceStateBar main_device_state_bar;
     @BindView(R.id.layout_analyze)
     View layout_analyze;
     Fragment[] fragments;
@@ -104,14 +107,13 @@ public class MainActivity extends BaseActivity {
                     if (!service.isConnected()) {
                         connectUsbDevice();
                     }else {
-                        //读取trim，最好再缓存到本地文件，以便下次可以直接读取
-
-
+                        BluetoothConnectedEvent event=new BluetoothConnectedEvent( service.getConnectedDevice().getDeviceName());
+                        main_device_state_bar.onBluetoothConnectedEvent(event);
                     }
                 }
 
             }
-        }, 1000);
+        }, 500);
 
 
         AndPermission.with(getActivity())

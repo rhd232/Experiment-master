@@ -257,6 +257,11 @@ public class BluetoothService extends CommunicationService {
         return null;
     }
 
+    @Override
+    public void stopReadThread() {
+
+    }
+
     private void toByteString(PcrCommand cmd) {
         ArrayList<Byte> bytes = cmd.getCommandList();
         byte[] data = new byte[bytes.size()];

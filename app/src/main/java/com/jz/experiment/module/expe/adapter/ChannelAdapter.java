@@ -25,5 +25,7 @@ public class ChannelAdapter extends QuickAdapter<Channel> {
             sBuilder.append("-").append(item.getRemark());
         }
         helper.setText(R.id.tv_channel_value,sBuilder.toString());
+
+        helper.getView().setEnabled(item.isEnabled());
     }
 }

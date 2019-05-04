@@ -1,6 +1,7 @@
 package com.jz.experiment.module.data.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
@@ -30,8 +31,12 @@ public class ChannelDataAdapter extends QuickAdapter<ChannelData> {
             tv.setText(item.getChannelName());
         }
         if (lineNumber==0 && !first){
-            int pos=item.getSampleIndex();
-            tv.setText(pos+"");
+           //int pos=item.getSampleIndex();
+            String alias=item.getSampleIndexAlias();
+            if (TextUtils.isEmpty(alias)){
+                alias=item.getSampleIndex()+"";
+            }
+            tv.setText(alias);
         }
         if (lineNumber>0 && !first){
             tv.setText(item.getSampleVal());

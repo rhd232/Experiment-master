@@ -107,7 +107,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     DtChart mDtChart;
     MeltingChart mMeltingChart;
     ExecutorService mExecutorService;
-    private HistoryExperiment mExeperiment;
+
     private boolean mSaved;
 
     @Override
@@ -118,9 +118,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-      //  ButterKnife.bind(this, view);
+
         EventBus.getDefault().register(this);
-        mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
+       // mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
 
         layout_ctparam_input.setOnCtParamChangeListener(this);
       /*  GridView[] gvs = new GridView[2];

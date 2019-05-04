@@ -1318,7 +1318,7 @@ public class ExampleUnitTest {
         float temperature = 17.625f;
      /*   System.out.println(Float.floatToIntBits(temperature));
         System.out.println();*/
-        byte[] tempBytes = ByteBufferUtil.getBytes(temperature, ByteOrder.LITTLE_ENDIAN);//LITTLE_ENDIAN 0011266  BIG_ENDIAN 6611200
+        byte[] tempBytes = ByteBufferUtil.getBytes(temperature, ByteOrder.BIG_ENDIAN);//LITTLE_ENDIAN 0011266  BIG_ENDIAN 6611200
         StringBuilder hex = new StringBuilder(tempBytes.length * 2);
         for (byte b : tempBytes) {
             if ((b & 0xFF) < 0x10) hex.append("0");

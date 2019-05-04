@@ -363,7 +363,13 @@ public class UsbService extends CommunicationService {
         if (mReadThread != null) {
             mReadThread.stopRun();
             mReadThread = null;
+
         }
+       /* try {
+            Thread.sleep(15);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
     }
 
     public void startReadThread() {
@@ -371,6 +377,7 @@ public class UsbService extends CommunicationService {
         mReadThread = new ReadThread();
         mReadThread.start();
     }
+
 
     private class ReadThread extends Thread {
         //private String deviceName;
@@ -385,6 +392,7 @@ public class UsbService extends CommunicationService {
             mmEndOut = mUsbEndpointOut;
             mmEndIn = mUsbEndpointIn;
             mmConnection = mUsbDeviceConnection;
+
         }
 
         private void stopRun() {
@@ -399,8 +407,8 @@ public class UsbService extends CommunicationService {
                 while (mRun) {
                     try {
                         byte[] buffer = new byte[64];
-                        int bytes = this.mmConnection.bulkTransfer(mmEndIn, buffer, 64, 5000);
-                        //System.out.println("mmEndIn:"+bytes);
+                        int bytes = this.mmConnection.bulkTransfer(mmEndIn, buffer, 64, 1000);//before 5000
+                      //  System.out.println("mmEndIn:"+bytes);
                         if (bytes > 0) {
                             StringBuilder hex = new StringBuilder(bytes * 2);
 
