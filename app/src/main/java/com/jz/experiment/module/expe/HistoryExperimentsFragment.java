@@ -25,6 +25,7 @@ import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.FlashTrimReader;
 import com.jz.experiment.util.StatusChecker;
+import com.jz.experiment.util.ThreadUtil;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.recyclerview.decoration.VerticalSpacesItemDecoration;
@@ -210,8 +211,14 @@ public class HistoryExperimentsFragment extends BaseFragment {
                     e.printStackTrace();
                 }
                 byte[] reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
+                int count=0;
                 while (reveicedBytes==null || reveicedBytes[0]==0){
+                    if (count>=50){
+                        break;
+                    }
                     reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
+                    count++;
+                    ThreadUtil.sleep(100);
                 }
                 String lid=ByteUtil.getHexStr(reveicedBytes,reveicedBytes.length);
                 DataFileUtil.writeFileLog(lid);

@@ -106,30 +106,23 @@ public class UserSettingsStep1Activity extends BaseActivity {
                 channel.setName("通道" + (i + 1));
                 channels.add(channel);
             }
-            int wellNum=CommData.KsIndex;//反应井个数
-            int halfWellNum=wellNum/2;
+
             List<Sample> samplesA = new ArrayList<>();
             firstInfo.setSamplesA(samplesA);
             for (int i = 0; i < 8; i++) {
                 Sample sample = new Sample();
                 samplesA.add(sample);
-                if (halfWellNum>(i)){
-                    sample.setEnabled(true);
-                }else {
-                    sample.setEnabled(false);
-                }
+
             }
             List<Sample> samplesB = new ArrayList<>();
             firstInfo.setSamplesB(samplesB);
             for (int i = 0; i < 8; i++) {
                 Sample sample = new Sample();
                 samplesB.add(sample);
-                if (halfWellNum>(i)){
-                    sample.setEnabled(true);
-                }else {
-                    sample.setEnabled(false);
-                }
+
             }
+            enableSamples(samplesA);
+            enableSamples(samplesB);
             inflateData();
         } else {
             //需要根据expe_id查询具体的Expe
@@ -147,6 +140,11 @@ public class UserSettingsStep1Activity extends BaseActivity {
                         public void call(FindExpeByIdResponse response) {
                             findSubscription.unsubscribe();
                             mExperiment = response.getData();
+                            List<Sample> samplesA=mExperiment.getSettingsFirstInfo().getSamplesA();
+                            List<Sample> samplesB=mExperiment.getSettingsFirstInfo().getSamplesB();
+
+                            enableSamples(samplesA);
+                            enableSamples(samplesB);
                             inflateData();
                         }
                     });
@@ -158,6 +156,19 @@ public class UserSettingsStep1Activity extends BaseActivity {
 
     }
 
+
+    private void enableSamples(List<Sample> samples){
+        int wellNum=CommData.KsIndex;//反应井个数
+        int halfWellNum=wellNum/2;
+        for (int i = 0; i < 8; i++) {
+            Sample sample = samples.get(i);
+            if (halfWellNum>(i)){
+                sample.setEnabled(true);
+            }else {
+                sample.setEnabled(false);
+            }
+        }
+    }
 
     private void inflateData() {
         //TODO 根据下位机通道数和孔数进行设置，多余的通道和孔位需要置灰，不可点。
