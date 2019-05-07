@@ -20,8 +20,6 @@ import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
 import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
-import com.jz.experiment.util.ByteUtil;
-import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.FlashTrimReader;
 import com.jz.experiment.util.StatusChecker;
@@ -220,8 +218,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
                     count++;
                     ThreadUtil.sleep(100);
                 }
-                String lid=ByteUtil.getHexStr(reveicedBytes,reveicedBytes.length);
-                DataFileUtil.writeFileLog(lid);
+              /*  String lid=ByteUtil.getHexStr(reveicedBytes,reveicedBytes.length);
+                DataFileUtil.writeFileLog(lid);*/
 
                 if (reveicedBytes == null || reveicedBytes[0] == 0) {
                     subscriber.onNext(CODE_NOT_CONECTED);

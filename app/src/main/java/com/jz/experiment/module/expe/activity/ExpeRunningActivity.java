@@ -942,7 +942,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             float lidTemp = onReadTemperature(PcrCommand.Temperature.LID);
             float peltierTemp = onReadTemperature(PcrCommand.Temperature.PELTIER);
             System.out.println("lidTemp:"+lidTemp+" peltierTemp:"+peltierTemp);
-            if (lidTemp < 10 || peltierTemp == 0) {
+            if (lidTemp < 10 || peltierTemp < 10) {
                 return;
             }
             mTempChart.addTemp(lidTemp, peltierTemp);
@@ -955,7 +955,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         float lidTemp = onReadTemperature(PcrCommand.Temperature.LID);
         float peltierTemp = onReadTemperature(PcrCommand.Temperature.PELTIER);
         System.out.println("lidTemp:"+lidTemp+" peltierTemp:"+peltierTemp);
-        if (lidTemp < 10 || peltierTemp == 0) {
+        if (lidTemp < 10 || peltierTemp < 10) {
             return;
         }
         mTempChart.addTemp(lidTemp, peltierTemp);
@@ -1059,17 +1059,22 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                                 tv_cycling_desc.setText("循环：");
                             }
 
-                        /*    StringBuilder sBuilder=new StringBuilder();
+                            StringBuilder sBuilder=new StringBuilder();
                             sBuilder.append("====================\n");
                             sBuilder.append("下位机返回的cyclingNum："+cyclingNum+"\n");
                             sBuilder.append("下位机返回的cyclingStep："+cyclingStep+"\n");
                             sBuilder.append("计算得到的当前阶段"+(mRunningCyclingStageIndex + 1)+"\n");
                             sBuilder.append("====================\n");
-                            DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);*/
+                            DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);
 
-                            List<Stage> stageList = getCyclingSteps();
-                            CyclingStage cyclingStage = (CyclingStage) stageList.get(mRunningCyclingStageIndex);
-                            tv_cycling.setText((cyclingNum + 1) + "/" + cyclingStage.getCyclingCount());
+                            try{
+                                List<Stage> stageList = getCyclingSteps();
+                                CyclingStage cyclingStage = (CyclingStage) stageList.get(mRunningCyclingStageIndex);
+                                tv_cycling.setText((cyclingNum + 1) + "/" + cyclingStage.getCyclingCount());
+                            }catch (Exception e){
+                                DataFileUtil.writeFileLog(e.getMessage(),mExecutorService);
+                            }
+
 
                         }
                     }
