@@ -41,6 +41,7 @@ import com.wind.base.BaseActivity;
 import com.wind.base.adapter.DisplayItem;
 import com.wind.base.bean.CyclingStage;
 import com.wind.base.bean.EndStage;
+import com.wind.base.bean.MeltingStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
 import com.wind.base.dialog.LoadingDialogHelper;
@@ -102,6 +103,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     private HistoryExperiment mHistoryExperiment;
     private ExpeDataStore mExpeDataStore;
     Subscription mReadTrimSubscription;
+
     @Override
     protected void setTitle() {
         mTitleBar.setTitle("用户设置2");
@@ -188,11 +190,11 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     }
 
     @Subscribe
-    public void onAddStartStageEvent(AddStartStageEvent event){
+    public void onAddStartStageEvent(AddStartStageEvent event) {
         //判断预变性温度，最多只能有两个
-        Stage stage= (Stage) mStageAdapter.getItems().get(1);
-        if (stage instanceof StartStage){
-            ToastUtil.showToast(getActivity(),"最多两个预变性阶段");
+        Stage stage = (Stage) mStageAdapter.getItems().get(1);
+        if (stage instanceof StartStage) {
+            ToastUtil.showToast(getActivity(), "最多两个预变性阶段");
             return;
         }
         mStageAdapter.add(event.getPosition(), new StartStage());
@@ -201,20 +203,21 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     }
 
     @Subscribe
-    public void onDelStartStageEvent(DelStartStageEvent event){
+    public void onDelStartStageEvent(DelStartStageEvent event) {
         //判断预变性温度，最少有一个
-        Stage stage= (Stage) mStageAdapter.getItems().get(1);
-        if (stage instanceof StartStage){
+        Stage stage = (Stage) mStageAdapter.getItems().get(1);
+        if (stage instanceof StartStage) {
             mStageAdapter.remove(event.getPosition());
             buildLink();
             Log.i("ChangeStage", "onDelStartStageEvent");
-        }else {
+        } else {
             ToastUtil.showToast(getActivity(), "最少一个预变性阶段");
             return;
         }
 
 
     }
+
     @Subscribe
     public void onRefreshStageAdapterEvent(RefreshStageAdapterEvent event) {
         mStageAdapter.notifyDataSetChanged();
@@ -251,16 +254,16 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mCommunicationService!=null){
+        if (mCommunicationService != null) {
             mCommunicationService.setNotify(null);
         }
 
-        if (mReadTrimSubscription!=null){
-            if (!mReadTrimSubscription.isUnsubscribed()){
+        if (mReadTrimSubscription != null) {
+            if (!mReadTrimSubscription.isUnsubscribed()) {
                 mReadTrimSubscription.unsubscribe();
             }
         }
-        mReadTrimSubscription=null;
+        mReadTrimSubscription = null;
         EventBus.getDefault().unregister(this);
     }
 
@@ -280,8 +283,17 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             secondInfo = new ExpeSettingSecondInfo();
             mHistoryExperiment.setSettingSecondInfo(secondInfo);
         }
-        String startT = tv_start_temp.getText().toString().trim();
-        String endT = tv_end_temp.getText().toString().trim();
+      /*  String startT = tv_start_temp.getText().toString().trim();
+        String endT = tv_end_temp.getText().toString().trim();*/
+        String startT = "0";
+        String endT = "0";
+        if (mModes.size() > 1) {
+            Stage s=(MeltingStage)(mStageAdapter.getItem(mStageAdapter.getItemCount()-2));
+            Stage e=(MeltingStage)(mStageAdapter.getItem(mStageAdapter.getItemCount()-1));
+            startT=s.getTemp()+"";
+            endT=e.getTemp()+"";
+        }
+
         secondInfo.setStartTemperature(startT);
         secondInfo.setEndTemperature(endT);
         secondInfo.setModes(mModes);
@@ -351,8 +363,8 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                     LoadingDialogHelper.showOpLoading(getActivity());
                     buildExperiment();
 
-                    if (CommData.sTrimFromFile){
-                        FlashData.flash_loaded=false;
+                    if (CommData.sTrimFromFile) {
+                        FlashData.flash_loaded = false;
                         //设置积分时间
                         setIntergrationTime()
                                 .subscribeOn(Schedulers.io())
@@ -364,12 +376,9 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                                         ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
                                     }
                                 });
-                    }else {
+                    } else {
                         readTrimDataFromInstrument();
                     }
-
-
-
 
 
                 }
@@ -388,7 +397,13 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                             Stage stage = (Stage) mStageAdapter.getItem(mStageAdapter.getItemCount() - 1);
                             int temp = (int) stage.getTemp();
                             tv_start_temp.setText(temp + "");
+
+
+                            addMeltingStage();
+                        } else {
+                            removeMeltingStage();
                         }
+
                         buildModeShowName();
                     }
                 });
@@ -396,21 +411,42 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         }
     }
 
+    private void removeMeltingStage() {
+        if (mStageAdapter.getItem(mStageAdapter.getItemCount() - 1)
+                instanceof MeltingStage) {
+            mStageAdapter.remove(mStageAdapter.getItemCount() - 1);
+            mStageAdapter.remove(mStageAdapter.getItemCount() - 1);
+        }
+    }
+
+    private void addMeltingStage() {
+        if (mStageAdapter.getItem(mStageAdapter.getItemCount() - 1)
+                instanceof MeltingStage) {
+
+        } else {
+            mStageAdapter.add(new MeltingStage());
+            mStageAdapter.add(new MeltingStage());
+
+            buildLink();
+        }
+    }
+
     private int mReadTrimCount;
+
     private void readTrimDataFromInstrument() {
-         mReadTrimSubscription=Observable.interval(1000,TimeUnit.MILLISECONDS)
+        mReadTrimSubscription = Observable.interval(1000, TimeUnit.MILLISECONDS)
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long aLong) {
-                        if (mReadTrimCount==3){
+                        if (mReadTrimCount == 3) {
                             mReadTrimSubscription.unsubscribe();
                             showConnectionTip();
                             return;
                         }
-                        if (mReadTrimCount>=2){
+                        if (mReadTrimCount >= 2) {
                             mReadTrimSubscription.unsubscribe();
                             verifyConnection();
-                        }else {
+                        } else {
                             mReadTrimCount++;
                             mCommunicationService.setNotify(UserSettingsStep2Activity.this);
                             TrimReader.getInstance().ReadTrimDataFromInstrument(mCommunicationService);
@@ -422,30 +458,30 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     }
 
     private void verifyConnection() {
-        PcrCommand cmd=PcrCommand.ofLidAndApaptorStatusCmd();
-        byte [] reveicedBytes=mCommunicationService.sendPcrCommandSync(cmd);
-        if (reveicedBytes!=null) {
-            try{
+        PcrCommand cmd = PcrCommand.ofLidAndApaptorStatusCmd();
+        byte[] reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
+        if (reveicedBytes != null) {
+            try {
                 int statusIndex = 1;
                 int status = reveicedBytes[statusIndex];
                 //TODO 检查返回的包是否正确
                 boolean succ = StatusChecker.checkStatus(status);
-                if (succ){
+                if (succ) {
                     readTrimDataFromInstrument();
-                }else {
+                } else {
                     showConnectionTip();
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 showConnectionTip();
             }
 
-        }else {
+        } else {
             showConnectionTip();
         }
     }
 
-    private void showConnectionTip(){
+    private void showConnectionTip() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -466,14 +502,14 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             public void call(Subscriber<? super Boolean> subscriber) {
 
 
-
                 doSetIntergrationTime();
                 subscriber.onNext(true);
                 subscriber.onCompleted();
             }
         });
     }
-    private void doSetIntergrationTime(){
+
+    private void doSetIntergrationTime() {
         //删除日志文件
         DataFileUtil.removeLogFile();
         if (!TextUtils.isEmpty(dp_str)) {
@@ -611,9 +647,9 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         if (mModes.size() == 2) {
             sBuilder.append("+")
                     .append(mModes.get(1).getName());
-            layout_melt.setVisibility(View.VISIBLE);
+            //  layout_melt.setVisibility(View.VISIBLE);
         } else {
-            layout_melt.setVisibility(View.GONE);
+            // layout_melt.setVisibility(View.GONE);
         }
         tv_mode.setText(sBuilder.toString());
     }
@@ -624,7 +660,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             return false;
         }
 
-        if (mModes.size() > 1) {
+       /* if (mModes.size() > 1) {
             //温度必须填写
             String startTemp = tv_start_temp.getText().toString();
             String endTemp = tv_end_temp.getText().toString();
@@ -632,7 +668,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                 ToastUtil.showToast(getActivity(), "请输入熔解曲线结束温度");
                 return false;
             }
-        }
+        }*/
         return true;
     }
 
@@ -655,11 +691,13 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     public void onDoThing() {
 
     }
+
     //dataposition.dat文件内容
     private String dp_str;
+
     @Override
     public void onReceivedData(Data data) {
-        if (mReadTrimSubscription==null){
+        if (mReadTrimSubscription == null) {
             return;
         }
         mReadTrimSubscription.unsubscribe();
@@ -787,30 +825,26 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
                     k++;
                 }
 
-                CommData.chan1_rampgen=  FlashData.rampgen[0];
-                CommData.chan2_rampgen=  FlashData.rampgen[1];
-                CommData.chan3_rampgen=  FlashData.rampgen[2];
-                CommData.chan4_rampgen=  FlashData.rampgen[3];
+                CommData.chan1_rampgen = FlashData.rampgen[0];
+                CommData.chan2_rampgen = FlashData.rampgen[1];
+                CommData.chan3_rampgen = FlashData.rampgen[2];
+                CommData.chan4_rampgen = FlashData.rampgen[3];
 
-                CommData.chan1_auto_v15=FlashData.auto_v15[0];
-                CommData.chan2_auto_v15=FlashData.auto_v15[1];
-                CommData.chan3_auto_v15=FlashData.auto_v15[2];
-                CommData.chan4_auto_v15=FlashData.auto_v15[3];
+                CommData.chan1_auto_v15 = FlashData.auto_v15[0];
+                CommData.chan2_auto_v15 = FlashData.auto_v15[1];
+                CommData.chan3_auto_v15 = FlashData.auto_v15[2];
+                CommData.chan4_auto_v15 = FlashData.auto_v15[3];
 
-                CommData.chan1_auto_v20=FlashData.auto_v20[0];
-                CommData.chan2_auto_v20=FlashData.auto_v20[1];
-                CommData.chan3_auto_v20=FlashData.auto_v20[2];
-                CommData.chan4_auto_v20=FlashData.auto_v20[3];
+                CommData.chan1_auto_v20 = FlashData.auto_v20[0];
+                CommData.chan2_auto_v20 = FlashData.auto_v20[1];
+                CommData.chan3_auto_v20 = FlashData.auto_v20[2];
+                CommData.chan4_auto_v20 = FlashData.auto_v20[3];
 
-                CommData.chan1_range=FlashData.range[0];
-                CommData.chan2_range=FlashData.range[1];
-                CommData.chan3_range=FlashData.range[2];
-                CommData.chan4_range=FlashData.range[3];
+                CommData.chan1_range = FlashData.range[0];
+                CommData.chan2_range = FlashData.range[1];
+                CommData.chan3_range = FlashData.range[2];
+                CommData.chan4_range = FlashData.range[3];
                 FlashData.flash_loaded = true;
-
-
-
-
 
 
                 //读取trim和dataposition成功
@@ -860,15 +894,13 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         }
     }
 
-    private String Buf2String(byte[] buff, int size)
-    {
+    private String Buf2String(byte[] buff, int size) {
         //String rstr;
-        StringBuilder sBuilder=new StringBuilder();
+        StringBuilder sBuilder = new StringBuilder();
         //rstr = "Chipdp\r\n";
         sBuilder.append("Chipdp\r\n");
-        for (int i = 0; i < size; i++)
-        {
-            sBuilder.append(buff[i]+" ");
+        for (int i = 0; i < size; i++) {
+            sBuilder.append(buff[i] + " ");
             //String str = String.format("{0} ", buff[i]);
             //rstr += str;
         }

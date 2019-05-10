@@ -96,7 +96,11 @@ public class VernierView extends View {
 
     private float startScale;
     public void setStartScale(float startScale) {
-
+        if (startScale==-1 && getMeasuredHeight()!=0){
+              startScale=getDragHeight() / 2f+spaceTopHeight;
+              setStartScale(startScale);
+            return;
+        }
         this.startScale = startScale;
         invalidate();
         if (listener!=null){
@@ -111,6 +115,12 @@ public class VernierView extends View {
     private float mScale;
 
     public void setScale(float scale) {
+        if (scale==-1&& getMeasuredHeight()!=0){
+           // float startScale=getDragHeight() / 2f+spaceTopHeight;
+            //setStartScale(startScale);
+            setScale(getDragHeight() / 2f+spaceTopHeight);
+            return;
+        }
         this.mScale = scale;
         invalidate();
     }
@@ -165,12 +175,16 @@ public class VernierView extends View {
                 //判断手指是否落在粗线范围内，若在可以拖动，否则不能拖动
                 if (mBoldLineRectF.contains(x,y)){
                     canDrag=true;
+                   // getParent().requestDisallowInterceptTouchEvent(true);
                 }else {
                     canDrag=false;
+                  //  getParent().requestDisallowInterceptTouchEvent(false);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
+
                 if (canDrag){
+                  //  getParent().requestDisallowInterceptTouchEvent(true);
                     /*if (y>getHeight()){
                         y=getHeight();
                     }
@@ -178,25 +192,33 @@ public class VernierView extends View {
                         y=spaceTopHeight;
                     }*/
                     float deltaY=y-downY;
-                    System.out.println("deltaY:"+deltaY);
+                    //System.out.println("deltaY:"+deltaY);
                     float temp=mScale+deltaY;
-                    if (temp>getHeight()){
-                        temp=getHeight();
+
+                    if (heightPercent(temp)>0.6f){
+                        temp= 0.6f*getDragHeight()+spaceTopHeight;
                     }
+
+                   /* if (temp>getHeight()){
+                        temp=getHeight();
+                    }*/
                     if (temp<spaceTopHeight){
                         temp=spaceTopHeight;
                     }
                     setScale(temp);
                     downY=y;
+                }else {
+                   // getParent().requestDisallowInterceptTouchEvent(false);
                 }
+                downY=y;
                 break;
 
             case MotionEvent.ACTION_UP:
                 canDrag=false;
-
+               // getParent().requestDisallowInterceptTouchEvent(false);
                 break;
         }
-        return true;
+        return canDrag;
     }
     private boolean touchDragBar(MotionEvent event){
         float x=event.getX();

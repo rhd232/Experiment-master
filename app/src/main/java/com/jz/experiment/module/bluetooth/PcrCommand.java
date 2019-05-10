@@ -94,10 +94,10 @@ public class PcrCommand {
 
 
     /**
-     *
+     *读取下位机温度
      * @param temperature
      */
-    public static PcrCommand readTemperatureCmd(Temperature temperature){
+    public static PcrCommand ofReadTemperatureCmd(Temperature temperature){
 
         int header=0xaa;
         int command=0x10;
@@ -556,6 +556,9 @@ public class PcrCommand {
         addCommand(listToByteArray(bytes));
     }
 
+    /**
+     * 获取当前阶段,循环数
+     */
     public void getCyclingInfo(){
         List<Byte> bytes = new ArrayList<>();
         bytes.add((byte) 0xaa);

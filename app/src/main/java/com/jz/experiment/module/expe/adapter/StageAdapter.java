@@ -20,7 +20,9 @@ public class StageAdapter extends BaseDelegateRecyclerAdapter {
         manager
                 .addDelegate(new StartStageDelegate(mActivity, R.layout.item_stage_start))
                 .addDelegate(new CyclingStageDelegate(mActivity, R.layout.item_stage_cycling))
-                .addDelegate(new EndStageDelegate(mActivity, R.layout.item_stage_start));
+                .addDelegate(new EndStageDelegate(mActivity, R.layout.item_stage_start))
+                .addDelegate(new MeltingStageDelegate(mActivity, R.layout.item_stage_melting));
+
     }
 
 

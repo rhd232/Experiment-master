@@ -7,6 +7,7 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqldelight.SqlDelightStatement;
 import com.wind.base.bean.CyclingStage;
 import com.wind.base.bean.EndStage;
+import com.wind.base.bean.MeltingStage;
 import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
@@ -322,6 +323,8 @@ public class ExpeDataStore {
                             List<Stage> stageList=new ArrayList<>();
                             EndStage endStage=new EndStage();
                             StartStage startStage=new StartStage();
+
+                            List<MeltingStage> meltingStages=new ArrayList<>();
                             while (stageCursor.moveToNext()) {
                                 StageInfo stageInfo = StageInfo.FACTORY.find_by_expeidMapper().map(stageCursor);
                                 long type = stageInfo.type();
@@ -344,6 +347,13 @@ public class ExpeDataStore {
                                     during=stageInfo.during();
                                 }
                                 switch ((int) type) {
+                                    case Stage.TYPE_MELTING:
+                                        MeltingStage meltingStage=new MeltingStage();
+                                        meltingStage.setStartScale((float) startScale);
+                                        meltingStage.setCurScale((float) curScale);
+                                        meltingStage.setDuring((short) during);
+                                        meltingStages.add(meltingStage);
+                                        break;
                                     case Stage.TYPE_END:
                                         endStage.setStartScale((float) startScale);
                                         endStage.setCurScale((float) curScale);
@@ -415,6 +425,9 @@ public class ExpeDataStore {
                             }
                             stageList.add(endStage);
 
+                            if (!meltingStages.isEmpty()) {
+                                stageList.addAll(meltingStages);
+                            }
                             secondInfo.setSteps(stageList);
 
 
@@ -559,6 +572,7 @@ public class ExpeDataStore {
                             List<Stage> stageList=new ArrayList<>();
                             EndStage endStage=new EndStage();
                             StartStage startStage=new StartStage();
+                            List<MeltingStage> meltingStages=new ArrayList<>();
                             while (stageCursor.moveToNext()) {
                                 StageInfo stageInfo = StageInfo.FACTORY.find_by_expeidMapper().map(stageCursor);
                                 long type = stageInfo.type();
@@ -580,6 +594,13 @@ public class ExpeDataStore {
                                     during=stageInfo.during();
                                 }
                                 switch ((int) type) {
+                                    case Stage.TYPE_MELTING:
+                                        MeltingStage meltingStage=new MeltingStage();
+                                        meltingStage.setStartScale((float) startScale);
+                                        meltingStage.setCurScale((float) curScale);
+                                        meltingStage.setDuring((short) during);
+                                        meltingStages.add(meltingStage);
+                                        break;
                                     case Stage.TYPE_END:
                                         endStage.setStartScale((float) startScale);
                                         endStage.setCurScale((float) curScale);
@@ -651,6 +672,9 @@ public class ExpeDataStore {
                             }
                             stageList.add(endStage);
 
+                            if (!meltingStages.isEmpty()){
+                                stageList.addAll(meltingStages);
+                            }
 
                             secondInfo.setSteps(stageList);
                             response.setErr(0);

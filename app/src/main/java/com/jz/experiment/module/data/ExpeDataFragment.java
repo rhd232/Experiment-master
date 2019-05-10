@@ -139,6 +139,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
         if (isSavedExpe()) {
             iv_save.setVisibility(View.GONE);
+        }else {
+            iv_save.setVisibility(View.VISIBLE);
         }
         // mExecutorService.execute(mRun);
 

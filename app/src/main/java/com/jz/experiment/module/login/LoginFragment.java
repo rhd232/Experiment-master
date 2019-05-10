@@ -188,6 +188,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
         }
     }
 
+    private boolean mNeedStopService=true;
     private void login() {
         if (validate()) {
             setNofity(null);
@@ -211,6 +212,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
                             if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                                 //登录成功
                                 MainActivity.start(getActivity());
+                                mNeedStopService=false;
                                 ActivityUtil.finish(getActivity());
                             } else {
                                 tv_msg.setText("用户不存在或密码错误");
@@ -381,5 +383,8 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
     public void onDestroy() {
         super.onDestroy();
         setNofity(null);
+        if (mNeedStopService) {
+            DeviceProxyHelper.getInstance(getActivity().getApplicationContext()).unbindService(getActivity().getApplicationContext());
+        }
     }
 }

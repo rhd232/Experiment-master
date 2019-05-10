@@ -30,7 +30,6 @@
             android:paddingBottom="50dp"
             android:clipChildren="false">
 
-
             <RelativeLayout
                 android:id="@+id/rl_mode_sel"
                 android:layout_width="match_parent"
@@ -78,6 +77,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+
                 >
                 <FrameLayout
                     android:layout_width="wrap_content"
@@ -89,12 +89,16 @@
                     android:layout_marginTop="136dp"
                     />
                 </FrameLayout>
-                <com.jz.experiment.widget.FixDragConflictRecyclerView
-                    android:id="@+id/rv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                <!--com.jz.experiment.widget.FixDragConflictRecyclerView-->
 
-                </com.jz.experiment.widget.FixDragConflictRecyclerView>
+
+                <com.jz.experiment.widget.SlidingConfilctRecyclerView
+                    android:id="@+id/rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                </com.jz.experiment.widget.SlidingConfilctRecyclerView>
             </LinearLayout>
 
             <Button

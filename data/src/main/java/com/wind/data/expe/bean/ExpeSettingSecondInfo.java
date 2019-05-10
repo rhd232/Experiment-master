@@ -3,6 +3,7 @@ package com.wind.data.expe.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wind.base.bean.MeltingStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
 
@@ -81,6 +82,13 @@ public class ExpeSettingSecondInfo implements Parcelable {
         cyclingStageList.remove(0);
         if (hasTwoStart)
             cyclingStageList.remove(0);
+
+        //判断最后两个是否是MeltingStage
+        if (cyclingStageList.get(cyclingStageList.size()-1) instanceof MeltingStage){
+            cyclingStageList.remove(cyclingStageList.size()-1);
+            cyclingStageList.remove(cyclingStageList.size()-1);
+        }
+        //移除EndStage
         cyclingStageList.remove(cyclingStageList.size()-1);
         return cyclingStageList;
 

@@ -22,6 +22,7 @@ import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
+import com.jz.experiment.util.ThreadUtil;
 import com.wind.toastlib.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -249,6 +250,7 @@ public class UsbService extends CommunicationService {
     public int sendPcrCommand(PcrCommand command) {
         int err = 0;
         try {
+            mSync=false;
             if (mReadThread == null || !mReadThread.mRun) {
                 startReadThread();
                 Thread.sleep(100);
@@ -270,7 +272,10 @@ public class UsbService extends CommunicationService {
 
     public byte[] sendPcrCommandSync(PcrCommand command) {
         //停止读取线程。
-        stopReadThread();
+        if (mReadThread == null || !mReadThread.mRun) {
+            startReadThread();
+        }
+        //stopReadThread();
         toByteString(command);
         ArrayList<Byte> bytes = command.getCommandList();
         byte[] data = new byte[bytes.size()];
@@ -279,7 +284,7 @@ public class UsbService extends CommunicationService {
         }
         return bulkSync(bytes);
     }
-
+    private boolean mSync;
     private byte[] bulkSync(ArrayList<Byte> command) {
         if (command != null && !command.isEmpty()) {
 
@@ -290,30 +295,38 @@ public class UsbService extends CommunicationService {
             for (int i = 0; i < command.size(); i++) {
                 data[i] = command.get(i).byteValue();
             }
-
+            mSync = true;
             //超时时间需要设置的长一点，不然很可能打印卡住，返回-1。
             int ret = mUsbDeviceConnection.bulkTransfer(mUsbEndpointOut, data, data.length, 5000);
             if (ret >= 0) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                byte[] buffer = new byte[64];
-                int bytes = this.mUsbDeviceConnection.bulkTransfer(mUsbEndpointIn, buffer, 64, 5000);
+                //等待读取线程读取
+                ThreadUtil.sleep(100);
 
-                if (bytes > 0) {
-                    StringBuilder hex = new StringBuilder(buffer.length * 2);
-                    for (int i = 0; i < bytes; i++) {
-                        byte b = buffer[i];
-                        if ((b & 0xFF) < 0x10) hex.append("0");
-                        hex.append(Integer.toHexString(b & 0xFF));
+                byte[] buffer = new byte[64];
+                if (mReadThread!=null){
+                    int count=0;
+                    while (mReadThread!=null&&mReadThread.mSyncReceivedBytes==null && count<=3){
+                        ThreadUtil.sleep(100);
+                        count++;
                     }
-                    System.out.println("同步接收到:" + hex.toString().toLowerCase());
-                    DataFileUtil.writeFileLog("同步接收到：" + hex.toString().toLowerCase());
-                    //Data d = new Data(buffer, bytes);
-                    //broadcastUpdate(BluetoothService.ACTION_DATA_AVAILABLE, d);
+                    if (mReadThread!=null&&mReadThread.mSyncReceivedBytes!=null) {
+                        buffer = mReadThread.mSyncReceivedBytes;
+                    }
                 }
+              //  int bytes = this.mUsbDeviceConnection.bulkTransfer(mUsbEndpointIn, buffer, 64, 5000);
+
+
+                StringBuilder hex = new StringBuilder(buffer.length * 2);
+                for (int i = 0; i < 64; i++) {
+                    byte b = buffer[i];
+                    if ((b & 0xFF) < 0x10) hex.append("0");
+                    hex.append(Integer.toHexString(b & 0xFF));
+                }
+                System.out.println("同步接收到:" + hex.toString().toLowerCase());
+                DataFileUtil.writeFileLog("同步接收到：" + hex.toString().toLowerCase());
+
+
+
                 return buffer;
             }
 
@@ -365,13 +378,7 @@ public class UsbService extends CommunicationService {
             mReadThread = null;
 
         }
-       /* try {
-            Thread.sleep(15);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
     }
-
     public void startReadThread() {
         stopReadThread();
         mReadThread = new ReadThread();
@@ -381,6 +388,7 @@ public class UsbService extends CommunicationService {
 
     private class ReadThread extends Thread {
         //private String deviceName;
+        public byte[] mSyncReceivedBytes;
         UsbEndpoint mmEndIn;
         UsbEndpoint mmEndOut;
         UsbDeviceConnection mmConnection;
@@ -397,6 +405,7 @@ public class UsbService extends CommunicationService {
 
         private void stopRun() {
             mRun = false;
+
         }
 
         @Override
@@ -410,21 +419,27 @@ public class UsbService extends CommunicationService {
                         int bytes = this.mmConnection.bulkTransfer(mmEndIn, buffer, 64, 1000);//before 5000
                       //  System.out.println("mmEndIn:"+bytes);
                         if (bytes > 0) {
-                            StringBuilder hex = new StringBuilder(bytes * 2);
+                            if (mSync){
+                                mSyncReceivedBytes=buffer;
+                            }else {
+                                mSyncReceivedBytes=null;
+                                StringBuilder hex = new StringBuilder(bytes * 2);
 
-                            for (int i = 0; i < bytes; i++) {
-                                byte b = buffer[i];
-                                if ((b & 0xFF) < 0x10) hex.append("0");
-                                hex.append(Integer.toHexString(b & 0xFF));
+                                for (int i = 0; i < bytes; i++) {
+                                    byte b = buffer[i];
+                                    if ((b & 0xFF) < 0x10) hex.append("0");
+                                    hex.append(Integer.toHexString(b & 0xFF));
+                                }
+                                System.out.println("接收到:" + hex.toString().toLowerCase());
+                                DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
+
+                                Data data = new Data(buffer, bytes);
+                                Message msg = Message.obtain();
+                                msg.what = 3;
+                                msg.obj = data;
+                                mHandler.sendMessage(msg);
                             }
-                            System.out.println("接收到:" + hex.toString().toLowerCase());
-                            DataFileUtil.writeFileLog("接收到：" + hex.toString().toLowerCase());
 
-                            Data data = new Data(buffer, bytes);
-                            Message msg = Message.obtain();
-                            msg.what = 3;
-                            msg.obj = data;
-                            mHandler.sendMessage(msg);
                         }
 
                         Thread.sleep(10);

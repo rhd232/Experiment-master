@@ -13,6 +13,7 @@ public class Stage implements DisplayItem,Parcelable {
     public static final int TYPE_CYCLING=1;
     public static final int TYPE_PART=2;
     public static final int TYPE_END=3;
+    public static final int TYPE_MELTING=4;
 
     private int type;//stage类型
 

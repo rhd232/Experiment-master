@@ -2,17 +2,16 @@ package com.jz.experiment.module.expe.adapter;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.jz.experiment.R;
-import com.wind.base.bean.CyclingStage;
-import com.wind.base.bean.PartStage;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
 import com.jz.experiment.module.expe.event.DelCyclingStageEvent;
 import com.wind.base.adapter.BaseAdapterDelegate;
 import com.wind.base.adapter.DisplayItem;
+import com.wind.base.bean.CyclingStage;
+import com.wind.base.bean.PartStage;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -80,7 +79,7 @@ public class CyclingStageDelegateBackup extends BaseAdapterDelegate<CyclingStage
             iv_cycling_add=itemView.findViewById(R.id.iv_cycling_add);
             iv_cycling_del=itemView.findViewById(R.id.iv_cycling_del);
 
-            rvInner = itemView.findViewById(R.id.rv_inner);
+            /*rvInner = itemView.findViewById(R.id.rv_inner);
             LinearLayoutManager manager = new LinearLayoutManager(itemView.getContext()){
                 @Override
                 public boolean canScrollHorizontally() {
@@ -94,7 +93,7 @@ public class CyclingStageDelegateBackup extends BaseAdapterDelegate<CyclingStage
             };
 
             manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            rvInner.setLayoutManager(manager);
+            rvInner.setLayoutManager(manager);*/
         }
     }
 }

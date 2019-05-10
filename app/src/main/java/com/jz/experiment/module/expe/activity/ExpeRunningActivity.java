@@ -30,6 +30,7 @@ import com.jz.experiment.module.expe.bean.ChannelImageStatus;
 import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.module.expe.event.FilterEvent;
+import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.ByteHelper;
 import com.jz.experiment.util.ByteUtil;
@@ -46,6 +47,7 @@ import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
 import com.wind.base.dialog.LoadingDialogHelper;
+import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.expe.bean.Channel;
@@ -608,7 +610,9 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
         if (mCommunicationService!=null){
             mCommunicationService.setNotify(null);
+
         }
+
 
         if (tv_duration != null) {
             tv_duration.stop();
@@ -918,7 +922,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         PcrCommand command = new PcrCommand();
         command.step6();
         mCommunicationService.sendPcrCommand(command);
-        //mUsbService.sendPcrCommand(command);
+
     }
 
     /**
@@ -977,18 +981,24 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         float temp = 0;
         try {
 
-            PcrCommand cmd = PcrCommand.readTemperatureCmd(temperature);
+            PcrCommand cmd = PcrCommand.ofReadTemperatureCmd(temperature);
             byte[] bytes = mCommunicationService.sendPcrCommandSync(cmd);
             int statusIndex = 1;
-            int status = hexToDecimal(bytes[statusIndex]);
-            boolean succ = StatusChecker.checkStatus(status);
-            if (succ) {
-                byte[] buffers = new byte[4];
-                buffers[0] = bytes[5];
-                buffers[1] = bytes[6];
-                buffers[2] = bytes[7];
-                buffers[3] = bytes[8];
-                temp = ByteUtil.getFloat(buffers);
+            int cmdIndex=2;
+            int typeIndex=4;
+            int cmd_=bytes[cmdIndex];
+            int type_=bytes[typeIndex];
+            if (cmd_==0x10 && type_==0x02) {
+                int status = hexToDecimal(bytes[statusIndex]);
+                boolean succ = StatusChecker.checkStatus(status);
+                if (succ) {
+                    byte[] buffers = new byte[4];
+                    buffers[0] = bytes[5];
+                    buffers[1] = bytes[6];
+                    buffers[2] = bytes[7];
+                    buffers[3] = bytes[8];
+                    temp = ByteUtil.getFloat(buffers);
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -1168,8 +1178,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         mHistoryExperiment.setDuring(tv_duration.getDuring());
         mHistoryExperiment.setFinishMilliTime(System.currentTimeMillis());
 
-        //TODO 下个版本直接保存实验
-      /*  saveExpe(mHistoryExperiment).subscribeOn(Schedulers.io())
+        //直接保存实验
+        saveExpe(mHistoryExperiment).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<InsertExpeResponse>() {
                     @Override
@@ -1192,12 +1202,12 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                         throwable.printStackTrace();
                         ToastUtil.showToast(getActivity(), "保存失败,请重试");
                     }
-                });*/
+                });
 
-        Tab tab = new Tab();
+       /* Tab tab = new Tab();
         tab.setIndex(MainActivity.TAB_INDEX_DATA);
         tab.setExtra(mHistoryExperiment);
-        MainActivity.start(getActivity(), tab);
+        MainActivity.start(getActivity(), tab);*/
 
     }
 

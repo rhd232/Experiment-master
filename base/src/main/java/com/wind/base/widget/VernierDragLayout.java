@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.ViewDragHelper;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -29,7 +28,7 @@ import rx.functions.Action1;
 
 public class VernierDragLayout extends FrameLayout implements VernierView.OnViewPositionChangedListener {
 
-    private ViewDragHelper mViewDragHelper;
+
     public VernierDragLayout(@NonNull Context context) {
         super(context);
         init();
@@ -122,6 +121,10 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
 
     }
 
+    public void setTimeLayoutVisibility(int visibility){
+        layout_time.setVisibility(visibility);
+    }
+
     private void translateView() {
         float temperatureTranslateY=mCurPos.y-layout_temperature.getHeight()-DisplayUtil.dip2px(getContext(),4);
         ViewHelper.setTranslationX(layout_temperature,mCurPos.x);
@@ -143,6 +146,8 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
     }
 
     public void setStartScale(float startScale){
+
+
         vernier_view.setStartScale(startScale);
     }
     public void setCurScale(float scale){
@@ -155,6 +160,8 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
         //刻度0-100
         float percent=vernier_view.heightPercent(mCurPos.y);
         float t=(1-percent)*100;
+
+
         String temp=decimalFormat.format(t);
         tv_temperature.setText(temp);
         mLink.setTemp(Float.parseFloat(temp));

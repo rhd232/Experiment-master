@@ -7,7 +7,7 @@
     <string name="cycling_stage">循环阶段</string>
     <string name="step">步骤%1$s</string>
     <string name="step_first">步骤1</string>
-
+    <string name="melting_stage">熔解阶段</string>
     <array name="spinner_values">
         <item>扩增曲线</item>
         <item>熔解曲线</item>

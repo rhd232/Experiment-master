@@ -2,7 +2,6 @@ package com.jz.experiment.module.expe.adapter;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -16,6 +15,7 @@ import com.jz.experiment.R;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
 import com.jz.experiment.module.expe.event.DelCyclingStageEvent;
 import com.jz.experiment.util.AppDialogHelper;
+import com.jz.experiment.widget.HorizontalContainer;
 import com.wind.base.adapter.BaseAdapterDelegate;
 import com.wind.base.adapter.DisplayItem;
 import com.wind.base.bean.CyclingStage;
@@ -50,7 +50,7 @@ View.OnFocusChangeListener{
 
         this.items=items;
         final ViewHolder vh = (ViewHolder) holder;
-        LinearLayoutManager manager=new LinearLayoutManager(mActivity){
+       /* LinearLayoutManager manager=new LinearLayoutManager(mActivity){
             @Override
             public boolean canScrollVertically() {
                 return false;
@@ -62,7 +62,7 @@ View.OnFocusChangeListener{
             }
         };
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        vh.rvInner.setLayoutManager(manager);
+        vh.rvInner.setLayoutManager(manager);*/
 
 
         final CyclingStage stage = (CyclingStage) items.get(position);
@@ -70,11 +70,12 @@ View.OnFocusChangeListener{
         VernierAdapter adapter = new VernierAdapter(mActivity, R.layout.item_inner_vernier);
         if (stage.getPartStageList().isEmpty()) {
             stage.addChildStage(0, new PartStage());
-            //stage.addChildStage(1, new PartStage());
         }
+
+
         adapter.setParentStage(stage);
-        vh.rvInner.setAdapter(adapter);
-        //   stage.setVernierAdapter(adapter);
+      //  vh.rvInner.setAdapter(adapter);
+        vh.horizontal_container.setAdapter(adapter);
         vh.iv_cycling_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,15 +218,16 @@ View.OnFocusChangeListener{
         EditText et_cycling_cnt;
         TextView tv_pic_step;
 
-
+        HorizontalContainer horizontal_container;
         public ViewHolder(View itemView) {
             super(itemView);
             iv_cycling_add = itemView.findViewById(R.id.iv_cycling_add);
             iv_cycling_del = itemView.findViewById(R.id.iv_cycling_del);
             et_cycling_cnt = itemView.findViewById(R.id.et_cycling_cnt);
-            tv_pic_step = itemView.findViewById(R.id.tv_pic_step);
-
-            rvInner = itemView.findViewById(R.id.rv_inner);
+            tv_pic_step =   itemView.findViewById(R.id.tv_pic_step);
+           // lv_inner=itemView.findViewById(R.id.lv_inner);
+            horizontal_container=itemView.findViewById(R.id.horizontal_container);
+            /*rvInner = itemView.findViewById(R.id.rv_inner);
             LinearLayoutManager manager = new LinearLayoutManager(itemView.getContext()) {
                 @Override
                 public boolean canScrollHorizontally() {
@@ -236,10 +238,12 @@ View.OnFocusChangeListener{
                 public boolean canScrollVertically() {
                     return false;
                 }
+
+
             };
 
             manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            rvInner.setLayoutManager(manager);
+            rvInner.setLayoutManager(manager);*/
         }
     }
 }

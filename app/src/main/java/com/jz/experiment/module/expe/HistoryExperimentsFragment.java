@@ -202,16 +202,16 @@ public class HistoryExperimentsFragment extends BaseFragment {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 PcrCommand cmd = PcrCommand.ofLidAndApaptorStatusCmd();
-                mCommunicationService.stopReadThread();
-                try {
+                //mCommunicationService.stopReadThread();
+               /* try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
+                }*/
                 byte[] reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
                 int count=0;
                 while (reveicedBytes==null || reveicedBytes[0]==0){
-                    if (count>=50){
+                    if (count>=3){
                         break;
                     }
                     reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
@@ -281,7 +281,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                             TrimReader.getInstance().ReadTrimFile(getActivity());
                             mNeedReadTrimFile=false;
                         }*/
-                        LoadingDialogHelper.showOpLoading(getActivity());
+                       /* LoadingDialogHelper.showOpLoading(getActivity());
                         //读取下位机是否插入了电源以及热盖的开闭
                         readLid().subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -291,7 +291,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
                                         doNextByStatus(status, event);
 
                                     }
-                                });
+                                });*/
+                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
 
 
                     }

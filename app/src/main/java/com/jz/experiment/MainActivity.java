@@ -175,9 +175,9 @@ public class MainActivity extends BaseActivity {
                 view_pager.setCurrentItem(TAB_INDEX_DATA, false);
                 if (tab != null) {
                     ExpeDataTabFragment expeDataTabFragment = (ExpeDataTabFragment) mAdapter.getItem(TAB_INDEX_DATA);
-                    expeDataTabFragment.setExpe(tab.getExtra());
-                    //TODO 下个版本刷新就行
-                    //expeDataTabFragment.reload();
+                    /*expeDataTabFragment.setExpe(tab.getExtra());*/
+                    //直接刷新就行
+                    expeDataTabFragment.reload();
                     tab = null;
                 }
                 break;

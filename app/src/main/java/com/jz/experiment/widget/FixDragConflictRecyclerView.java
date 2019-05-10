@@ -26,47 +26,55 @@ public class FixDragConflictRecyclerView extends RecyclerView {
         super(context, attrs, defStyle);
     }
 
-    int mLastXIntercept,mLastYIntercept;
+    int mLastXIntercept, mLastYIntercept;
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent e) {
-        boolean intercepted=false;
-        int x= (int) e.getX();
-        int y= (int) e.getY();
-        switch (e.getAction()){
+        boolean intercepted = false;
+        int x = (int) e.getX();
+        int y = (int) e.getY();
+        switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                intercepted=false;
+                intercepted = false;
+                getParent().requestDisallowInterceptTouchEvent(false);
                 break;
             case MotionEvent.ACTION_MOVE:
-                int deltaX=x-mLastXIntercept;
-                int deltaY=y-mLastYIntercept;
+                int deltaX = x - mLastXIntercept;
+                int deltaY = y - mLastYIntercept;
                 //判断是否按住了vernierview上
-                View view=findChildViewUnder(e.getX(),e.getY());
-                boolean consumeDrag=false;
-                if (view!=null){
-                    Log.i("TouchEvent",view.getClass().getSimpleName());
-                    VernierDragLayout dragLayout=view.findViewById(R.id.vernier_drag_layout);
-                    if (dragLayout!=null){
-                        consumeDrag=dragLayout.consumeDrag();
+                View view = findChildViewUnder(e.getX(), e.getY());
+                boolean consumeDrag = false;
+                if (view != null) {
+                    Log.i("TouchEvent", view.getClass().getSimpleName());
+                    VernierDragLayout dragLayout = view.findViewById(R.id.vernier_drag_layout);
+                    if (dragLayout != null) {
+                        consumeDrag = dragLayout.consumeDrag();
                     }
                 }
 
-                if (consumeDrag){
-                    intercepted=false;
-                }else {
+                if (consumeDrag) {
+                    intercepted = false;
+                } else {
                     if (Math.abs(deltaX) > Math.abs(deltaY) * 2) {
                         intercepted = true;
                     } else {
                         intercepted = false;
                     }
                 }
+                if (intercepted) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                } else {
+                    getParent().requestDisallowInterceptTouchEvent(false);
+                }
+                System.out.println("FixDragRecyclerView intercepted:"+intercepted);
                 break;
             case MotionEvent.ACTION_UP:
-                intercepted=false;
+                intercepted = false;
                 break;
         }
 
-        mLastXIntercept=x;
-        mLastYIntercept=y;
+        mLastXIntercept = x;
+        mLastYIntercept = y;
         return intercepted;
     }
 }
