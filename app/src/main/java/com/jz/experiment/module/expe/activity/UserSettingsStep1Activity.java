@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -67,8 +68,14 @@ public class UserSettingsStep1Activity extends BaseActivity {
     @BindView(R.id.lv_channel)
     ListView lv_channel;
 
-    @BindView(R.id.et_integration_time)
-    ValidateEditText et_integration_time;
+    @BindView(R.id.et_integration_time_1)
+    ValidateEditText et_integration_time_1;
+    @BindView(R.id.et_integration_time_2)
+    ValidateEditText et_integration_time_2;
+    @BindView(R.id.et_integration_time_3)
+    ValidateEditText et_integration_time_3;
+    @BindView(R.id.et_integration_time_4)
+    ValidateEditText et_integration_time_4;
 
     @BindView(R.id.gv_sample_a)
     GridView gv_sample_a;
@@ -104,6 +111,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
             for (int i = 0; i < 4; i++) {
                 Channel channel = new Channel();
                 channel.setName("通道" + (i + 1));
+                channel.setIntegrationTime(10);
                 channels.add(channel);
             }
 
@@ -178,6 +186,10 @@ public class UserSettingsStep1Activity extends BaseActivity {
         for (int i=0;i<enabledChannels;i++){
             channels.get(i).setEnabled(true);
         }
+        et_integration_time_1.setText(channels.get(0).getIntegrationTime()+"");
+        et_integration_time_2.setText(channels.get(1).getIntegrationTime()+"");
+        et_integration_time_3.setText(channels.get(2).getIntegrationTime()+"");
+        et_integration_time_4.setText(channels.get(3).getIntegrationTime()+"");
 
         mChannelAdapter.replaceAll(channels);
         lv_channel.setAdapter(mChannelAdapter);
@@ -230,21 +242,37 @@ public class UserSettingsStep1Activity extends BaseActivity {
     };
 
 
+
+    private void setIntegrationTime(List<Channel> channels){
+
+        EditText []et_integration_times={et_integration_time_1,
+                et_integration_time_2,et_integration_time_3,
+                et_integration_time_4};
+
+        for (int i=0;i<channels.size();i++){
+            String integrationTimeStr=et_integration_times[i].getText().toString().trim();
+            int integrationTime=10;
+            try {
+                integrationTime=Integer.parseInt(integrationTimeStr);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            channels.get(i).setIntegrationTime(integrationTime);
+        }
+
+    }
+
     @OnClick(R.id.tv_next)
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.tv_next:
-                if (true) {//validate()
+                if (validate()) {//
 
-                    String integrationTimeStr=et_integration_time.getText().toString().trim();
-                    int integrationTime=10;
-                    try {
-                         integrationTime=Integer.parseInt(integrationTimeStr);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
 
-                    mExperiment.setIntegrationTime(integrationTime);
+/*
+                    String integrationTime= buildIntegrationTime();
+
+                    mExperiment.setIntegrationTime(integrationTime);*/
 
                     //获取实验名称，通道设置，样板设置
                     ExpeSettingsFirstInfo firstInfo = new ExpeSettingsFirstInfo();
@@ -252,6 +280,9 @@ public class UserSettingsStep1Activity extends BaseActivity {
                     mExperiment.setName(et_expe_name.getText().toString());
                     List<Channel> channels = mChannelAdapter.getData();
                     firstInfo.setChannels(channels);
+                    //设置通道积分时间
+                    setIntegrationTime(channels);
+
 
                     List<Sample> samplesA = mSampleAdapterA.getData();
                     List<Sample> samplesB = mSampleAdapterB.getData();

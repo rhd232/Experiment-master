@@ -194,6 +194,9 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
        mExecutorService.execute(new Runnable() {
            @Override
            public void run() {
+               //删除factor_log.txt文件
+               DataFileUtil.getOrCreateFile("factor_log.txt").delete();
+
                List<Stage> cyclingSteps=mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
                StringBuilder sb=new StringBuilder();
                sb.append("=========================\n");
@@ -330,7 +333,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
         cmd.step1(channelOp);
         mCommunicationService.sendPcrCommand(cmd);
-        //mUsbService.sendPcrCommand(cmd);
+
     }
 
     private void initChart() {
@@ -648,7 +651,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         //TODO 检查返回的包是否正确
         boolean succ = StatusChecker.checkStatus(status);
         if (!succ) {
-            if (!ActivityUtil.isFinish(getActivity())) {
+            /*if (!ActivityUtil.isFinish(getActivity())) {
                 AppDialogHelper.showSingleBtnDialog(getActivity(), StatusChecker.getStatusDesc(status), new AppDialogHelper.DialogOperCallback() {
                     @Override
                     public void onDialogConfirmClick() {
@@ -656,7 +659,15 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     }
                 });
                 DataFileUtil.writeFileLog("返回错误：" + ByteUtil.getHexStr(reveicedBytes, reveicedBytes.length));
-            }
+            }*/
+            /*
+                报出比较多的 图像命令超时错误
+                这里的处理改为继续查询循环状态
+
+                图像命令超时 是查询图像中断的指令报出的。
+             */
+            // 图像命令超时可以继续查询循环状态 避免报出图像命令超时错误
+            // step5Subscription();
             return;
 
         }

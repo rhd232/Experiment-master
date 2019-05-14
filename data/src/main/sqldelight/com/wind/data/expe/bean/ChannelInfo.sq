@@ -4,6 +4,7 @@ CREATE TABLE channel_info(
     name TEXT NOT NULL,
     value TEXT,
     remark TEXT,
+    integration_time INTEGER,
     --外键
     expe_id INTEGER NOT NULL,
     FOREIGN KEY(expe_id) REFERENCES expe_info(_id)

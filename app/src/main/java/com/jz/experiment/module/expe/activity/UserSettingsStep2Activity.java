@@ -50,6 +50,7 @@ import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.LogUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.DbOpenHelper;
+import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.DtMode;
 import com.wind.data.expe.bean.ExpeSettingSecondInfo;
 import com.wind.data.expe.bean.ExperimentStatus;
@@ -525,17 +526,25 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         //初始化设备
         resetTrim();
 
-
         FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
         factUpdater.SetInitData();
-        int integrationTime = mHistoryExperiment.getIntegrationTime();
+        /*int integrationTime = mHistoryExperiment.getIntegrationTime();
         if (integrationTime > 0) {
             //获取积分时间
             factUpdater.int_time_1 = mHistoryExperiment.getIntegrationTime();
             factUpdater.int_time_2 = mHistoryExperiment.getIntegrationTime();
             factUpdater.int_time_3 = mHistoryExperiment.getIntegrationTime();
             factUpdater.int_time_4 = mHistoryExperiment.getIntegrationTime();
-        }
+        }else {
+            factUpdater.int_time_1 = 10;
+            factUpdater.int_time_2 = 10;
+            factUpdater.int_time_3 = 10;
+            factUpdater.int_time_4 = 10;
+        }*/
+        List<Channel> channels =mHistoryExperiment.getSettingsFirstInfo().getChannels();
+        setChannelIntegrationTime(factUpdater,channels);
+
+
         if (mCommunicationService != null) {
             sleep(50);
             PcrCommand gainCmd = new PcrCommand();
@@ -547,6 +556,33 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             setSensorAndInTime(2, factUpdater.int_time_3);
             setSensorAndInTime(3, factUpdater.int_time_4);
 
+        }
+    }
+
+    private void setChannelIntegrationTime(FactUpdater factUpdater ,List<Channel> channels) {
+        int integrationTime=channels.get(0).getIntegrationTime();
+        if (integrationTime > 0){
+            factUpdater.int_time_1=integrationTime;
+        }else {
+            factUpdater.int_time_1=10;
+        }
+        integrationTime=channels.get(1).getIntegrationTime();
+        if (integrationTime > 0){
+            factUpdater.int_time_2=integrationTime;
+        }else {
+            factUpdater.int_time_2=10;
+        }
+        integrationTime=channels.get(2).getIntegrationTime();
+        if (integrationTime > 0){
+            factUpdater.int_time_3=integrationTime;
+        }else {
+            factUpdater.int_time_3=10;
+        }
+        integrationTime=channels.get(3).getIntegrationTime();
+        if (integrationTime > 0){
+            factUpdater.int_time_4=integrationTime;
+        }else {
+            factUpdater.int_time_4=10;
         }
     }
 
@@ -613,7 +649,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         doSetV20(service, CommData.chan3_auto_v20[1], 3);
         doSetV20(service, CommData.chan4_auto_v20[1], 4);
 
-        CommData.int_time1 = CommData.int_time2 = CommData.int_time3 = CommData.int_time4 = 10;
+        CommData.int_time1 = CommData.int_time2 = CommData.int_time3 = CommData.int_time4 = 1;
         sleep(50);
         doSetLEDConfig(service);
         sleep(50);

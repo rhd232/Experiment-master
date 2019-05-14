@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.jz.experiment.module.bluetooth.CommunicationService;
 import com.jz.experiment.module.bluetooth.PcrCommand;
 import com.jz.experiment.util.DataFileUtil;
+import com.jz.experiment.util.ThreadUtil;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -45,9 +46,10 @@ public class FactUpdater {
             UpdatePCRCurve(i, 0);
         }
 
-        DynamicUpdateIntTime();
 
+        DynamicUpdateIntTime();
         CommData.m_factorData = m_factorData;
+
     }
     /// <summary>
     /// 初始化值
@@ -72,10 +74,10 @@ public class FactUpdater {
         int_time3 = 1;
         int_time4 = 1;
 
-        int_time_1=20;//默认积分时间20ms
+      /*  int_time_1=20;//默认积分时间20ms
         int_time_2=20;
         int_time_3=20;
-        int_time_4=20;
+        int_time_4=20;*/
     }
     int xhindex = 1;
 
@@ -94,14 +96,12 @@ public class FactUpdater {
         for (int i = 0; i < CCurveShow.MAX_CHAN; i++)
         {
 
-            //		if (m_factorInt[i].empty()) {
-            //			m_factorInt[i].push_back(m_factorIntTime[i]);    // First time push twice
-            //		}
-            //		m_factorInt[i].push_back(m_factorIntTime[i]);
 
-            if (m_dynIntTime[i] && m_factorIntTime[i] > 0.03)
+
+
+           /* if (m_dynIntTime[i] && m_factorIntTime[i] > 0.03 )
             {
-                m_factorIntTime[i] *= (float)0.5;
+                m_factorIntTime[i] *= 0.5f;
 
                 // Call to update Int time
                 float new_factor;
@@ -109,10 +109,29 @@ public class FactUpdater {
                 m_factorIntTime[i] = new_factor;
                 m_dynIntTime[i] = false;
             }
+            if (xhindex==1){
+                m_factorData[i][0] = m_factorIntTime[i];
+            }
+            m_factorData[i][xhindex] = m_factorIntTime[i];*/
 
-            m_factorData[i][xhindex] = m_factorIntTime[i];
+            float curFactorIntTime=m_factorIntTime[i];
+            if (m_dynIntTime[i] && m_factorIntTime[i] > 0.03 )
+            {
+                 m_factorIntTime[i] *= 0.5f;
+
+                // Call to update Int time
+                float new_factor;
+                new_factor = DynamicUpdateIntTime(m_factorIntTime[i], i);	// done here because we need to set int time before auto trigger happens.
+                m_factorIntTime[i] = new_factor;
+                m_dynIntTime[i] = false;
+            }
+            if (xhindex==1){
+                m_factorData[i][0] = curFactorIntTime;
+            }
+            m_factorData[i][xhindex] = curFactorIntTime;
         }
-
+        System.out.println("xhindex:"+xhindex);
+        DataFileUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"),"xhindex:"+xhindex+"\n");
         xhindex++;
 
     }
@@ -177,6 +196,8 @@ public class FactUpdater {
         {
             SetIntergrationTime(InTime);
         }*/
+
+        ThreadUtil.sleep(10);
         SetIntergrationTime(InTime);
         String txt="通道"+(c+1)+"积分时间："+InTime;
         DataFileUtil.writeFileLog(txt);

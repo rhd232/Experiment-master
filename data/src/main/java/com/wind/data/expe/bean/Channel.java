@@ -8,16 +8,34 @@ public class Channel implements Parcelable {
     private String name;
     private String value;
     private String remark;//备注
+    private int integrationTime;//积分时间
     private boolean enabled;//是否可用
 
     public Channel(){}
+
 
     protected Channel(Parcel in) {
         id = in.readLong();
         name = in.readString();
         value = in.readString();
         remark = in.readString();
+        integrationTime = in.readInt();
         enabled = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(name);
+        dest.writeString(value);
+        dest.writeString(remark);
+        dest.writeInt(integrationTime);
+        dest.writeByte((byte) (enabled ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Channel> CREATOR = new Creator<Channel>() {
@@ -72,17 +90,11 @@ public class Channel implements Parcelable {
         this.enabled = enabled;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getIntegrationTime() {
+        return integrationTime;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(id);
-        dest.writeString(name);
-        dest.writeString(value);
-        dest.writeString(remark);
-        dest.writeByte((byte) (enabled ? 1 : 0));
+    public void setIntegrationTime(int integrationTime) {
+        this.integrationTime = integrationTime;
     }
 }

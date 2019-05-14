@@ -10,6 +10,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.jz.experiment.device.Well;
+import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.widget.CtParamInputLayout;
 
 import java.io.File;
@@ -48,14 +49,40 @@ public class DtChart extends WindChart {
 
     }
 
+    private void recordFactorData(String msg, double[][] factorData){
+        StringBuilder sBuilder=new StringBuilder();
+        sBuilder.append(msg);
+        sBuilder.append("\n");
+        sBuilder.append("[");
+        for (int j=0;j<=3;j++) {
+            if (j==0) {
+                String s = "通道" + (j + 1);
+                sBuilder.append(s);
+                sBuilder.append("\n");
+                for (int i = 0; i < 100; i++) {
+                    double d = factorData[j][i];
+                    if (i % 10 == 0) {
+                        sBuilder.append("\n");
+                    }
+                    sBuilder.append(d).append(",");
+                }
+                sBuilder.append("\n");
+            }
+        }
+        sBuilder.append("]");
+        System.out.println(sBuilder.toString());
+        DataFileUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"),sBuilder.toString());
+    }
     public void show(List<String> ChanList, List<String> KSList,InputStream ips,CtParamInputLayout.CtParam ctParam) {
 
         //读取图像文件数据
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
         if (mRunning) {
             mFactUpdater.updateFact();
+            recordFactorData("运行",CommData.m_factorData);
         }else {
             CommData.m_factorData=DataFileReader.getInstance().factorValue;
+            recordFactorData("离线",CommData.m_factorData);
         }
         CurveReader.getInstance().readCurve(CommData.m_factorData,ctParam);
 

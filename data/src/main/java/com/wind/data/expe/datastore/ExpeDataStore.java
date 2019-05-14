@@ -131,9 +131,11 @@ public class ExpeDataStore {
                     ExpeSettingsFirstInfo firstInfo = experiment.getSettingsFirstInfo();
                     for (int i = 0; i < firstInfo.getChannels().size(); i++) {
                         Channel channel = firstInfo.getChannels().get(i);
+                        long integration_time=(long) channel.getIntegrationTime();
                         ChannelInfoModel.Marshal channelMarshal = ChannelInfo.FACTORY.marshal();
                         ContentValues channelValues = channelMarshal.name(channel.getName())
                                 .value(channel.getValue())
+                                .integration_time(integration_time)
                                 .remark(channel.getRemark())
                                 .expe_id(expe_id).asContentValues();
                         mBriteDb.insert(ChannelInfo.TABLE_NAME, channelValues);
@@ -322,7 +324,8 @@ public class ExpeDataStore {
                             List<PartStage> partStageList=new ArrayList<>();
                             List<Stage> stageList=new ArrayList<>();
                             EndStage endStage=new EndStage();
-                            StartStage startStage=new StartStage();
+                            List<StartStage> startStages=new ArrayList<>();
+                            //StartStage startStage=new StartStage();
 
                             List<MeltingStage> meltingStages=new ArrayList<>();
                             while (stageCursor.moveToNext()) {
@@ -360,10 +363,12 @@ public class ExpeDataStore {
                                         endStage.setDuring((short) during);
                                         break;
                                     case Stage.TYPE_START:
-
+                                        StartStage startStage=new StartStage();
                                         startStage.setStartScale((float) startScale);
                                         startStage.setCurScale((float) curScale);
                                         startStage.setDuring((short) during);
+
+                                        startStages.add(startStage);
                                         break;
                                     case Stage.TYPE_CYCLING:
                                         long count=stageInfo.cycling_count();
@@ -419,7 +424,7 @@ public class ExpeDataStore {
                                 }
                             });
 
-                            stageList.add(startStage);
+                            stageList.addAll(startStages);
                             for (int i=0;i<cyclingStageList.size();i++){
                                 stageList.add(cyclingStageList.get(i));
                             }
@@ -532,6 +537,7 @@ public class ExpeDataStore {
                                 ChannelInfo channelInfo = ChannelInfo.FACTORY.find_by_expeidMapper().map(channelCursor);
                                 Channel channel = new Channel();
                                 channel.setName(channelInfo.name());
+                                channel.setIntegrationTime(channelInfo.integration_time().intValue());
                                 channel.setValue(channelInfo.value());
                                 channel.setRemark(channelInfo.remark());
                                 channelList.add(channel);
@@ -571,7 +577,8 @@ public class ExpeDataStore {
                             List<PartStage> partStageList=new ArrayList<>();
                             List<Stage> stageList=new ArrayList<>();
                             EndStage endStage=new EndStage();
-                            StartStage startStage=new StartStage();
+                            List<StartStage> startStages=new ArrayList<>();
+                          //  StartStage startStage=new StartStage();
                             List<MeltingStage> meltingStages=new ArrayList<>();
                             while (stageCursor.moveToNext()) {
                                 StageInfo stageInfo = StageInfo.FACTORY.find_by_expeidMapper().map(stageCursor);
@@ -607,10 +614,11 @@ public class ExpeDataStore {
                                         endStage.setDuring((short) during);
                                         break;
                                     case Stage.TYPE_START:
-
+                                        StartStage startStage=new StartStage();
                                         startStage.setStartScale((float) startScale);
                                         startStage.setCurScale((float) curScale);
                                         startStage.setDuring((short) during);
+                                        startStages.add(startStage);
                                         break;
                                     case Stage.TYPE_CYCLING:
                                         long count=stageInfo.cycling_count();
@@ -666,7 +674,7 @@ public class ExpeDataStore {
                                 }
                             });
 
-                            stageList.add(startStage);
+                            stageList.addAll(startStages);
                             for (int i=0;i<cyclingStageList.size();i++){
                                 stageList.add(cyclingStageList.get(i));
                             }

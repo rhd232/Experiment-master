@@ -19,7 +19,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "w_db";
 
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
     public static DbOpenHelper instance;
     public static DbOpenHelper getInstance(Context context){
         if (instance==null){
@@ -39,6 +39,18 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     // Better than static final field -> allows VM to unload useless String
     // Because you need this string only once per application life on the device
 
+    String CREATE_TABLE = ""
+            + "CREATE TABLE channel_info(\n"
+            + "    --基本信息\n"
+            + "    _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+            + "    name TEXT NOT NULL,\n"
+            + "    value TEXT,\n"
+            + "    remark TEXT,\n"
+            + "    --外键\n"
+            + "    expe_id INTEGER NOT NULL,\n"
+            + "    FOREIGN KEY(expe_id) REFERENCES expe_info(_id)\n"
+            + "\n"
+            + ")";
     @Override
     public void onCreate(final SQLiteDatabase db) {
 
@@ -47,6 +59,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
         //历史实验简表
         db.execSQL(ExpeInfo.CREATE_TABLE);
         db.execSQL(ChannelInfo.CREATE_TABLE);
+       // db.execSQL(CREATE_TABLE);
         db.execSQL(SampleInfo.CREATE_TABLE);
         db.execSQL(StageInfo.CREATE_TABLE);
 
@@ -56,21 +69,20 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
   @Override
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-        /*for (int i = oldVersion; i < newVersion; i++) {
-            switch (i) {
-                case 1:
-                    //version为2 时stage_info表新增了一个字段during
+           System.out.println("onUpgrade:oldVersion"+oldVersion);
+            switch (newVersion) {
+                case 2:
+                    //version为2 时channel_info表新增了一个字段integration_time
                     upgradeToVersion2(db);
                     break;
                 default:
                     break;
             }
-        }*/
 
     }
 
-    /*  private void upgradeToVersion2(SQLiteDatabase db) {
-        String sql = "ALTER TABLE "+StageInfo.TABLE_NAME+" ADD COLUMN during INTEGER";
+      private void upgradeToVersion2(SQLiteDatabase db) {
+        String sql = "ALTER TABLE "+ChannelInfo.TABLE_NAME+" ADD COLUMN integration_time INTEGER";
         db.execSQL(sql);
-    }*/
+    }
 }
