@@ -536,6 +536,8 @@ public class PcrCommand {
         addCommand(listToByteArray(bytes));
     }
 
+
+
     /**
      * 查询循环状态
      * 询问是否继续polling图像板

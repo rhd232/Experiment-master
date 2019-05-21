@@ -31,6 +31,8 @@ import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.widget.CtParamInputLayout;
 import com.wind.base.bean.CyclingStage;
+import com.wind.base.bean.PartStage;
+import com.wind.base.bean.Stage;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.AppUtil;
@@ -257,8 +259,25 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (mExeperiment == null) {
             return;
         }
-        CyclingStage cyclingStage = (CyclingStage) mExeperiment.getSettingSecondInfo().getCyclingSteps().get(0);
-        mDtChart = new DtChart(chart_dt, cyclingStage.getCyclingCount());
+       // CyclingStage cyclingStage = (CyclingStage) mExeperiment.getSettingSecondInfo().getCyclingSteps().get(0);
+
+        //统计总共有多少循环（不拍照的不包括）
+        int totalCyclingCount=0;
+        List<Stage> cyclingSteps=mExeperiment.getSettingSecondInfo().getCyclingSteps();
+        for (int i=0;i<cyclingSteps.size();i++){
+            CyclingStage cyclingStage= (CyclingStage) cyclingSteps.get(i);
+            boolean pic=false;
+            for (PartStage partStage:cyclingStage.getPartStageList()){
+                if (partStage.isTakePic()){
+                    pic=true;
+                    break;
+                }
+            }
+            if (pic){
+                totalCyclingCount+=cyclingStage.getCyclingCount();
+            }
+        }
+        mDtChart = new DtChart(chart_dt, totalCyclingCount);
         mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment),layout_ctparam_input.getCtParam());
 
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下

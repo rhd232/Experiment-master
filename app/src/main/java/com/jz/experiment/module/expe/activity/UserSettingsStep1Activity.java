@@ -6,12 +6,16 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
+import com.jz.experiment.chart.CCurveShow;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.FlashData;
 import com.jz.experiment.di.ProviderModule;
@@ -77,10 +81,26 @@ public class UserSettingsStep1Activity extends BaseActivity {
     @BindView(R.id.et_integration_time_4)
     ValidateEditText et_integration_time_4;
 
+    @BindView(R.id.ll_integration_time_1)
+    LinearLayout ll_integration_time_1;
+    @BindView(R.id.ll_integration_time_2)
+    LinearLayout ll_integration_time_2;
+    @BindView(R.id.ll_integration_time_3)
+    LinearLayout ll_integration_time_3;
+    @BindView(R.id.ll_integration_time_4)
+    LinearLayout ll_integration_time_4;
+
+
     @BindView(R.id.gv_sample_a)
     GridView gv_sample_a;
     @BindView(R.id.gv_sample_b)
     GridView gv_sample_b;
+
+    @BindView(R.id.cb_int)
+    CheckBox cb_int;
+    @BindView(R.id.ll_int)
+    View ll_int;
+
     SampleAdapter mSampleAdapterA;
     SampleAdapter mSampleAdapterB;
     ChannelAdapter mChannelAdapter;
@@ -100,6 +120,13 @@ public class UserSettingsStep1Activity extends BaseActivity {
         setContentView(R.layout.activity_user_setting_step1);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
+        cb_int.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                int visibility=isChecked?View.GONE:View.VISIBLE;
+                ll_int.setVisibility(visibility);
+            }
+        });
         mExperiment = Navigator.getParcelableExtra(this);
         if (mExperiment == null) {
             mExperiment = new HistoryExperiment();
@@ -129,8 +156,21 @@ public class UserSettingsStep1Activity extends BaseActivity {
                 samplesB.add(sample);
 
             }
-            enableSamples(samplesA);
-            enableSamples(samplesB);
+            if (FlashData.NUM_WELLS==4){
+                //4孔机只有A，没有B
+                for (int i=0;i<8;i++){
+                    if (i<4) {
+                        samplesA.get(i).setEnabled(true);
+                    }else {
+                        samplesA.get(i).setEnabled(false);
+                    }
+                    samplesB.get(i).setEnabled(false);
+                }
+            }else {
+                enableSamples(samplesA);
+                enableSamples(samplesB);
+            }
+
             inflateData();
         } else {
             //需要根据expe_id查询具体的Expe
@@ -150,9 +190,21 @@ public class UserSettingsStep1Activity extends BaseActivity {
                             mExperiment = response.getData();
                             List<Sample> samplesA=mExperiment.getSettingsFirstInfo().getSamplesA();
                             List<Sample> samplesB=mExperiment.getSettingsFirstInfo().getSamplesB();
-
-                            enableSamples(samplesA);
-                            enableSamples(samplesB);
+                            cb_int.setChecked(mExperiment.isAutoIntegrationTime());
+                            if (FlashData.NUM_WELLS==4){
+                                //4孔机只有A，没有B
+                                for (int i=0;i<8;i++){
+                                    if (i<4) {
+                                        samplesA.get(i).setEnabled(true);
+                                    }else {
+                                        samplesA.get(i).setEnabled(false);
+                                    }
+                                    samplesB.get(i).setEnabled(false);
+                                }
+                            }else {
+                                enableSamples(samplesA);
+                                enableSamples(samplesB);
+                            }
                             inflateData();
                         }
                     });
@@ -162,20 +214,27 @@ public class UserSettingsStep1Activity extends BaseActivity {
         CommData.ReadDatapositionFile(getActivity());
         TrimReader.getInstance().ReadTrimFile(getActivity());
 
+
+
+
     }
 
 
     private void enableSamples(List<Sample> samples){
         int wellNum=CommData.KsIndex;//反应井个数
-        int halfWellNum=wellNum/2;
+
+
+
+        int halfWellNum = wellNum / 2;
         for (int i = 0; i < 8; i++) {
             Sample sample = samples.get(i);
-            if (halfWellNum>(i)){
+            if (halfWellNum > (i)) {
                 sample.setEnabled(true);
-            }else {
+            } else {
                 sample.setEnabled(false);
             }
         }
+
     }
 
     private void inflateData() {
@@ -183,13 +242,43 @@ public class UserSettingsStep1Activity extends BaseActivity {
         mChannelAdapter = new ChannelAdapter(getActivity(), R.layout.item_channel);
         List<Channel> channels=mExperiment.getSettingsFirstInfo().getChannels();
         int enabledChannels=FlashData.NUM_CHANNELS;
+
+        View[] integrationTimeViews={ll_integration_time_1,
+                ll_integration_time_2,
+                ll_integration_time_3,
+                ll_integration_time_4};
+        for (int i=0;i<integrationTimeViews.length;i++){
+            integrationTimeViews[i].setBackgroundColor(getResources().getColor(R.color.colorE8E8E8));
+            integrationTimeViews[i].setEnabled(false);
+        }
+        View[] integrationTimeEts={et_integration_time_1,
+                et_integration_time_2,
+                et_integration_time_3,
+                et_integration_time_4};
+        /*for (int i=0;i<integrationTimeViews.length;i++){
+            integrationTimeEts[i].setFocusable(false);
+        }*/
+
+
+
         for (int i=0;i<enabledChannels;i++){
             channels.get(i).setEnabled(true);
+            integrationTimeViews[i].setBackgroundColor(getResources().getColor(R.color.white));
+            integrationTimeViews[i].setEnabled(true);
+            //integrationTimeEts[i].setFocusable(true);
         }
+
+        for (int i=enabledChannels;i< CCurveShow.MAX_CHAN;i++){
+            integrationTimeViews[i].setEnabled(false);
+            integrationTimeEts[i].setFocusable(false);
+        }
+
         et_integration_time_1.setText(channels.get(0).getIntegrationTime()+"");
         et_integration_time_2.setText(channels.get(1).getIntegrationTime()+"");
         et_integration_time_3.setText(channels.get(2).getIntegrationTime()+"");
         et_integration_time_4.setText(channels.get(3).getIntegrationTime()+"");
+
+
 
         mChannelAdapter.replaceAll(channels);
         lv_channel.setAdapter(mChannelAdapter);
@@ -276,6 +365,9 @@ public class UserSettingsStep1Activity extends BaseActivity {
 
                     //获取实验名称，通道设置，样板设置
                     ExpeSettingsFirstInfo firstInfo = new ExpeSettingsFirstInfo();
+                    //设置是否自动积分时间，如果选择了自动计算积分时间将不考虑程序设置的积分时间。
+                    int auto=cb_int.isChecked()?HistoryExperiment.CODE_AUTO_YES:HistoryExperiment.CODE_AUTO_NO;
+                    mExperiment.setAutoIntegrationTime(auto);
 
                     mExperiment.setName(et_expe_name.getText().toString());
                     List<Channel> channels = mChannelAdapter.getData();

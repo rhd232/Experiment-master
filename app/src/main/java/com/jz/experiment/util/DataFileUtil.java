@@ -48,6 +48,13 @@ public class DataFileUtil {
         return getOrCreateFile(fileName);
     }
 
+    public static boolean deleteFile(String filename){
+        File file = new File(C.Value.IMAGE_DATA, filename);
+        if (file.exists()){
+            return file.delete();
+        }
+        return true;
+    }
     public static File getOrCreateFile(String filename) {
         File file = new File(C.Value.IMAGE_DATA, filename);
         if (!file.getParentFile().exists()) {
@@ -184,6 +191,7 @@ public class DataFileUtil {
         if (!sDebug){
             return;
         }
+        System.out.println(txt);
         if (executorService==null) {
             File file = getLogFile();
             writeToFile(file, txt);
@@ -199,6 +207,7 @@ public class DataFileUtil {
 
     }
     public static void writeFileLog(String txt) {
+
         writeFileLog(txt,null);
 
     }

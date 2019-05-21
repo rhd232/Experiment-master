@@ -35,6 +35,7 @@ import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.DeviceProxyHelper;
+import com.jz.experiment.util.ImageDataReader;
 import com.jz.experiment.util.StatusChecker;
 import com.jz.experiment.util.TrimReader;
 import com.wind.base.BaseActivity;
@@ -67,6 +68,8 @@ import org.greenrobot.eventbus.Subscribe;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -104,7 +107,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     private HistoryExperiment mHistoryExperiment;
     private ExpeDataStore mExpeDataStore;
     Subscription mReadTrimSubscription;
-
+    private ExecutorService mExecutorService;
     @Override
     protected void setTitle() {
         mTitleBar.setTitle("用户设置2");
@@ -144,6 +147,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_setting_step2);
         ButterKnife.bind(this);
+        mExecutorService= Executors.newSingleThreadExecutor();
         mHistoryExperiment = Navigator.getParcelableExtra(getActivity());
         mCommunicationService = DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
 
@@ -177,7 +181,6 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             List<Stage> stageList = expeSettingSecondInfo.getSteps();
             list.addAll(stageList);
             mStageAdapter.replace(list);
-
         }
 
         rv.postDelayed(new Runnable() {
@@ -289,10 +292,10 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         String startT = "0";
         String endT = "0";
         if (mModes.size() > 1) {
-            Stage s=(MeltingStage)(mStageAdapter.getItem(mStageAdapter.getItemCount()-2));
-            Stage e=(MeltingStage)(mStageAdapter.getItem(mStageAdapter.getItemCount()-1));
-            startT=s.getTemp()+"";
-            endT=e.getTemp()+"";
+            Stage s = (MeltingStage) (mStageAdapter.getItem(mStageAdapter.getItemCount() - 2));
+            Stage e = (MeltingStage) (mStageAdapter.getItem(mStageAdapter.getItemCount() - 1));
+            startT = s.getTemp() + "";
+            endT = e.getTemp() + "";
         }
 
         secondInfo.setStartTemperature(startT);
@@ -528,61 +531,85 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
         FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
         factUpdater.SetInitData();
-        /*int integrationTime = mHistoryExperiment.getIntegrationTime();
-        if (integrationTime > 0) {
-            //获取积分时间
-            factUpdater.int_time_1 = mHistoryExperiment.getIntegrationTime();
-            factUpdater.int_time_2 = mHistoryExperiment.getIntegrationTime();
-            factUpdater.int_time_3 = mHistoryExperiment.getIntegrationTime();
-            factUpdater.int_time_4 = mHistoryExperiment.getIntegrationTime();
-        }else {
-            factUpdater.int_time_1 = 10;
-            factUpdater.int_time_2 = 10;
-            factUpdater.int_time_3 = 10;
-            factUpdater.int_time_4 = 10;
-        }*/
-        List<Channel> channels =mHistoryExperiment.getSettingsFirstInfo().getChannels();
-        setChannelIntegrationTime(factUpdater,channels);
 
+        //TODO 判断是否是自动计算积分时间
+        if (!mHistoryExperiment.isAutoIntegrationTime()) {
+            List<Channel> channels = mHistoryExperiment.getSettingsFirstInfo().getChannels();
+            setChannelIntegrationTime(factUpdater, channels);
+            if (mCommunicationService != null) {
+                sleep(50);
+                PcrCommand gainCmd = new PcrCommand();
+                gainCmd.setGainMode();
+                mCommunicationService.sendPcrCommandSync(gainCmd);
 
-        if (mCommunicationService != null) {
-            sleep(50);
-            PcrCommand gainCmd = new PcrCommand();
-            gainCmd.setGainMode();
-            mCommunicationService.sendPcrCommandSync(gainCmd);
+                setSensorAndInTime(0, factUpdater.int_time_1);
+                setSensorAndInTime(1, factUpdater.int_time_2);
+                setSensorAndInTime(2, factUpdater.int_time_3);
+                setSensorAndInTime(3, factUpdater.int_time_4);
 
-            setSensorAndInTime(0, factUpdater.int_time_1);
-            setSensorAndInTime(1, factUpdater.int_time_2);
-            setSensorAndInTime(2, factUpdater.int_time_3);
-            setSensorAndInTime(3, factUpdater.int_time_4);
-
+            }
+        } else {
+            //自动计算积分时间
+            autoInt(factUpdater);
         }
     }
 
-    private void setChannelIntegrationTime(FactUpdater factUpdater ,List<Channel> channels) {
-        int integrationTime=channels.get(0).getIntegrationTime();
-        if (integrationTime > 0){
-            factUpdater.int_time_1=integrationTime;
-        }else {
-            factUpdater.int_time_1=10;
+
+    private Object mLock=new Object();
+    private  void autoInt(FactUpdater factUpdater) {
+        synchronized (mLock) {
+
+            DataFileUtil.writeFileLog("===========开始自动积分==========",mExecutorService);
+            ImageDataReader imageDataReader = new ImageDataReader(this, mCommunicationService,
+                    mHistoryExperiment, factUpdater,mExecutorService);
+            imageDataReader.autoInt()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<Boolean>() {
+                        @Override
+                        public void call(Boolean aBoolean) {
+
+                            synchronized (mLock) {
+
+                                DataFileUtil.writeFileLog("===========开始自动积分==========",mExecutorService);
+                                mLock.notifyAll();
+                            }
+                        }
+                    });
+            try {
+                mLock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        integrationTime=channels.get(1).getIntegrationTime();
-        if (integrationTime > 0){
-            factUpdater.int_time_2=integrationTime;
-        }else {
-            factUpdater.int_time_2=10;
+
+    }
+
+
+    private void setChannelIntegrationTime(FactUpdater factUpdater, List<Channel> channels) {
+        int integrationTime = channels.get(0).getIntegrationTime();
+        if (integrationTime > 0) {
+            factUpdater.int_time_1 = integrationTime;
+        } else {
+            factUpdater.int_time_1 = 10;
         }
-        integrationTime=channels.get(2).getIntegrationTime();
-        if (integrationTime > 0){
-            factUpdater.int_time_3=integrationTime;
-        }else {
-            factUpdater.int_time_3=10;
+        integrationTime = channels.get(1).getIntegrationTime();
+        if (integrationTime > 0) {
+            factUpdater.int_time_2 = integrationTime;
+        } else {
+            factUpdater.int_time_2 = 10;
         }
-        integrationTime=channels.get(3).getIntegrationTime();
-        if (integrationTime > 0){
-            factUpdater.int_time_4=integrationTime;
-        }else {
-            factUpdater.int_time_4=10;
+        integrationTime = channels.get(2).getIntegrationTime();
+        if (integrationTime > 0) {
+            factUpdater.int_time_3 = integrationTime;
+        } else {
+            factUpdater.int_time_3 = 10;
+        }
+        integrationTime = channels.get(3).getIntegrationTime();
+        if (integrationTime > 0) {
+            factUpdater.int_time_4 = integrationTime;
+        } else {
+            factUpdater.int_time_4 = 10;
         }
     }
 

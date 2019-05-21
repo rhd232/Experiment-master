@@ -8,12 +8,14 @@ import com.wind.base.adapter.DisplayItem;
 public class HistoryExperiment implements DisplayItem,Parcelable {
     public static final long ID_NONE=-1;
     private long id=ID_NONE;//实验id
+    public static final int CODE_AUTO_YES=0;
+    public static final int CODE_AUTO_NO=1;
     private String name;     //实验名称
     private String device;  //实验连接的设备
     private long millitime;//实验时间毫秒值
     private ExperimentStatus status;//实验状态
 
-    private int integrationTime;//积分时间
+    private int autoIntegrationTime;//是否自动计算积分时间,默认自动计算
 
     private long finishMilliTime;//实验结束时间
     private long during;//实验持续时间，秒为单位
@@ -33,7 +35,7 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
         device = in.readString();
         millitime = in.readLong();
         status = in.readParcelable(ExperimentStatus.class.getClassLoader());
-        integrationTime = in.readInt();
+        autoIntegrationTime = in.readInt();
         finishMilliTime = in.readLong();
         during = in.readLong();
         settingsFirstInfo = in.readParcelable(ExpeSettingsFirstInfo.class.getClassLoader());
@@ -49,7 +51,7 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
         dest.writeString(device);
         dest.writeLong(millitime);
         dest.writeParcelable(status, flags);
-        dest.writeInt(integrationTime);
+        dest.writeInt(autoIntegrationTime);
         dest.writeLong(finishMilliTime);
         dest.writeLong(during);
         dest.writeParcelable(settingsFirstInfo, flags);
@@ -166,11 +168,15 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
         this.during = during;
     }
 
-    public int getIntegrationTime() {
-        return integrationTime;
+    public int getAutoIntegrationTime() {
+        return autoIntegrationTime;
     }
 
-    public void setIntegrationTime(int integrationTime) {
-        this.integrationTime = integrationTime;
+    public void setAutoIntegrationTime(int autoIntegrationTime) {
+        this.autoIntegrationTime = autoIntegrationTime;
+    }
+
+    public boolean isAutoIntegrationTime(){
+        return autoIntegrationTime==CODE_AUTO_YES;
     }
 }

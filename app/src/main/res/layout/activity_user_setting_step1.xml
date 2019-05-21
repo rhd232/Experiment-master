@@ -138,34 +138,56 @@
                     android:layout_marginRight="12dp"
                     android:background="@color/color1F4E99" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="积分时间（ms）"
-                    android:textColor="@color/color333333"
-                    android:textSize="14sp" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="积分时间（ms）"
+                        android:textColor="@color/color333333"
+                        android:textSize="14sp" />
+
+                    <CheckBox
+                        android:id="@+id/cb_int"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:text="自动积分"
+                        android:checked="true"
+                        android:layout_marginRight="12dp"/>
+
+                </RelativeLayout>
+
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ll_int"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
                 android:orientation="vertical"
-                android:paddingBottom="10dp">
+                android:visibility="gone"
+                >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    >
+                    android:orientation="horizontal">
 
                     <LinearLayout
+                        android:id="@+id/ll_integration_time_1"
                         android:layout_width="0dp"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:paddingLeft="28dp">
+                        android:paddingLeft="28dp"
+                        android:gravity="center"
+
+                        android:background="@drawable/selector_ffffff_e8e8e8">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -180,7 +202,7 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:inputType="number"
-                            android:text="10"
+                            android:text="5"
                             android:textColor="@color/color333333"
                             android:textColorHint="@color/color999999"
                             android:textSize="14sp" />
@@ -188,10 +210,14 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/ll_integration_time_2"
                         android:layout_width="0dp"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:background="@drawable/selector_ffffff_e8e8e8">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -206,7 +232,8 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:inputType="number"
-                            android:text="10"
+                            android:text="50"
+
                             android:textColor="@color/color333333"
                             android:textColorHint="@color/color999999"
                             android:textSize="14sp" />
@@ -215,18 +242,20 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/ll_integration_time_3"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center"
                     android:orientation="horizontal"
-                    android:layout_marginTop="10dp">
+                    android:background="@drawable/selector_ffffff_e8e8e8">
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
+
                         android:orientation="horizontal"
-                        android:paddingLeft="28dp"
-                       >
+                        android:paddingLeft="28dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -241,7 +270,8 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:inputType="number"
-                            android:text="10"
+                            android:text="100"
+
                             android:textColor="@color/color333333"
                             android:textColorHint="@color/color999999"
                             android:textSize="14sp" />
@@ -249,11 +279,13 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/ll_integration_time_4"
                         android:layout_width="0dp"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:orientation="horizontal"
-                        >
+                        android:background="@drawable/selector_ffffff_e8e8e8">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -268,7 +300,8 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:inputType="number"
-                            android:text="10"
+                            android:text="100"
+
                             android:textColor="@color/color333333"
                             android:textColorHint="@color/color999999"
                             android:textSize="14sp" />
@@ -283,7 +316,8 @@
                 android:layout_marginTop="8dp"
                 android:background="@color/white"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
 
                 <View
                     android:layout_width="2dp"

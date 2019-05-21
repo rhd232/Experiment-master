@@ -15,7 +15,11 @@ public class CurveReader {
     public static CurveReader getInstance(){
         return INSTANCE;
     }
-    public void readCurve(/*List<String> tdlist,List<String> kslist*/double[][] factorValues, CtParamInputLayout.CtParam ctParam){
+    public void readCurveYData(){
+
+
+    }
+    public void readCurve(double[][] factorValues, CtParamInputLayout.CtParam ctParam){
         double[][][]  m_yData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
         CCurveShow cCurveShow =  CCurveShow.getInstance();
         int minCt=13;
@@ -55,11 +59,10 @@ public class CurveReader {
                 {
 
 
-                    double factorValue=factorValues[GetChan(tdlist.get(i))][k];
-                    m_yData[i][n][k] = cdlist.get(k).y /factorValue;
-                   // m_yData[i][n][k] = cdlist.get(k).y ;
-                    //String t=i+"-"+n+"-"+k+"="+ cdlist.get(k).y;
-                    //AppendToFile(t,file);
+                   /* double factorValue=factorValues[GetChan(tdlist.get(i))][k];
+                    m_yData[i][n][k] = cdlist.get(k).y /factorValue;*/
+                    m_yData[i][n][k] = cdlist.get(k).y ;
+
                 }
             }
             if (CommData.diclist.size() > 0 && CommData.diclist.get(tdlist.get(i))!=null)

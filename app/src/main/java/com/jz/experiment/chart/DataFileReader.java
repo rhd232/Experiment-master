@@ -22,9 +22,11 @@ public class DataFileReader {
 
     private DataFileReader() {
     }
-
-
     public void ReadFileData(InputStream ips, boolean running) {
+        ReadFileData(ips,running,false);
+    }
+
+    public void ReadFileData(InputStream ips, boolean running,boolean ignoreDp) {
         try {
             CommData.diclist.clear();
             //  InputStream ips = context.getAssets().open("fluorescence_data.txt");
@@ -48,6 +50,9 @@ public class DataFileReader {
                             if (line.contains("Chip#")) continue;
                             CommData.diclist.get(name).add(line);
                         } else {
+                            if (ignoreDp){
+                                return;
+                            }
                             //4.13 加入dpheader
                             if (dpheader) {
                                 dpstr += line;
@@ -120,7 +125,8 @@ public class DataFileReader {
                 }
 
             }
-            if (running) {
+
+           if (running) {
                 return;
             }
             for (String item : CommData.diclist.keySet()) {

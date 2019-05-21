@@ -30,7 +30,8 @@ public class DtChart extends WindChart {
 
         XAxis xAxis = chart.getXAxis();
       //  xAxis.setLabelCount(cylingCount + 4, true);
-        xAxis.setAxisMaximum(60);
+      //  xAxis.setAxisMaximum(60);
+        xAxis.setAxisMaximum(cylingCount);
 
         YAxis yAxis=chart.getAxisLeft();
       //  yAxis.setAxisMinimum(-500);
@@ -79,10 +80,11 @@ public class DtChart extends WindChart {
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
         if (mRunning) {
             mFactUpdater.updateFact();
-            recordFactorData("运行",CommData.m_factorData);
+           // CommData.m_factorData=DataFileReader.getInstance().factorValue;
+           // recordFactorData("运行",CommData.m_factorData);
         }else {
             CommData.m_factorData=DataFileReader.getInstance().factorValue;
-            recordFactorData("离线",CommData.m_factorData);
+           // recordFactorData("离线",CommData.m_factorData);
         }
         CurveReader.getInstance().readCurve(CommData.m_factorData,ctParam);
 

@@ -326,8 +326,7 @@ public class CommData {
                     datalist.put(k, list);
 
                 }
-                //int factori=Integer.parseInt(datalist.get(11).get(12));
-
+                int factori=Integer.parseInt(datalist.get(11).get(11));
                 int value = 0;
                 int cindex = GetChanIndex(chan);
 
@@ -361,9 +360,9 @@ public class CommData {
                     }
                 }
 
-              /*  double vf=(double) value;
+                double vf=(double) value;
                 vf/=GetFactor(factori);
-                value=(int) vf;*/
+                value=(int) vf;
                 cd.y = value;
                 cdlist.add(cd);
                 if (i == 0) {
@@ -389,6 +388,103 @@ public class CommData {
             factor = (((double) value - 5000) / 10000d);
         }
         return factor;
+    }
+
+
+
+    public static List<ChartData> GetMaxChartData(String chan, int ks, String currks)
+    {
+        List<ChartData> cdlist = new ArrayList<>();
+        try
+        {
+            int n = (diclist.get(chan).size() / imgFrame);
+            //if (ks == 4)
+            //{
+            int ksindex= Well.getWell().getWellIndex(currks);
+            if (ksindex == -1)
+            {
+                return cdlist;
+            }
+
+            int cindex = -1;
+
+            switch (chan)
+            {
+                case "Chip#1":
+                    cindex = 0;
+                    break;
+                case "Chip#2":
+                    cindex = 1;
+                    break;
+                case "Chip#3":
+                    cindex = 2;
+                    break;
+                case "Chip#4":
+                    cindex = 3;
+                    break;
+                default:
+                    break;
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                ChartData cd = new ChartData();
+                cd.x = i;
+                List<String> strlist =diclist.get(chan).subList(i * imgFrame,i * imgFrame+imgFrame);
+                //List<String> strlist = diclist.get(chan).Skip(i * imgFrame).Take(imgFrame).ToList();
+                Map<Integer, List<String>> datalist = new HashMap<>();
+                for (int k = 0; k < strlist.size(); k++) {
+                    List<String> list =Arrays.asList(strlist.get(k).split(" "));
+                    datalist.put(k, list);
+
+                }
+
+                //===========Use flash version of data position index============
+                int value = 0;
+
+                if (FlashData.flash_loaded){
+                    int npoint = FlashData.row_index[cindex][ ksindex].size();
+
+                    for (int j = 0; j < npoint; j++)
+                    {
+                        int row = FlashData.row_index[cindex][ ksindex].get(j);
+                        int col = FlashData.col_index[cindex][ ksindex].get(j);
+                        int val=Integer.parseInt(datalist.get(row).get(col));
+                        int v = val - 100;
+                        value += v;
+                    }
+                }else {
+
+                    String ss = positionlist.get(chan).get(ksindex);
+                    String[] newstrs = ss.split("\\+");
+
+                    for (String item : newstrs) {
+                        String[] nstrs = item.split("-");
+
+                        if (nstrs.length > 1) {
+                            int j = Integer.parseInt(nstrs[0]);
+                            int k = Integer.parseInt(nstrs[1]);
+                            //  int v = Integer.parseInt(datalist.get(k).get(j)) - 100;
+                            int val = Integer.parseInt(datalist.get(k).get(j));
+                            int v = val - 100;
+                            if (v<0){
+                                v=0;
+                            }
+                            value += v;
+                        }
+                    }
+                }
+
+                cd.y = value;
+                cdlist.add(cd);
+            }
+
+        }
+        catch (Exception ex)
+        {
+
+        }
+        return cdlist;
     }
 
 }

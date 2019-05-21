@@ -339,7 +339,24 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     private void initChart() {
         mFactUpdater = FactUpdater.getInstance(mCommunicationService);
         mFactUpdater.SetInitData();
-        mDtChart = new DtChart(chart_dt, getCurCyclingStage().getCyclingCount(), mFactUpdater);
+        //统计总共有多少循环（不拍照的不包括）
+        int totalCyclingCount=0;
+        List<Stage> cyclingSteps=mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
+        for (int i=0;i<cyclingSteps.size();i++){
+            CyclingStage cyclingStage= (CyclingStage) cyclingSteps.get(i);
+            boolean pic=false;
+            for (PartStage partStage:cyclingStage.getPartStageList()){
+                if (partStage.isTakePic()){
+                    pic=true;
+                    break;
+                }
+            }
+            if (pic){
+                totalCyclingCount+=cyclingStage.getCyclingCount();
+            }
+        }
+
+        mDtChart = new DtChart(chart_dt,totalCyclingCount, mFactUpdater);
         mDtChart.setRunning(true);
         mMeltingChart = new MeltingChart(chart_melt, mFactUpdater);
         mMeltingChart.setRunning(true);
@@ -477,10 +494,10 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                             break;
                         }
                     }
-                    if (mCommunicationService instanceof UsbService) {
+                 /*   if (mCommunicationService instanceof UsbService) {
                         UsbService usbService = (UsbService) mCommunicationService;
                         usbService.stopReadThread();
-                    }
+                    }*/
 
                     Thread.sleep(100);
 
@@ -1019,6 +1036,59 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
     }
 
 
+    private void onExpeCycling(){
+        mInCycling = true;
+        PcrCommand cyclingInfoCmd = new PcrCommand();
+        cyclingInfoCmd.getCyclingInfo();
+        byte[] bytes = mCommunicationService.sendPcrCommandSync(cyclingInfoCmd);
+        //获取循环数和循环阶段
+        if (bytes != null) {
+            //检查cmd和type
+            int cycling_cmd = bytes[2];
+            int cycling_type = bytes[4];
+            if (cycling_cmd == 0x14 && cycling_type == 0x1) {
+                int cyclingNum = bytes[5];
+                int cyclingStep = bytes[6];
+                System.out.println("cyclingStep:" + cyclingStep + " cyclingNum:" + cyclingNum);
+
+                mRunningCyclingStageIndex= bytes[7];
+                            /*if (cyclingNum == 0) {//只有一个循环时会出问题
+                                if (mStartCyclingNum) {
+                                    mRunningCyclingStageIndex++;
+                                    mStartCyclingNum = false;
+                                }
+
+                            } else {
+                                mStartCyclingNum = true;
+                            }*/
+                if (mCyclingStageCount > 1) {
+                    String stepDesc = "阶段" + (mRunningCyclingStageIndex + 1) + "循环：";
+                    tv_cycling_desc.setText(stepDesc);
+
+                } else {
+                    tv_cycling_desc.setText("循环：");
+                }
+
+                StringBuilder sBuilder=new StringBuilder();
+                sBuilder.append("====================\n");
+                sBuilder.append("下位机返回的cyclingNum："+cyclingNum+"\n");
+                sBuilder.append("下位机返回的cyclingStep："+cyclingStep+"\n");
+                sBuilder.append("计算得到的当前阶段"+(mRunningCyclingStageIndex + 1)+"\n");
+                sBuilder.append("====================\n");
+                DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);
+
+                try{
+                    List<Stage> stageList = getCyclingSteps();
+                    CyclingStage cyclingStage = (CyclingStage) stageList.get(mRunningCyclingStageIndex);
+                    tv_cycling.setText((cyclingNum + 1) + "/" + cyclingStage.getCyclingCount());
+                }catch (Exception e){
+                    DataFileUtil.writeFileLog(e.getMessage(),mExecutorService);
+                }
+
+
+            }
+        }
+    }
     /**
      * 返回循环状态
      *
@@ -1047,58 +1117,8 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     tv_cycling.setText("");
                     break;
                 case 2://CYCLING
+                    onExpeCycling();
 
-                    mInCycling = true;
-                    PcrCommand cyclingInfoCmd = new PcrCommand();
-                    cyclingInfoCmd.getCyclingInfo();
-                    byte[] bytes = mCommunicationService.sendPcrCommandSync(cyclingInfoCmd);
-                    //获取循环数和循环阶段
-                    if (bytes != null) {
-                        //检查cmd和type
-                        int cycling_cmd = bytes[2];
-                        int cycling_type = bytes[4];
-                        if (cycling_cmd == 0x14 && cycling_type == 0x1) {
-                            int cyclingNum = bytes[5];
-                            int cyclingStep = bytes[6];
-                            System.out.println("cyclingStep:" + cyclingStep + " cyclingNum:" + cyclingNum);
-
-                            mRunningCyclingStageIndex= bytes[7];
-                            /*if (cyclingNum == 0) {//只有一个循环时会出问题
-                                if (mStartCyclingNum) {
-                                    mRunningCyclingStageIndex++;
-                                    mStartCyclingNum = false;
-                                }
-
-                            } else {
-                                mStartCyclingNum = true;
-                            }*/
-                            if (mCyclingStageCount > 1) {
-                                String stepDesc = "阶段" + (mRunningCyclingStageIndex + 1) + "循环：";
-                                tv_cycling_desc.setText(stepDesc);
-
-                            } else {
-                                tv_cycling_desc.setText("循环：");
-                            }
-
-                            StringBuilder sBuilder=new StringBuilder();
-                            sBuilder.append("====================\n");
-                            sBuilder.append("下位机返回的cyclingNum："+cyclingNum+"\n");
-                            sBuilder.append("下位机返回的cyclingStep："+cyclingStep+"\n");
-                            sBuilder.append("计算得到的当前阶段"+(mRunningCyclingStageIndex + 1)+"\n");
-                            sBuilder.append("====================\n");
-                            DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);
-
-                            try{
-                                List<Stage> stageList = getCyclingSteps();
-                                CyclingStage cyclingStage = (CyclingStage) stageList.get(mRunningCyclingStageIndex);
-                                tv_cycling.setText((cyclingNum + 1) + "/" + cyclingStage.getCyclingCount());
-                            }catch (Exception e){
-                                DataFileUtil.writeFileLog(e.getMessage(),mExecutorService);
-                            }
-
-
-                        }
-                    }
                     break;
                 case 3://COOL DOWN
                     tv_cycling_desc.setText("冷却中");
@@ -1106,7 +1126,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     mInCycling = false;
 
 
-                    // mExpeFinished = true;
+                    mExpeFinished = false;
                     break;
                 case 4:
                     tv_cycling_desc.setText("");
@@ -1125,7 +1145,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                     mInMeltCurve = true;
                     break;
             }
-            if (status == 1 || status == 3) {
+            if (status == 1 /*|| status == 3*/) {
 
                 mStep5Responsed = false;
                 if (step5Subscription == null) {
@@ -1160,15 +1180,30 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 step6Subscription.unsubscribe();
                 step6Subscription = null;
             }
-            if (status == 0) {//实验已经结束
+            if (status == 0||status==3) {//实验已经结束
                 if (!mBackPressed) {
-                    ToastUtil.showToast(getActivity(), "实验结束");
-                    //TODO 自动跳转到实验数据分析页面
 
-                    toAnalyzePage();
+                    LoadingDialogHelper.showOpLoading(getActivity());
 
-                    EventBus.getDefault().post(new ExpeNormalFinishEvent());
-                    ActivityUtil.finish(getActivity());
+                    closeDevice()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
+                        @Override
+                        public void call(Boolean aBoolean) {
+                            ToastUtil.showToast(getActivity(), "实验结束");
+                            //顺便关闭实验
+
+                            //TODO 自动跳转到实验数据分析页面
+
+                            toAnalyzePage();
+
+                            EventBus.getDefault().post(new ExpeNormalFinishEvent());
+                            ActivityUtil.finish(getActivity());
+                        }
+                    });
+
+
+
                 }
 
                 return;

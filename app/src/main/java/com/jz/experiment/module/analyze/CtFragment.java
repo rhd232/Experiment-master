@@ -68,7 +68,7 @@ public abstract class CtFragment extends BaseFragment {
             for (int i=0;i<sampleAs.size();i++){
                 String val=sampleAs.get(i).getName();
                 if (TextUtils.isEmpty(val)){
-                    val=i+"";
+                    val=(i+1)+"";
                 }
                 sampleAlias[0][i]=val;
             }
@@ -76,7 +76,7 @@ public abstract class CtFragment extends BaseFragment {
             for (int i=0;i<sampleBs.size();i++){
                 String val=sampleBs.get(i).getName();
                 if (TextUtils.isEmpty(val)){
-                    val=i+"";
+                    val=(i+1)+"";
                 }
                 sampleAlias[1][i]=val;
             }
@@ -85,11 +85,11 @@ public abstract class CtFragment extends BaseFragment {
                 channelAlias[i]="通道"+(i+1);
             }
             for (int i=0;i<8;i++){
-                String val=i+"";
+                String val=(i+1)+"";
                 sampleAlias[0][i]=val;
             }
             for (int i=0;i<8;i++){
-                String val=i+"";
+                String val=(i+1)+"";
                 sampleAlias[1][i]=val;
             }
         }
