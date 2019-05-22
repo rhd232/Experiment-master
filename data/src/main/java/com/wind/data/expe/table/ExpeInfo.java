@@ -10,17 +10,18 @@ import com.wind.data.expe.bean.ExpeInfoModel;
 public abstract class ExpeInfo implements ExpeInfoModel {
     public static final Factory<ExpeInfo> FACTORY = new Factory<>(
             new Creator<ExpeInfo>() {
+
                 @Override
                 public ExpeInfo create(long _id, @NonNull String name,
                                        @Nullable String device, long millitime,
                                        long status, @NonNull String status_desc,
                                        @Nullable Long finish_millitime, @Nullable Long during,
                                        @NonNull String mode, @Nullable String startTemperature,
-                                       @Nullable String endTemperature) {
+                                       @Nullable String endTemperature,  @Nullable Long autoIntTime) {
                     return new AutoValue_ExpeInfo(_id, name,
                             device, millitime,
-                            status, status_desc,finish_millitime,during, mode,
-                            startTemperature, endTemperature);
+                            status, status_desc,finish_millitime,during,mode,
+                            startTemperature, endTemperature,autoIntTime);
                 }
             }
     );

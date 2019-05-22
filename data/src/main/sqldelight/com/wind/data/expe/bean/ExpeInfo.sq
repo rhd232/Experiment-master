@@ -13,7 +13,8 @@ CREATE TABLE expe_info(
     --实验设置信息
     mode TEXT NOT NULL,
     startTemperature TEXT,
-    endTemperature TEXT
+    endTemperature TEXT,
+     autoIntTime INTEGER
 
 );
 

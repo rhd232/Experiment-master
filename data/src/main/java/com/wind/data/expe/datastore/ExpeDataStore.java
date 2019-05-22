@@ -103,6 +103,7 @@ public class ExpeDataStore {
                             .status_desc(experiment.getStatus().getDesc())
                             .finish_millitime(experiment.getFinishMilliTime())
                             .during(experiment.getDuring())
+                            .autoIntTime((long) experiment.getAutoIntegrationTime())
                             .mode(sBuilder.toString())
                             .asContentValues();
                     mBriteDb.insert(ExpeInfo.TABLE_NAME, values);
@@ -262,6 +263,11 @@ public class ExpeDataStore {
                             experiment.setMillitime(expeInfo.millitime());
                             experiment.setFinishMilliTime(expeInfo.finish_millitime());
                             experiment.setDuring(expeInfo.during());
+                            if (expeInfo.autoIntTime()==null){
+                                experiment.setAutoIntegrationTime(0);
+                            }else {
+                                experiment.setAutoIntegrationTime(expeInfo.autoIntTime().intValue());
+                            }
                             ExperimentStatus status = new ExperimentStatus();
                             status.setStatus((int) expeInfo.status());
                             status.setDesc(expeInfo.status_desc());
@@ -471,6 +477,12 @@ public class ExpeDataStore {
                             experiment.setId(expeInfo._id());
                             experiment.setDevice(expeInfo.device());
                             experiment.setMillitime(expeInfo.millitime());
+                            if (expeInfo.autoIntTime()==null){
+                                experiment.setAutoIntegrationTime(0);
+                            }else {
+                                experiment.setAutoIntegrationTime(expeInfo.autoIntTime().intValue());
+                            }
+
                             ExperimentStatus status = new ExperimentStatus();
                             status.setStatus((int) expeInfo.status());
                             status.setDesc(expeInfo.status_desc());
@@ -514,6 +526,11 @@ public class ExpeDataStore {
                             experiment.setName(expeInfo.name());
                             experiment.setDevice(expeInfo.device());
                             experiment.setMillitime(expeInfo.millitime());
+                            if (expeInfo.autoIntTime()==null){
+                                experiment.setAutoIntegrationTime(0);
+                            }else {
+                                experiment.setAutoIntegrationTime(expeInfo.autoIntTime().intValue());
+                            }
                             ExperimentStatus status = new ExperimentStatus();
                             status.setStatus((int) expeInfo.status());
                             status.setDesc(expeInfo.status_desc());

@@ -244,6 +244,7 @@ public class UsbService extends CommunicationService {
             hex.append(Integer.toHexString(b & 0xFF));
         }*/
         System.out.println("发送：" + hex);
+
         DataFileUtil.writeFileLog("发送：" + hex);
     }
 

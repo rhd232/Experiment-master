@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -207,7 +208,9 @@ public class DataFileUtil {
 
     }
     public static void writeFileLog(String txt) {
-
+        //拼上一个发送时间
+        long milliTime=new Date().getTime();
+        txt+=DateUtil.getDateTime(milliTime)+" ";
         writeFileLog(txt,null);
 
     }

@@ -170,7 +170,8 @@ public class UserSettingsStep1Activity extends BaseActivity {
                 enableSamples(samplesA);
                 enableSamples(samplesB);
             }
-
+          /*  enableSamples(samplesA);
+            enableSamples(samplesB);*/
             inflateData();
         } else {
             //需要根据expe_id查询具体的Expe
@@ -206,6 +207,8 @@ public class UserSettingsStep1Activity extends BaseActivity {
                                 enableSamples(samplesB);
                             }
                             inflateData();
+                          /*  enableSamples(samplesA);
+                            enableSamples(samplesB);*/
                         }
                     });
         }
@@ -222,8 +225,6 @@ public class UserSettingsStep1Activity extends BaseActivity {
 
     private void enableSamples(List<Sample> samples){
         int wellNum=CommData.KsIndex;//反应井个数
-
-
 
         int halfWellNum = wellNum / 2;
         for (int i = 0; i < 8; i++) {
