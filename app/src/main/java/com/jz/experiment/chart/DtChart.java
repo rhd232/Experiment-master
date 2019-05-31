@@ -10,7 +10,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.jz.experiment.device.Well;
+import com.anitoa.well.Well;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.widget.CtParamInputLayout;
 

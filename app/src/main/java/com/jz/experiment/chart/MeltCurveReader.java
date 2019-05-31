@@ -1,6 +1,6 @@
 package com.jz.experiment.chart;
 
-import com.jz.experiment.device.Well;
+import com.anitoa.well.Well;
 
 import java.util.ArrayList;
 import java.util.List;

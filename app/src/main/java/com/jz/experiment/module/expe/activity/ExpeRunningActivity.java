@@ -27,7 +27,7 @@ import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.TempChart;
-import com.jz.experiment.device.Well;
+import com.anitoa.well.Well;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.data.FilterActivity;
 import com.jz.experiment.module.expe.bean.ChannelImageStatus;

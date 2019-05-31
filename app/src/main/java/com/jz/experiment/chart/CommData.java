@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.anitoa.bean.FlashData;
-import com.jz.experiment.device.Well;
+import com.anitoa.well.Well;
 import com.wind.base.C;
 
 import java.io.BufferedReader;

@@ -1,4 +1,4 @@
-package com.jz.experiment.device;
+package com.anitoa.exception;
 
 public class UnsupportedDeviceException extends RuntimeException {
 

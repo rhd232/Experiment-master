@@ -7,7 +7,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
-import com.jz.experiment.device.Well;
+import com.anitoa.well.Well;
 import com.jz.experiment.util.TrimReader;
 import com.wind.base.BaseActivity;
 

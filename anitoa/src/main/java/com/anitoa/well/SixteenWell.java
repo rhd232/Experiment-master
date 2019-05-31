@@ -1,4 +1,4 @@
-package com.jz.experiment.device;
+package com.anitoa.well;
 
 import java.util.ArrayList;
 import java.util.List;

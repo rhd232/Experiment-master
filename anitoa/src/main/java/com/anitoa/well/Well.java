@@ -1,6 +1,7 @@
-package com.jz.experiment.device;
+package com.anitoa.well;
 
-import com.jz.experiment.chart.CommData;
+import com.anitoa.bean.FlashData;
+import com.anitoa.exception.UnsupportedDeviceException;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public abstract class Well {
 
     public static Well getWell() {
         Well well=null;
-        int numWell = CommData.KsIndex;
+        int numWell =  FlashData.NUM_WELLS;
         switch (numWell) {
             case 4:
                 well = new FourWell();

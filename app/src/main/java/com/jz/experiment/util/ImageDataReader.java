@@ -15,7 +15,7 @@ import com.jz.experiment.chart.ChartData;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DataFileReader;
 import com.jz.experiment.chart.FactUpdater;
-import com.jz.experiment.device.Well;
+import com.anitoa.well.Well;
 import com.jz.experiment.module.expe.bean.ChannelImageStatus;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.HistoryExperiment;

@@ -198,9 +198,7 @@ public class FactUpdater {
     }
 
     private byte[] SetIntergrationTime(float InTime) {
-        PcrCommand cmd = new PcrCommand();
-        cmd.setIntergrationTime(InTime);
-
+        PcrCommand cmd =  PcrCommand.ofIntergrationTime(InTime);
         return mCommunicationService.sendPcrCommandSync(cmd);
     }
 

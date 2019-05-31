@@ -49,6 +49,7 @@ public class FlashData {
      * 下位机通道数
      */
     public static int NUM_CHANNELS;
+
     /**
      * 下位机反应孔数
      */
