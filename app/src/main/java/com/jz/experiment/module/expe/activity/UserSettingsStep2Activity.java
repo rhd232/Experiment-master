@@ -571,7 +571,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
                             synchronized (mLock) {
 
-                                DataFileUtil.writeFileLog("===========开始自动积分==========",mExecutorService);
+                                DataFileUtil.writeFileLog("===========结束自动积分==========",mExecutorService);
                                 mLock.notifyAll();
                             }
                         }

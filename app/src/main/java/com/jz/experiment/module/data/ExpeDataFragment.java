@@ -120,8 +120,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
        // mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
 
         layout_ctparam_input.setOnCtParamChangeListener(this);
@@ -598,7 +599,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
     }
 
     @Override

@@ -19,11 +19,10 @@ public class FourWell extends Well {
             case "A2":
                 ksindex = 1;
                 break;
-
-            case "B1":
+            case "A3":
                 ksindex = 2;
                 break;
-            case "B2":
+            case "A4":
                 ksindex = 3;
                 break;
 
@@ -37,8 +36,8 @@ public class FourWell extends Well {
 
         KSList.add("A1");
         KSList.add("A2");
-        KSList.add("B1");
-        KSList.add("B2");
+        KSList.add("A3");
+        KSList.add("A4");
 
 
         return KSList;

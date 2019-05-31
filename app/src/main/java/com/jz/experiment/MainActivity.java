@@ -58,6 +58,7 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.layout_analyze)
     View layout_analyze;
     Fragment[] fragments;
+
     public static void start(Context context) {
         Navigator.navigate(context, MainActivity.class);
     }
@@ -65,7 +66,7 @@ public class MainActivity extends BaseActivity {
     public static void start(Context context, Tab tab) {
         Navigator.navigate(context, MainActivity.class, tab);
     }
-
+    private Handler mHandler=new Handler();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,39 +84,42 @@ public class MainActivity extends BaseActivity {
         view_pager.setOffscreenPageLimit(3);
         onViewClick(layout_expe);
 
-
-       // startBluetoothService();
-
-       /* Config config=ConfigRepo.getInstance().get(getActivity());
-        if (!TextUtils.isEmpty(config.getBluetoothDeviceAddress())){
-            //自动连接设备
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (bluetoothAdapter!=null && bluetoothAdapter.isEnabled()){
-
-            }
-
-        }*/
-
+        // startBluetoothService();
         DeviceProxyHelper.getInstance(getActivity());
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!ActivityUtil.isFinish(getActivity())) {
-                    //判断是否已经连接
-                    CommunicationService service = DeviceProxyHelper.getInstance(getActivity())
-                            .getCommunicationService();
-                    if (!service.isConnected()) {
-                        connectUsbDevice();
-                    }else {
-                        BluetoothConnectedEvent event=new BluetoothConnectedEvent( service.getConnectedDevice().getDeviceName());
-                        main_device_state_bar.onBluetoothConnectedEvent(event);
-                    }
+
+        mHandler.postDelayed(mRonnectRunnable, 500);
+
+        checkStoragePermission();
+    }
+
+    private Runnable mRonnectRunnable=new Runnable() {
+        @Override
+        public void run() {
+            tryConnectDevice();
+        }
+    };
+    private int mTryConnectCount;
+    private void tryConnectDevice() {
+        if (!ActivityUtil.isFinish(getActivity())) {
+            //判断是否已经连接
+            mTryConnectCount++;
+            CommunicationService service = DeviceProxyHelper.getInstance(getActivity())
+                    .getCommunicationService();
+            if (service != null) {
+                if (!service.isConnected()) {
+                    connectUsbDevice();
+                } else {
+                    BluetoothConnectedEvent event = new BluetoothConnectedEvent(service.getConnectedDevice().getDeviceName());
+                    main_device_state_bar.onBluetoothConnectedEvent(event);
                 }
-
+            }else {
+                if (mTryConnectCount<=3)
+                    mHandler.postDelayed(mRonnectRunnable, 500);
             }
-        }, 500);
+        }
+    }
 
-
+    private void checkStoragePermission() {
         AndPermission.with(getActivity())
                 .runtime()
                 .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -154,7 +158,7 @@ public class MainActivity extends BaseActivity {
         return getResources().getColor(R.color.color686868);
     }
 
-    @OnClick({R.id.layout_expe, R.id.layout_data,R.id.layout_analyze})
+    @OnClick({R.id.layout_expe, R.id.layout_data, R.id.layout_analyze})
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.layout_expe:
@@ -229,7 +233,7 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         DeviceProxyHelper.getInstance(getApplicationContext()).unbindService(getApplicationContext());
-       // stopService(mServiceIntent);
+        // stopService(mServiceIntent);
         EventBus.getDefault().unregister(this);
     }
 
@@ -246,7 +250,7 @@ public class MainActivity extends BaseActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         tab = Navigator.getParcelableExtra(this);
-        if (tab==null){
+        if (tab == null) {
             return;
         }
         if (tab.getIndex() == TAB_INDEX_DATA) {

@@ -388,17 +388,17 @@ public abstract class CtFragment extends BaseFragment {
                 ksIndexInAdapter = lineCount * line + 2;
                 break;
 
-            case "B1":
-                gvIndex = 1;
+            case "A3":
+                gvIndex = 0;
                 ksindex = 2;
 
-                ksIndexInAdapter = lineCount * line + 1;
+                ksIndexInAdapter = lineCount * line + 3;
                 break;
-            case "B2":
-                gvIndex = 1;
+            case "A4":
+                gvIndex = 0;
                 ksindex = 3;
 
-                ksIndexInAdapter = lineCount * line + 2;
+                ksIndexInAdapter = lineCount * line + 4;
                 break;
 
         }

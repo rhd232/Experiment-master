@@ -451,6 +451,9 @@ public class CommData {
                         int col = FlashData.col_index[cindex][ ksindex].get(j);
                         int val=Integer.parseInt(datalist.get(row).get(col));
                         int v = val - 100;
+                        if (v<0){
+                            v=0;
+                        }
                         value += v;
                     }
                 }else {

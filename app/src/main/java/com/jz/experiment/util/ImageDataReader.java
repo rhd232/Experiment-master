@@ -397,7 +397,7 @@ public class ImageDataReader {
 
 
     private int jfindex;
-    private final float AutoInt_Target = 500;
+    private final float AutoInt_Target = 1600;
     private void AutocalibInt() {
         int max_read;
         float inc;
@@ -436,6 +436,9 @@ public class ImageDataReader {
 
             //inc = (float)Math.Round(Convert.ToDouble((AutoInt_Target - max_read) * inc_factor[i]), 2);    // slowly approach the opt int time to avoid saturation
             inc = Float.parseFloat(String.format("%.2f", (AutoInt_Target - max_read) * inc_factor[i]));
+            if (inc<0)
+                inc=0;
+
             opt_int_time[i] += inc;
 
             if (opt_int_time[i] < 1)
@@ -443,9 +446,20 @@ public class ImageDataReader {
             else if (opt_int_time[i] > 600)
                 opt_int_time[i] = 600;
 
+            float intTime=(float) Math.ceil(opt_int_time[i]);
 
-            setSensorAndInTime(i, (float) Math.ceil(opt_int_time[i]));
+
+            setSensorAndInTime(i,intTime);
         }
+
+        StringBuilder sBuilder=new StringBuilder();
+        sBuilder.append("通道1：max_read:"+ max_read_list[0]+"   int_time:"+opt_int_time[0]).append("\n");
+        sBuilder.append("通道2：max_read:"+ max_read_list[1]+"   int_time:"+opt_int_time[1]).append("\n");
+        sBuilder.append("通道3：max_read:"+ max_read_list[2]+"   int_time:"+opt_int_time[2]).append("\n");
+        sBuilder.append("通道4：max_read:"+ max_read_list[3]+"   int_time:"+opt_int_time[3]).append("\n");
+
+        //System.out.println(sBuilder.toString());
+        DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);
     }
     private void setSensorAndInTime(int c, float inTime) {
         sleep(50);

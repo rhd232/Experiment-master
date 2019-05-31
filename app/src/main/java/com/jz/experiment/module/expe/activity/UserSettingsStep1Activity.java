@@ -356,8 +356,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.tv_next:
-                if (validate()) {//
-
+                if (validate()) {//validate()
 
 /*
                     String integrationTime= buildIntegrationTime();

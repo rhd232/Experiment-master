@@ -488,6 +488,10 @@ public class UsbService extends CommunicationService {
                 connect(device.getDeviceName());
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
                 mTargetDevice = null;
+                if (mReadThread!=null){
+                    mReadThread.stopRun();
+                    mReadThread=null;
+                }
                 String name = "HID";
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     name = device.getProductName();
