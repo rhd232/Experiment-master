@@ -66,9 +66,9 @@
             android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
             ></activity>
-        <service android:name=".module.bluetooth.ble.BluetoothLeService"></service>
-        <service android:name=".module.bluetooth.BluetoothService"></service>
-        <service android:name=".module.bluetooth.UsbService">
+        <service android:name="com.anitoa.service.BluetoothLeService"></service>
+        <service android:name="com.anitoa.service.BluetoothService"></service>
+        <service android:name="com.anitoa.service.UsbService">
         </service>
 
         <provider

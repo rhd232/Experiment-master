@@ -2,10 +2,11 @@ package com.jz.experiment.chart;
 
 import android.text.TextUtils;
 
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.PcrCommand;
+import com.anitoa.cmd.PcrCommand;
+import com.anitoa.service.CommunicationService;
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.util.DataFileUtil;
-import com.jz.experiment.util.ThreadUtil;
+import com.anitoa.util.ThreadUtil;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -122,24 +123,10 @@ public class FactUpdater {
             //存储下个循环使用的积分因子
             m_factorData[i][xhindex] = m_factorIntTime[i];
 
-           /* float curFactorIntTime=m_factorIntTime[i];
-            if (m_dynIntTime[i] && m_factorIntTime[i] > 0.03 )
-            {
-                 m_factorIntTime[i] *= 0.5f;
 
-                // Call to update Int time
-                float new_factor;
-                new_factor = DynamicUpdateIntTime(m_factorIntTime[i], i);	// done here because we need to set int time before auto trigger happens.
-                m_factorIntTime[i] = new_factor;
-                m_dynIntTime[i] = false;
-            }
-            if (xhindex==1){
-                m_factorData[i][0] = curFactorIntTime;
-            }
-            m_factorData[i][xhindex] = curFactorIntTime;*/
         }
-        System.out.println("xhindex:" + xhindex);
-        DataFileUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"), "xhindex:" + xhindex + "\n");
+
+        AnitoaLogUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"), "xhindex:" + xhindex + "\n");
         xhindex++;
 
     }
@@ -206,7 +193,7 @@ public class FactUpdater {
         ThreadUtil.sleep(10);
         SetIntergrationTime(InTime);
         String txt = "通道" + (c + 1) + "积分时间：" + InTime;
-        DataFileUtil.writeFileLog(txt);
+        AnitoaLogUtil.writeFileLog(txt);
         return rev_bytes;
     }
 
@@ -223,7 +210,7 @@ public class FactUpdater {
             int max = list.get(0);
             int last_max = list.get(1);
             boolean big = max + (max - last_max) > 3300;
-            DataFileUtil.writeFileLog("max + (max - last_max)=" + (max + (max - last_max)) + " > 3300:" + big);
+            AnitoaLogUtil.writeFileLog("max + (max - last_max)=" + (max + (max - last_max)) + " > 3300:" + big);
             if (big) {
                 m_dynIntTime[PCRNum - 1] = true;
             }
@@ -284,7 +271,7 @@ public class FactUpdater {
             return max;
         } catch (Exception ex) {
             ex.printStackTrace();
-            DataFileUtil.writeFileLog(ex.getMessage());
+            AnitoaLogUtil.writeFileLog(ex.getMessage());
             return 0;
         }
 

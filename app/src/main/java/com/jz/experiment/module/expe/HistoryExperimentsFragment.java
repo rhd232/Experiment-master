@@ -8,22 +8,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.anitoa.Anitoa;
+import com.anitoa.bean.FlashData;
+import com.anitoa.cmd.PcrCommand;
+import com.anitoa.event.AnitoaDisConnectedEvent;
+import com.anitoa.service.CommunicationService;
+import com.anitoa.util.ThreadUtil;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
-import com.jz.experiment.chart.FlashData;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.PcrCommand;
-import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.module.expe.activity.DeviceListActivity;
 import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
 import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
-import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.FlashTrimReader;
 import com.jz.experiment.util.StatusChecker;
-import com.jz.experiment.util.ThreadUtil;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.recyclerview.decoration.VerticalSpacesItemDecoration;
@@ -77,7 +77,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @BindView(R.id.tv_device_state)
     TextView tv_device_state;
 
-    private DeviceProxyHelper sDeviceProxyHelper;
+    private Anitoa sAnitoa;
     private ExecutorService mExecutorService;
     private FlashTrimReader mFlashTrimReader;
 
@@ -117,7 +117,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
         loadData();
 
         //初始化blutoothservice
-        sDeviceProxyHelper = DeviceProxyHelper
+        sAnitoa = Anitoa
                 .getInstance(getActivity());
 
 
@@ -129,7 +129,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
 
-        if (sDeviceProxyHelper.getBluetoothService() != null && sDeviceProxyHelper.getBluetoothService().isConnected()) {
+        if (sAnitoa.getBluetoothService() != null && sAnitoa.getBluetoothService().isConnected()) {
             tv_device_state.setText("已连接");
             tv_device_state.setActivated(true);
         } else {
@@ -146,7 +146,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onBluetoothDisConnectedEvent(BluetoothDisConnectedEvent event) {
+    public void onBluetoothDisConnectedEvent(AnitoaDisConnectedEvent event) {
         tv_device_state.setText("未连接");
         tv_device_state.setActivated(false);
     }
@@ -264,7 +264,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Subscribe
     public void onToExpeSettingsEvent(final ToExpeSettingsEvent event) {
         if (mCommunicationService==null){
-            mCommunicationService=sDeviceProxyHelper.getCommunicationService();
+            mCommunicationService=sAnitoa.getCommunicationService();
         }
 
         //判断是否已经连接设备

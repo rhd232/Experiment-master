@@ -3,17 +3,19 @@ package com.jz.experiment.util;
 import android.app.Activity;
 import android.text.TextUtils;
 
+import com.anitoa.bean.Data;
+import com.anitoa.cmd.PcrCommand;
+import com.anitoa.listener.AnitoaConnectionListener;
+import com.anitoa.listener.SimpleConnectionListener;
+import com.anitoa.service.CommunicationService;
+import com.anitoa.util.AnitoaLogUtil;
+import com.anitoa.util.ByteUtil;
 import com.jz.experiment.chart.CCurveShow;
 import com.jz.experiment.chart.ChartData;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DataFileReader;
 import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.device.Well;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.Data;
-import com.jz.experiment.module.bluetooth.PcrCommand;
-import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
-import com.jz.experiment.module.bluetooth.ble.SimpleConnectionListener;
 import com.jz.experiment.module.expe.bean.ChannelImageStatus;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.HistoryExperiment;
@@ -31,7 +33,7 @@ import java.util.concurrent.ExecutorService;
 import rx.Observable;
 import rx.Subscriber;
 
-import static com.jz.experiment.util.ThreadUtil.sleep;
+import static com.anitoa.util.ThreadUtil.sleep;
 
 public class ImageDataReader {
 
@@ -97,7 +99,7 @@ public class ImageDataReader {
 
     private void readAllImg() {
 
-        DataFileUtil.writeFileLog("第"+(jfindex+1)+"次读取图像版",mExecutorService);
+        AnitoaLogUtil.writeFileLog("第"+(jfindex+1)+"次读取图像版",mExecutorService);
         mChannelStatusList = new ArrayList<>();
         List<Channel> channels = mExperiment.getSettingsFirstInfo().getChannels();
         //防止读出其他通道数据(设置了chip2第一条可能读出chip3，下位机bug)
@@ -144,7 +146,7 @@ public class ImageDataReader {
 
 
     private Map<String, List<String>> mItemData = new LinkedHashMap<>();
-    private BluetoothConnectionListener mListener = new SimpleConnectionListener() {
+    private AnitoaConnectionListener mListener = new SimpleConnectionListener() {
         @Override
         public void onReceivedData(Data data) {
             byte[] reveicedBytes = data.getBuffer();
@@ -259,7 +261,7 @@ public class ImageDataReader {
                                             .append("\n");
                                 }
                                 //System.out.println("图像内容："+ sBuilder.toString());
-                                DataFileUtil.writeToFile(mAutoIntFile, sBuilder.toString());
+                                AnitoaLogUtil.writeToFile(mAutoIntFile, sBuilder.toString());
                             }
                         }
                         mItemData.clear();
@@ -365,8 +367,9 @@ public class ImageDataReader {
             if (jfindex>4){
                 //设置积分时间和gain模式
                 sleep(50);
-                PcrCommand gainCmd = new PcrCommand();
-                gainCmd.setGainMode();
+
+                PcrCommand gainCmd = PcrCommand.ofGainMode(CommData.gain_mode);
+
                 mCommunicationService.sendPcrCommandSync(gainCmd);
 
                 mFactUpdater.int_time_1= (float) Math.ceil(opt_int_time[0]);
@@ -385,7 +388,7 @@ public class ImageDataReader {
                 sBuilder.append("通道3积分时间："+ mFactUpdater.int_time_3).append("\n");
                 sBuilder.append("通道4积分时间："+ mFactUpdater.int_time_4).append("\n");
                 //System.out.println(sBuilder.toString());
-                DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);
+                AnitoaLogUtil.writeFileLog(sBuilder.toString(),mExecutorService);
                 mOnAutoIntTimeListener.onAutoIntTimeFinished();
             }else {
                 readAllImg();
@@ -459,7 +462,7 @@ public class ImageDataReader {
         sBuilder.append("通道4：max_read:"+ max_read_list[3]+"   int_time:"+opt_int_time[3]).append("\n");
 
         //System.out.println(sBuilder.toString());
-        DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);
+        AnitoaLogUtil.writeFileLog(sBuilder.toString(),mExecutorService);
     }
     private void setSensorAndInTime(int c, float inTime) {
         sleep(50);
@@ -468,8 +471,7 @@ public class ImageDataReader {
         mCommunicationService.sendPcrCommandSync(sensorCmd);
 
         sleep(50);
-        PcrCommand inTimeCmd = new PcrCommand();
-        inTimeCmd.setIntergrationTime(inTime);
+        PcrCommand inTimeCmd =PcrCommand.ofIntergrationTime(inTime);
         mCommunicationService.sendPcrCommandSync(inTimeCmd);
 
     }

@@ -7,17 +7,12 @@ import com.wind.data.expe.bean.HistoryExperiment;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 public class DataFileUtil {
-
 
     public static String getPdfFileName(HistoryExperiment experiment, boolean melt) {
         String name = "变温扩增";
@@ -132,86 +127,8 @@ public class DataFileUtil {
         }
     }
 
-    public static void removeLogFile() {
-        File file = getLogFile();
-        if (file.exists()) {
-            file.delete();
-        }
-    }
-
-    public static File getLogFile() {
-        String fileName = "communicate_log.txt";
-        return getOrCreateFile(fileName);
-    }
-
-    public static void writeToFile(File file, String txt) {
-
-        FileOutputStream fos = null;
-        OutputStreamWriter osw = null;
-
-        try {
-            if (!file.exists()) {
-                boolean hasFile = file.createNewFile();
-               /* if (hasFile) {
-                    System.out.println("file not exists, create new file");
-                }*/
-                fos = new FileOutputStream(file);
-            } else {
-                // System.out.println("file exists");
-                fos = new FileOutputStream(file, true);
-            }
-
-            osw = new OutputStreamWriter(fos, "utf-8");
-            osw.write(txt); //写入内容
-            osw.write("\r\n");  //换行
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {   //关闭流
-            try {
-                if (osw != null) {
-                    osw.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
 
-    }
-    public static boolean sDebug;
 
 
-    public static void writeFileLog(final String txt, ExecutorService executorService) {
-        if (!sDebug){
-            return;
-        }
-        System.out.println(txt);
-        if (executorService==null) {
-            File file = getLogFile();
-            writeToFile(file, txt);
-        }else {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    File file = getLogFile();
-                    writeToFile(file, txt);
-                }
-            });
-        }
-
-    }
-    public static void writeFileLog(String txt) {
-        //拼上一个发送时间
-        long milliTime=new Date().getTime();
-        txt+=DateUtil.getDateTime(milliTime)+" ";
-        writeFileLog(txt,null);
-
-    }
 }

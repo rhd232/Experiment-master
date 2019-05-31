@@ -7,6 +7,18 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.anitoa.Anitoa;
+import com.anitoa.bean.Data;
+import com.anitoa.cmd.PcrCommand;
+import com.anitoa.event.AnitoaDisConnectedEvent;
+import com.anitoa.listener.AnitoaConnectionListener;
+import com.anitoa.receiver.BluetoothReceiver;
+import com.anitoa.service.BluetoothService;
+import com.anitoa.service.CommunicationService;
+import com.anitoa.service.UsbService;
+import com.anitoa.util.AnitoaLogUtil;
+import com.anitoa.util.ByteUtil;
+import com.anitoa.util.ThreadUtil;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
@@ -17,14 +29,6 @@ import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.TempChart;
 import com.jz.experiment.device.Well;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.module.bluetooth.BluetoothReceiver;
-import com.jz.experiment.module.bluetooth.BluetoothService;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.Data;
-import com.jz.experiment.module.bluetooth.PcrCommand;
-import com.jz.experiment.module.bluetooth.UsbService;
-import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
-import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
 import com.jz.experiment.module.data.FilterActivity;
 import com.jz.experiment.module.expe.bean.ChannelImageStatus;
 import com.jz.experiment.module.expe.bean.Tab;
@@ -33,11 +37,8 @@ import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.ByteHelper;
-import com.jz.experiment.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
-import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.StatusChecker;
-import com.jz.experiment.util.ThreadUtil;
 import com.jz.experiment.util.TrimReader;
 import com.jz.experiment.widget.DuringView;
 import com.wind.base.BaseActivity;
@@ -87,7 +88,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class ExpeRunningActivity extends BaseActivity implements BluetoothConnectionListener {
+public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectionListener {
 
 
     public static void start(Context context, HistoryExperiment experiment) {
@@ -195,7 +196,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
            @Override
            public void run() {
                //删除factor_log.txt文件
-               DataFileUtil.getOrCreateFile("factor_log.txt").delete();
+               AnitoaLogUtil.getOrCreateFile("factor_log.txt").delete();
 
                List<Stage> cyclingSteps=mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
                StringBuilder sb=new StringBuilder();
@@ -228,7 +229,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                    sb.append("\n");
                }
                sb.append("=========================\n");
-               DataFileUtil.writeFileLog(sb.toString());
+               AnitoaLogUtil.writeFileLog(sb.toString());
            }
        });
 
@@ -261,13 +262,13 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             sBuilder.append("\n");
 
         }
-        DataFileUtil.writeFileLog(sBuilder.toString());
+        AnitoaLogUtil.writeFileLog(sBuilder.toString());
     }
 
     private void bindService() {
-        mCommunicationService = DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
-//        mBluetoothService = DeviceProxyHelper.getInstance(getActivity()).getBluetoothService();
-//        mUsbService = DeviceProxyHelper.getInstance(getActivity()).getUsbService();
+        mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
+//        mBluetoothService = Anitoa.getInstance(getActivity()).getBluetoothService();
+//        mUsbService = Anitoa.getInstance(getActivity()).getUsbService();
         mCommunicationService.setNotify(this);
         chart_dt.postDelayed(new Runnable() {
             @Override
@@ -566,7 +567,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onBluetoothDisConnectedEvent(BluetoothDisConnectedEvent event) {
+    public void onBluetoothDisConnectedEvent(AnitoaDisConnectedEvent event) {
 
     }
 
@@ -675,7 +676,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
                     }
                 });
-                DataFileUtil.writeFileLog("返回错误：" + ByteUtil.getHexStr(reveicedBytes, reveicedBytes.length));
+                AnitoaLogUtil.writeFileLog("返回错误：" + ByteUtil.getHexStr(reveicedBytes, reveicedBytes.length));
             }*/
             /*
                 报出比较多的 图像命令超时错误
@@ -809,7 +810,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
             StringBuilder sBuilder = new StringBuilder();
             sBuilder.append("温度+" + i + ":" + partStage.getTemp() + "时间:" + partStage.getDuring());
             System.out.println(sBuilder.toString());
-            DataFileUtil.writeFileLog(sBuilder.toString());
+            AnitoaLogUtil.writeFileLog(sBuilder.toString());
         }
 
         int rsvd = cyclingStage.getCyclingCount();
@@ -930,7 +931,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         }
         sBuilder.append("结束温度：" + endStage.getTemp() + "时间：" + endStage.getDuring());
         System.out.println(sBuilder.toString());
-        DataFileUtil.writeFileLog(sBuilder.toString());
+        AnitoaLogUtil.writeFileLog(sBuilder.toString());
 
 
         command.step4(PcrCommand.Control.START, cyclingCount, cmdMode,
@@ -1075,14 +1076,14 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                 sBuilder.append("下位机返回的cyclingStep："+cyclingStep+"\n");
                 sBuilder.append("计算得到的当前阶段"+(mRunningCyclingStageIndex + 1)+"\n");
                 sBuilder.append("====================\n");
-                DataFileUtil.writeFileLog(sBuilder.toString(),mExecutorService);
+                AnitoaLogUtil.writeFileLog(sBuilder.toString(),mExecutorService);
 
                 try{
                     List<Stage> stageList = getCyclingSteps();
                     CyclingStage cyclingStage = (CyclingStage) stageList.get(mRunningCyclingStageIndex);
                     tv_cycling.setText((cyclingNum + 1) + "/" + cyclingStage.getCyclingCount());
                 }catch (Exception e){
-                    DataFileUtil.writeFileLog(e.getMessage(),mExecutorService);
+                    AnitoaLogUtil.writeFileLog(e.getMessage(),mExecutorService);
                 }
 
 
@@ -1165,7 +1166,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                                 @Override
                                 public void call(Throwable throwable) {
                                     throwable.printStackTrace();
-                                    DataFileUtil.writeFileLog(throwable.getMessage());
+                                    AnitoaLogUtil.writeFileLog(throwable.getMessage());
                                 }
                             });
                 }
@@ -1403,7 +1404,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                         @Override
                         public void call(Throwable throwable) {
                             throwable.printStackTrace();
-                            DataFileUtil.writeFileLog(throwable.getMessage());
+                            AnitoaLogUtil.writeFileLog(throwable.getMessage());
                         }
                     });
         }
@@ -1429,7 +1430,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                         @Override
                         public void call(Throwable throwable) {
                             throwable.printStackTrace();
-                            // DataFileUtil.writeFileLog(throwable.getMessage());
+                            // AnitoaLogUtil.writeFileLog(throwable.getMessage());
                         }
                     });
         }
@@ -1454,7 +1455,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                         @Override
                         public void call(Throwable throwable) {
                             throwable.printStackTrace();
-                            DataFileUtil.writeFileLog(throwable.getMessage());
+                            AnitoaLogUtil.writeFileLog(throwable.getMessage());
                         }
                     });
         }
@@ -1511,7 +1512,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
        /* System.out.println("curRowIndex:" + curRowIndex);
         if (curRowIndex<0|| curRowIndex>11){
             String error="========= errorCurRowIndex:"+curRowIndex+" =========";
-            DataFileUtil.writeFileLog(error);
+            AnitoaLogUtil.writeFileLog(error);
         }*/
        /* byte pixs[] = new byte[mImageMode.getSize() * 2];//每个图像像素有2个字节组成
         for (int i = 0; i < mImageMode.getSize() * 2; i++) {
@@ -1561,11 +1562,11 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
 
             //System.out.println("通道" + channelIndex + "图像数据第" + curRowIndex);
             file = DataFileUtil.getDtImageDataFile(mHistoryExperiment);
-            // sourceFile = DataFileUtil.getDtImageDataSourceFile(mHistoryExperiment);
+            // sourceFile = AnitoaLogUtil.getDtImageDataSourceFile(mHistoryExperiment);
         } else if (mInMeltCurve) {
             //System.out.println("熔解曲线通道" + channelIndex + "图像数据第" + curRowIndex);
             file = DataFileUtil.getMeltImageDateFile(mHistoryExperiment);
-            // sourceFile = DataFileUtil.getMeltImageDataSourceFile(mHistoryExperiment);
+            // sourceFile = AnitoaLogUtil.getMeltImageDataSourceFile(mHistoryExperiment);
         }
         //保存到本地文件中
         if (curRowIndex == 0) {
@@ -1646,7 +1647,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
                                     .append("\n");
                         }
                         //System.out.println("图像内容："+ sBuilder.toString());
-                        DataFileUtil.writeToFile(file, sBuilder.toString());
+                        AnitoaLogUtil.writeToFile(file, sBuilder.toString());
                     }
                 }
                 mItemData.clear();
@@ -1810,7 +1811,7 @@ public class ExpeRunningActivity extends BaseActivity implements BluetoothConnec
         float speed = 1;
         command.meltingCurve(PcrCommand.Control.START, startT, endT, speed);
         System.out.println("熔解曲线温度startT：" + startT + " endT:" + endT);
-        DataFileUtil.writeFileLog("熔解曲线温度startT：" + startT + " endT:" + endT);
+        AnitoaLogUtil.writeFileLog("熔解曲线温度startT：" + startT + " endT:" + endT);
         mCommunicationService.sendPcrCommandSync(command);
         //mUsbService.sendPcrCommandSync(command);
 

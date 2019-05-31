@@ -12,16 +12,16 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import com.anitoa.Anitoa;
+import com.anitoa.event.AnitoaConnectedEvent;
+import com.anitoa.service.CommunicationService;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.module.analyze.AnalyzeFragment;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
 import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.module.settings.event.LogoutEvent;
 import com.jz.experiment.util.DataFileUtil;
-import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.TrimReader;
 import com.jz.experiment.util.UsbManagerHelper;
 import com.jz.experiment.widget.DeviceStateBar;
@@ -85,7 +85,7 @@ public class MainActivity extends BaseActivity {
         onViewClick(layout_expe);
 
         // startBluetoothService();
-        DeviceProxyHelper.getInstance(getActivity());
+        Anitoa.getInstance(getActivity());
 
         mHandler.postDelayed(mRonnectRunnable, 500);
 
@@ -103,13 +103,13 @@ public class MainActivity extends BaseActivity {
         if (!ActivityUtil.isFinish(getActivity())) {
             //判断是否已经连接
             mTryConnectCount++;
-            CommunicationService service = DeviceProxyHelper.getInstance(getActivity())
+            CommunicationService service = Anitoa.getInstance(getActivity())
                     .getCommunicationService();
             if (service != null) {
                 if (!service.isConnected()) {
                     connectUsbDevice();
                 } else {
-                    BluetoothConnectedEvent event = new BluetoothConnectedEvent(service.getConnectedDevice().getDeviceName());
+                    AnitoaConnectedEvent event = new AnitoaConnectedEvent(service.getConnectedDevice().getDeviceName());
                     main_device_state_bar.onBluetoothConnectedEvent(event);
                 }
             }else {
@@ -232,7 +232,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        DeviceProxyHelper.getInstance(getApplicationContext()).unbindService(getApplicationContext());
+        Anitoa.getInstance(getApplicationContext()).unbindService(getApplicationContext());
         // stopService(mServiceIntent);
         EventBus.getDefault().unregister(this);
     }

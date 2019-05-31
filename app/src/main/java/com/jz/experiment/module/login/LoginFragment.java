@@ -9,15 +9,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.anitoa.Anitoa;
+import com.anitoa.bean.Data;
+import com.anitoa.cmd.PcrCommand;
+import com.anitoa.listener.AnitoaConnectionListener;
+import com.anitoa.service.CommunicationService;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.Data;
-import com.jz.experiment.module.bluetooth.PcrCommand;
-import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.util.DataFileUtil;
-import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.StatusChecker;
 import com.jz.experiment.util.UsbManagerHelper;
 import com.wind.base.C;
@@ -61,7 +61,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
-public class LoginFragment extends BaseFragment implements BluetoothConnectionListener {
+public class LoginFragment extends BaseFragment implements AnitoaConnectionListener {
 
 
     @BindView(R.id.iv_pwd_toggle)
@@ -88,7 +88,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
 
     UserDataStore mUserDataStore;
     Subscription findSubscription;
-    private DeviceProxyHelper sDeviceProxyHelper;
+    private Anitoa sAnitoa;
     private Handler mHandler = new Handler();
     CommunicationService mCommunicationService;
 
@@ -132,7 +132,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
                     }
                 });
         //绑定service
-        sDeviceProxyHelper = DeviceProxyHelper
+        sAnitoa = Anitoa
                 .getInstance(getActivity());
 
 
@@ -140,7 +140,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
             @Override
             public void run() {
                 if (!ActivityUtil.isFinish(getActivity())) {
-                    mCommunicationService = sDeviceProxyHelper.getCommunicationService();
+                    mCommunicationService = sAnitoa.getCommunicationService();
                     if (mCommunicationService != null) {
                         setNofity(LoginFragment.this);
                         UsbManagerHelper.connectUsbDevice(getActivity());
@@ -155,7 +155,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
         /*mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                CommunicationService service=sDeviceProxyHelper.getCommunicationService();
+                CommunicationService service=sAnitoa.getCommunicationService();
                 if (service!=null){
                     service.setNotify(LoginFragment.this);
                     service.sendPcrCommand(PcrCommand.ofVersionCmd());
@@ -313,7 +313,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
     }
 
 
-    private void setNofity(BluetoothConnectionListener listener) {
+    private void setNofity(AnitoaConnectionListener listener) {
         if (mCommunicationService != null) {
             mCommunicationService.setNotify(listener);
         }
@@ -321,11 +321,11 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
 
     @Override
     public void onConnectSuccess() {
-        if (sDeviceProxyHelper != null) {
+        if (sAnitoa != null) {
             if (mCommunicationService!=null){
                 mCommunicationService.sendPcrCommand(PcrCommand.ofVersionCmd());
             }
-          /*  CommunicationService service = sDeviceProxyHelper.getCommunicationService();
+          /*  CommunicationService service = sAnitoa.getCommunicationService();
             if (service != null)
                 service.sendPcrCommand(PcrCommand.ofVersionCmd());*/
         }
@@ -384,7 +384,7 @@ public class LoginFragment extends BaseFragment implements BluetoothConnectionLi
         super.onDestroy();
         setNofity(null);
         if (mNeedStopService) {
-            DeviceProxyHelper.getInstance(getActivity().getApplicationContext()).unbindService(getActivity().getApplicationContext());
+            Anitoa.getInstance(getActivity().getApplicationContext()).unbindService(getActivity().getApplicationContext());
         }
     }
 }

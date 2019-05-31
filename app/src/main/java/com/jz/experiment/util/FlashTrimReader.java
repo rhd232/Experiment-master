@@ -2,13 +2,14 @@ package com.jz.experiment.util;
 
 import android.app.Activity;
 
+import com.anitoa.bean.Data;
+import com.anitoa.bean.FlashData;
+import com.anitoa.cmd.PcrCommand;
+import com.anitoa.listener.AnitoaConnectionListener;
+import com.anitoa.listener.SimpleConnectionListener;
+import com.anitoa.service.CommunicationService;
+import com.anitoa.util.ByteUtil;
 import com.jz.experiment.chart.CommData;
-import com.jz.experiment.chart.FlashData;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.Data;
-import com.jz.experiment.module.bluetooth.PcrCommand;
-import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
-import com.jz.experiment.module.bluetooth.ble.SimpleConnectionListener;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.utils.LogUtil;
 
@@ -62,7 +63,7 @@ public class FlashTrimReader {
     }
     //dataposition.dat文件内容
     private String dp_str;
-    private BluetoothConnectionListener mListener=new SimpleConnectionListener(){
+    private AnitoaConnectionListener mListener=new SimpleConnectionListener(){
         @Override
         public void onReceivedData(Data data) {
             if (mReadTrimSubscription==null){

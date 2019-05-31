@@ -21,15 +21,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.anitoa.Anitoa;
+import com.anitoa.bean.Data;
+import com.anitoa.listener.AnitoaConnectionListener;
+import com.anitoa.receiver.BluetoothReceiver;
+import com.anitoa.service.BluetoothService;
 import com.jz.experiment.R;
-import com.jz.experiment.module.bluetooth.BluetoothReceiver;
-import com.jz.experiment.module.bluetooth.BluetoothService;
-import com.jz.experiment.module.bluetooth.Data;
-import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.expe.adapter.DeviceAdapter;
 import com.jz.experiment.module.expe.event.ConnectRequestEvent;
 import com.jz.experiment.util.AppDialogHelper;
-import com.jz.experiment.util.DeviceProxyHelper;
 import com.wind.base.bean.Config;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
@@ -52,7 +52,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ezy.ui.layout.LoadingLayout;
 
-public class DeviceListFragment extends BaseFragment implements BluetoothConnectionListener {
+public class DeviceListFragment extends BaseFragment implements
+        AnitoaConnectionListener {
     public static final String TAG = "Device";
     public static final int REQUEST_ENABLE_BT = 1212;
     @BindView(R.id.rv_devices)
@@ -74,7 +75,7 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     @BindView(R.id.checkbox)
     ImageView checkbox;
 
-    private DeviceProxyHelper sDeviceProxyHelper;
+    private Anitoa sAnitoa;
     private BluetoothService mBluetoothService;
     private BluetoothDevice mConnectedDevice;
     @Override
@@ -172,8 +173,8 @@ public class DeviceListFragment extends BaseFragment implements BluetoothConnect
     }
 
     private void bindService() {
-        sDeviceProxyHelper=DeviceProxyHelper.getInstance(getActivity());
-        mBluetoothService=sDeviceProxyHelper.getBluetoothService();
+        sAnitoa=Anitoa.getInstance(getActivity());
+        mBluetoothService=sAnitoa.getBluetoothService();
         mConnectedDevice=mBluetoothService.getConnectedBluetoothDevice();
         if (mConnectedDevice!=null){
             checkbox.setActivated(true);

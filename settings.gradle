@@ -1,4 +1,4 @@
-include ':app', ':base', ':data', ':domain'
+include ':app', ':base', ':data', ':domain', ':anitoa'
 
 include ':wheelpicker'
 project(':wheelpicker').projectDir = new File(rootDir, 'modules/wheelpicker')

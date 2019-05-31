@@ -2,10 +2,10 @@ package com.jz.experiment.util;
 
 import android.content.Context;
 
+import com.anitoa.cmd.PcrCommand;
+import com.anitoa.service.CommunicationService;
 import com.jz.experiment.chart.CommData;
-import com.jz.experiment.chart.FlashData;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.PcrCommand;
+import com.anitoa.bean.FlashData;
 import com.wind.base.C;
 
 import java.io.BufferedReader;

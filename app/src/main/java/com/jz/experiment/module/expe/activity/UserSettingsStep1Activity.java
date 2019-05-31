@@ -17,7 +17,7 @@ import android.widget.TextView;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CCurveShow;
 import com.jz.experiment.chart.CommData;
-import com.jz.experiment.chart.FlashData;
+import com.anitoa.bean.FlashData;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.expe.adapter.ChannelAdapter;
 import com.jz.experiment.module.expe.adapter.SampleAdapter;

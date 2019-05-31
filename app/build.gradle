@@ -53,13 +53,14 @@ dependencies {
     implementation project(path:':aop-annotations')
     implementation project(path:':aop-runtime')
     implementation project(path:':wheelpicker')
+    implementation project(path:':anitoa')
 
     implementation project (path:':coder-annotations')
     annotationProcessor project(path:':coder-compiler')
 
 
     implementation androidDependencies.cardview
-    implementation presentationDependencies.eventbus
+
     implementation 'com.yanzhenjie:permission:2.0.0-rc12'
     /****dagger注解处理器*******/
     annotationProcessor presentationDependencies.daggerCompiler

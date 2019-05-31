@@ -22,10 +22,10 @@ import android.util.Log;
 import android.view.View;
 
 import com.jz.experiment.R;
-import com.jz.experiment.module.bluetooth.Data;
-import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
-import com.jz.experiment.module.bluetooth.ble.BluetoothLeService;
-import com.jz.experiment.module.bluetooth.ble.GattupdateReceiver;
+import com.anitoa.bean.Data;
+import com.anitoa.listener.AnitoaConnectionListener;
+import com.anitoa.service.BluetoothLeService;
+import com.anitoa.receiver.GattupdateReceiver;
 import com.jz.experiment.module.expe.adapter.DeviceAdapter;
 import com.jz.experiment.module.expe.event.ConnectRequestEvent;
 import com.wind.base.mvp.view.BaseFragment;
@@ -47,7 +47,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ezy.ui.layout.LoadingLayout;
 
-public class DeviceListBLEFragment extends BaseFragment implements BluetoothConnectionListener {
+public class DeviceListBLEFragment extends BaseFragment implements AnitoaConnectionListener {
     public static final String TAG = "Device";
     public static final int REQUEST_ENABLE_BT = 1212;
     @BindView(R.id.rv_devices)

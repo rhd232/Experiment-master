@@ -44,7 +44,8 @@ public class C {
         public static final String SHOW_ERROR_RETRY_LAYOUT = "10";
     }
     public static class Value{
-        public static final String APP_FOLDER= Environment.getExternalStorageDirectory().getAbsolutePath()+"/anitoa/";
+        public static final String APP_FOLDER= Environment.getExternalStorageDirectory().
+                getAbsolutePath()+"/anitoa/";
         public static final String IMAGE_DATA=APP_FOLDER+"imageData/";
         public static final String REPORT_FOLDER=APP_FOLDER+"report/";
         public static final String TRIM_FOLDER=APP_FOLDER+"trim/";

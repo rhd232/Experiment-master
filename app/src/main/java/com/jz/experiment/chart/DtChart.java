@@ -2,6 +2,7 @@ package com.jz.experiment.chart;
 
 import android.graphics.Color;
 
+import com.anitoa.util.AnitoaLogUtil;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
@@ -18,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class DtChart extends WindChart {
 
@@ -71,8 +71,8 @@ public class DtChart extends WindChart {
             }
         }
         sBuilder.append("]");
-        System.out.println(sBuilder.toString());
-        DataFileUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"),sBuilder.toString());
+        //System.out.println(sBuilder.toString());
+        AnitoaLogUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"),sBuilder.toString());
     }
     public void show(List<String> ChanList, List<String> KSList,InputStream ips,CtParamInputLayout.CtParam ctParam) {
 
@@ -108,92 +108,6 @@ public class DtChart extends WindChart {
         mHandler.sendEmptyMessage(WHAT_REFRESH_CHART);
     }
 
-    public void DrawLineFromServer(String chan,String currks, Map<Integer,List<List<String>>> chanMap) {
-        int currChan = 0;
-        int ksindex = -1;
-
-        int color = 0;
-        LegendEntry legendEntry;
-        switch (chan) {
-            case "Chip#1":
-                currChan = 0;
-                color = Color.argb(255, 24, 60, 209);
-                break;
-            case "Chip#2":
-                currChan = 1;
-                color = Color.argb(255, 83, 182, 97);
-                break;
-            case "Chip#3":
-                currChan = 2;
-                color = Color.argb(255, 245, 195, 66);
-
-                break;
-            case "Chip#4":
-                currChan = 3;
-                color = Color.argb(255, 234, 51, 35);
-                break;
-        }
-
-        if (mLegendEntries.size() <= currChan) {
-            legendEntry = new LegendEntry("通道" + (currChan + 1), Legend.LegendForm.LINE,
-                    20, 4, null, color);
-            if (!contains("通道" + (currChan + 1))){
-                mLegendEntries.add(legendEntry);
-            }
-        }
-
-
-
-        ksindex= Well.getWell().getWellIndex(currks);
-       /* switch (currks) {
-            case "A1":
-                ksindex = 0;
-                break;
-            case "A2":
-                ksindex = 1;
-                break;
-            case "A3":
-                ksindex = 2;
-                break;
-            case "A4":
-                ksindex = 3;
-                break;
-            case "B1":
-                ksindex = 4;
-                break;
-            case "B2":
-                ksindex = 5;
-                break;
-            case "B3":
-                ksindex = 6;
-                break;
-            case "B4":
-                ksindex = 7;
-                break;
-        }*/
-        List<String> lineData=chanMap.get(currChan).get(ksindex);
-
-        List<Entry> expeData = new ArrayList<>();
-
-        int count = lineData.size();
-
-        for (int i = 0; i < count; i++) {
-
-            float y = Float.parseFloat(lineData.get(i));
-            Entry entry = new Entry(i, y);
-            expeData.add(entry);
-
-        }
-
-        LineDataSet dataSet = new LineDataSet(expeData, "通道" + (currChan + 1));
-        dataSet.setColor(color);
-        dataSet.setDrawCircles(false);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setDrawValues(false);
-        mLineColors.add(color);
-        mDataSets.add(dataSet);
-
-    }
     public void DrawLine(String chan, int ks, String currks) {
         if (!CommData.diclist.keySet().contains(chan) || CommData.diclist.get(chan).size() == 0)
             return;

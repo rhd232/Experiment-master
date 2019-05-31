@@ -8,16 +8,17 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.anitoa.Anitoa;
+import com.anitoa.event.AnitoaConnectedEvent;
+import com.anitoa.event.AnitoaDisConnectedEvent;
+import com.anitoa.service.CommunicationService;
 import com.jz.experiment.R;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.event.BluetoothConnectedEvent;
-import com.jz.experiment.module.bluetooth.event.BluetoothDisConnectedEvent;
-import com.jz.experiment.util.DeviceProxyHelper;
 import com.wind.base.utils.SystemUiUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
 
 public class DeviceStateBar extends FrameLayout {
 
@@ -44,8 +45,8 @@ public class DeviceStateBar extends FrameLayout {
         tv_device_name=findViewById(R.id.tv_device_name);
         tv_device_state=findViewById(R.id.tv_device_state);
         setBackgroundResource(R.drawable.selector_device_state_bar);
-       // BluetoothService service=DeviceProxyHelper.getInstance(getContext()).getBluetoothService();
-        CommunicationService service=DeviceProxyHelper.getInstance(getContext()).getCommunicationService();
+       // BluetoothService service=Anitoa.getInstance(getContext()).getBluetoothService();
+        CommunicationService service= Anitoa.getInstance(getContext()).getCommunicationService();
         String name="";
         if (service!=null){
             if (service.getConnectedDevice()!=null){
@@ -83,7 +84,7 @@ public class DeviceStateBar extends FrameLayout {
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onBluetoothConnectedEvent(BluetoothConnectedEvent event){
+    public void onBluetoothConnectedEvent(AnitoaConnectedEvent event){
         tv_device_name.setText(event.getDeviceName());
         tv_device_state.setText("已连接");
         setActivated(false);
@@ -101,7 +102,7 @@ public class DeviceStateBar extends FrameLayout {
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onBluetoothDisConnectedEvent(BluetoothDisConnectedEvent event){
+    public void onBluetoothDisConnectedEvent(AnitoaDisConnectedEvent event){
         tv_device_name.setText(event.getDeviceName());
         tv_device_state.setText("连接已中断");
         setActivated(true);

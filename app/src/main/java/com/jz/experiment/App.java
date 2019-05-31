@@ -3,9 +3,9 @@ package com.jz.experiment;
 import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.Fragment;
 
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.di.AppComponent;
 import com.jz.experiment.di.DaggerAppComponent;
-import com.jz.experiment.util.DataFileUtil;
 
 import javax.inject.Inject;
 
@@ -30,7 +30,7 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
         mAppComponent = createComponent();
         mAppComponent.inject(this);
 
-        DataFileUtil.sDebug=true;
+        AnitoaLogUtil.sDebug=true;
 
 
     }

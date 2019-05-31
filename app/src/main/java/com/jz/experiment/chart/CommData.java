@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.anitoa.bean.FlashData;
 import com.jz.experiment.device.Well;
 import com.wind.base.C;
 

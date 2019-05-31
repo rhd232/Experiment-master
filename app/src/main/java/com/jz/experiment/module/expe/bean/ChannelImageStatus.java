@@ -1,6 +1,7 @@
 package com.jz.experiment.module.expe.bean;
 
-import com.jz.experiment.module.bluetooth.PcrCommand;
+
+import com.anitoa.cmd.PcrCommand;
 
 public class ChannelImageStatus {
     private int channelIndex;

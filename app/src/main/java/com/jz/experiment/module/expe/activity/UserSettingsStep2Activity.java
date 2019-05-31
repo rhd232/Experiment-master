@@ -15,15 +15,17 @@ import android.widget.TextView;
 import com.aigestudio.wheelpicker.utils.WheelPickerFactory;
 import com.aigestudio.wheelpicker.widget.IWheelVo;
 import com.aigestudio.wheelpicker.widget.WheelSimpleVo;
+import com.anitoa.Anitoa;
+import com.anitoa.bean.Data;
+import com.anitoa.cmd.PcrCommand;
+import com.anitoa.listener.AnitoaConnectionListener;
+import com.anitoa.service.CommunicationService;
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.FactUpdater;
-import com.jz.experiment.chart.FlashData;
+import com.anitoa.bean.FlashData;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.module.bluetooth.CommunicationService;
-import com.jz.experiment.module.bluetooth.Data;
-import com.jz.experiment.module.bluetooth.PcrCommand;
-import com.jz.experiment.module.bluetooth.ble.BluetoothConnectionListener;
 import com.jz.experiment.module.expe.adapter.StageAdapter;
 import com.jz.experiment.module.expe.event.AddCyclingStageEvent;
 import com.jz.experiment.module.expe.event.AddStartStageEvent;
@@ -32,9 +34,8 @@ import com.jz.experiment.module.expe.event.DelStartStageEvent;
 import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.module.expe.event.RefreshStageAdapterEvent;
 import com.jz.experiment.util.AppDialogHelper;
-import com.jz.experiment.util.ByteUtil;
+import com.anitoa.util.ByteUtil;
 import com.jz.experiment.util.DataFileUtil;
-import com.jz.experiment.util.DeviceProxyHelper;
 import com.jz.experiment.util.ImageDataReader;
 import com.jz.experiment.util.StatusChecker;
 import com.jz.experiment.util.TrimReader;
@@ -82,9 +83,9 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-import static com.jz.experiment.util.ThreadUtil.sleep;
+import static com.anitoa.util.ThreadUtil.sleep;
 
-public class UserSettingsStep2Activity extends BaseActivity implements BluetoothConnectionListener {
+public class UserSettingsStep2Activity extends BaseActivity implements AnitoaConnectionListener {
 
     public static void start(Context context, HistoryExperiment experiment) {
 
@@ -149,7 +150,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         ButterKnife.bind(this);
         mExecutorService= Executors.newSingleThreadExecutor();
         mHistoryExperiment = Navigator.getParcelableExtra(getActivity());
-        mCommunicationService = DeviceProxyHelper.getInstance(getActivity()).getCommunicationService();
+        mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
 
         mExpeDataStore = new ExpeDataStore(
                 ProviderModule
@@ -316,8 +317,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
         mCommunicationService.sendPcrCommandSync(sensorCmd);
 
         sleep(50);
-        PcrCommand inTimeCmd = new PcrCommand();
-        inTimeCmd.setIntergrationTime(inTime);
+        PcrCommand inTimeCmd = PcrCommand.ofIntergrationTime(inTime);
         mCommunicationService.sendPcrCommandSync(inTimeCmd);
 
     }
@@ -515,15 +515,15 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
     private void doSetIntergrationTime() {
         //删除日志文件
-        DataFileUtil.removeLogFile();
+        AnitoaLogUtil.removeLogFile();
         if (!TextUtils.isEmpty(dp_str)) {
             //生成数据文件，插入dp_str
             File file = DataFileUtil.getDtImageDataFile(mHistoryExperiment);
-            DataFileUtil.writeToFile(file, dp_str);
+            AnitoaLogUtil.writeToFile(file, dp_str);
             boolean hasMelting = mHistoryExperiment.getSettingSecondInfo().getModes().size() == 2;
             if (hasMelting) {
                 File meltFile = DataFileUtil.getMeltImageDateFile(mHistoryExperiment);
-                DataFileUtil.writeToFile(meltFile, dp_str);
+                AnitoaLogUtil.writeToFile(meltFile, dp_str);
             }
         }
         //初始化设备
@@ -538,8 +538,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
             setChannelIntegrationTime(factUpdater, channels);
             if (mCommunicationService != null) {
                 sleep(50);
-                PcrCommand gainCmd = new PcrCommand();
-                gainCmd.setGainMode();
+                PcrCommand gainCmd = PcrCommand.ofGainMode(CommData.gain_mode);
                 mCommunicationService.sendPcrCommandSync(gainCmd);
 
                 setSensorAndInTime(0, factUpdater.int_time_1);
@@ -559,7 +558,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
     private  void autoInt(FactUpdater factUpdater) {
         synchronized (mLock) {
 
-            DataFileUtil.writeFileLog("===========开始自动积分==========",mExecutorService);
+            AnitoaLogUtil.writeFileLog("===========开始自动积分==========",mExecutorService);
             ImageDataReader imageDataReader = new ImageDataReader(this, mCommunicationService,
                     mHistoryExperiment, factUpdater,mExecutorService);
             imageDataReader.autoInt()
@@ -571,7 +570,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements Bluetooth
 
                             synchronized (mLock) {
 
-                                DataFileUtil.writeFileLog("===========结束自动积分==========",mExecutorService);
+                                AnitoaLogUtil.writeFileLog("===========结束自动积分==========",mExecutorService);
                                 mLock.notifyAll();
                             }
                         }

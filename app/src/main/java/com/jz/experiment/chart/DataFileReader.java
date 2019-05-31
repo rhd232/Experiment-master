@@ -2,6 +2,8 @@ package com.jz.experiment.chart;
 
 import android.text.TextUtils;
 
+import com.anitoa.bean.FlashData;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
