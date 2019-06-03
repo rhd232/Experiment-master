@@ -31,3 +31,6 @@ select * from expe_info where _id= ?;
 --select expe.name,expe.millitime, channel.name,channel.value,channel.remark,sample.name,sample.type
 --from expe_info expe inner join channel_info channel  on channel.expe_id =expe._id
 --inner join sample_info sample on sample.expe_id =expe._id and expe._id = ?;
+
+del_by_expeid:
+delete from expe_info where _id = ?;

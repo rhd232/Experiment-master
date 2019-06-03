@@ -1150,7 +1150,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
                 mStep5Responsed = false;
                 if (step5Subscription == null) {
-                    step5Subscription = Observable.interval(10, 1000, TimeUnit.MILLISECONDS)
+                    step5Subscription = Observable.interval(10, 2000, TimeUnit.MILLISECONDS)
                             /*.subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())*/
                             .onBackpressureLatest()
@@ -1388,7 +1388,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     private void step6Subscription() {
         if (step6Subscription == null) {
             mStep6Responsed = false;
-            step6Subscription = Observable.interval(10, 1000, TimeUnit.MILLISECONDS)
+            step6Subscription = Observable.interval(10, 2000, TimeUnit.MILLISECONDS)
                     /* .subscribeOn(Schedulers.io())
                      .observeOn(AndroidSchedulers.mainThread())*/
                     .onBackpressureLatest()
@@ -1462,7 +1462,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void step5Subscription() {
-        step5Subscription(1000);
+        step5Subscription(2000);
     }
 
     private void step7(PcrCommand.PCR_IMAGE pcr_image) {
@@ -1660,9 +1660,9 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     step5Subscription.unsubscribe();
                     step5Subscription = null;
                 }
-                step5Subscription(50);
+                //step5Subscription(500);
 
-                //step5();
+                step5();
               /*  if (step5Subscription != null && !step5Subscription.isUnsubscribed()) {
                     step5Subscription.unsubscribe();
                     step5Subscription=null;

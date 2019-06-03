@@ -22,3 +22,6 @@ CREATE TABLE stage_info(
 
 find_by_expeid:
 select * from stage_info where expe_id = ?;
+
+del_by_expeid:
+delete from stage_info where expe_id = ?;

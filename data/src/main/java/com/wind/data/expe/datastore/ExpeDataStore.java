@@ -24,9 +24,11 @@ import com.wind.data.expe.bean.Mode;
 import com.wind.data.expe.bean.Sample;
 import com.wind.data.expe.bean.SampleInfoModel;
 import com.wind.data.expe.bean.StageInfoModel;
+import com.wind.data.expe.request.DelExpeRequest;
 import com.wind.data.expe.request.FindExpeByIdResponse;
 import com.wind.data.expe.request.FindExpeRequest;
 import com.wind.data.expe.request.InsertExpeRequest;
+import com.wind.data.expe.response.DelExpeResponse;
 import com.wind.data.expe.response.FindExpeResponse;
 import com.wind.data.expe.response.InsertExpeResponse;
 import com.wind.data.expe.table.ChannelInfo;
@@ -72,6 +74,54 @@ public class ExpeDataStore {
         return Observable.create(new Observable.OnSubscribe<InsertExpeResponse>() {
             @Override
             public void call(Subscriber<? super InsertExpeResponse> subscriber) {
+
+            }
+        });
+    }
+
+
+    public Observable<DelExpeResponse> delExpe(final DelExpeRequest request){
+        return Observable.create(new Observable.OnSubscribe<DelExpeResponse>() {
+
+            @Override
+            public void call(Subscriber<? super DelExpeResponse> subscriber) {
+
+                //删除channel表，sampleinfo表，stageinfo表，expe表
+                long expeId=request.getId();
+                DelExpeResponse response = new DelExpeResponse();
+                response.setErr(-1);
+                final BriteDatabase.Transaction transaction = mBriteDb.newTransaction();
+                try {
+
+                    SqlDelightStatement channelDelStatement=ChannelInfo.FACTORY.del_by_expeid(expeId);
+                    mBriteDb.execute(channelDelStatement.statement);
+                    //int channelAffected=mBriteDb.getWritableDatabase().delete(ChannelInfo.TABLE_NAME,channelDelStatement.statement,channelDelStatement.args);
+
+                    SqlDelightStatement sampleDelStatement=SampleInfo.FACTORY.del_by_expeid(expeId);
+                    mBriteDb.execute(sampleDelStatement.statement);
+                   // int sampleAffected=mBriteDb.getWritableDatabase().delete(SampleInfo.TABLE_NAME,sampleDelStatement.statement,sampleDelStatement.args);
+
+                    SqlDelightStatement stageDelStatement=StageInfo.FACTORY.del_by_expeid(expeId);
+                    mBriteDb.execute(stageDelStatement.statement);
+                    //int stageAffected=mBriteDb.getWritableDatabase().delete(StageInfo.TABLE_NAME, stageDelStatement.statement,stageDelStatement.args);
+
+
+                    SqlDelightStatement expeDelStatement=ExpeInfo.FACTORY.del_by_expeid(expeId);
+                    mBriteDb.execute(expeDelStatement.statement);
+                    //int expeAffected=mBriteDb.getWritableDatabase().delete(ExpeInfo.TABLE_NAME, expeDelStatement.statement,expeDelStatement.args);
+
+                    transaction.markSuccessful();
+                    response.setErr(0);
+                    subscriber.onNext(response);
+                    subscriber.onCompleted();
+                }catch (Exception e){
+                    e.printStackTrace();
+                    subscriber.onError(e);
+                }finally {
+                    transaction.end();
+                }
+
+
 
             }
         });

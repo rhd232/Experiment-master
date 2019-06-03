@@ -1,7 +1,5 @@
 package com.jz.experiment.util;
 
-import android.app.Activity;
-
 import com.anitoa.bean.Data;
 import com.anitoa.bean.FlashData;
 import com.anitoa.cmd.PcrCommand;
@@ -10,7 +8,6 @@ import com.anitoa.listener.SimpleConnectionListener;
 import com.anitoa.service.CommunicationService;
 import com.anitoa.util.ByteUtil;
 import com.jz.experiment.chart.CommData;
-import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -24,10 +21,8 @@ import rx.functions.Action1;
 public class FlashTrimReader {
 
     private CommunicationService communicationService;
-    private Activity mActivity;
-    public FlashTrimReader(Activity activity,CommunicationService communicationService){
+    public FlashTrimReader(CommunicationService communicationService){
         this.communicationService=communicationService;
-        this.mActivity=activity;
     }
     private int mReadTrimCount;
     Subscription mReadTrimSubscription;
@@ -235,6 +230,7 @@ public class FlashTrimReader {
     public interface OnReadFlashListener{
         void onReadFlashSuccess();
     }
+
     private void verifyConnection() {
         PcrCommand cmd=PcrCommand.ofLidAndApaptorStatusCmd();
         byte [] reveicedBytes=communicationService.sendPcrCommandSync(cmd);
@@ -288,6 +284,7 @@ public class FlashTrimReader {
         }
     }
 
+
     private String Buf2String(byte[] buff, int size)
     {
         //String rstr;
@@ -306,7 +303,12 @@ public class FlashTrimReader {
     }
     private void showConnectionTip(){
         communicationService.setNotify(null);
-        mActivity.runOnUiThread(new Runnable() {
+
+        if (mOnDeviceDisconnectionListener!=null){
+            mOnDeviceDisconnectionListener.onDeviceDisconnected();
+        }
+
+        /*mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 LoadingDialogHelper.hideOpLoading();
@@ -317,7 +319,7 @@ public class FlashTrimReader {
                     }
                 });
             }
-        });
+        });*/
     }
 
     public void destroy(){
@@ -325,5 +327,14 @@ public class FlashTrimReader {
             mReadTrimSubscription.unsubscribe();
         }
         mReadTrimSubscription=null;
+    }
+
+
+    private OnDeviceDisconnectionListener mOnDeviceDisconnectionListener;
+    public void setOnDeviceDisconnectionListener(OnDeviceDisconnectionListener listener){
+        mOnDeviceDisconnectionListener=listener;
+    }
+    public interface OnDeviceDisconnectionListener{
+        void onDeviceDisconnected();
     }
 }

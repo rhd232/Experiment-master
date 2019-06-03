@@ -409,30 +409,7 @@ public class UserSettingsStep1Activity extends BaseActivity {
             ToastUtil.showToast(getActivity(), "请设置通道染料");
             return false;
         }
-        /*  boolean sampleSetted = false;
-        //检查样本
-            List<Sample> samplesA = mSampleAdapterA.getData();
-        for (int i = 0; i < samplesA.size(); i++) {
-            Sample sample = samplesA.get(i);
-            if (!TextUtils.isEmpty(sample.getName())) {
-                sampleSetted = true;
-            }
-        }
-        if (!sampleSetted) {
-            ToastUtil.showToast(getActivity(), "请设置样本A名称");
-            return false;
-        }
-        List<Sample> samplesB = mSampleAdapterB.getData();
-        for (int i = 0; i < samplesB.size(); i++) {
-            Sample sample = samplesB.get(i);
-            if (!TextUtils.isEmpty(sample.getName())) {
-                sampleSetted = true;
-            }
-        }
-        if (!sampleSetted) {
-            ToastUtil.showToast(getActivity(), "请设置样本B名称");
-            return false;
-        }*/
+
 
         return true;
     }

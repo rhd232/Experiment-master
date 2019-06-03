@@ -110,7 +110,7 @@ public class AnitoaLogUtil {
     }
 
     public static String getDateTime(long milliTime){
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy.MM.dd HH:mm:ss:SSS");
         String date=dateFormat.format(new Date(milliTime));
         return date;
     }

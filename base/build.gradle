@@ -33,6 +33,7 @@ dependencies {
     //api 'com.github.hannesa2:MPAndroidChart:3.0.7'
    // api baseDependencies.appcompat
     api androidDependencies.recycler_view
+
     //apt baseDependencies.daggerCompilerr //apt is deprecated annotationProcessor instead
 
     annotationProcessor baseDependencies.daggerCompiler

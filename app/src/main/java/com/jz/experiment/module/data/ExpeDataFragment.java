@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.anitoa.well.SixteenWell;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
@@ -198,7 +199,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         }catch (UnsupportedDeviceException e){
             //第一次安装，没有文件读取权限导致
             e.printStackTrace();
-            KSList.add("A1");
+            KSList=new SixteenWell().getKsList();
+          /*  KSList.add("A1");
             KSList.add("A2");
             KSList.add("A3");
             KSList.add("A4");
@@ -214,7 +216,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             KSList.add("B5");
             KSList.add("B6");
             KSList.add("B7");
-            KSList.add("B8");
+            KSList.add("B8");*/
         }
 
     }
@@ -279,6 +281,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             }
         }
         mDtChart = new DtChart(chart_dt, totalCyclingCount);
+        //文件读取之后孔数已经有值
         mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment),layout_ctparam_input.getCtParam());
 
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下

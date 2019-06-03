@@ -129,25 +129,13 @@ public class Anitoa {
 
         return mUsbService;
     }
-   /* public boolean isConnected(){
-        return mBluetoothService==null?false:mBluetoothService.isConnected();
-    }*/
-   /* public boolean isConnected(ConnectMode mode){
-        boolean connected=false;
-       switch (mode){
-           case BLUETOOTH:
-               connected= mBluetoothService==null?false:mBluetoothService.isConnected();
-               break;
-           case USB:
-               connected= mUsbService==null?false:mUsbService.isConnected();
-               break;
-       }
-
-       return connected;
-    }*/
-
 
     public enum ConnectMode{
         BLUETOOTH,USB
     }
+
+
+
+
+
 }

@@ -49,13 +49,19 @@ public class ChartMarkerView extends MarkerView {
         //根据此x值获取其他折线的y值
         listener.onPointSelected(e);
         ll_container.removeAllViews();
+
         for (int i=0;i<mAdapter.getCount();i++){
             ColorfulEntry item=mAdapter.getItem(i);
             View view=LayoutInflater.from(getContext()).inflate(R.layout.item_markerview,ll_container,false);
+            TextView tv_well_name=view.findViewById(R.id.tv_well_name);
             TextView tv_xvalue=view.findViewById(R.id.tv_xvalue);
             TextView tv_yvalue=view.findViewById(R.id.tv_yvalue);
             View indicator=view.findViewById(R.id.indicator);
-            tv_xvalue.setText(item.getEntry().getX()+"");
+
+
+            tv_well_name.setText(item.getWellName());
+
+            tv_xvalue.setText((int)item.getEntry().getX()+"");
             tv_yvalue.setText(item.getEntry().getY()+"");
             indicator.setBackgroundColor(item.getColor());
 

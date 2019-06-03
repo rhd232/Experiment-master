@@ -31,7 +31,6 @@ public class DataFileReader {
     public void ReadFileData(InputStream ips, boolean running,boolean ignoreDp) {
         try {
             CommData.diclist.clear();
-            //  InputStream ips = context.getAssets().open("fluorescence_data.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
             String line;
             String name = "";
@@ -101,7 +100,7 @@ public class DataFileReader {
                                 //{
                                 CommData.KsIndex = num_wells;
                                 FlashData.flash_loaded = true;                                                   // treated the same as flash loaded.
-
+                                FlashData.NUM_WELLS=num_wells;
                                 for (int i = 0; i < num_channels; i++) {
                                     for (int j = 0; j < num_wells; j++) {
                                         int n = trim_buff[k];

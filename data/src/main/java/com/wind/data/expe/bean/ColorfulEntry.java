@@ -6,7 +6,7 @@ public class ColorfulEntry {
     private Entry entry;
 
     private int color;
-
+    private String wellName;
     public Entry getEntry() {
         return entry;
     }
@@ -21,5 +21,13 @@ public class ColorfulEntry {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public String getWellName() {
+        return wellName;
+    }
+
+    public void setWellName(String wellName) {
+        this.wellName = wellName;
     }
 }

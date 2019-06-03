@@ -26,6 +26,7 @@ import java.util.List;
 public abstract class WindChart {
     protected List<ILineDataSet> mDataSets;
     protected List<Integer> mLineColors;
+    protected List<String> mWellNames;
     protected LineData mLineData;
     private ChartMarkerView mChartMarkerView;
     protected LineChart mChart;
@@ -41,6 +42,7 @@ public abstract class WindChart {
         this.mFactUpdater=factUpdater;
         mDataSets = new ArrayList<>();
         mLineColors = new ArrayList<>();
+        mWellNames = new ArrayList<>();
         XAxis xAxis = chart.getXAxis();
         xAxis.setEnabled(true);
 
@@ -94,6 +96,7 @@ public abstract class WindChart {
                         ColorfulEntry colorfulEntry = new ColorfulEntry();
                         colorfulEntry.setEntry(entry);
                         colorfulEntry.setColor(mLineColors.get(i));
+                        colorfulEntry.setWellName(mWellNames.get(i));
                         entries.add(colorfulEntry);
                     } catch (Exception ex) {
                         ex.printStackTrace();

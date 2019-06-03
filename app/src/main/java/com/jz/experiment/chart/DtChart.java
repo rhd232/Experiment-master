@@ -93,6 +93,7 @@ public class DtChart extends WindChart {
 
         mLegendEntries = new ArrayList<>();
         mLineColors.clear();
+        mWellNames.clear();
         mDataSets.clear();
 
         for (String chan : ChanList) {
@@ -192,6 +193,7 @@ public class DtChart extends WindChart {
        // dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setDrawValues(false);
         mLineColors.add(color);
+        mWellNames.add(currks);
         mDataSets.add(dataSet);
     }
 

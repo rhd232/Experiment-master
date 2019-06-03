@@ -13,3 +13,6 @@ CREATE TABLE channel_info(
 
 find_by_expeid:
 select * from channel_info where expe_id = ?;
+
+del_by_expeid:
+delete from channel_info where expe_id = ?;

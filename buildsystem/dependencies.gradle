@@ -71,6 +71,7 @@ ext {
             glide        : "com.github.bumptech.glide:glide:${glideVersion}",
             support_core_utils: "com.android.support:support-core-utils:${appCompatVersion}",
             support_core_ui: "com.android.support:support-core-ui:${appCompatVersion}",
+            percent    : "com.android.support:percent:${appCompatVersion}"
     ]
     umengDependencies = [
             // umeng_analytics:    "com.umeng.analytics:analytics:latest.integration"

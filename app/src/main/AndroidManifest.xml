@@ -26,7 +26,8 @@
             android:process=":error_activity" />
         <activity android:name=".SplashActivity"
             android:screenOrientation="portrait"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize">
+            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

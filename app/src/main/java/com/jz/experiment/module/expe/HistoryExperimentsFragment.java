@@ -22,6 +22,7 @@ import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
 import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
+import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.FlashTrimReader;
 import com.jz.experiment.util.StatusChecker;
 import com.wind.base.dialog.LoadingDialogHelper;
@@ -34,6 +35,8 @@ import com.wind.coder.annotations.Param;
 import com.wind.data.expe.bean.AddExperiment;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.datastore.ExpeDataStore;
+import com.wind.data.expe.request.DelExpeRequest;
+import com.wind.data.expe.response.DelExpeResponse;
 import com.wind.data.expe.response.FindExpeResponse;
 import com.wind.toastlib.ToastUtil;
 import com.wind.view.DisplayUtil;
@@ -123,6 +126,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
         System.out.println("HistoryExperimentFragment onViewCreated");
     }
+
+
 
 
     @Override
@@ -342,19 +347,40 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
     private void readTrimDataFromInstrument(final ToExpeSettingsEvent event) {
 
-        FlashTrimReader reader = new
-                FlashTrimReader(getActivity(),
-                mCommunicationService);
+        final FlashTrimReader reader = new
+                FlashTrimReader(mCommunicationService);
         reader.setOnReadFlashListener(new FlashTrimReader.OnReadFlashListener() {
             //读取flash成功返回
             @Override
             public void onReadFlashSuccess() {
-
+                reader.destroy();
                 UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+            }
+
+        });
+        reader.setOnDeviceDisconnectionListener(new FlashTrimReader.OnDeviceDisconnectionListener() {
+            @Override
+            public void onDeviceDisconnected() {
+                showConnectionTip();
             }
         });
         reader.readTrimDataFromInstrument();
 
+    }
+
+    private void showConnectionTip(){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                LoadingDialogHelper.hideOpLoading();
+                AppDialogHelper.showNormalDialog(getActivity(), "请检查HID设备连接情况", new AppDialogHelper.DialogOperCallback() {
+                    @Override
+                    public void onDialogConfirmClick() {
+
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -362,5 +388,25 @@ public class HistoryExperimentsFragment extends BaseFragment {
         super.onDestroyView();
 
         EventBus.getDefault().unregister(this);
+    }
+
+   /* public int getContextMenuPosition() {
+        return mAdapter.getContextMenuPosition();
+    }*/
+
+    public void doItemLongClick() {
+        HistoryExperiment experiment=mAdapter.getLongClingItemData();
+        final DelExpeRequest request=new DelExpeRequest();
+        request.setId(experiment.getId());
+        mExpeDataStore.delExpe(request)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<DelExpeResponse>() {
+                    @Override
+                    public void call(DelExpeResponse response) {
+
+                        loadData();
+                    }
+                });
     }
 }

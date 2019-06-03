@@ -10,6 +10,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.anitoa.Anitoa;
@@ -221,6 +223,8 @@ public class MainActivity extends BaseActivity {
         public int getCount() {
             return fragments.length;
         }
+
+
     }
 
 
@@ -266,4 +270,19 @@ public class MainActivity extends BaseActivity {
     }
 
 
+    public void CreateMenu(Menu menu)
+    {
+
+        menu.add("删除");
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        HistoryExperimentsFragment f= (HistoryExperimentsFragment) fragments[0];
+
+        f.doItemLongClick();
+
+        return super.onContextItemSelected(item);
+    }
 }
