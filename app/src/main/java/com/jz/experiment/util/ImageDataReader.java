@@ -1,6 +1,5 @@
 package com.jz.experiment.util;
 
-import android.app.Activity;
 import android.text.TextUtils;
 
 import com.anitoa.bean.Data;
@@ -10,12 +9,12 @@ import com.anitoa.listener.SimpleConnectionListener;
 import com.anitoa.service.CommunicationService;
 import com.anitoa.util.AnitoaLogUtil;
 import com.anitoa.util.ByteUtil;
+import com.anitoa.well.Well;
 import com.jz.experiment.chart.CCurveShow;
 import com.jz.experiment.chart.ChartData;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DataFileReader;
 import com.jz.experiment.chart.FactUpdater;
-import com.anitoa.well.Well;
 import com.jz.experiment.module.expe.bean.ChannelImageStatus;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.HistoryExperiment;
@@ -38,7 +37,6 @@ import static com.anitoa.util.ThreadUtil.sleep;
 public class ImageDataReader {
 
     private CommunicationService mCommunicationService;
-    private Activity mActivity;
     private HistoryExperiment mExperiment;
     PcrCommand.IMAGE_MODE mImageMode;
     private File mAutoIntFile;
@@ -49,12 +47,11 @@ public class ImageDataReader {
     float[] inc_factor = new float[4];
     public static final String FILE_NAME = "auth_int_time.txt";
     private ExecutorService mExecutorService;
-    public ImageDataReader(Activity activity,
+    public ImageDataReader(
                            CommunicationService communicationService,
                            HistoryExperiment experiment, FactUpdater factUpdater,
                           ExecutorService executorService) {
         this.mCommunicationService = communicationService;
-        this.mActivity = activity;
         this.mExperiment = experiment;
         mImageMode = PcrCommand.IMAGE_MODE.IMAGE_12;
         mFactUpdater = factUpdater;

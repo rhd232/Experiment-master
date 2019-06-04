@@ -559,7 +559,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements AnitoaCon
         synchronized (mLock) {
 
             AnitoaLogUtil.writeFileLog("===========开始自动积分==========",mExecutorService);
-            ImageDataReader imageDataReader = new ImageDataReader(this, mCommunicationService,
+            ImageDataReader imageDataReader = new ImageDataReader(mCommunicationService,
                     mHistoryExperiment, factUpdater,mExecutorService);
             imageDataReader.autoInt()
                     .subscribeOn(Schedulers.io())
@@ -576,6 +576,7 @@ public class UserSettingsStep2Activity extends BaseActivity implements AnitoaCon
                         }
                     });
             try {
+                //等待自动积分完成
                 mLock.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
