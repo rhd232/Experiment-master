@@ -29,70 +29,7 @@ import java.util.List;
 public class AppDialogHelper {
 
 
-    /*  public static void showItemsDialogWithOneBtn(Context context,String title,String btnName,String []items,final DialogOperCallback callback){
-          final AlertDialog alertDialog = AlertDialogUtil.showAlertDialog(context, R.layout.dialog_items_with_onebtn, false);
-          TextView tv_dialog_title= (TextView) alertDialog.findViewById(R.id.tv_dialog_title);
-          tv_dialog_title.setText(title);
 
-          RecyclerView rv= (RecyclerView) alertDialog.findViewById(R.id.rv);
-          LinearLayoutManager manager=new LinearLayoutManager(context);
-          manager.setOrientation(LinearLayoutManager.VERTICAL);
-          rv.setLayoutManager(manager);
-          //String items[]=context.getResources().getStringArray(arrayRes);
-          DialogStringItemAdapter adapter=new DialogStringItemAdapter(context,items);
-          rv.setAdapter(adapter);
-
-          TextView tv_btn= (TextView) alertDialog.findViewById(R.id.tv_btn);
-          tv_btn.setText(btnName);
-          tv_btn.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                  alertDialog.dismiss();
-                  callback.onDialogConfirmClick();
-              }
-          });
-      }
-
-      public static void showItemsDialogWithBtns(Context context,String title,String subTitle,String btnName,String []items,final DialogOperCallback callback) {
-          final AlertDialog alertDialog = AlertDialogUtil.showAlertDialog(context, R.layout.dialog_items_with_btns, false);
-          TextView tv_dialog_title= (TextView) alertDialog.findViewById(R.id.tv_dialog_title);
-          tv_dialog_title.setText(title);
-          TextView tv_dialog_subtitle= (TextView) alertDialog.findViewById(R.id.tv_dialog_subtitle);
-          tv_dialog_subtitle.setText(subTitle);
-          RecyclerView rv= (RecyclerView) alertDialog.findViewById(R.id.rv);
-          LinearLayoutManager manager=new LinearLayoutManager(context);
-          manager.setOrientation(LinearLayoutManager.VERTICAL);
-          rv.setLayoutManager(manager);
-          //String items[]=context.getResources().getStringArray(arrayRes);
-          DialogStringItemAdapter adapter=new DialogStringItemAdapter(context,items);
-          rv.setAdapter(adapter);
-
-          TextView tv_btn= (TextView) alertDialog.findViewById(R.id.tv_btn);
-          tv_btn.setText(btnName);
-          tv_btn.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                  alertDialog.dismiss();
-                  callback.onDialogConfirmClick();
-              }
-          });
-          TextView tv_close= (TextView) alertDialog.findViewById(R.id.tv_close);
-          tv_close.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                  alertDialog.dismiss();
-                  callback.onDialogCancelClick();
-              }
-          });
-          tv_close.getPaint().setFlags(Paint. UNDERLINE_TEXT_FLAG );
-          alertDialog.findViewById(R.id.iv_close).setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                  alertDialog.dismiss();
-              }
-          });
-      }
-    */
     public interface OnStepSelectListener {
         void onStepSelected(PartStage step);
     }

@@ -35,8 +35,8 @@
 
             <ImageView
                 android:id="@+id/expe_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/tabbar_icon_size"
+                android:layout_height="@dimen/tabbar_icon_size"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/selector_main_expe_tab_icon" />
@@ -51,8 +51,8 @@
 
             <ImageView
                 android:id="@+id/data_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/tabbar_icon_size"
+                android:layout_height="@dimen/tabbar_icon_size"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/selector_main_data_tab_icon" />
@@ -65,8 +65,8 @@
 
             <ImageView
                 android:id="@+id/analyze_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/tabbar_icon_size"
+                android:layout_height="@dimen/tabbar_icon_size"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/selector_main_analyze_tab_icon" />

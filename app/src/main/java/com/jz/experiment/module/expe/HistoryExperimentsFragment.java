@@ -3,7 +3,7 @@ package com.jz.experiment.module.expe;
 import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -27,7 +27,7 @@ import com.jz.experiment.util.FlashTrimReader;
 import com.jz.experiment.util.StatusChecker;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
-import com.wind.base.recyclerview.decoration.VerticalSpacesItemDecoration;
+import com.wind.base.recyclerview.decoration.DividerGridItemDecoration;
 import com.wind.base.response.BaseResponse;
 import com.wind.coder.annotations.Api;
 import com.wind.coder.annotations.Heros;
@@ -108,12 +108,14 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 });
             }
         });
-        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        manager.setOrientation(LinearLayoutManager.VERTICAL);
+       /* LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        manager.setOrientation(LinearLayoutManager.VERTICAL);*/
+        GridLayoutManager manager=new GridLayoutManager(getContext(),2);
         rv.setLayoutManager(manager);
         mAdapter = new HistoryExperimentAdapter(getActivity());
         rv.setAdapter(mAdapter);
-        rv.addItemDecoration(new VerticalSpacesItemDecoration(DisplayUtil.dip2px(getActivity(), 8)));
+       // rv.addItemDecoration(new VerticalSpacesItemDecoration(DisplayUtil.dip2px(getActivity(), 8)));
+        rv.addItemDecoration(new DividerGridItemDecoration(DisplayUtil.dip2px(getActivity(), 8)));
         mExpeDataStore = new ExpeDataStore(ProviderModule.getInstance()
                 .getBriteDb(getActivity()
                         .getApplicationContext()));
@@ -286,7 +288,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                             TrimReader.getInstance().ReadTrimFile(getActivity());
                             mNeedReadTrimFile=false;
                         }*/
-                        LoadingDialogHelper.showOpLoading(getActivity());
+                      /*  LoadingDialogHelper.showOpLoading(getActivity());
                         //读取下位机是否插入了电源以及热盖的开闭
                         readLid().subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -296,8 +298,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
                                         doNextByStatus(status, event);
 
                                     }
-                                });
-                       // UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                                });*/
+                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
 
 
                     }

@@ -2,5 +2,17 @@
 <resources>
     <dimen name="vernier_height">258dp</dimen>
 
+    <dimen name="stage_height">441dp</dimen>
+    <dimen name="stage_width">120dp</dimen>
+
     <dimen name="bottom_bar_height">50dp</dimen>
+
+    <dimen name="sample_item_height">44dp</dimen>
+    <dimen name="tabbar_icon_size">33dp</dimen>
+
+    <dimen name="inner_stage_height">305dp</dimen>
+
+
+    <dimen name="device_statebar_height">20dp</dimen>
+    <dimen name="titlebar_height">44dp</dimen>
 </resources>

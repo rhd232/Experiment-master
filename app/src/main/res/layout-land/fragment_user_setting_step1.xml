@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:background="@color/colorF5F5F5">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+      >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <!--   android:layout_marginTop="8dp"-->
+                <!-- 实验名称 -->
+                <LinearLayout
+                    android:id="@+id/ll_item_expe_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:background="@color/color1F4E99" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="实验名称："
+                        android:textColor="@color/color333333"
+                        android:textSize="14sp" />
+
+                    <com.wind.view.ValidateEditText
+                        android:id="@+id/et_expe_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="请输入实验名称"
+                        android:textColor="@color/color333333"
+                        android:textColorHint="@color/color999999"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <!-- 实验时间 -->
+                <RelativeLayout
+                    android:id="@+id/rl_item_expe_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="1dp"
+                    android:background="@color/white">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="26dp"
+                        android:text="实验时间"
+                        android:textColor="@color/color333333" />
+
+                    <TextView
+                        android:id="@+id/tv_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="26dp"
+                        android:layout_marginRight="12dp"
+                        android:drawableRight="@drawable/icon_calendar"
+                        android:drawablePadding="10dp"
+                        android:text="实验时间"
+                        android:textColor="@color/color333333" />
+                </RelativeLayout>
+                <!-- 通道选择 -->
+                <LinearLayout
+                    android:id="@+id/ll_item_expe_channel"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:background="@color/color1F4E99" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="通道选择"
+                        android:textColor="@color/color333333"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <!-- 通道 4个 -->
+                <com.wind.base.widget.NoFlexibleListView
+                    android:id="@+id/lv_channel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:background="@color/white"
+                    android:divider="@color/colorF5F5F5"
+                    android:dividerHeight="1dp" />
+                <!--积分时间 -->
+                <LinearLayout
+                    android:id="@+id/ll_item_expe_int"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:background="@color/color1F4E99" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:text="积分时间（ms）"
+                            android:textColor="@color/color333333"
+                            android:textSize="14sp" />
+
+                        <CheckBox
+                            android:id="@+id/cb_int"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:text="自动积分"
+                            android:checked="true"
+                            android:layout_marginRight="12dp"/>
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+                <!--积分2行 -->
+                <LinearLayout
+                    android:id="@+id/ll_int"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="invisible"
+                    >
+                    <LinearLayout
+                        android:id="@+id/ll_int_line_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/ll_integration_time_1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:paddingLeft="28dp"
+                            android:gravity="center"
+
+                            android:background="@drawable/selector_ffffff_e8e8e8">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="通道1："
+                                android:textColor="@color/color333333"
+                                android:textSize="14sp" />
+
+                            <com.wind.view.ValidateEditText
+                                android:id="@+id/et_integration_time_1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:inputType="number"
+                                android:text="5"
+                                android:textColor="@color/color333333"
+                                android:textColorHint="@color/color999999"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_integration_time_2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:background="@drawable/selector_ffffff_e8e8e8">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="通道2："
+                                android:textColor="@color/color333333"
+                                android:textSize="14sp" />
+
+                            <com.wind.view.ValidateEditText
+                                android:id="@+id/et_integration_time_2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:inputType="number"
+                                android:text="50"
+
+                                android:textColor="@color/color333333"
+                                android:textColorHint="@color/color999999"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_int_line_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:background="@drawable/selector_ffffff_e8e8e8">
+
+                        <LinearLayout
+                            android:id="@+id/ll_integration_time_3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:paddingLeft="28dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="通道3："
+                                android:textColor="@color/color333333"
+                                android:textSize="14sp" />
+
+                            <com.wind.view.ValidateEditText
+                                android:id="@+id/et_integration_time_3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:inputType="number"
+                                android:text="100"
+
+                                android:textColor="@color/color333333"
+                                android:textColorHint="@color/color999999"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_integration_time_4"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:background="@drawable/selector_ffffff_e8e8e8">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="通道4："
+                                android:textColor="@color/color333333"
+                                android:textSize="14sp" />
+
+                            <com.wind.view.ValidateEditText
+                                android:id="@+id/et_integration_time_4"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:inputType="number"
+                                android:text="100"
+
+                                android:textColor="@color/color333333"
+                                android:textColorHint="@color/color999999"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    >
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:background="@color/color1F4E99" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textColor="@color/color333333"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <com.wind.base.widget.NoFlexibleGridView
+                    android:id="@+id/gv_sample_a"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:horizontalSpacing="1dp"
+                    android:numColumns="4"
+                    android:verticalSpacing="1dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:background="@color/color1F4E99" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="B"
+                        android:textColor="@color/color333333"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <com.wind.base.widget.NoFlexibleGridView
+                    android:id="@+id/gv_sample_b"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:horizontalSpacing="1dp"
+                    android:numColumns="4"
+                    android:verticalSpacing="1dp" />
+
+                <TextView
+                    android:id="@+id/tv_next"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/color1F4E99"
+                    android:gravity="center"
+                    android:text="下一步"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</FrameLayout>

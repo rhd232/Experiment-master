@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="vernier_height">158dp</dimen>
+    <dimen name="stage_height">341dp</dimen>
+    <dimen name="stage_width">220dp</dimen>
+    <dimen name="bottom_bar_height">70dp</dimen>
+    <dimen name="sample_item_height">64dp</dimen>
+    <dimen name="tabbar_icon_size">33dp</dimen>
+    <dimen name="inner_stage_height">205dp</dimen>
+
+</resources>

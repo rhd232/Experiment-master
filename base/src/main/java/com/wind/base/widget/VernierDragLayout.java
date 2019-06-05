@@ -159,9 +159,8 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
         Log.i("DragCallback","left:"+mCurPos.x+"-top:"+mCurPos.y);
         //刻度0-100
         float percent=vernier_view.heightPercent(mCurPos.y);
+        System.out.println("percent:"+percent);
         float t=(1-percent)*100;
-
-
         String temp=decimalFormat.format(t);
         tv_temperature.setText(temp);
         mLink.setTemp(Float.parseFloat(temp));
