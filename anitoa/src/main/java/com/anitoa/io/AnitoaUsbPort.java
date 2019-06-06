@@ -38,8 +38,8 @@ public class AnitoaUsbPort extends AnitoaPort {
     private AnitoaUsbPort.ConnectThread mConnectThread = null;
     private AnitoaUsbPort.ConnectedThread mConnectedThread = null;
     
-    public AnitoaUsbPort(Context context, int deviceId, String deviceName, Handler handler) {
-        super(deviceId,deviceName,handler);
+    public AnitoaUsbPort(Context context, int deviceIndex, String deviceName, Handler handler) {
+        super(deviceIndex,deviceName,handler);
         mContext=context;
         mUsbManager= (UsbManager) context.getSystemService(Context.USB_SERVICE);
     }
@@ -70,7 +70,9 @@ public class AnitoaUsbPort extends AnitoaPort {
         IntentFilter permissionFilter = new IntentFilter(ACTION_DEVICE_PERMISSION);
         mContext.registerReceiver(mUsbPermissionReceiver, permissionFilter);
     }
-    
+
+
+
 
 
     @Override
@@ -420,6 +422,11 @@ public class AnitoaUsbPort extends AnitoaPort {
         }
     }
 
+    @Override
+    public boolean isConnected() {
+        return !mClosePort && mConnectThread!=null && mConnectedThread!=null;
+    }
+
     /**
      * 接收用户是否同意连接到usb设备
      */
@@ -433,7 +440,6 @@ public class AnitoaUsbPort extends AnitoaPort {
                 if (granted) {
                     //获得了usb使用权限
                     connect();
-
                 }
                 getUsbPort().mContext.unregisterReceiver(this);
             }

@@ -33,5 +33,6 @@
         android:paddingBottom="2dp"
         android:layout_marginRight="12dp"
         android:background="@drawable/shape_solidffffff_corner10"
-        android:textColor="@color/selector_999999_f2bc00"/>
+        android:textColor="@color/selector_999999_f2bc00"
+        android:visibility="invisible"/>
 </RelativeLayout>

@@ -138,7 +138,8 @@ public class BluetoothService extends CommunicationService {
                 mConnectedThread = null;
                 //发送蓝牙已断开连接通知
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                EventBus.getDefault().post(new AnitoaDisConnectedEvent(device.getName()));
+                EventBus.getDefault().post(new AnitoaDisConnectedEvent(device.getName(),
+                        device.getAddress()));
 
                 onDeviceDisconnected();
             }else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)){
@@ -147,8 +148,10 @@ public class BluetoothService extends CommunicationService {
             }else if (BluetoothAdapter.STATE_OFF==state){
                 Device device=getConnectedDevice();
                 String name="";
+                String addr="";
                 if (device!=null){
                     name=device.getDeviceName();
+                    addr=device.getAddr();
                 }
                 if (mConnectedThread != null) {
                     mConnectedThread.setRun(false);
@@ -159,7 +162,8 @@ public class BluetoothService extends CommunicationService {
                 }
                 mConnectedThread = null;
                // BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                EventBus.getDefault().post(new AnitoaDisConnectedEvent(name));
+
+                EventBus.getDefault().post(new AnitoaDisConnectedEvent(name,addr));
 
                 onDeviceDisconnected();
             }

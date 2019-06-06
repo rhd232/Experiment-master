@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FlashData {
+
+
     public static List<Integer>[][] row_index = new ArrayList[4][16];
     public static List<Integer>[][] col_index = new ArrayList[4][16];
     public static double[][] chan1_kb = new double[12][ 6];

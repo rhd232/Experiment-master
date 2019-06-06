@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sv"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!--实验基础信息-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:orientation="horizontal">
+            <!--实验名称-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="实验名称："
+                    android:textColor="@color/color333333" />
+
+                <TextView
+                    android:id="@+id/tv_expe_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/color333333" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+                <!--实验人-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="实验人："
+                        android:textColor="@color/color686868" />
+
+                    <TextView
+                        android:id="@+id/tv_worker_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/color333333" />
+                </LinearLayout>
+                <!--完成时间-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="80dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="完成时间："
+                        android:textColor="@color/color686868" />
+
+                    <TextView
+                        android:id="@+id/tv_finish_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/color333333" />
+                </LinearLayout>
+
+            </LinearLayout>
+            <!--耗时-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="耗时："
+                    android:textColor="@color/color686868" />
+
+                <TextView
+                    android:id="@+id/tv_elapsed_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/color333333" />
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorF5F5F5" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <!--图像信息-->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp">
+
+                    <TextView
+                        android:id="@+id/tv_dt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:background="@drawable/selector_mode"
+                        android:paddingLeft="17dp"
+                        android:paddingTop="7dp"
+                        android:paddingRight="17dp"
+                        android:paddingBottom="7dp"
+                        android:text="变温扩增"
+                        android:textColor="@color/selector_ffffff_1f4e99" />
+
+                    <TextView
+                        android:id="@+id/tv_melt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="50dp"
+                        android:layout_toRightOf="@+id/tv_dt"
+                        android:background="@drawable/selector_mode"
+                        android:paddingLeft="17dp"
+                        android:paddingTop="7dp"
+                        android:paddingRight="17dp"
+                        android:paddingBottom="7dp"
+                        android:text="熔解曲线"
+                        android:textColor="@color/selector_ffffff_1f4e99" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="17dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/iv_save"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/icon_save" />
+
+                        <ImageView
+                            android:id="@+id/iv_pdf"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="22dp"
+                            android:src="@drawable/icon_pdf" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <com.jz.experiment.widget.CtParamInputLayout
+                    android:id="@+id/layout_ctparam_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/chart_dt"
+                    android:layout_width="match_parent"
+                    android:layout_height="265dp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/chart_melt"
+                    android:layout_width="match_parent"
+                    android:layout_height="265dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+            <!--表格信息-->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <com.wind.base.widget.NoFlexibleGridView
+                    android:id="@+id/gv_a"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginRight="12dp"
+                    android:numColumns="9" />
+
+                <com.wind.base.widget.NoFlexibleGridView
+                    android:id="@+id/gv_b"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="12dp"
+                    android:numColumns="9" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>

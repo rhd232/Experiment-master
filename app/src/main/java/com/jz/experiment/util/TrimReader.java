@@ -91,7 +91,6 @@ public class TrimReader {
         }*/
         try {
 
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
             String line;
             List<String> ss = new ArrayList<>();
@@ -109,7 +108,6 @@ public class TrimReader {
             for (int i = 0; i < ss.size(); i++) {
                 if (ss.get(i).contains("Version")) {
                     version = ss.get(i + 1);
-
                 }
                 if (ss.get(i).contains("Kb")) {
                     kb = new double[12][6];

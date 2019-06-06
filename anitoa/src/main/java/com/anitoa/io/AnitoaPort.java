@@ -6,17 +6,19 @@ import com.anitoa.cmd.CommandSendable;
 
 public abstract class AnitoaPort implements CommandSendable {
 
-    protected int mDeviceId;
+    protected int mDeviceIndex;
     protected String mDeviceName;
     protected boolean mClosePort;
     protected Handler mHandler;
-    public AnitoaPort(int deviceId, String deviceName, Handler handler){
-        mDeviceId=deviceId;
+    public AnitoaPort(int deviceIndex, String deviceName, Handler handler){
+        mDeviceIndex=deviceIndex;
         this.mDeviceName=deviceName;
         mHandler=handler;
     }
 
     public abstract void connect();
     public abstract void stop();
+
+    public abstract boolean isConnected();
 
 }

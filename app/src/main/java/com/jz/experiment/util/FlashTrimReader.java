@@ -119,6 +119,7 @@ public class FlashTrimReader {
                     CommData.KsIndex = num_wells;
                     FlashData.NUM_WELLS=num_wells;
                     FlashData.NUM_CHANNELS=num_channels;
+
                     //4.13新增
                     CommData.sn1 = sn1;
                     CommData.sn2 = sn2;

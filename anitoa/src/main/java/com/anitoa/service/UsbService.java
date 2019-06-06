@@ -477,7 +477,7 @@ public class UsbService extends CommunicationService {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     name = device.getProductName();
                 }
-                AnitoaDisConnectedEvent event = new AnitoaDisConnectedEvent(name);
+                AnitoaDisConnectedEvent event = new AnitoaDisConnectedEvent(name,device.getDeviceName());
                 EventBus.getDefault().post(event);
 
 

@@ -125,6 +125,12 @@ public class CommData {
                     if (line.contains("NWELLS")) {
                         String[] strs = line.split("=");
                         KsIndex = Integer.parseInt(strs[1]);
+                        FlashData.NUM_WELLS=KsIndex;
+                    }
+                    if (line.contains("NCHANNELS")) {
+                        String[] strs = line.split("=");
+                        int numChannel = Integer.parseInt(strs[1]);
+                        FlashData.NUM_CHANNELS=numChannel;
                     }
                     continue;
                 }
@@ -188,6 +194,8 @@ public class CommData {
         strlist = Arrays.asList(sts);
         return strlist;
     }
+
+
     public static List<MeltChartData> GetChartDataByRJQX(String chan, int ks, String currks)
     {
         List<MeltChartData> cdlist = new ArrayList<>();

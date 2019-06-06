@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.wind.view.TitleBar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <ScrollView
+        android:id="@+id/sv_pdf"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp">
+
+                    <TextView
+                        android:id="@+id/btn_select"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center"
+                        android:background="@color/color1F4E99"
+                        android:textColor="#ffffff"
+                        android:paddingLeft="6dp"
+                        android:paddingRight="6dp"
+                        android:text="选择数据文件" />
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                       android:layout_toRightOf="@+id/btn_select"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="8dp"
+                        android:background="@drawable/shape_solidffffff_stroke1f4e99">
+                        <Spinner
+                            android:id="@+id/spinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:entries="@array/spinner_values" />
+
+
+                    </FrameLayout>
+
+
+                    <ImageView
+                        android:id="@+id/iv_pdf"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="20dp"
+                        android:src="@drawable/icon_pdf" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+
+                    <com.jz.experiment.widget.CtParamInputLayout
+                        android:id="@+id/layout_ctparam_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp" />
+
+
+                </RelativeLayout>
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/chart_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="246dp"
+                    android:layout_marginTop="50dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <com.wind.base.widget.NoFlexibleGridView
+                    android:id="@+id/gv_a"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginRight="12dp"
+                    android:numColumns="9" />
+
+                <com.wind.base.widget.NoFlexibleGridView
+                    android:id="@+id/gv_b"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginBottom="30dp"
+                    android:numColumns="9" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
