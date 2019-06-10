@@ -267,7 +267,7 @@ public class FlashTrimReader {
     int EPKT_SZ = 52;
     int NUM_EPKT = 4;
     int TRIM_IMAGER_SIZE = 12;
-    byte[][] EepromBuff = new byte[8 + 4 * NUM_EPKT][EPKT_SZ + 1];
+    byte[][] EepromBuff = new byte[16 + 4 * NUM_EPKT][EPKT_SZ + 1];
 
     private void MoveToEEPBuffer(byte[] inputdatas, int index) {
         byte eeprom_parity = 0;

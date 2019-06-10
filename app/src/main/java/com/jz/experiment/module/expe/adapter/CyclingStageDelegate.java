@@ -108,7 +108,8 @@ View.OnFocusChangeListener{
             vh.tv_pic_step.setText(picStage.getStepName());
            // stage.setPicStage(picStage);
         } else {
-            vh.tv_pic_step.setText("无");
+
+            vh.tv_pic_step.setText(mActivity.getString(R.string.setup_nopic));
         }
 
         vh.tv_pic_step.setOnClickListener(new View.OnClickListener() {

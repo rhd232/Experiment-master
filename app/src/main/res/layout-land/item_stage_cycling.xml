@@ -56,7 +56,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="循环次数："
+                            android:text="@string/setup_total_cycles"
 
                             android:textColor="@color/color333333" />
                         <EditText
@@ -83,7 +83,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="拍照阶段："
+                            android:text="@string/setup_pic_step"
                             android:textColor="@color/color333333" />
                         <TextView
                             android:layout_width="wrap_content"

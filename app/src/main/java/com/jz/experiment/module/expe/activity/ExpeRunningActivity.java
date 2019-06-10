@@ -144,8 +144,10 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
     @Override
     protected void setTitle() {
-        mTitleBar.setTitle("运行");
-        mTitleBar.setRightText("筛选");
+        String running=getString(R.string.title_running);
+        String filter=getString(R.string.running_filter);
+        mTitleBar.setTitle(running);
+        mTitleBar.setRightText(filter);
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,7 +174,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             mHasMeltingCurve = true;
         }
         printHistoryInfo();
-        tv_cur_mode.setText("当前模式：变温扩增");
+        String msg=getString(R.string.running_mode_pcr);
+        tv_cur_mode.setText(msg);
         tv_cycling_desc.setText("");
         tv_cycling.setText("");
         //启动计时器
@@ -450,7 +453,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         mBackPressed = true;
         if (!mExpeFinished) {
 
-            String msg = "确定要强行终止吗？";
+            String msg = getString(R.string.running_dialog_stop_msg);
             AppDialogHelper.showNormalDialog(getActivity(), msg, new AppDialogHelper.DialogOperCallback() {
                 @Override
                 public void onDialogCancelClick() {
@@ -1114,7 +1117,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     break;
                 case 1://LID HEAT
                     mInCycling = false;
-                    tv_cycling_desc.setText("加热中");
+
+                    tv_cycling_desc.setText(getString(R.string.running_heating));
                     tv_cycling.setText("");
                     break;
                 case 2://CYCLING
@@ -1122,7 +1126,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
                     break;
                 case 3://COOL DOWN
-                    tv_cycling_desc.setText("冷却中");
+                    tv_cycling_desc.setText(getString(R.string.running_cooling));
                     tv_cycling.setText("");
                     mInCycling = false;
 
@@ -1133,12 +1137,13 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     tv_cycling_desc.setText("");
                     tv_cycling.setText("");
                     //熔解曲线预热阶段
-                    tv_cur_mode.setText("当前模式：熔解曲线");
+
+                    tv_cur_mode.setText( getString(R.string.running_mode_melting));
                     mInCycling = false;
                     mInMeltCurve = true;
                     break;
                 case 5:
-                    tv_cur_mode.setText("当前模式：熔解曲线");
+                    tv_cur_mode.setText( getString(R.string.running_mode_melting));
                     tv_cycling_desc.setText("");
                     tv_cycling.setText("");
                     //熔解曲线阶段
@@ -1191,7 +1196,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                             .observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean aBoolean) {
-                            ToastUtil.showToast(getActivity(), "实验结束");
+
+                            ToastUtil.showToast(getActivity(), getString(R.string.running_test_finished));
                             //顺便关闭实验
 
                             //TODO 自动跳转到实验数据分析页面
@@ -1239,7 +1245,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                             tab.setExtra(mHistoryExperiment);
                             MainActivity.start(getActivity(), tab);
                         } else {
-                            ToastUtil.showToast(getActivity(), "保存失败");
+                            String saveError=getString(R.string.setup_save_error);
+                            ToastUtil.showToast(getActivity(), saveError);
                         }
 
                     }
@@ -1247,7 +1254,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     @Override
                     public void call(Throwable throwable) {
                         throwable.printStackTrace();
-                        ToastUtil.showToast(getActivity(), "保存失败,请重试");
+                        String saveError=getString(R.string.setup_save_error);
+                        ToastUtil.showToast(getActivity(), saveError);
                     }
                 });
 
@@ -1262,7 +1270,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     private Observable<InsertExpeResponse> saveExpe(HistoryExperiment experiment) {
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_COMPLETED);
-        status.setDesc("已完成");
+        String finished=getString(R.string.test_status_finished);
+        status.setDesc(finished);
         experiment.setStatus(status);
         //新插入一条数据
         experiment.setId(HistoryExperiment.ID_NONE);

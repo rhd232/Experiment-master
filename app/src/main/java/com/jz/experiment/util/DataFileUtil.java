@@ -1,5 +1,8 @@
 package com.jz.experiment.util;
 
+import android.content.Context;
+
+import com.jz.experiment.R;
 import com.wind.base.C;
 import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.HistoryExperiment;
@@ -14,10 +17,11 @@ import java.util.List;
 
 public class DataFileUtil {
 
-    public static String getPdfFileName(HistoryExperiment experiment, boolean melt) {
-        String name = "变温扩增";
+    public static String getPdfFileName(Context context,HistoryExperiment experiment, boolean melt) {
+        //String name = "变温扩增";
+        String name=context.getString(R.string.setup_mode_dt);
         if (melt) {
-            name = "熔解曲线";
+             name=context.getString(R.string.setup_mode_melting);
         }
         return DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + name + ".pdf";
     }

@@ -245,7 +245,8 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
         firstInfo.setChannels(channels);
         for (int i = 0; i < 4; i++) {
             Channel channel = new Channel();
-            channel.setName("通道" + (i + 1));
+            String channelName=getString(R.string.setup_channel);
+            channel.setName(channelName + (i + 1));
             channel.setIntegrationTime(10);
             channels.add(channel);
         }
@@ -375,7 +376,7 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             if (!mChannelAdapter.getItem(position).isEnabled()){
-                ToastUtil.showToast(getActivity(),"当前机器该通道不可用");
+                //ToastUtil.showToast(getActivity(),"当前机器该通道不可用");
                 return;
             }
 
@@ -422,7 +423,7 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.tv_next:
-                if (true) {//validate()
+                if (validate()) {//validate()
 
 /*
                     String integrationTime= buildIntegrationTime();
@@ -458,7 +459,8 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
 
     private boolean validate() {
         if (!et_expe_name.validate(true)) {
-            ToastUtil.showToast(getActivity(), "请输入实验名称");
+
+            ToastUtil.showToast(getActivity(), getString(R.string.setup_input_test_name));
             return false;
         }
         boolean channelSetted = false;
@@ -472,11 +474,10 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
             }
         }
         if (!channelSetted) {
-            ToastUtil.showToast(getActivity(), "请设置通道染料");
+            String tips=getString(R.string.setup_channel_select_tip);
+            ToastUtil.showToast(getActivity(), tips);
             return false;
         }
-
-
         return true;
     }
 

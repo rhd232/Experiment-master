@@ -150,7 +150,8 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             list.add(new EndStage());
             mStageAdapter.addAll(list);
             mModes = new ArrayList<>();
-            mModes.add(new DtMode("变温扩增"));
+            String dt=getString(R.string.setup_mode_dt);
+            mModes.add(new DtMode(dt));
         } else {
             mModes = expeSettingSecondInfo.getModes();
             buildModeShowName();
@@ -178,7 +179,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         //判断预变性温度，最多只能有两个
         Stage stage = (Stage) mStageAdapter.getItems().get(1);
         if (stage instanceof StartStage) {
-            ToastUtil.showToast(getActivity(), "最多两个预变性阶段");
+            //ToastUtil.showToast(getActivity(), "最多两个预变性阶段");
             return;
         }
         mStageAdapter.add(event.getPosition(), new StartStage());
@@ -195,7 +196,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             buildLink();
             Log.i("ChangeStage", "onDelStartStageEvent");
         } else {
-            ToastUtil.showToast(getActivity(), "最少一个预变性阶段");
+            //ToastUtil.showToast(getActivity(), "最少一个预变性阶段");
             return;
         }
 
@@ -245,7 +246,8 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         mHistoryExperiment.setDevice(deviceName);
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_NOT_START);
-        status.setDesc("未启动");
+        String unstart=getString(R.string.unstart);
+        status.setDesc(unstart);
         mHistoryExperiment.setStatus(status);
         if (secondInfo == null) {
             secondInfo = new ExpeSettingSecondInfo();
@@ -354,7 +356,8 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             case R.id.rl_mode_sel:
                 if (mModes == null) {
                     mModes = new ArrayList<>();
-                    mModes.add(new DtMode("变温扩增"));
+                    String dt=getString(R.string.setup_mode_dt);
+                    mModes.add(new DtMode(dt));
                 }
                 AppDialogHelper.showModeSelectDialog(getActivity(), mModes, new AppDialogHelper.OnModeSelectListener() {
                     @Override
@@ -453,7 +456,9 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             @Override
             public void run() {
                 LoadingDialogHelper.hideOpLoading();
-                AppDialogHelper.showNormalDialog(getActivity(), "请检查HID设备连接情况", new AppDialogHelper.DialogOperCallback() {
+                String msg=getString(R.string.check_hid_connection);
+                AppDialogHelper.showNormalDialog(getActivity(), msg,
+                        new AppDialogHelper.DialogOperCallback() {
                     @Override
                     public void onDialogConfirmClick() {
 
@@ -683,7 +688,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
     private boolean validate() {
         if (mModes == null) {
-            ToastUtil.showToast(getActivity(), "请选择程序模式");
+            //ToastUtil.showToast(getActivity(), "请选择程序模式");
             return false;
         }
 
@@ -953,9 +958,9 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                         String msg;
                         if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                             //保存成功
-                            msg = "保存成功";
+                            msg=getString(R.string.setup_save_success);
                         } else {
-                            msg = "保存失败";
+                            msg=getString(R.string.setup_save_error);
                         }
                         ToastUtil.showToast(getActivity(), msg);
                     }

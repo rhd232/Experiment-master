@@ -65,11 +65,11 @@
             android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
 
         <activity android:name=".module.expe.activity.DeviceListActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
 
         <activity android:name=".module.expe.activity.ExpeRunningActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
 
         <activity android:name=".module.data.FilterActivity"

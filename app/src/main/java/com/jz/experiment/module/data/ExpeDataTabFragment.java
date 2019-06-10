@@ -75,8 +75,10 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         mTitleBar.setRightTextColor(Color.WHITE);
         mTitleBar.setLeftVisibility(View.GONE);
         mTitleBar.setBackgroundColor(getResources().getColor(R.color.color686868));
-        mTitleBar.setTitle("数据");
-        mTitleBar.setRightText("筛选");
+        String title=getString(R.string.title_data);
+        mTitleBar.setTitle(title);
+        String filter=getString(R.string.running_filter);
+        mTitleBar.setRightText(filter);
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

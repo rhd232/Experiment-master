@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="新建实验"
+            android:text="@string/test_new"
             android:textColor="#F4C53F"
             android:layout_marginTop="2dp"
             android:textSize="16sp" />

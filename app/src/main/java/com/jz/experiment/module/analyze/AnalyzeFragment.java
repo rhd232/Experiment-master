@@ -89,8 +89,9 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         mTitleBar.setRightTextColor(Color.WHITE);
         mTitleBar.setLeftVisibility(View.GONE);
         mTitleBar.setBackgroundColor(getResources().getColor(R.color.color686868));
-        mTitleBar.setTitle("分析");
-        mTitleBar.setRightText("筛选");
+
+        mTitleBar.setTitle(getString(R.string.title_analyze));
+        mTitleBar.setRightText(getString(R.string.running_filter));
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,7 +173,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         try {
-            startActivityForResult(Intent.createChooser(intent, "选择文件上传"), REQUEST_CODE_FILE);
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.analyze_select_file)), REQUEST_CODE_FILE);
         } catch (android.content.ActivityNotFoundException ex) {
             ToastUtil.showToast(getActivity(), "请安装一个文件管理器");
         }
@@ -198,7 +199,8 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     String item = (String) spinner.getSelectedItem();
 
                     double[][] ctValues;
-                    if ("熔解曲线".equals(item)) {
+                    String melting=getString(R.string.setup_mode_melting);
+                    if (melting.equals(item)) {
                         mChart = new MeltingChart(chart_line);
                         ctValues = CCurveShowMet.getInstance().m_CTValue;
                       /*  float f=Float.parseFloat(String.format("%f",40f));
@@ -319,8 +321,9 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                         .onGranted(new Action<List<String>>() {
                             @Override
                             public void onAction(List<String> data) {
+                                String msg=getString(R.string.dialog_msg_pdf);
                                 AppDialogHelper.showNormalDialog(getActivity(),
-                                        "确定要导出pdf吗？", new AppDialogHelper.DialogOperCallback() {
+                                        msg, new AppDialogHelper.DialogOperCallback() {
                                             @Override
                                             public void onDialogConfirmClick() {
 
@@ -332,9 +335,11 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                                                         StringBuilder sPdfNameBuilder=new StringBuilder();
                                                         sPdfNameBuilder.append(mOpenedFile.getName().replace(".txt",""));
 ;                                                        if (mChart instanceof DtChart){
-                                                            sPdfNameBuilder.append("变温扩增");
+                                                            String dt=getString(R.string.setup_mode_dt);
+                                                            sPdfNameBuilder.append(dt);
                                                         }else {
-                                                            sPdfNameBuilder.append("熔解曲线");
+                                                            String melting=getString(R.string.setup_mode_melting);
+                                                            sPdfNameBuilder.append(melting);
                                                         }
                                                         sPdfNameBuilder.append(".pdf");
                                                         String pdfName = sPdfNameBuilder.toString();
@@ -348,7 +353,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                                                                     public void call(Boolean aboolean) {
 
                                                                         LoadingDialogHelper.hideOpLoading();
-                                                                        ToastUtil.showToast(getActivity(), "已导出");
+                                                                        ToastUtil.showToast(getActivity(), getString(R.string.pdf_exported));
 
                                                                     }
                                                                 }, new Action1<Throwable>() {
@@ -356,7 +361,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                                                                     public void call(Throwable throwable) {
                                                                         LoadingDialogHelper.hideOpLoading();
                                                                         throwable.printStackTrace();
-                                                                        ToastUtil.showToast(getActivity(), "导出失败");
+                                                                        ToastUtil.showToast(getActivity(), getString(R.string.pdf_export_error));
                                                                     }
                                                                 });
                                                     }

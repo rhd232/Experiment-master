@@ -41,7 +41,8 @@ public class AppDialogHelper {
         final StepSelectAdapter adapter = new StepSelectAdapter(context, R.layout.item_sel_channel_material);
         adapter.replaceAll(partStages);
         PartStage none = new PartStage();
-        none.setStepName("无");
+
+        none.setStepName(context.getString(R.string.setup_nopic));
         boolean hasPic = false;
         for (PartStage pStage : partStages) {
             if (pStage.isTakePic()) {
@@ -174,7 +175,7 @@ public class AppDialogHelper {
         void onModeSelected(List<Mode> modes);
     }
 
-    public static void showModeSelectDialog(Context context, final List<Mode> modes, final OnModeSelectListener listener) {
+    public static void showModeSelectDialog(final Context context, final List<Mode> modes, final OnModeSelectListener listener) {
 
         final AlertDialog alertDialog = AlertDialogUtil.showAlertDialog(context, R.layout.dialog_mode_select, false);
         View tv_mode1 = alertDialog.findViewById(R.id.tv_mode1);
@@ -188,7 +189,8 @@ public class AppDialogHelper {
             public void onClick(View v) {
                 if (tv_mode2.isActivated()) {
                     if (modes.size() == 1) {
-                        modes.add(new MeltMode("熔解曲线"));
+                        String melting=context.getString(R.string.setup_mode_melting);
+                        modes.add(new MeltMode(melting));
                     }
                 } else {
                     if (modes.size() == 2) {
@@ -238,7 +240,7 @@ public class AppDialogHelper {
     }
 
     public static void showSingleBtnDialog(Context context, final DialogOperCallback callback) {
-        showSingleBtnDialog(context,"确定",callback);
+        showSingleBtnDialog(context,context.getString(R.string.dialog_btn_ok),callback);
     }
     public static void showSingleBtnDialog(Context context, String msg, final DialogOperCallback callback) {
         final AlertDialog alertDialog = AlertDialogUtil.showAlertDialog(context, R.layout.dialog_single, true);
@@ -255,7 +257,7 @@ public class AppDialogHelper {
     }
 
     public static void showNormalDialog(Context context, String msg, final DialogOperCallback callback) {
-        showNormalDialog(context, msg, "取消", "确定", callback);
+        showNormalDialog(context, msg, context.getString(R.string.dialog_btn_cancel), context.getString(R.string.dialog_btn_ok), callback);
     }
 
 

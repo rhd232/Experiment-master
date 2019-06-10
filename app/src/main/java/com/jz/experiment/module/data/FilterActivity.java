@@ -12,7 +12,6 @@ import com.jz.experiment.module.data.adapter.StringSelectableAdapter;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.wind.base.BaseActivity;
 import com.wind.base.utils.Navigator;
-import com.wind.toastlib.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -42,19 +41,26 @@ public class FilterActivity extends BaseActivity {
     @Override
     protected void setTitle() {
         mTitleBar.setLeftIcon(R.drawable.icon_close);
-        mTitleBar.setTitle("筛选");
-    }
 
+        mTitleBar.setTitle(getString(R.string.running_filter));
+    }
+    private  final String channel1=getString(R.string.channel_1_str);
+    private  final String channel2=getString(R.string.channel_2_str);
+    private  final String channel3=getString(R.string.channel_3_str);
+    private  final String channel4=getString(R.string.channel_4_str);
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
         ButterKnife.bind(this);
+
+
         mChannelAdapter = new StringSelectableAdapter(getActivity(), R.layout.item_string);
         List<StringSelectable> channelList = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             StringSelectable selectable = new StringSelectable();
-            selectable.setVal("通道" + (i + 1));
+            String c=getString(R.string.setup_channel);
+            selectable.setVal(c + (i + 1));
             channelList.add(selectable);
         }
         mChannelAdapter.replaceAll(channelList);
@@ -114,25 +120,21 @@ public class FilterActivity extends BaseActivity {
                 List<StringSelectable> selectedSampleAList = mSampleAAdapter.getSelectedList();
                 List<StringSelectable> selectedSampleBList = mSampleBAdapter.getSelectedList();
                 List<String> ChanList = new ArrayList<>();
+
                 for (StringSelectable selectable : selectedChannelList) {
-                    switch (selectable.getVal()) {
-                        case "通道1":
-                            ChanList.add("Chip#1");
-                            break;
-                        case "通道2":
-                            ChanList.add("Chip#2");
-                            break;
-                        case "通道3":
-                            ChanList.add("Chip#3");
-                            break;
-                        case "通道4":
-                            ChanList.add("Chip#4");
-                            break;
+                    if (selectable.getVal().equals(channel1)){
+                        ChanList.add("Chip#1");
+                    }else if (selectable.getVal().equals(channel2)){
+                        ChanList.add("Chip#2");
+                    }else if (selectable.getVal().equals(channel3)){
+                        ChanList.add("Chip#3");
+                    }else if (selectable.getVal().equals(channel4)){
+                        ChanList.add("Chip#4");
                     }
                 }
 
                 if (ChanList.isEmpty()){
-                    ToastUtil.showToast(getActivity(),"最少选择一个通道");
+                    //ToastUtil.showToast(getActivity(),"最少选择一个通道");
                     return;
                 }
                 List<String> KSList = new ArrayList<String>();
@@ -144,7 +146,7 @@ public class FilterActivity extends BaseActivity {
                 }
 
                 if (KSList.isEmpty()){
-                    ToastUtil.showToast(getActivity(),"最少选择一个样本");
+                    //ToastUtil.showToast(getActivity(),"最少选择一个样本");
                     return;
                 }
 

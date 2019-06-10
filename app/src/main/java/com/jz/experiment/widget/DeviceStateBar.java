@@ -46,19 +46,22 @@ public class DeviceStateBar extends FrameLayout {
         tv_device_state=findViewById(R.id.tv_device_state);
         setBackgroundResource(R.drawable.selector_device_state_bar);
        // BluetoothService service=Anitoa.getInstance(getContext()).getBluetoothService();
+
+       String disconnected= getContext().getString(R.string.device_status_bar_no_device_connected);
         CommunicationService service= Anitoa.getInstance(getContext()).getCommunicationService();
         String name="";
         if (service!=null){
             if (service.getConnectedDevice()!=null){
                 name = service.getConnectedDevice().getDeviceName();
             }else {
-                tv_device_state.setText("未连接");
+
+                tv_device_state.setText(disconnected);
                 setActivated(true);
                 setStatusbarColor(getContext().getResources().getColor(R.color.colorD54646));
             }
 
         }else {
-            tv_device_state.setText("未连接");
+            tv_device_state.setText(disconnected);
             setActivated(true);
             setStatusbarColor(getContext().getResources().getColor(R.color.colorD54646));
         }
@@ -86,7 +89,8 @@ public class DeviceStateBar extends FrameLayout {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onBluetoothConnectedEvent(AnitoaConnectedEvent event){
         tv_device_name.setText(event.getDeviceName());
-        tv_device_state.setText("已连接");
+        String connected=getContext().getString(R.string.device_status_bar_connected);
+        tv_device_state.setText(connected);
         setActivated(false);
         setStatusbarColor(getContext().getResources().getColor(R.color.color1F4E99));
     }
@@ -104,7 +108,8 @@ public class DeviceStateBar extends FrameLayout {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onBluetoothDisConnectedEvent(AnitoaDisConnectedEvent event){
         tv_device_name.setText(event.getDeviceName());
-        tv_device_state.setText("连接已中断");
+        String disconnected=getContext().getString(R.string.device_status_bar_disconnected);
+        tv_device_state.setText(disconnected);
         setActivated(true);
         setStatusbarColor(getContext().getResources().getColor(R.color.colorD54646));
     }

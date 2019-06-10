@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -97,8 +98,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     @BindView(R.id.chart_melt)
     LineChart chart_melt;
 
-    @BindView(R.id.sv)
+   /* @BindView(R.id.sv)*/
     ScrollView sv;
+    LinearLayout ll_root;
     @BindView(R.id.iv_save)
     View iv_save;
    /* LineData mLineData;
@@ -125,7 +127,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             EventBus.getDefault().register(this);
         }
        // mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
-
+       sv= view.findViewById(R.id.sv);
+        ll_root= view.findViewById(R.id.ll_root);
         layout_ctparam_input.setOnCtParamChangeListener(this);
       /*  GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
@@ -380,8 +383,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                         .onGranted(new Action<List<String>>() {
                             @Override
                             public void onAction(List<String> data) {
+                                String msg=getString(R.string.dialog_msg_pdf);
                                 AppDialogHelper.showNormalDialog(getActivity(),
-                                        "确定要导出pdf吗？", new AppDialogHelper.DialogOperCallback() {
+                                        msg, new AppDialogHelper.DialogOperCallback() {
                                             @Override
                                             public void onDialogConfirmClick() {
 
@@ -392,7 +396,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                                                 mHandler.postDelayed(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        String pdfName = DataFileUtil.getPdfFileName(mExeperiment, false);
+                                                        String pdfName = DataFileUtil.getPdfFileName(getActivity(),mExeperiment, false);
                                                         //生成pdf
                                                         generatePdf(pdfName)
                                                                 .subscribeOn(Schedulers.io())
@@ -405,7 +409,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                                                                             new Handler().postDelayed(new Runnable() {
                                                                                 @Override
                                                                                 public void run() {
-                                                                                    String pdfName = DataFileUtil.getPdfFileName(mExeperiment, true);
+                                                                                    String pdfName = DataFileUtil.getPdfFileName(getActivity(),mExeperiment, true);
 
                                                                                     generatePdf(pdfName)
                                                                                             .subscribeOn(Schedulers.io())
@@ -414,14 +418,15 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                                                                                                 @Override
                                                                                                 public void call(Boolean aBoolean) {
                                                                                                     LoadingDialogHelper.hideOpLoading();
-                                                                                                    ToastUtil.showToast(getActivity(), "已导出");
+
+                                                                                                    ToastUtil.showToast(getActivity(), getString(R.string.pdf_exported));
                                                                                                 }
                                                                                             }, new Action1<Throwable>() {
                                                                                                 @Override
                                                                                                 public void call(Throwable throwable) {
                                                                                                     throwable.printStackTrace();
                                                                                                     LoadingDialogHelper.hideOpLoading();
-                                                                                                    ToastUtil.showToast(getActivity(), "请重试");
+                                                                                                    ToastUtil.showToast(getActivity(),  getString(R.string.pdf_export_error));
                                                                                                 }
                                                                                             });
                                                                                 }
@@ -429,7 +434,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
                                                                         } else {
                                                                             LoadingDialogHelper.hideOpLoading();
-                                                                            ToastUtil.showToast(getActivity(), "已导出");
+                                                                            ToastUtil.showToast(getActivity(),  getString(R.string.pdf_exported));
                                                                         }
 
                                                                     }
@@ -438,7 +443,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                                                                     public void call(Throwable throwable) {
                                                                         LoadingDialogHelper.hideOpLoading();
                                                                         throwable.printStackTrace();
-                                                                        ToastUtil.showToast(getActivity(), "导出失败");
+                                                                        ToastUtil.showToast(getActivity(),  getString(R.string.pdf_export_error));
                                                                     }
                                                                 });
                                                     }
@@ -467,12 +472,12 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                         public void call(InsertExpeResponse response) {
                             if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                                 EventBus.getDefault().post(new SavedExpeDataEvent());
-                                ToastUtil.showToast(getActivity(), "已保存到本地");
+                                //ToastUtil.showToast(getActivity(), "已保存到本地");
                                 Tab tab = new Tab();
                                 tab.setIndex(MainActivity.TAB_INDEX_EXPE);
                                 MainActivity.start(getActivity(), tab);
                             } else {
-                                ToastUtil.showToast(getActivity(), "保存失败");
+                                ToastUtil.showToast(getActivity(),   getString(R.string.setup_save_error));
                             }
 
                         }
@@ -480,7 +485,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                         @Override
                         public void call(Throwable throwable) {
                             throwable.printStackTrace();
-                            ToastUtil.showToast(getActivity(), "保存失败,请重试");
+                            ToastUtil.showToast(getActivity(),   getString(R.string.setup_save_error));
                         }
                     });
         }
@@ -488,7 +493,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     private Observable<InsertExpeResponse> saveExpe() {
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_COMPLETED);
-        status.setDesc("已完成");
+
+        status.setDesc(getString(R.string.test_status_finished));
         mExeperiment.setStatus(status);
         //新插入一条数据
         mExeperiment.setId(HistoryExperiment.ID_NONE);
@@ -510,9 +516,13 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 PdfDocument document = new PdfDocument();
                 int width = AppUtil.getScreenWidth(getActivity());
                 int height = 0;// AppUtil.getScreenHeight(getActivity());
-                //计算scrollview的高度
-                for (int i = 0; i < sv.getChildCount(); i++) {
-                    height += sv.getChildAt(i).getHeight();
+                if (sv!=null) {
+                    //计算scrollview的高度
+                    for (int i = 0; i < sv.getChildCount(); i++) {
+                        height += sv.getChildAt(i).getHeight();
+                    }
+                }else {
+                    height=ll_root.getHeight();
                 }
 
                 PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo
@@ -521,7 +531,11 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
                 PdfDocument.Page page = document.startPage(pageInfo);
                 Canvas canvas = page.getCanvas();
-                sv.draw(canvas);
+                if (sv!=null) {
+                    sv.draw(canvas);
+                }else {
+                    ll_root.draw(canvas);
+                }
               /*  chart.draw(canvas);
                 canvas.translate(0, chart.getHeight());
 

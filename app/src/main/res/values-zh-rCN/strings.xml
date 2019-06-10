@@ -3,6 +3,7 @@
     <string name="channel_select_title">请选择通道%1$s染料</string>
 
 
+
     <string name="holding_stage">保持阶段</string>
     <string name="cycling_stage">循环阶段</string>
     <string name="step">步骤%1$s</string>
@@ -12,4 +13,122 @@
         <item>扩增曲线</item>
         <item>熔解曲线</item>
     </array>
+
+
+
+    <string name="title_analyze">分析</string>
+    <string name="analyze_select_file">选择文件上传</string>
+
+    <string name="channel_1_str">通道1</string>
+    <string name="channel_2_str">通道2</string>
+    <string name="channel_3_str">通道3</string>
+    <string name="channel_4_str">通道4</string>
+
+    <string name="channel_1">通道1：</string>
+    <string name="channel_2">通道2：</string>
+    <string name="channel_3">通道3：</string>
+    <string name="channel_4">通道4：</string>
+    <string name="device_status_bar_no_device_connected">未连接</string>
+    <string name="device_status_bar_connected">已连接</string>
+    <string name="device_status_bar_disconnected">连接已中断</string>
+
+    <string name="dialog_btn_ok">确定</string>
+    <string name="dialog_btn_cancel">取消</string>
+
+
+    <string name="title_running">运行</string>
+    <string name="running_filter">筛选</string>
+    <string name="running_mode_melting">当前模式：熔解曲线</string>
+    <string name="running_mode_pcr">当前模式：变温扩增</string>
+    <string name="running_timer">持续时间</string>
+    <string name="running_stop">强行停止</string>
+    <string name="running_cycle">循环</string>
+    <string name="running_dialog_stop_msg">确定要强行制止吗？</string>
+    <string name="running_heating">加热中</string>
+    <string name="running_cooling">冷却中</string>
+    <string name="running_test_finished">实验结束</string>
+
+    <string name="title_setup_1">用户设置1</string>
+    <string name="setup_test_name">实验名称：</string>
+    <string name="setup_input_test_name">请输入实验名称</string>
+    <string name="setup_test_time">实验时间</string>
+    <string name="setup_selelct_test_channel">通道选择</string>
+    <string name="setup_next">下一步</string>
+    <string name="setup_dialog_channel_select_msg">请选择%1$s染料</string>
+    <string name="setup_input_desc">请输入备注信息</string>
+    <string name="setup_channel_select_tip">请设置通道染料</string>
+    <string name="setup_channel">通道</string>
+
+    <string name="setup_int_time">积分时间（ms）</string>
+    <string name="setup_auto_int_time">自动积分</string>
+
+
+
+
+    <string name="title_setup_2">用户设置2</string>
+    <string name="setup_operation">程序模式设置</string>
+    <string name="setup_mode_dt">变温扩增</string>
+    <string name="setup_mode_melting">熔解曲线</string>
+    <string name="setup_start">启动</string>
+    <string name="setup_total_cycles">循环数量：</string>
+    <string name="setup_pic_step">拍照阶段：</string>
+    <string name="dialog_pic_step">拍照阶段</string>
+    <string name="setup_nopic">无</string>
+    <string name="setup_save_success">保存成功</string>
+    <string name="setup_save_error">保存失败</string>
+    <string name="unstart">未启动</string>
+    <string name="start">启动</string>
+
+
+    <string name="test_status_finished">已完成</string>
+
+
+
+    <string name="setup_temp_range">温度区间</string>
+    <string name="setup_start_temp">开始温度</string>
+    <string name="setup_end_temp">结束温度</string>
+
+    <string name="login_input_name">请输入用户名</string>
+    <string name="login_input_pwd">请输入密码</string>
+    <string name="login_login">登录</string>
+    <string name="login_pwd_error">密码输入错误，请重新输入</string>
+
+    <string name="login_error_tips">用户不存在</string>
+
+
+
+    <string name="title_data">数据</string>
+    <string name="data_by">实验人</string>
+    <string name="data_finish_time">完成时间：</string>
+    <string name="data_during_time">耗时：</string>
+
+    <string name="data_ct_lower">Ct 下限:</string>
+    <string name="data_ct_threshold">Ct 阈值(%):</string>
+    <string name="data_ct_refresh">刷新</string>
+
+    <string name="title_pwd">修改密码</string>
+    <string name="pwd_settings">Enter Password</string>
+    <string name="pwd_tips">密码长度大于6位，需包含字母和数字</string>
+    <string name="pwd_old">旧密码</string>
+    <string name="pwd_new">新密码</string>
+    <string name="pwd_confirm">确认密码</string>
+    <string name="pwd_input_error">旧密码输入错误</string>
+
+
+    <string name="title_user_settings">用户设置</string>
+    <string name="user_settings_dialog_msg">确定要退出吗？</string>
+    <string name="user_settings_log_off">退出登录</string>
+
+    <string name="version_host">HOST</string>
+    <string name="version_temp">TEMP</string>
+    <string name="version_img">IMG</string>
+
+    <string name="test_new">新建实验</string>
+
+
+    <string name="dialog_msg_pdf">确定要导出pdf吗？</string>
+    <string name="pdf_exported">已导出</string>
+    <string name="pdf_export_error">导出失败</string>
+
+    <string name="check_hid_connection">请检查HID设备连接情况</string>
 </resources>

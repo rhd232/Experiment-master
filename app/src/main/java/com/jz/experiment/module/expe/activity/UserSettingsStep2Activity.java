@@ -20,7 +20,8 @@ public class UserSettingsStep2Activity extends BaseActivity {
 
     @Override
     protected void setTitle() {
-        mTitleBar.setTitle("用户设置2");
+        String title=getString(R.string.title_setup_2);
+        mTitleBar.setTitle(title);
         mTitleBar.setRightIcon(R.drawable.icon_program_save);
 
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {

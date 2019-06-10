@@ -21,7 +21,7 @@
         android:background="@null"
         android:drawableLeft="@drawable/icon_admin"
         android:drawablePadding="20dp"
-        android:hint="请输入用户名"
+        android:hint="@string/login_input_name"
         android:text="admin"
         android:textColor="@color/color333333"
         android:textColorHint="@color/colorC7C7C7" />
@@ -51,7 +51,7 @@
             android:background="@null"
             android:drawableLeft="@drawable/icon_password"
             android:drawablePadding="20dp"
-            android:hint="请输入密码"
+            android:hint="@string/login_input_pwd"
             android:text="123456"
             android:inputType="textPassword"
             android:textColor="@color/color333333"
@@ -92,7 +92,7 @@
         android:layout_marginRight="26dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/shape_solid1f4e99_corner4"
-        android:text="登录"
+        android:text="@string/login_login"
         android:textColor="@color/white"
         android:gravity="center"/>
 

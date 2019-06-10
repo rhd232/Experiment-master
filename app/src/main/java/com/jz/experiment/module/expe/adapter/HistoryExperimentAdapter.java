@@ -22,7 +22,6 @@ public class HistoryExperimentAdapter extends BaseDelegateRecyclerAdapter {
 
 
     public HistoryExperiment getLongClingItemData() {
-
        return (HistoryExperiment) getItem(mHistoryExperimentDelegate.getContextMenuPosition());
     }
 }

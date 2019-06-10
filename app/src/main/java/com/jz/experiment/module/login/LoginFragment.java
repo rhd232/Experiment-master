@@ -151,7 +151,7 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
         }, 500);
 
         String appVersion = AppUtil.getAppVersionName(getActivity());
-        tv_app_version.setText("App版本：" + appVersion);
+        tv_app_version.setText("App：" + appVersion);
         /*mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -215,7 +215,8 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
                                 mNeedStopService=false;
                                 ActivityUtil.finish(getActivity());
                             } else {
-                                tv_msg.setText("用户不存在或密码错误");
+                                String tips=getString(R.string.login_error_tips);
+                                tv_msg.setText(tips);
                             }
                         }
                     });
@@ -224,11 +225,13 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
 
     private boolean validate() {
         if (!et_username.validate()) {
-            tv_msg.setText("输入用户名");
+            String nameTips=getString(R.string.login_input_name);
+            tv_msg.setText(nameTips);
             return false;
         }
         if (!et_pwd.validate()) {
-            tv_msg.setText("输入密码");
+            String pwdTips=getString(R.string.login_input_pwd);
+            tv_msg.setText(pwdTips);
             return false;
         }
         return true;
@@ -372,9 +375,9 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
             int tempMajorVersion = buffer[dataIndex++];
             int tempMinorVersion = buffer[dataIndex++];
             //host1.35-temp1.29-img1.42
-            tv_lower_computer_host_version.setText("下位机HOST版本：" + majorVersion + "." + minorVersion);
-            tv_lower_computer_img_version.setText("下位机TEMP版本：" + imgMajorVersion + "." + imgMinorVersion);
-            tv_lower_computer_temp_version.setText("下位机IMG版本：" + tempMajorVersion + "." + tempMinorVersion);
+            tv_lower_computer_host_version.setText("HOST：" + majorVersion + "." + minorVersion);
+            tv_lower_computer_img_version.setText("TEMP：" + imgMajorVersion + "." + imgMinorVersion);
+            tv_lower_computer_temp_version.setText("IMG：" + tempMajorVersion + "." + tempMinorVersion);
         }
     }
 
