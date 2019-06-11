@@ -221,9 +221,21 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
     @Subscribe
     public void onDelCyclingStageEvent(DelCyclingStageEvent event) {
-        mStageAdapter.remove(event.getPosition());
-        buildLink();
-        Log.i("ChangeStage", "onDelCyclingStageEvent");
+        //判断当前cycleing
+        int cyclingStageCount=0;
+        for (int i = 0; i < mStageAdapter.getItemCount(); i++) {
+            Stage stage = (Stage) mStageAdapter.getItem(i);
+            if (stage instanceof CyclingStage){
+                cyclingStageCount++;
+            }
+        }
+        if (cyclingStageCount>1) {
+            mStageAdapter.remove(event.getPosition());
+            buildLink();
+            Log.i("ChangeStage", "onDelCyclingStageEvent");
+        }else {
+            ToastUtil.showToast(getActivity(),"至少含有一个循环阶段");
+        }
     }
 
     private void buildLink() {
@@ -419,6 +431,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                         } else {
                             mReadTrimCount++;
                             mCommunicationService.setNotify(UserSettingsStep2Fragment.this);
+                            AnitoaLogUtil.writeFileLog("============开始读取flash=============");
                             TrimReader.getInstance().ReadTrimDataFromInstrument(mCommunicationService);
                         }
 
@@ -494,8 +507,10 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                 AnitoaLogUtil.writeToFile(meltFile, dp_str);
             }
         }
+        AnitoaLogUtil.writeFileLog("===========开始初始化设备==========", mExecutorService);
         //初始化设备
         resetTrim();
+        AnitoaLogUtil.writeFileLog("===========初始化设备结束==========", mExecutorService);
 
         FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
         factUpdater.SetInitData();
@@ -691,16 +706,20 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             //ToastUtil.showToast(getActivity(), "请选择程序模式");
             return false;
         }
+        for (int i = 0; i < mStageAdapter.getItemCount(); i++) {
+            Stage stage = (Stage) mStageAdapter.getItem(i);
 
-       /* if (mModes.size() > 1) {
-            //温度必须填写
-            String startTemp = tv_start_temp.getText().toString();
-            String endTemp = tv_end_temp.getText().toString();
-            if (TextUtils.isEmpty(endTemp)) {
-                ToastUtil.showToast(getActivity(), "请输入熔解曲线结束温度");
-                return false;
+            if (stage instanceof CyclingStage){
+                CyclingStage cyclingStage= (CyclingStage) stage;
+                int count=cyclingStage.getCyclingCount();
+                if (count<=0){
+                    ToastUtil.showToast(getActivity(),"循环数量不能少于1个");
+                    return false;
+                }
             }
-        }*/
+        }
+
+
         return true;
     }
 
@@ -878,7 +897,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                 CommData.chan4_range = FlashData.range[3];
                 FlashData.flash_loaded = true;
 
-
+                AnitoaLogUtil.writeFileLog("==============读取flash完毕==============");
                 //读取trim和dataposition成功
                 setIntergrationTime()
                         .subscribeOn(Schedulers.io())
@@ -908,7 +927,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
     int EPKT_SZ = 52;
     int NUM_EPKT = 4;
     int TRIM_IMAGER_SIZE = 12;
-    byte[][] EepromBuff = new byte[8 + 4 * NUM_EPKT][EPKT_SZ + 1];
+    byte[][] EepromBuff = new byte[16 + 4 * NUM_EPKT][EPKT_SZ + 1];
 
     private void MoveToEEPBuffer(byte[] inputdatas, int index) {
         byte eeprom_parity = 0;

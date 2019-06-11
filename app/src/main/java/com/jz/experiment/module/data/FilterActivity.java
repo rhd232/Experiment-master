@@ -44,16 +44,20 @@ public class FilterActivity extends BaseActivity {
 
         mTitleBar.setTitle(getString(R.string.running_filter));
     }
-    private  final String channel1=getString(R.string.channel_1_str);
-    private  final String channel2=getString(R.string.channel_2_str);
-    private  final String channel3=getString(R.string.channel_3_str);
-    private  final String channel4=getString(R.string.channel_4_str);
+    private  String channel1;
+    private  String channel2;
+    private  String channel3;
+    private  String channel4;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
         ButterKnife.bind(this);
 
+        channel1=getString(R.string.channel_1_str);
+        channel2=getString(R.string.channel_2_str);
+        channel3=getString(R.string.channel_3_str);
+        channel4=getString(R.string.channel_4_str);
 
         mChannelAdapter = new StringSelectableAdapter(getActivity(), R.layout.item_string);
         List<StringSelectable> channelList = new ArrayList<>();

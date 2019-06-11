@@ -31,7 +31,9 @@ public class UserSettingsActivity extends BaseActivity {
 
     @Override
     protected void setTitle() {
-        mTitleBar.setTitle("用户设置");
+
+        String title=getString(R.string.title_user_settings);
+        mTitleBar.setTitle(title);
     }
 
     @Override
@@ -51,8 +53,9 @@ public class UserSettingsActivity extends BaseActivity {
                 EditPwdActivity.start(getActivity());
                 break;
             case R.id.tv_logout:
+                String msg=getString(R.string.user_settings_dialog_msg);
                 AppDialogHelper.showNormalDialog(getActivity(),
-                        "确定要退出吗？", new AppDialogHelper.DialogOperCallback() {
+                        msg, new AppDialogHelper.DialogOperCallback() {
                             @Override
                             public void onDialogConfirmClick() {
                                 EventBus.getDefault().post(new LogoutEvent());

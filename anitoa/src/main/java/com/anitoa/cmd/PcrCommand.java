@@ -65,6 +65,11 @@ public class PcrCommand {
         bytes.add((byte) header);
         return bytes;
     }
+
+    /**
+     *
+     * @return
+     */
     public static PcrCommand ofLidAndApaptorStatusCmd() {
         int command=0x17;
         int length=0x01;

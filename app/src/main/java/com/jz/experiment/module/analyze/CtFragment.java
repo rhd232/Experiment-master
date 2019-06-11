@@ -82,7 +82,8 @@ public abstract class CtFragment extends BaseFragment {
             }
         }else {
             for (int i=0;i<4;i++){
-                channelAlias[i]="通道"+(i+1);
+                String channel=getString(R.string.setup_channel);
+                channelAlias[i]=channel+(i+1);
             }
             for (int i=0;i<8;i++){
                 String val=(i+1)+"";

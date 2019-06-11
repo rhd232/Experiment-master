@@ -52,7 +52,8 @@ public class EditPwdActivity extends BaseActivity {
 
     @Override
     protected void setTitle() {
-        mTitleBar.setTitle("修改密码");
+        String title=getActivity().getString(R.string.title_pwd);
+        mTitleBar.setTitle(title);
     }
 
     @Override
@@ -88,7 +89,8 @@ public class EditPwdActivity extends BaseActivity {
                                         //找到，继续修改密码
                                         updatePwd();
                                     }else {
-                                        tv_msg.setText("旧密码输入错误");
+
+                                        tv_msg.setText(getString(R.string.pwd_input_error));
                                     }
 
                                 }
@@ -126,15 +128,16 @@ public class EditPwdActivity extends BaseActivity {
 
     private boolean validate() {
         if (!et_old_pwd.validate(true)){
-            tv_msg.setText("输入旧密码");
+
+            tv_msg.setText(getString(R.string.pwd_enter_old));
             return false;
         }
         if (!et_new_pwd.validate(true)){
-            tv_msg.setText("输入新密码");
+            tv_msg.setText(getString(R.string.pwd_enter_new));
             return false;
         }
         if (!et_confirm_pwd.validate(true)){
-            tv_msg.setText("输入确认密码");
+            tv_msg.setText(getString(R.string.pwd_enter_confirm));
             return false;
         }
         String newPwd=et_new_pwd.getText().toString();

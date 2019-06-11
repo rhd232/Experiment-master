@@ -103,7 +103,7 @@ public class AppDialogHelper {
                 alertDialog.dismiss();
             }
         });
-        tv.setText(context.getString(R.string.channel_select_title, (position+1) + ""));
+        tv.setText(context.getString(R.string.setup_dialog_channel_select_msg, (position+1) + ""));
         GridView gv = alertDialog.findViewById(R.id.gv_ranliao);
         final ChannelMaterialAdapter adapter = new ChannelMaterialAdapter(context, R.layout.item_sel_channel_material);
         alertDialog.findViewById(R.id.tv_confirm).setOnClickListener(new View.OnClickListener() {

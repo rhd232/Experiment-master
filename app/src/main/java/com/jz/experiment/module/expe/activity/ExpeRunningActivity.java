@@ -3,6 +3,7 @@ package com.jz.experiment.module.expe.activity;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -141,7 +142,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
      * 是否包含两个StartStage
      */
     private boolean mHasTwoStartStage;
-
+    private Handler mHander;
     @Override
     protected void setTitle() {
         String running=getString(R.string.title_running);
@@ -162,7 +163,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         setContentView(R.layout.activity_expe_running);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
-
+        mHander=new Handler();
         mImageMode = PcrCommand.IMAGE_MODE.IMAGE_12;
         mHistoryExperiment = Navigator.getParcelableExtra(this);
         Stage stage = mHistoryExperiment.getSettingSecondInfo().getSteps().get(1);
@@ -277,6 +278,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             @Override
             public void run() {
                 if (!ActivityUtil.isFinish(getActivity())) {
+                    AnitoaLogUtil.writeFileLog("===========开始实验==========");
                     step0();
                     step1();
                 }
@@ -1152,12 +1154,17 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     break;
             }
             if (status == 1 /*|| status == 3*/) {
-
+               /* mHander.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        step5();
+                    }
+                },1000);
+              */
                 mStep5Responsed = false;
                 if (step5Subscription == null) {
-                    step5Subscription = Observable.interval(10, 2000, TimeUnit.MILLISECONDS)
-                            /*.subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())*/
+                    step5Subscription = Observable.interval(10, 2000,
+                            TimeUnit.MILLISECONDS)
                             .onBackpressureLatest()
                             .subscribe(new Action1<Long>() {
                                 @Override
@@ -1175,6 +1182,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                                 }
                             });
                 }
+
 
                 return;
             }

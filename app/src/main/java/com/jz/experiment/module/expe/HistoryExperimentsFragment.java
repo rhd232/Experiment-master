@@ -137,10 +137,11 @@ public class HistoryExperimentsFragment extends BaseFragment {
         super.onResume();
 
         if (sAnitoa.getBluetoothService() != null && sAnitoa.getBluetoothService().isConnected()) {
-            tv_device_state.setText("已连接");
+
+            tv_device_state.setText( getString(R.string.device_status_bar_connected));
             tv_device_state.setActivated(true);
         } else {
-            tv_device_state.setText("未连接");
+            tv_device_state.setText( getString(R.string.device_status_bar_no_device_connected));
             tv_device_state.setActivated(false);
         }
 
@@ -154,7 +155,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onBluetoothDisConnectedEvent(AnitoaDisConnectedEvent event) {
-        tv_device_state.setText("未连接");
+        tv_device_state.setText( getString(R.string.device_status_bar_no_device_connected));
         tv_device_state.setActivated(false);
     }
 
@@ -334,6 +335,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
             case CODE_LID_ERROR:
                 LoadingDialogHelper.hideOpLoading();
+
                 ToastUtil.showToast(getActivity(), "请先关闭热盖");
                 break;
             case CODE_ADAPTOR_ERROR:

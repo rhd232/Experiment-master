@@ -67,7 +67,7 @@ public class VernierAdapter extends BaseRecyclerAdapter<PartStage,VernierAdapter
             @Override
             public void onClick(View v) {
                 if (getItemCount()==1){
-                    ToastUtil.showToast(mActivity,"最后一个不能删除");
+                    ToastUtil.showToast(mActivity,"至少含有一个循环步骤");
                 }else {
                     mParentStage.removeChildStage(position);
                     remove(position);

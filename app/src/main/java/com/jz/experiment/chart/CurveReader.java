@@ -73,6 +73,10 @@ public class CurveReader {
 
         cCurveShow.m_yData = m_yData;
         cCurveShow.m_Size = cyclenum+1;
+     /*   cCurveShow.m_Size[0] = cyclenum+1;
+        cCurveShow.m_Size[1] = cyclenum+1;
+        cCurveShow.m_Size[2] = cyclenum+1;
+        cCurveShow.m_Size[3] = cyclenum+1;*/
         cCurveShow.ifactor = factorValues;
         cCurveShow.UpdateAllcurve();
 

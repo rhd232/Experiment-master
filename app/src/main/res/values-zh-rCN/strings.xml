@@ -40,9 +40,9 @@
     <string name="running_filter">筛选</string>
     <string name="running_mode_melting">当前模式：熔解曲线</string>
     <string name="running_mode_pcr">当前模式：变温扩增</string>
-    <string name="running_timer">持续时间</string>
+    <string name="running_timer">持续时间：</string>
     <string name="running_stop">强行停止</string>
-    <string name="running_cycle">循环</string>
+    <string name="running_cycle">循环：</string>
     <string name="running_dialog_stop_msg">确定要强行制止吗？</string>
     <string name="running_heating">加热中</string>
     <string name="running_cooling">冷却中</string>
@@ -54,7 +54,7 @@
     <string name="setup_test_time">实验时间</string>
     <string name="setup_selelct_test_channel">通道选择</string>
     <string name="setup_next">下一步</string>
-    <string name="setup_dialog_channel_select_msg">请选择%1$s染料</string>
+    <string name="setup_dialog_channel_select_msg">请选择通道%1$s染料</string>
     <string name="setup_input_desc">请输入备注信息</string>
     <string name="setup_channel_select_tip">请设置通道染料</string>
     <string name="setup_channel">通道</string>
@@ -110,8 +110,11 @@
     <string name="pwd_settings">Enter Password</string>
     <string name="pwd_tips">密码长度大于6位，需包含字母和数字</string>
     <string name="pwd_old">旧密码</string>
+    <string name="pwd_enter_old">输入旧密码</string>
+    <string name="pwd_enter_new">输入新密码</string>
     <string name="pwd_new">新密码</string>
     <string name="pwd_confirm">确认密码</string>
+    <string name="pwd_enter_confirm">输入确认密码</string>
     <string name="pwd_input_error">旧密码输入错误</string>
 
 
@@ -125,7 +128,7 @@
 
     <string name="test_new">新建实验</string>
 
-
+    <string name="no_previous_test">您还没有历史实验</string>
     <string name="dialog_msg_pdf">确定要导出pdf吗？</string>
     <string name="pdf_exported">已导出</string>
     <string name="pdf_export_error">导出失败</string>

@@ -18,6 +18,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:text="已连接"
+        android:text="@string/device_status_bar_connected"
         android:textSize="10sp"/>
 </LinearLayout>
