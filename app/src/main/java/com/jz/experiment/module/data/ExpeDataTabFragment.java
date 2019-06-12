@@ -90,6 +90,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     private Subscription mFindSubscription;
 
     private void loadExpe() {
+
         layout_loading.showLoading();
         mFindSubscription = mExpeDataStore
                 .findAllCompleted()
@@ -183,7 +184,8 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     }
 
     public void reload() {
-        loadExpe();
+        if (layout_loading!=null)
+            loadExpe();
     }
 }
 

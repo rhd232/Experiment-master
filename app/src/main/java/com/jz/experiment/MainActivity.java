@@ -137,7 +137,7 @@ public class MainActivity extends BaseActivity {
                 }).onDenied(new Action<List<String>>() {
             @Override
             public void onAction(List<String> data) {
-                ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
+                ToastUtil.showToast(getActivity(), getString(R.string.tip_sd_permission));
             }
         }).start();
     }
@@ -180,7 +180,8 @@ public class MainActivity extends BaseActivity {
                 layout_data.setActivated(true);
                 view_pager.setCurrentItem(TAB_INDEX_DATA, false);
                 if (tab != null) {
-                    ExpeDataTabFragment expeDataTabFragment = (ExpeDataTabFragment) mAdapter.getItem(TAB_INDEX_DATA);
+                    ExpeDataTabFragment expeDataTabFragment = (ExpeDataTabFragment)
+                            mAdapter.getItem(TAB_INDEX_DATA);
                     /*expeDataTabFragment.setExpe(tab.getExtra());*/
                     //直接刷新就行
                     expeDataTabFragment.reload();
@@ -273,7 +274,7 @@ public class MainActivity extends BaseActivity {
     public void CreateMenu(Menu menu)
     {
 
-        menu.add("删除");
+        menu.add(getString(R.string.op_del));
     }
 
 

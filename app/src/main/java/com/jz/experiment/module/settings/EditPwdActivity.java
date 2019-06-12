@@ -116,11 +116,11 @@ public class EditPwdActivity extends BaseActivity {
                     public void call(UpdateUserResponse response) {
                         mUpdateSubscription.unsubscribe();
                         if (response.getErrCode()==BaseResponse.CODE_SUCCESS){
-                            ToastUtil.showToast(getActivity(),"修改成功");
+                            ToastUtil.showToast(getActivity(),R.string.pwd_pwd_edit_succ);
                             //跳转
                             ActivityUtil.finish(getActivity());
                         }else {
-                            tv_msg.setText("修改失败");
+                            ToastUtil.showToast(getActivity(),R.string.pwd_pwd_edit_error);
                         }
                     }
                 });
@@ -143,12 +143,13 @@ public class EditPwdActivity extends BaseActivity {
         String newPwd=et_new_pwd.getText().toString();
         boolean eq=newPwd.equals(et_confirm_pwd.getText().toString());
         if (!eq){
-            tv_msg.setText("新密码与确认密码不一致");
+
+            tv_msg.setText(getString(R.string.pwd_not_equal_pwd));
             return false;
         }
         //检查新密码是否符合规则
         if (!isLetterDigit(newPwd)){
-            tv_msg.setText("新密码不满足密码规则设置");
+            tv_msg.setText( getString(R.string.pwd_not_pwd_rule));
             return false;
         }
         return true;

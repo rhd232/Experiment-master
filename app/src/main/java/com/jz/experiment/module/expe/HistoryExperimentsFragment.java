@@ -309,7 +309,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                     @Override
                     public void onAction(List<String> data) {
 
-                        ToastUtil.showToast(getActivity(), "拒绝访问sd卡权限将无法新建实验");
+                        ToastUtil.showToast(getActivity(),  getResString(R.string.tip_sd_permission));
 
                     }
                 }).start();
@@ -336,19 +336,22 @@ public class HistoryExperimentsFragment extends BaseFragment {
             case CODE_LID_ERROR:
                 LoadingDialogHelper.hideOpLoading();
 
-                ToastUtil.showToast(getActivity(), "请先关闭热盖");
+                ToastUtil.showToast(getActivity(), getResString(R.string.tip_close_heating_cover));
                 break;
             case CODE_ADAPTOR_ERROR:
                 LoadingDialogHelper.hideOpLoading();
-                ToastUtil.showToast(getActivity(), "请先插入电源适配器");
+                ToastUtil.showToast(getActivity(), getResString(R.string.tip_power_cord));
                 break;
             case CODE_NOT_CONECTED:
                 LoadingDialogHelper.hideOpLoading();
-                ToastUtil.showToast(getActivity(), "请检查HID设备是否已连接");
+                ToastUtil.showToast(getActivity(), getResString(R.string.check_hid_connection));
                 break;
         }
     }
 
+    public String getResString(int res){
+        return getActivity().getString(res);
+    }
     private void readTrimDataFromInstrument(final ToExpeSettingsEvent event) {
 
         final FlashTrimReader reader = new
@@ -377,7 +380,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
             @Override
             public void run() {
                 LoadingDialogHelper.hideOpLoading();
-                AppDialogHelper.showNormalDialog(getActivity(), "请检查HID设备连接情况", new AppDialogHelper.DialogOperCallback() {
+                AppDialogHelper.showNormalDialog(getActivity(),  getResString(R.string.check_hid_connection), new AppDialogHelper.DialogOperCallback() {
                     @Override
                     public void onDialogConfirmClick() {
 
