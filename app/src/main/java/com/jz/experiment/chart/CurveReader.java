@@ -21,7 +21,7 @@ public class CurveReader {
     }
     public void readCurve(double[][] factorValues, CtParamInputLayout.CtParam ctParam){
         double[][][]  m_yData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
-        CCurveShow cCurveShow =  CCurveShow.getInstance();
+        CCurveShowPolyFit cCurveShow =  CCurveShowPolyFit.getInstance();
         int minCt=13;
         int threshold=12;
         if (ctParam!=null){
@@ -72,11 +72,12 @@ public class CurveReader {
         }
 
         cCurveShow.m_yData = m_yData;
-        cCurveShow.m_Size = cyclenum+1;
-     /*   cCurveShow.m_Size[0] = cyclenum+1;
+      //  cCurveShow.m_Size = cyclenum+1;
+        cCurveShow.m_Size[0] = cyclenum+1;
         cCurveShow.m_Size[1] = cyclenum+1;
         cCurveShow.m_Size[2] = cyclenum+1;
-        cCurveShow.m_Size[3] = cyclenum+1;*/
+        cCurveShow.m_Size[3] = cyclenum+1;
+
         cCurveShow.ifactor = factorValues;
         cCurveShow.UpdateAllcurve();
 

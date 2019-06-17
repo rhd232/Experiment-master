@@ -25,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="实验名称："
+                android:text="@string/setup_test_name"
                 android:textColor="@color/color333333" />
 
             <TextView
@@ -46,7 +46,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="实验人："
+                android:text="@string/data_by"
                 android:textColor="@color/color686868" />
 
             <TextView
@@ -72,7 +72,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="完成时间："
+                    android:text="@string/data_finish_time"
                     android:textColor="@color/color686868" />
 
                 <TextView
@@ -94,7 +94,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
-                    android:text="耗时："
+                    android:text="@string/data_during_time"
                     android:textColor="@color/color686868" />
 
                 <TextView
@@ -126,7 +126,7 @@
                 android:paddingTop="7dp"
                 android:paddingRight="17dp"
                 android:paddingBottom="7dp"
-                android:text="变温扩增"
+                android:text="@string/setup_mode_dt"
                 android:textColor="@color/selector_ffffff_1f4e99" />
 
             <TextView
@@ -140,7 +140,7 @@
                 android:paddingTop="7dp"
                 android:paddingRight="17dp"
                 android:paddingBottom="7dp"
-                android:text="熔解曲线"
+                android:text="@string/setup_mode_melting"
                 android:textColor="@color/selector_ffffff_1f4e99" />
 
             <LinearLayout

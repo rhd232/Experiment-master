@@ -35,7 +35,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="实验名称："
+                    android:text="@string/setup_test_name"
                     android:textColor="@color/color333333"
                     android:textSize="14sp" />
 
@@ -44,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:hint="请输入实验名称"
+                    android:hint="@string/setup_input_test_name"
                     android:textColor="@color/color333333"
                     android:textColorHint="@color/color999999"
                     android:textSize="14sp" />
@@ -61,7 +61,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="26dp"
-                    android:text="实验时间"
+                    android:text="@string/setup_test_time"
                     android:textColor="@color/color333333" />
 
                 <TextView
@@ -74,7 +74,7 @@
                     android:layout_marginRight="12dp"
                     android:drawableRight="@drawable/icon_calendar"
                     android:drawablePadding="10dp"
-                    android:text="实验时间"
+                    android:text=""
                     android:textColor="@color/color333333" />
             </RelativeLayout>
 
@@ -96,7 +96,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="通道选择"
+                    android:text="@string/setup_selelct_test_channel"
                     android:textColor="@color/color333333"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -133,7 +133,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:text="积分时间（ms）"
+                        android:text="@string/setup_int_time"
                         android:textColor="@color/color333333"
                         android:textSize="14sp" />
 
@@ -143,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:text="自动积分"
+                        android:text="@string/setup_auto_int_time"
                         android:checked="true"
                         android:layout_marginRight="12dp"/>
 
@@ -179,7 +179,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="通道1："
+                            android:text="@string/channel_1"
                             android:textColor="@color/color333333"
                             android:textSize="14sp" />
 
@@ -209,7 +209,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="通道2："
+                            android:text="@string/channel_2"
                             android:textColor="@color/color333333"
                             android:textSize="14sp" />
 
@@ -247,7 +247,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="通道3："
+                            android:text="@string/channel_3"
                             android:textColor="@color/color333333"
                             android:textSize="14sp" />
 
@@ -277,7 +277,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="通道4："
+                            android:text="@string/channel_4"
                             android:textColor="@color/color333333"
                             android:textSize="14sp" />
 
@@ -371,7 +371,7 @@
                 android:layout_marginTop="8dp"
                 android:background="@color/color1F4E99"
                 android:gravity="center"
-                android:text="下一步"
+                android:text="@string/setup_next"
                 android:textColor="@color/white" />
         </LinearLayout>
 

@@ -13,17 +13,17 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.anitoa.exception.UnsupportedDeviceException;
 import com.anitoa.well.SixteenWell;
+import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
-import com.jz.experiment.chart.CCurveShow;
 import com.jz.experiment.chart.CCurveShowMet;
+import com.jz.experiment.chart.CCurveShowPolyFit;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
-import com.anitoa.exception.UnsupportedDeviceException;
-import com.anitoa.well.Well;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.analyze.CtFragment;
 import com.jz.experiment.module.expe.bean.Tab;
@@ -243,7 +243,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (tv_dt.isActivated()) {
 
             mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment),layout_ctparam_input.getCtParam());
-            ctValues=CCurveShow.getInstance().m_CTValue;
+            ctValues= CCurveShowPolyFit.getInstance().m_CTValue;
         } else {
           /*  float t=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
             float f=Float.parseFloat(String.format("%f",t));
@@ -294,7 +294,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         //获取CT value
         for (String chan : ChanList) {
             for (String ks : KSList) {
-                getCtValue(chan, ks,CCurveShow.getInstance().m_CTValue);
+                getCtValue(chan, ks,CCurveShowPolyFit.getInstance().m_CTValue);
             }
         }
 

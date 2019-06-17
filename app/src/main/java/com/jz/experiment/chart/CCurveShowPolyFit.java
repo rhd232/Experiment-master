@@ -13,6 +13,7 @@ public class CCurveShowPolyFit {
     boolean ALL_SEL = true;
     boolean GD_MOMENTUM = true;
     boolean POLYFIT_OUTLIER = true;
+
     final int numChannels = 4;
     int numWells = 16;
     public int MIN_CT = 13;         //之前15 // minimal allowed CT
@@ -73,9 +74,9 @@ public class CCurveShowPolyFit {
 
     public void InitData() {
         numWells = CommData.KsIndex;
-        int i, j;
-        for (i = 0; i < MAX_CHAN; i++) {
-            for (j = 0; j < numWells; j++) {
+
+        for (int i = 0; i < MAX_CHAN; i++) {
+            for (int j = 0; j < numWells; j++) {
                 m_CTValue[i][j] = 0;
                 m_mean[i][j] = 0;
                 m_falsePositive[i][j] = false;
@@ -83,8 +84,8 @@ public class CCurveShowPolyFit {
             }
         }
 
-        for (i = 0; i < MAX_WELL; i++) {
-            for (j = 0; j < MAX_CHAN; j++) {
+        for (int i = 0; i < MAX_WELL; i++) {
+            for (int j = 0; j < MAX_CHAN; j++) {
                 k[i][j] = 15;
                 r[i][j] = 0.3;
                 t[i][j] = 25;
@@ -92,18 +93,17 @@ public class CCurveShowPolyFit {
             }
         }
 
-        for (i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             ct_offset[i] = (float) Math.log(1 / log_threshold[i] - 1);
         }
 
         m_zData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
+        m_zData2 = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         m_yData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         ifactor = new double[MAX_CHAN][MAX_CYCL];
         x = new double[MAX_CYCL];
         y = new double[MAX_CYCL];
-        k = new double[MAX_WELL][4];
-        r = new double[MAX_WELL][4];
-        t = new double[MAX_WELL][4];
+
         ran = new Random();
 /*#if DEBUG
             cheat_factor2 = 1.0f;
@@ -377,18 +377,18 @@ public class CCurveShowPolyFit {
         return y;
     }
 
-    public double sumArray(double []arr){
-        double sum=0;
-        for (int i=0;i<arr.length;i++){
-            sum+=arr[i];
+    public double sumArray(double[] arr) {
+        double sum = 0;
+        for (int i = 0; i < arr.length; i++) {
+            sum += arr[i];
         }
         return sum;
     }
 
-    public double sumList(List<Double> list){
-        double sum=0;
-        for (int i=0;i<list.size();i++){
-            sum+=list.get(i);
+    public double sumList(List<Double> list) {
+        double sum = 0;
+        for (int i = 0; i < list.size(); i++) {
+            sum += list.get(i);
         }
         return sum;
     }
@@ -418,96 +418,98 @@ public class CCurveShowPolyFit {
                 if (size < MIN_CT)      //data has not enough to perform Ct calculation
                     continue;
 
-if( POLYFIT_OUTLIER) {
+                if (POLYFIT_OUTLIER) {
 
-    double[] yy = new double[size];
-    double[] xx = new double[size];
-    double[] diff = new double[size];
-    PolynomialCurveFitter polynomialCurveFitter = PolynomialCurveFitter.create(5);
-    ArrayList<WeightedObservedPoint> weightedObservedPoints = new ArrayList();
-    for (int k = 0; k < size; k++) {
-        yy[k] = yData[k];
-        xx[k] = (double) k;
+                    double[] yy = new double[size];
+                    double[] xx = new double[size];
+                    double[] diff = new double[size];
 
-        WeightedObservedPoint weightedObservedPoint = new WeightedObservedPoint(1,
-                k,yData[k]);
+                    PolynomialCurveFitter polynomialCurveFitter = PolynomialCurveFitter.create(5);
+                    ArrayList<WeightedObservedPoint> weightedObservedPoints = new ArrayList();
+                    for (int k = 0; k < size; k++) {
+                        yy[k] = yData[k];
+                        xx[k] = (double) k;
 
-        weightedObservedPoints.add(weightedObservedPoint);
-    }
+                        WeightedObservedPoint weightedObservedPoint = new WeightedObservedPoint(1,
+                                k, yData[k]);
 
-    double [] fitted=polynomialCurveFitter.fit(weightedObservedPoints);
-
+                        weightedObservedPoints.add(weightedObservedPoint);
+                    }
+                    //多项式系数
+                    double[] coefficients = polynomialCurveFitter.fit(weightedObservedPoints);
+                    //获取拟合的y值
+                    double[] fitted = fitValue(coefficients, xx);
   /*  var polyfit = new PolyFit(xx, yy, 5);
     var fitted = polyfit.Fit(xx);*/
 
-    for (int k = 0; k < size; k++) {
-        diff[k] = yy[k] - fitted[k];
-    }
-    double sum=sumArray(diff);
+                    for (int k = 0; k < size; k++) {
+                        diff[k] = yy[k] - fitted[k];
+                    }
+                    double sum = sumArray(diff);
 
-    double mean = sum / diff.length;
+                    double mean = sum / diff.length;
 
-    double accum = 0.0;
+                    double accum = 0.0;
 
-    for (int k = 0; k < diff.length; k++) {
-        accum += (diff[k] - mean) * (diff[k] - mean);
-    }
-    double stdev = Math.sqrt(accum / diff.length);         //方差
+                    for (int k = 0; k < diff.length; k++) {
+                        accum += (diff[k] - mean) * (diff[k] - mean);
+                    }
+                    double stdev = Math.sqrt(accum / diff.length);         //方差
 
-    for (int k = 0; k < size; k++) {
-        if (diff[k] > OUTLIER_THRESHOLD * stdev || diff[k] < -OUTLIER_THRESHOLD * stdev) {
-            yData[k] = fitted[k];
+                    for (int k = 0; k < size; k++) {
+                        if (diff[k] > OUTLIER_THRESHOLD * stdev || diff[k] < -OUTLIER_THRESHOLD * stdev) {
+                            yData[k] = fitted[k];
 
 /*#if DEBUG
 //                            String debuginfo = "yvalue = " + yy[k].ToString() + " found the " + k.ToString() + "position outlier data( " + i.ToString() + " " + j.ToString() + ")";
 //                            MessageBox.Show(debuginfo);
 #endif*/
-        }
-    }
+                        }
+                    }
 
 
-}else {
+                } else {
 
-   /* for (int n = 3; n < MIN_CT; n++) {
-        tempData.Add(yData[n]);
-    }
+                    /*for (int n = 3; n < MIN_CT; n++) {
+                        tempData.Add(yData[n]);
+                    }
 
-    sum = tempData.Sum();
+                    sum = tempData.Sum();
 
-    //calculate CT value
-    //double sum = std::accumulate(std::begin(tempData), std::end(tempData), 0.0);
-    mean = sum / tempData.Count; //mean
+                    //calculate CT value
+                    //double sum = std::accumulate(std::begin(tempData), std::end(tempData), 0.0);
+                    mean = sum / tempData.Count; //mean
 
-    accum = 0.0;
-    for (int m = 0; m < tempData.Count; m++) {
-        accum += (tempData[m] - mean) * (tempData[m] - mean);
-    }
+                    accum = 0.0;
+                    for (int m = 0; m < tempData.Count; m++) {
+                        accum += (tempData[m] - mean) * (tempData[m] - mean);
+                    }
 
-    //std::for_each (std::begin(tempData), std::end(tempData), [&](const double d) {
-    //    accum  += (d-mean)*(d-mean);
-    //});
-    stdev = Math.Sqrt(accum / tempData.Count); //方差
+                    //std::for_each (std::begin(tempData), std::end(tempData), [&](const double d) {
+                    //    accum  += (d-mean)*(d-mean);
+                    //});
+                    stdev = Math.Sqrt(accum / tempData.Count); //方差
 
-    //========== outlier data remove=================
-    //std::for_each(std::begin(tempData), std::end(tempData), [&](double &d) {
-    //    if (d - mean > 2 * stdev || d - mean < -2 * stdev) d = mean;
-    //});
+                    //========== outlier data remove=================
+                    //std::for_each(std::begin(tempData), std::end(tempData), [&](double &d) {
+                    //    if (d - mean > 2 * stdev || d - mean < -2 * stdev) d = mean;
+                    //});
 
 
-    for (int v = 0; v < tempData.Count; v++) {
-        if (tempData[v] - mean > 2.5 * stdev || tempData[v] - mean < -2.5 * stdev) {
-            tempData[v] = mean;
-            yData[v + 3] = mean;
-        }
-    }*/
+                    for (int v = 0; v < tempData.Count; v++) {
+                        if (tempData[v] - mean > 2.5 * stdev || tempData[v] - mean < -2.5 * stdev) {
+                            tempData[v] = mean;
+                            yData[v + 3] = mean;
+                        }
+                    }*/
 
-}
+                }
                 List<Double> tempData = new ArrayList<>();
 
                 for (int n = 3; n < MIN_CT; n++) {
                     tempData.add(yData[n]);
                 }
-                double sum=sumList(tempData);
+                double sum = sumList(tempData);
                 //sum = tempData.sum();
                 double mean = sum / tempData.size();
 
@@ -553,6 +555,31 @@ if( POLYFIT_OUTLIER) {
             }
         }
     }
+
+    private double[] fitValue(double[] coefficients, double[] xx) {
+        double yy[] = new double[xx.length];
+        for (int i = 0; i < xx.length; i++) {
+            yy[i] = getY(coefficients, xx[i]);
+        }
+
+        return yy;
+    }
+
+    public double getY(double[] coefficients, double x) {
+        int degree = coefficients.length - 1;
+        double y = 0;
+        for (int i = degree; i >= 0; i--) {
+            y += coefficients[i] * Math.pow(x, i);
+        }
+        return y;
+      /*  return coefficients[0] +
+                coefficients[1] * x +
+                coefficients[2] * Math.pow(x, 2) +
+                coefficients[3] * Math.pow(x, 3) +
+                coefficients[4] * Math.pow(x, 4) +
+                coefficients[5] * Math.pow(x, 5);*/
+    }
+
 
     final double r_th = 0.21;
 

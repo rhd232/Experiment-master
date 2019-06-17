@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="您还没有历史实验"
+        android:text="@string/no_previous_test"
         android:textColor="#a7a7a7" />
 
     <TextView
@@ -25,7 +25,7 @@
         android:paddingTop="8dp"
         android:paddingRight="14dp"
         android:paddingBottom="8dp"
-        android:text="新建实验"
+        android:text="@string/test_new"
         android:background="@drawable/shape_solidffffff_strokef2bc00_corner4"
         android:layout_marginTop="24dp"
         android:textColor="#F2BC00" />

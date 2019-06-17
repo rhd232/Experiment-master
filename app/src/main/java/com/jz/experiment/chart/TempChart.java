@@ -72,7 +72,7 @@ public class TempChart extends WindChart {
         entry.setX(lidDataSet.getValues().size());
         entry.setY(lid);
         lidDataSet.addEntry(entry);
-
+        lidDataSet.setDrawValues(false);
 
         Entry pentry = new Entry();
         pentry.setX(peltierDataSet.getValues().size());

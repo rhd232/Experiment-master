@@ -37,7 +37,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="确定"
+            android:text="@string/dialog_btn_ok"
             android:textColor="@color/color1F4E99"
             android:textSize="14sp" />
 

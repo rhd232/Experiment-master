@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:gravity="center_horizontal"
-            android:text="请选择通道"
+            android:text="@string/setup_selelct_test_channel"
             android:textColor="@color/color686868" />
 
         <GridView
@@ -40,7 +40,7 @@
             android:background="@drawable/shape_solidffffff_stroke999999_corner4"
             android:gravity="center"
             android:textColorHint="@color/color999999"
-            android:hint="请输入备注信息"
+            android:hint="@string/setup_input_desc"
             android:textColor="@color/color333333"
             android:textSize="12sp" />
 
@@ -55,7 +55,7 @@
             android:layout_marginBottom="29dp"
             android:background="@drawable/shape_solid1f4e99_corner4"
             android:gravity="center"
-            android:text="确定"
+            android:text="@string/dialog_btn_ok"
             android:textColor="@color/white" />
     </LinearLayout>
 

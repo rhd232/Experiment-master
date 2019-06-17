@@ -17,16 +17,16 @@ import android.widget.AdapterView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 
+import com.anitoa.exception.UnsupportedDeviceException;
+import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.R;
-import com.jz.experiment.chart.CCurveShow;
 import com.jz.experiment.chart.CCurveShowMet;
+import com.jz.experiment.chart.CCurveShowPolyFit;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.WindChart;
-import com.anitoa.exception.UnsupportedDeviceException;
-import com.anitoa.well.Well;
 import com.jz.experiment.module.data.FilterActivity;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.util.AppDialogHelper;
@@ -208,7 +208,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     } else {
                         //获取类型，是扩增曲线还是熔解曲线
                         mChart = new DtChart(chart_line, 40);
-                        ctValues = CCurveShow.getInstance().m_CTValue;
+                        ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
                     }
                     mChart.show(ChanList, KSList, mOpenedFile, null);
                     KSList.clear();
@@ -292,7 +292,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            double[][] ctValues = CCurveShow.getInstance().m_CTValue;
+                            double[][] ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
                             KSList.clear();
                             KSList = Well.getWell().getKsList();
                             for (String chan : ChanList) {

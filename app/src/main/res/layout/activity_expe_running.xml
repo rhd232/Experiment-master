@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="循环："
+                android:text="@string/running_cycle"
                 android:textColor="@color/color333333" />
 
             <TextView
@@ -64,7 +64,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="持续时间："
+                android:text="@string/running_timer"
                 android:textColor="@color/color333333" />
 
             <com.jz.experiment.widget.DuringView
@@ -114,6 +114,6 @@
         android:layout_margin="12dp"
         android:background="@drawable/shape_solid1f4e99_corner4"
         android:gravity="center"
-        android:text="强行制止"
+        android:text="@string/running_stop"
         android:textColor="@color/white" />
 </LinearLayout>

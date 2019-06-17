@@ -11,6 +11,7 @@ import com.anitoa.util.AnitoaLogUtil;
 import com.anitoa.util.ByteUtil;
 import com.anitoa.well.Well;
 import com.jz.experiment.chart.CCurveShow;
+import com.jz.experiment.chart.CCurveShowPolyFit;
 import com.jz.experiment.chart.ChartData;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DataFileReader;
@@ -42,9 +43,10 @@ public class ImageDataReader {
     private File mAutoIntFile;
     private FactUpdater mFactUpdater;
 
-    float[] opt_int_time = new float[4];
-    float[] max_read_list = new float[4];
-    float[] inc_factor = new float[4];
+    float[] opt_int_time = new float[CCurveShow.MAX_CHAN];
+    float[] max_read_list = new float[CCurveShow.MAX_CHAN];
+    float[] inc_factor = new float[CCurveShow.MAX_CHAN];
+    int[] max_read_0 = new int[CCurveShow.MAX_CHAN];
     public static final String FILE_NAME = "auth_int_time.txt";
     private ExecutorService mExecutorService;
     public ImageDataReader(
@@ -78,6 +80,7 @@ public class ImageDataReader {
                     opt_int_time[i] = 1;
                     max_read_list[i] = 30;
                     inc_factor[i] = 0;
+                    max_read_0[i] = 100;
                     setSensorAndInTime(i,opt_int_time[i]);
                 }
                 readAllImg();
@@ -361,7 +364,7 @@ public class ImageDataReader {
             jfindex++;
 
 
-            if (jfindex>4){
+            if (jfindex>5){
                 //设置积分时间和gain模式
                 sleep(50);
 
@@ -403,53 +406,61 @@ public class ImageDataReader {
         float inc;
         float i_factor = 0;
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < CCurveShow.MAX_CHAN; i++) {
             max_read = GetMaxChanRead(i);
             max_read_list[i] = max_read;
+            if (jfindex==0){
+                max_read_0[i]=max_read;
 
-            if (jfindex == 0) {
+            }else if (jfindex == 1) {
+                max_read -= max_read_0[i];
                 if (max_read < 20) max_read = 20;
 
                 float top;
 
-                switch (i) {
+                switch(i)
+                {
                     case 0:
-                        top = 0.6f;
+                        top = 0.5f;
                         break;
                     case 1:
-                        top = 0.8f;
+                        top = 0.6f;
                         break;
                     case 2:
-                        top = 3.0f;
+                        top = 1.6f;
                         break;
                     case 3:
-                        top = 1.5f;
+                        top = 1.0f;
                         break;
                     default:
                         top = 0;
                         break;
                 }
 
-                i_factor = top / (float) max_read;
+                i_factor = top / (float)max_read;
                 inc_factor[i] = i_factor;
             }
+
 
             //inc = (float)Math.Round(Convert.ToDouble((AutoInt_Target - max_read) * inc_factor[i]), 2);    // slowly approach the opt int time to avoid saturation
             inc = Float.parseFloat(String.format("%.2f", (AutoInt_Target - max_read) * inc_factor[i]));
             if (inc<0)
                 inc=0;
 
-            opt_int_time[i] += inc;
+            if (jfindex == 0)
+            {
+                opt_int_time[i] = 2;
+            }
+            else
+            {
+                opt_int_time[i] += inc;
+            }
 
-            if (opt_int_time[i] < 1)
-                opt_int_time[i] = 1;
-            else if (opt_int_time[i] > 600)
+            if (opt_int_time[i] > 600)
                 opt_int_time[i] = 600;
 
-            float intTime=(float) Math.ceil(opt_int_time[i]);
 
-
-            setSensorAndInTime(i,intTime);
+            setSensorAndInTime(i,opt_int_time[i]);
         }
 
         StringBuilder sBuilder=new StringBuilder();
@@ -489,7 +500,7 @@ public class ImageDataReader {
 
     private double[][][] ReadCCurveShow() {
         double[][][] m_yData = new double[CCurveShow.MAX_CHAN][ CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
-        CCurveShow cCurveShow =  CCurveShow.getInstance();
+        CCurveShowPolyFit cCurveShow =  CCurveShowPolyFit.getInstance();
         cCurveShow.InitData();
 
         List<String> kslist= Well.getWell().getKsList();
