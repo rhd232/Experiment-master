@@ -8,6 +8,7 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:minWidth="120dp"
+        android:id="@+id/ll_stage_item"
         android:layout_height="441dp"
         android:orientation="vertical">
 

@@ -123,6 +123,10 @@ public abstract class WindChart {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case WHAT_REFRESH_CHART:
+                    if (!mLegendEntries.isEmpty()) {
+                        Legend legend = mChart.getLegend();
+                        legend.setCustom(mLegendEntries);
+                    }
                     //  synchronized (ExpeRunningActivity.this) {
                     mChart.setDrawMarkers(false);
                     mChart.setAutoScaleMinMaxEnabled(true);

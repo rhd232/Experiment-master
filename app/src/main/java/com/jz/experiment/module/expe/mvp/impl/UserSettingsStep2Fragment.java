@@ -44,12 +44,15 @@ import com.wind.base.adapter.DisplayItem;
 import com.wind.base.bean.CyclingStage;
 import com.wind.base.bean.EndStage;
 import com.wind.base.bean.MeltingStage;
+import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.ActivityUtil;
+import com.wind.base.utils.AppUtil;
+import com.wind.base.utils.DisplayUtil;
 import com.wind.base.utils.LogUtil;
 import com.wind.data.DbOpenHelper;
 import com.wind.data.expe.bean.Channel;
@@ -139,14 +142,28 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rv.setLayoutManager(manager);
         rv.setNestedScrollingEnabled(false);
-        mStageAdapter = new StageAdapter(getActivity());
+
+        //动态计算stage宽度
+        boolean isLandscape=ActivityUtil.isLandscape(getActivity());
+        int stageItemWidth;
+        if (isLandscape){
+
+             stageItemWidth=AppUtil.getScreenWidth(getActivity())/4;
+        }else {
+            stageItemWidth= DisplayUtil.dip2px(getActivity(),120);
+        }
+
+        mStageAdapter = new StageAdapter(getActivity(),stageItemWidth);
         rv.setAdapter(mStageAdapter);
 
         ExpeSettingSecondInfo expeSettingSecondInfo = mHistoryExperiment.getSettingSecondInfo();
         if (expeSettingSecondInfo == null) {
             List<DisplayItem> list = new ArrayList<>();
             list.add(new StartStage());
-            list.add(new CyclingStage());
+            CyclingStage cyclingStage=new CyclingStage();
+            cyclingStage.addChildStage(0, new PartStage());
+            cyclingStage.addChildStage(1, new PartStage());
+            list.add(cyclingStage);
             list.add(new EndStage());
             mStageAdapter.addAll(list);
             mModes = new ArrayList<>();
@@ -185,6 +202,24 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         mStageAdapter.add(event.getPosition(), new StartStage());
         buildLink();
         Log.i("StartStage", "onAddStartStageEvent");
+
+    }
+    private void caculateStageItemWidth() {
+        /*int count=mStageAdapter.getItemCount();
+        //需要算出每个循环阶段下的步骤数
+        List<DisplayItem> stages=mStageAdapter.getItems();
+        for (DisplayItem stage:stages){
+            if (stage instanceof CyclingStage){
+                count--;
+                CyclingStage cyclingStage= (CyclingStage) stage;
+                count+=cyclingStage.getPartStageList().size();
+
+            }
+        }
+        int size=Math.min(count,5);
+        int stageItemWidth=AppUtil.getScreenWidth(getActivity())/size;
+        mStageAdapter.setStageItemWidth(stageItemWidth);*/
+
     }
 
     @Subscribe
@@ -199,7 +234,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             //ToastUtil.showToast(getActivity(), "最少一个预变性阶段");
             return;
         }
-
+        caculateStageItemWidth();
 
     }
 
@@ -208,6 +243,8 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         mStageAdapter.notifyDataSetChanged();
         buildLink();
         Log.i("ChangeStage", "onRefreshStageAdapterEvent");
+
+        caculateStageItemWidth();
     }
 
     @Subscribe
@@ -217,6 +254,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         buildLink();
 
         Log.i("ChangeStage", "onAddCyclingStage");
+        caculateStageItemWidth();
     }
 
     @Subscribe
@@ -236,6 +274,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         }else {
             ToastUtil.showToast(getActivity(),"至少含有一个循环阶段");
         }
+        caculateStageItemWidth();
     }
 
     private void buildLink() {
@@ -243,6 +282,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             @Override
             public void run() {
                 mStageAdapter.buildLink();
+                caculateStageItemWidth();
                 mStageAdapter.notifyDataSetChanged();
             }
         }, 200);

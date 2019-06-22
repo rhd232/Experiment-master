@@ -1067,12 +1067,16 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                             } else {
                                 mStartCyclingNum = true;
                             }*/
+                String c=getString(R.string.running_cycle);
                 if (mCyclingStageCount > 1) {
-                    String stepDesc = "阶段" + (mRunningCyclingStageIndex + 1) + "循环：";
+                    String stage=getString(R.string.running_stage);
+
+                    String stepDesc = stage + (mRunningCyclingStageIndex + 1) + c;
                     tv_cycling_desc.setText(stepDesc);
 
                 } else {
-                    tv_cycling_desc.setText("循环：");
+
+                    tv_cycling_desc.setText(c);
                 }
 
                 StringBuilder sBuilder=new StringBuilder();

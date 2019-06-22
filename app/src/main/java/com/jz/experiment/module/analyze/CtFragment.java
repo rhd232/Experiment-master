@@ -57,7 +57,13 @@ public abstract class CtFragment extends BaseFragment {
             for (int i=0;i<channels.size();i++){
                 String val=channels.get(i).getValue();
                 if (TextUtils.isEmpty(val)){
-                    val=channels.get(i).getName();
+                    String fullName=channels.get(i).getName();
+                    if (fullName.startsWith("Channel")){
+                        val=channels.get(i).getName().replace("nel","");
+                    }else {
+                        val=channels.get(i).getName();
+                    }
+
                 }else {
                     val+=channels.get(i).getRemark();
                 }
@@ -83,6 +89,9 @@ public abstract class CtFragment extends BaseFragment {
         }else {
             for (int i=0;i<4;i++){
                 String channel=getString(R.string.setup_channel);
+                if (channel.startsWith("Channel")){
+                    channel=channel.replace("nel","");
+                }
                 channelAlias[i]=channel+(i+1);
             }
             for (int i=0;i<8;i++){
@@ -141,7 +150,7 @@ public abstract class CtFragment extends BaseFragment {
     }
 
 
-    protected void getCtValue(String chan, String currks, double[][] ctValues) {
+    protected void getCtValue(String chan, String currks, double[][] ctValues,boolean[][] falsePositive) {
         if (!CommData.diclist.keySet().contains(chan) || CommData.diclist.get(chan).size() == 0)
             return;
 
@@ -182,10 +191,26 @@ public abstract class CtFragment extends BaseFragment {
         gvIndex=numberVal.gvIndex;
         ksindex=numberVal.ksindex;
         ksIndexInAdapter=numberVal.ksIndexInAdapter;
+        //还需要判断是否是假阳性
+        String negative=getString(R.string.negative);
+        String ctValue;
+        if (falsePositive[currChan][ksindex]){
+            //假阳性
 
-        double val = ctValues[currChan][ksindex];
-        DecimalFormat format = new DecimalFormat("#0.00");
-        String ctValue = format.format(val);
+            ctValue = "["+negative+"]";
+        }else {
+            double val = ctValues[currChan][ksindex];
+            if (val>0) {
+                DecimalFormat format = new DecimalFormat("#0.00");
+                ctValue = format.format(val);
+            }else {
+                ctValue = negative;
+            }
+
+        }
+
+
+
         mChannelDataAdapters[gvIndex].getItem(ksIndexInAdapter).setSampleVal(ctValue);
     }
 

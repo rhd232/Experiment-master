@@ -45,12 +45,18 @@ public class LoginActivity extends BaseActivity{
         int screenWidth = (int) (width / density);  // 屏幕宽度(dp)
         int screenHeight = (int) (height / density);// 屏幕高度(dp)
 
-
+        int stageWidth=getResources().getDimensionPixelSize(R.dimen.stage_width);
         Log.d("h_bl", "屏幕宽度（像素）：" + width);
         Log.d("h_bl", "屏幕高度（像素）：" + height);
         Log.d("h_bl", "屏幕密度（0.75 / 1.0 / 1.5）：" + density);
         Log.d("h_bl", "屏幕密度dpi（120 / 160 / 240）：" + densityDpi);
         Log.d("h_bl", "屏幕宽度（dp）：" + screenWidth);
         Log.d("h_bl", "屏幕高度（dp）：" + screenHeight);
+
+
+
+
     }
+
+
 }

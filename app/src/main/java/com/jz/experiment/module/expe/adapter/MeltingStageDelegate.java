@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.jz.experiment.R;
 import com.wind.base.adapter.BaseAdapterDelegate;
@@ -32,17 +33,23 @@ public class MeltingStageDelegate extends BaseAdapterDelegate<MeltingStageDelega
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull List<DisplayItem> items,final int position, @NonNull RecyclerView.ViewHolder holder, @NonNull List<Object> payloads) {
-        final ViewHolder vh= (ViewHolder) holder;
-        MeltingStage startStage= (MeltingStage) items.get(position);
+    protected void onBindViewHolder(@NonNull List<DisplayItem> items, final int position, @NonNull RecyclerView.ViewHolder holder, @NonNull List<Object> payloads) {
+        final ViewHolder vh = (ViewHolder) holder;
+
+        if (StageAdapter.STAGE_ITEM_WIDTH!=0){
+            ViewGroup.LayoutParams lp=vh.stageItemView.getLayoutParams();
+            lp.width=StageAdapter.STAGE_ITEM_WIDTH;
+        }
+
+        MeltingStage startStage = (MeltingStage) items.get(position);
         startStage.setStepName("step 1");
-        final float startScale=startStage.getStartScale();
+        final float startScale = startStage.getStartScale();
        /* if (position==0){
             startScale=-1;
         }*/
-        final float curScale=startStage.getCurScale();
-       // System.out.println("curScale:"+curScale);
-       // vh.vernier_drag_layout.setLink(null);
+        final float curScale = startStage.getCurScale();
+        // System.out.println("curScale:"+curScale);
+        // vh.vernier_drag_layout.setLink(null);
         vh.vernier_drag_layout.setLink(startStage);
         vh.vernier_drag_layout.setStartScale(startScale);
         vh.vernier_drag_layout.setCurScale(curScale);
@@ -67,13 +74,14 @@ public class MeltingStageDelegate extends BaseAdapterDelegate<MeltingStageDelega
 
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder extends RecyclerView.ViewHolder {
         VernierDragLayout vernier_drag_layout;
-
+        View stageItemView;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            vernier_drag_layout=itemView.findViewById(R.id.vernier_drag_layout);
+            stageItemView = itemView.findViewById(R.id.ll_stage_item);
+            vernier_drag_layout = itemView.findViewById(R.id.vernier_drag_layout);
 
         }
     }

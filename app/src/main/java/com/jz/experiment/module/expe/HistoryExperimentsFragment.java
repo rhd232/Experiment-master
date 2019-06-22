@@ -402,7 +402,13 @@ public class HistoryExperimentsFragment extends BaseFragment {
     }*/
 
     public void doItemLongClick() {
+        if(mAdapter==null){
+            return;
+        }
         HistoryExperiment experiment=mAdapter.getLongClingItemData();
+        if (experiment==null){
+            return;
+        }
         final DelExpeRequest request=new DelExpeRequest();
         request.setId(experiment.getId());
         mExpeDataStore.delExpe(request)

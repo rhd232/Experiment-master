@@ -8,6 +8,7 @@ import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.jz.experiment.R;
 import com.jz.experiment.widget.CtParamInputLayout;
 
 import java.io.File;
@@ -78,18 +79,21 @@ public class TempChart extends WindChart {
         pentry.setX(peltierDataSet.getValues().size());
         pentry.setY(peltier);
         peltierDataSet.addEntry(pentry);
-
+        peltierDataSet.setDrawValues(false);
         if (mLegendEntries == null || mLegendEntries.isEmpty()) {
             mLegendEntries = new ArrayList<>();
-            LegendEntry lidlegendEntry = new LegendEntry("热盖温度", Legend.LegendForm.LINE,
+            String lidT=mChart.getContext().getString(R.string.running_lid_temp);
+            LegendEntry lidlegendEntry = new LegendEntry(lidT, Legend.LegendForm.LINE,
                     20, 4, null, Color.BLUE);
             mLegendEntries.add(lidlegendEntry);
-            LegendEntry plegendEntry = new LegendEntry("加热器温度", Legend.LegendForm.LINE,
+
+            String heaterT=mChart.getContext().getString(R.string.running_heater_temp);
+            LegendEntry plegendEntry = new LegendEntry(heaterT, Legend.LegendForm.LINE,
                     20, 4, null, Color.RED);
             mLegendEntries.add(plegendEntry);
 
-            Legend legend = mChart.getLegend();
-            legend.setCustom(mLegendEntries);
+          /*  Legend legend = mChart.getLegend();
+            legend.setCustom(mLegendEntries);*/
         }
 
 

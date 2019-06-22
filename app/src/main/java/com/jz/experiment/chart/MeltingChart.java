@@ -72,8 +72,8 @@ public class MeltingChart extends WindChart {
             }
         }
 
-        Legend legend = mChart.getLegend();
-        legend.setCustom(mLegendEntries);
+      /*  Legend legend = mChart.getLegend();
+        legend.setCustom(mLegendEntries);*/
 
         mHandler.sendEmptyMessage(WHAT_REFRESH_CHART);
     }

@@ -11,10 +11,14 @@ import com.wind.base.adapter.BaseDelegateRecyclerAdapter;
 import java.util.List;
 
 public class StageAdapter extends BaseDelegateRecyclerAdapter {
-    public StageAdapter(Activity activity) {
+    public static int STAGE_ITEM_WIDTH;
+    public StageAdapter(Activity activity,int stageItemWidth) {
         super(activity);
+        STAGE_ITEM_WIDTH=stageItemWidth;
     }
-
+    public void setStageItemWidth(int stageItemWidth){
+        STAGE_ITEM_WIDTH=stageItemWidth;
+    }
     @Override
     protected void addDelegate() {
         manager

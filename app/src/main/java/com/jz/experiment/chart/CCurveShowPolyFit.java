@@ -101,8 +101,8 @@ public class CCurveShowPolyFit {
         m_zData2 = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         m_yData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         ifactor = new double[MAX_CHAN][MAX_CYCL];
-        x = new double[MAX_CYCL];
-        y = new double[MAX_CYCL];
+       /* x = new double[MAX_CYCL];
+        y = new double[MAX_CYCL];*/
 
         ran = new Random();
 /*#if DEBUG
@@ -469,26 +469,26 @@ public class CCurveShowPolyFit {
 
 
                 } else {
-
-                    /*for (int n = 3; n < MIN_CT; n++) {
-                        tempData.Add(yData[n]);
+                    List<Double> tempData = new ArrayList<>();
+                    for (int n = 3; n < MIN_CT; n++) {
+                        tempData.add(yData[n]);
                     }
 
-                    sum = tempData.Sum();
+                    double sum = sumList(tempData);//tempData.Sum();
 
                     //calculate CT value
                     //double sum = std::accumulate(std::begin(tempData), std::end(tempData), 0.0);
-                    mean = sum / tempData.Count; //mean
+                    double mean = sum / tempData.size(); //mean
 
-                    accum = 0.0;
-                    for (int m = 0; m < tempData.Count; m++) {
-                        accum += (tempData[m] - mean) * (tempData[m] - mean);
+                    double accum = 0.0;
+                    for (int m = 0; m < tempData.size(); m++) {
+                        accum += (tempData.get(m) - mean) * (tempData.get(m) - mean);
                     }
 
                     //std::for_each (std::begin(tempData), std::end(tempData), [&](const double d) {
                     //    accum  += (d-mean)*(d-mean);
                     //});
-                    stdev = Math.Sqrt(accum / tempData.Count); //方差
+                    double stdev = Math.sqrt(accum / tempData.size()); //方差
 
                     //========== outlier data remove=================
                     //std::for_each(std::begin(tempData), std::end(tempData), [&](double &d) {
@@ -496,12 +496,13 @@ public class CCurveShowPolyFit {
                     //});
 
 
-                    for (int v = 0; v < tempData.Count; v++) {
-                        if (tempData[v] - mean > 2.5 * stdev || tempData[v] - mean < -2.5 * stdev) {
-                            tempData[v] = mean;
+                    for (int v = 0; v < tempData.size(); v++) {
+                        if (tempData.get(v) - mean > 2.5 * stdev || tempData.get(v) - mean < -2.5 * stdev) {
+                           // tempData[v] = mean;
+                            tempData.set(v,mean);
                             yData[v + 3] = mean;
                         }
-                    }*/
+                    }
 
                 }
                 List<Double> tempData = new ArrayList<>();
@@ -567,17 +568,17 @@ public class CCurveShowPolyFit {
 
     public double getY(double[] coefficients, double x) {
         int degree = coefficients.length - 1;
-        double y = 0;
+       /* double y = 0;
         for (int i = degree; i >= 0; i--) {
             y += coefficients[i] * Math.pow(x, i);
         }
-        return y;
-      /*  return coefficients[0] +
+        return y;*/
+        return coefficients[0] +
                 coefficients[1] * x +
                 coefficients[2] * Math.pow(x, 2) +
                 coefficients[3] * Math.pow(x, 3) +
                 coefficients[4] * Math.pow(x, 4) +
-                coefficients[5] * Math.pow(x, 5);*/
+                coefficients[5] * Math.pow(x, 5);
     }
 
 
@@ -615,7 +616,8 @@ public class CCurveShowPolyFit {
 //                      m_Confidence[iy, frameindex] = "可信度: " + (confi * 100).ToString("0") + "%";       // full confidence is 100
 //                }
 
-            confi = (ratio - 0.1) * 1.11 * 0.4 + (r[frameindex][iy] - 0.19) * 2.17 * 0.6; // Weighted average of 2 score, r generally range 0.19 to 0.65
+            confi = (ratio - 0.1) * 1.11 * 0.4 +
+                    (r[frameindex][iy] - 0.19) * 2.17 * 0.6; // Weighted average of 2 score, r generally range 0.19 to 0.65
 
             if (confi < 0)
                 confi = 0;

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/stage_width"
+    android:id="@+id/ll_stage_item"
     android:layout_height="match_parent">
 
 

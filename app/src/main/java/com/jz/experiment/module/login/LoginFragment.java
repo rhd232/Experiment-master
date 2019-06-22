@@ -1,7 +1,9 @@
 package com.jz.experiment.module.login;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.print.PrintManager;
 import android.support.annotation.Nullable;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -165,13 +167,22 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
 
     }
 
+    private void doPdfPrint(String filePath) {
+
+        PrintManager printManager = (PrintManager) getActivity().getSystemService(Context.PRINT_SERVICE);
+        PdfPrintAdapter myPrintAdapter = new PdfPrintAdapter(filePath);
+        printManager.print("print_pdf", myPrintAdapter, null);
+
+    }
+
     Subscription loginSubscription;
 
     @OnClick({R.id.iv_pwd_toggle, R.id.tv_login})
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.tv_login:
-
+              /*  String filePath = C.Value.REPORT_FOLDER + "2019_03_03_20_08_00变温扩增.pdf";
+                doPdfPrint(filePath);*/
                 login();
                 break;
             case R.id.iv_pwd_toggle:
@@ -188,7 +199,8 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
         }
     }
 
-    private boolean mNeedStopService=true;
+    private boolean mNeedStopService = true;
+
     private void login() {
         if (validate()) {
             setNofity(null);
@@ -212,10 +224,10 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
                             if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                                 //登录成功
                                 MainActivity.start(getActivity());
-                                mNeedStopService=false;
+                                mNeedStopService = false;
                                 ActivityUtil.finish(getActivity());
                             } else {
-                                String tips=getString(R.string.login_error_tips);
+                                String tips = getString(R.string.login_error_tips);
                                 tv_msg.setText(tips);
                             }
                         }
@@ -225,12 +237,12 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
 
     private boolean validate() {
         if (!et_username.validate()) {
-            String nameTips=getString(R.string.login_input_name);
+            String nameTips = getString(R.string.login_input_name);
             tv_msg.setText(nameTips);
             return false;
         }
         if (!et_pwd.validate()) {
-            String pwdTips=getString(R.string.login_input_pwd);
+            String pwdTips = getString(R.string.login_input_pwd);
             tv_msg.setText(pwdTips);
             return false;
         }
@@ -325,7 +337,7 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
     @Override
     public void onConnectSuccess() {
         if (sAnitoa != null) {
-            if (mCommunicationService!=null){
+            if (mCommunicationService != null) {
                 mCommunicationService.sendPcrCommand(PcrCommand.ofVersionCmd());
             }
           /*  CommunicationService service = sAnitoa.getCommunicationService();

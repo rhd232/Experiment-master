@@ -3,14 +3,15 @@ package com.jz.experiment.module.expe.adapter;
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
+import com.jz.experiment.module.expe.event.RefreshStageAdapterEvent;
+import com.wind.base.adapter.BaseRecyclerAdapter;
 import com.wind.base.bean.CyclingStage;
 import com.wind.base.bean.PartStage;
-import com.jz.experiment.module.expe.event.RefreshStageAdapterEvent;
 import com.wind.base.widget.VernierDragLayout;
-import com.wind.base.adapter.BaseRecyclerAdapter;
 import com.wind.toastlib.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -35,6 +36,11 @@ public class VernierAdapter extends BaseRecyclerAdapter<PartStage,VernierAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
+
+        if (StageAdapter.STAGE_ITEM_WIDTH!=0){
+            ViewGroup.LayoutParams lp=holder.stageItemView.getLayoutParams();
+            lp.width=StageAdapter.STAGE_ITEM_WIDTH;
+        }
 
         PartStage partStage= getItem(position);
         partStage.setStepName("step "+(position+1));
@@ -84,8 +90,10 @@ public class VernierAdapter extends BaseRecyclerAdapter<PartStage,VernierAdapter
         View iv_add,iv_del;
         VernierDragLayout vernier_drag_layout;
         TextView tv_step_name;
+        View stageItemView;
         public ViewHolder(View itemView) {
             super(itemView);
+            stageItemView=itemView.findViewById(R.id.ll_stage_item);
             iv_add=itemView.findViewById(R.id.iv_add);
             iv_del=itemView.findViewById(R.id.iv_del);
             tv_step_name=itemView.findViewById(R.id.tv_step_name);

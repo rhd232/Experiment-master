@@ -240,21 +240,24 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
     private void showChart() {
         double [][] ctValues;
+        boolean [][] falsePositive;
         if (tv_dt.isActivated()) {
 
             mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment),layout_ctparam_input.getCtParam());
             ctValues= CCurveShowPolyFit.getInstance().m_CTValue;
+            falsePositive=new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
         } else {
           /*  float t=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
             float f=Float.parseFloat(String.format("%f",t));
             mMeltingChart.setAxisMinimum(f);*/
             mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment),layout_ctparam_input.getCtParam());
             ctValues=CCurveShowMet.getInstance().m_CTValue;
+            falsePositive=CCurveShowPolyFit.getInstance().m_falsePositive;
         }
 
         for (String chan : ChanList) {
             for (String ks : KSList) {
-                getCtValue(chan, ks,ctValues);
+                getCtValue(chan, ks,ctValues,falsePositive);
             }
         }
         notifyCtChanged();
@@ -294,7 +297,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         //获取CT value
         for (String chan : ChanList) {
             for (String ks : KSList) {
-                getCtValue(chan, ks,CCurveShowPolyFit.getInstance().m_CTValue);
+                getCtValue(chan, ks,CCurveShowPolyFit.getInstance().m_CTValue,CCurveShowPolyFit.getInstance().m_falsePositive);
             }
         }
 
@@ -513,6 +516,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
+
                 PdfDocument document = new PdfDocument();
                 int width = AppUtil.getScreenWidth(getActivity());
                 int height = 0;// AppUtil.getScreenHeight(getActivity());

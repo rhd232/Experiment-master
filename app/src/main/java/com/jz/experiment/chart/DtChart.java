@@ -3,6 +3,7 @@ package com.jz.experiment.chart;
 import android.graphics.Color;
 
 import com.anitoa.util.AnitoaLogUtil;
+import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
@@ -10,7 +11,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.anitoa.well.Well;
+import com.jz.experiment.R;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.widget.CtParamInputLayout;
 
@@ -25,9 +26,10 @@ public class DtChart extends WindChart {
     public DtChart(LineChart chart,int cylingCount) {
         this(chart,cylingCount,null);
     }
+    private String channelStr;
     public DtChart(LineChart chart,int cylingCount,FactUpdater factUpdater) {
         super(chart,factUpdater);
-
+        channelStr=chart.getContext().getString(R.string.setup_channel);
         XAxis xAxis = chart.getXAxis();
       //  xAxis.setLabelCount(cylingCount + 4, true);
       //  xAxis.setAxisMaximum(60);
@@ -57,7 +59,7 @@ public class DtChart extends WindChart {
         sBuilder.append("[");
         for (int j=0;j<=3;j++) {
             if (j==0) {
-                String s = "通道" + (j + 1);
+                String s = channelStr + (j + 1);
                 sBuilder.append(s);
                 sBuilder.append("\n");
                 for (int i = 0; i < 100; i++) {
@@ -102,9 +104,8 @@ public class DtChart extends WindChart {
                 // DrawLineFromServer(chan,ks,chanMap);
             }
         }
-
-        Legend legend = mChart.getLegend();
-        legend.setCustom(mLegendEntries);
+       /* Legend legend = mChart.getLegend();
+        legend.setCustom(mLegendEntries);*/
 
         mHandler.sendEmptyMessage(WHAT_REFRESH_CHART);
     }
@@ -161,9 +162,9 @@ public class DtChart extends WindChart {
         }
         if (mLegendEntries.size() <= currChan) {
 
-            legendEntry = new LegendEntry("通道" + (currChan + 1), Legend.LegendForm.LINE,
+            legendEntry = new LegendEntry(channelStr + (currChan + 1), Legend.LegendForm.LINE,
                     20, 4, null, color);
-            if (!contains("通道" + (currChan + 1))){
+            if (!contains(channelStr + (currChan + 1))){
                 mLegendEntries.add(legendEntry);
             }
 
@@ -182,12 +183,11 @@ public class DtChart extends WindChart {
 
             float y = (float) CurveReader.getInstance().m_zData[currChan][ksindex][i];
             Entry entry = new Entry(i, y);
-
             expeData.add(entry);
 
         }
 
-        LineDataSet dataSet = new LineDataSet(expeData, "通道" + (currChan + 1));
+        LineDataSet dataSet = new LineDataSet(expeData, channelStr + (currChan + 1));
         dataSet.setColor(color);
         dataSet.setDrawCircles(false);
        // dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);

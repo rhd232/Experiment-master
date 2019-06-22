@@ -47,7 +47,9 @@
     <string name="running_heating">加热中</string>
     <string name="running_cooling">冷却中</string>
     <string name="running_test_finished">实验结束</string>
-
+    <string name="running_lid_temp">热盖温度</string>
+    <string name="running_heater_temp">加热器温度</string>
+    <string name="running_stage">阶段</string>
     <string name="title_setup_1">用户设置1</string>
     <string name="setup_test_name">实验名称：</string>
     <string name="setup_input_test_name">请输入实验名称</string>
@@ -98,7 +100,7 @@
 
 
     <string name="title_data">数据</string>
-    <string name="data_by">实验人</string>
+    <string name="data_by">实验人：</string>
     <string name="data_finish_time">完成时间：</string>
     <string name="data_during_time">耗时：</string>
 
@@ -147,5 +149,7 @@
 
     <string name="tip_least_one_cycle">至少含有一个循环</string>
     <string name="op_del">删除</string>
+
+    <string name="negative">阴性</string>
 
 </resources>

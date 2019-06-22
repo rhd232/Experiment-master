@@ -49,6 +49,7 @@ import com.wind.base.bean.StartStage;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.ActivityUtil;
+import com.wind.base.utils.DisplayUtil;
 import com.wind.base.utils.LogUtil;
 import com.wind.base.utils.Navigator;
 import com.wind.data.DbOpenHelper;
@@ -163,7 +164,8 @@ public class UserSettingsStep2ActivityBackup extends BaseActivity implements Ani
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rv.setLayoutManager(manager);
         rv.setNestedScrollingEnabled(false);
-        mStageAdapter = new StageAdapter(getActivity());
+        int stageItemWidth= DisplayUtil.dip2px(getActivity(),120);
+        mStageAdapter = new StageAdapter(getActivity(),stageItemWidth);
         rv.setAdapter(mStageAdapter);
 
         ExpeSettingSecondInfo expeSettingSecondInfo = mHistoryExperiment.getSettingSecondInfo();
@@ -203,8 +205,18 @@ public class UserSettingsStep2ActivityBackup extends BaseActivity implements Ani
             return;
         }
         mStageAdapter.add(event.getPosition(), new StartStage());
+
         buildLink();
         Log.i("StartStage", "onAddStartStageEvent");
+
+        caculateStageItemWidth();
+
+    }
+
+    private void caculateStageItemWidth() {
+        int count=mStageAdapter.getItemCount();
+        int size=Math.min(count,5);
+
     }
 
     @Subscribe

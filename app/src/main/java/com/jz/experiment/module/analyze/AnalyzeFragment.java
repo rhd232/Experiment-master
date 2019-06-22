@@ -199,23 +199,26 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     String item = (String) spinner.getSelectedItem();
 
                     double[][] ctValues;
+                    boolean [][] falsePositive;
                     String melting=getString(R.string.setup_mode_melting);
                     if (melting.equals(item)) {
                         mChart = new MeltingChart(chart_line);
                         ctValues = CCurveShowMet.getInstance().m_CTValue;
                       /*  float f=Float.parseFloat(String.format("%f",40f));
                         mChart.setAxisMinimum(f);*/
+                        falsePositive=new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
                     } else {
                         //获取类型，是扩增曲线还是熔解曲线
                         mChart = new DtChart(chart_line, 40);
                         ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+                        falsePositive=CCurveShowPolyFit.getInstance().m_falsePositive;
                     }
                     mChart.show(ChanList, KSList, mOpenedFile, null);
                     KSList.clear();
                     KSList = Well.getWell().getKsList();
                     for (String chan : ChanList) {
                         for (String ks : KSList) {
-                            getCtValue(chan, ks, ctValues);
+                            getCtValue(chan, ks, ctValues,falsePositive);
                         }
                     }
                     notifyCtChanged();
@@ -293,11 +296,12 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                         @Override
                         public void run() {
                             double[][] ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+                            boolean[][] falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
                             KSList.clear();
                             KSList = Well.getWell().getKsList();
                             for (String chan : ChanList) {
                                 for (String ks : KSList) {
-                                    getCtValue(chan, ks, ctValues);
+                                    getCtValue(chan, ks, ctValues,falsePositive);
                                 }
                             }
                             notifyCtChanged();
@@ -314,6 +318,9 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.iv_pdf:
+                if(mOpenedFile==null){
+                    return;
+                }
                 AndPermission.with(this)
                         .runtime()
                         .permission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,

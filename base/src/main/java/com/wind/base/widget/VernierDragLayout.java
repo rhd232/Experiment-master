@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -156,10 +155,10 @@ public class VernierDragLayout extends FrameLayout implements VernierView.OnView
     @Override
     public void onViewPositionChanged(PointF pos) {
         mCurPos=pos;
-        Log.i("DragCallback","left:"+mCurPos.x+"-top:"+mCurPos.y);
+       // Log.i("DragCallback","left:"+mCurPos.x+"-top:"+mCurPos.y);
         //刻度0-100
         float percent=vernier_view.heightPercent(mCurPos.y);
-        System.out.println("percent:"+percent);
+       // System.out.println("percent:"+percent);
         float t=(1-percent)*100;
         String temp=decimalFormat.format(t);
         tv_temperature.setText(temp);

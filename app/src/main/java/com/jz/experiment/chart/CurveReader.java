@@ -22,10 +22,13 @@ public class CurveReader {
     public void readCurve(double[][] factorValues, CtParamInputLayout.CtParam ctParam){
         double[][][]  m_yData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
         CCurveShowPolyFit cCurveShow =  CCurveShowPolyFit.getInstance();
-        int minCt=13;
-        int threshold=12;
+      /*  int minCt=13;
+        int threshold=10;*/
+        int minCt=5;
+        int threshold=8;
         if (ctParam!=null){
             minCt=ctParam.ctMin;
+            threshold=ctParam.ctThreshhold;
             if (minCt < 5) minCt = 5;
             else if (minCt > 18) minCt = 25;
 

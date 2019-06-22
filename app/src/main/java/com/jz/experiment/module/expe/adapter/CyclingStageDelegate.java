@@ -218,10 +218,11 @@ View.OnFocusChangeListener{
         View iv_cycling_add, iv_cycling_del;
         EditText et_cycling_cnt;
         TextView tv_pic_step;
-
+        View stageItemView;
         HorizontalContainer horizontal_container;
         public ViewHolder(View itemView) {
             super(itemView);
+            stageItemView=itemView.findViewById(R.id.ll_stage_item);
             iv_cycling_add = itemView.findViewById(R.id.iv_cycling_add);
             iv_cycling_del = itemView.findViewById(R.id.iv_cycling_del);
             et_cycling_cnt = itemView.findViewById(R.id.et_cycling_cnt);
