@@ -11,8 +11,20 @@ public class Sample implements Serializable {
     private String name;
     private int type;//样本类型，
     private boolean enabled;
+
+    public static final int CODE_DEFAULT=0;
+    public static final int CODE_STANDARD=1;
+    public static final int CODE_UNKWON=2;
+    private int status;
+
+    private int seq;//序号
     public String getName() {
         return name;
+    }
+
+    public String getSeqName(){
+        String type=getType()==Sample.TYPE_A?"A":"B";
+        return type+seq;
     }
 
     public void setName(String name) {
@@ -41,5 +53,21 @@ public class Sample implements Serializable {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
     }
 }

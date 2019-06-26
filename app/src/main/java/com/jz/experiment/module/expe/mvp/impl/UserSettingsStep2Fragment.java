@@ -129,7 +129,8 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         mExecutorService = Executors.newSingleThreadExecutor();
         mHistoryExperiment = getArguments().getParcelable(BaseUserSettingsStep1Fragment.ARG_KEY_EXPE);
 
-        mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
+        mCommunicationService = Anitoa.getInstance(getActivity())
+                .getCommunicationService();
 
         mExpeDataStore = new ExpeDataStore(
                 ProviderModule
@@ -147,7 +148,6 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         boolean isLandscape=ActivityUtil.isLandscape(getActivity());
         int stageItemWidth;
         if (isLandscape){
-
              stageItemWidth=AppUtil.getScreenWidth(getActivity())/4;
         }else {
             stageItemWidth= DisplayUtil.dip2px(getActivity(),120);
@@ -169,6 +169,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             mModes = new ArrayList<>();
             String dt=getString(R.string.setup_mode_dt);
             mModes.add(new DtMode(dt));
+            buildModeShowName();
         } else {
             mModes = expeSettingSecondInfo.getModes();
             buildModeShowName();
@@ -821,10 +822,12 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                 List<Integer> rlist = new ArrayList<>();      // row index
                 List<Integer> clist = new ArrayList<>();      // col index
 
-                byte[] trim_buff = new byte[2048];
+                int[] trim_buff = new int[2048];
+               // byte[] trim_buff = new byte[2048];
 
                 for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
-                    trim_buff[j] = EepromBuff[0][j];        // copy first page
+                    //c# byte取值范围0-255 java byte取值范围-128-127  所以要& 0xff
+                    trim_buff[j] = EepromBuff[0][j] & 0xff;        // copy first page
                 }
 
                 int k = 0;
@@ -883,11 +886,11 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                         }
                     }
 
-                    byte b0 = trim_buff[k];
+                    int b0 = trim_buff[k];
                     k++;        // Extract chip name
-                    byte b1 = trim_buff[k];
+                    int b1 = trim_buff[k];
                     k++;
-                    byte b2 = trim_buff[k];
+                    int b2 = trim_buff[k];
                     k++;
 
                     for (int i = 0; i < TRIM_IMAGER_SIZE; i++) {
@@ -955,6 +958,15 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         }
     }
 
+    private int Buf2Int(int[] buff, int k) {
+        byte[] x = {(byte) buff[k + 1],
+                (byte)buff[k]};
+        int y = ByteUtil.getShort(x);
+        //int y = (int) BitConverter.ToInt16(x, 0);
+
+        return y;
+    }
+
     private int Buf2Int(byte[] buff, int k) {
         byte[] x = {buff[k + 1],
                 buff[k]};
@@ -985,7 +997,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         }
     }
 
-    private String Buf2String(byte[] buff, int size) {
+    private String Buf2String(int[] buff, int size) {
         //String rstr;
         StringBuilder sBuilder = new StringBuilder();
         //rstr = "Chipdp\r\n";

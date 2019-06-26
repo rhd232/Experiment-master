@@ -25,6 +25,11 @@ public class TempChart extends WindChart {
     }
 
     @Override
+    public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam, boolean norm) {
+
+    }
+
+    @Override
     public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam) {
 
 

@@ -40,6 +40,11 @@ public class MeltingChart extends WindChart {
 
     @Override
     public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam) {
+        show(ChanList,KSList,dataFile,ctParam,true);
+    }
+
+    @Override
+    public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam,boolean norm) {
 
         InputStream ips = null;
         try {

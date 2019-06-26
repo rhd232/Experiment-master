@@ -39,13 +39,15 @@ public class DtChart extends WindChart {
       //  yAxis.setAxisMinimum(-500);
         yAxis.setDrawGridLines(true);
     }
-
     public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam){
+        show(ChanList,KSList,dataFile,ctParam,true);
+    }
+    public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam,boolean norm){
         InputStream ips = null;
         try {
             ips = new FileInputStream(dataFile);
             //ips = mChart.getContext().getAssets().open("2019_02_13_04_11_17_dt.txt");
-            show(ChanList, KSList, ips,ctParam);
+            show(ChanList, KSList, ips,ctParam, norm);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,7 +78,7 @@ public class DtChart extends WindChart {
         //System.out.println(sBuilder.toString());
         AnitoaLogUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"),sBuilder.toString());
     }
-    public void show(List<String> ChanList, List<String> KSList,InputStream ips,CtParamInputLayout.CtParam ctParam) {
+    public void show(List<String> ChanList, List<String> KSList,InputStream ips,CtParamInputLayout.CtParam ctParam,boolean norm) {
 
         //读取图像文件数据
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
@@ -88,7 +90,7 @@ public class DtChart extends WindChart {
             CommData.m_factorData=DataFileReader.getInstance().factorValue;
            // recordFactorData("离线",CommData.m_factorData);
         }
-        CurveReader.getInstance().readCurve(CommData.m_factorData,ctParam);
+        CurveReader.getInstance().readCurve(CommData.m_factorData,ctParam,norm);
 
         // Map<Integer,List<List<String>>> chanMap= DataParser.parseDtData(dataFile);
         //请求服务器，解析图像版返回的原始数据

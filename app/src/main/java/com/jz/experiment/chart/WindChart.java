@@ -123,7 +123,7 @@ public abstract class WindChart {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case WHAT_REFRESH_CHART:
-                    if (!mLegendEntries.isEmpty()) {
+                    if (mLegendEntries!=null && !mLegendEntries.isEmpty()) {
                         Legend legend = mChart.getLegend();
                         legend.setCustom(mLegendEntries);
                     }
@@ -146,7 +146,7 @@ public abstract class WindChart {
                     mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                         @Override
                         public void onValueSelected(Entry e, Highlight h) {
-                            if (thisChart() instanceof TempChart){
+                            if (thisChart() instanceof TempChart || thisChart() instanceof StandardChart){
                                 mChart.setDrawMarkers(false);
                             }else {
                                 mChart.setDrawMarkers(true);
@@ -172,8 +172,9 @@ public abstract class WindChart {
     public void setRunning(boolean running){
         this.mRunning=running;
     }
-    public abstract void show(List<String> ChanList, List<String> KSList,File dataFile, CtParamInputLayout.CtParam ctParam);
+    public abstract void show(List<String> ChanList, List<String> KSList,File dataFile, CtParamInputLayout.CtParam ctParam,boolean norm);
 
+    public abstract void show(List<String> ChanList, List<String> KSList,File dataFile, CtParamInputLayout.CtParam ctParam);
 
     public  void setAxisMinimum(float start){
         XAxis xAxis = mChart.getXAxis();

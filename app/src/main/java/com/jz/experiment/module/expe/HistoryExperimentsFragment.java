@@ -300,7 +300,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
                                     }
                                 });
-                        //UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                      //  UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
 
 
                     }

@@ -155,8 +155,15 @@
                     android:id="@+id/iv_save"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/icon_save" />
-
+                    android:src="@drawable/icon_save"
+                    android:visibility="gone"/>
+                <ImageView
+                    android:id="@+id/iv_std_curve"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/icon_standard_curve" />
                 <ImageView
                     android:id="@+id/iv_pdf"
                     android:layout_width="wrap_content"

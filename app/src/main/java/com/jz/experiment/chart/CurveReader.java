@@ -19,13 +19,13 @@ public class CurveReader {
 
 
     }
-    public void readCurve(double[][] factorValues, CtParamInputLayout.CtParam ctParam){
+    public void readCurve(double[][] factorValues, CtParamInputLayout.CtParam ctParam,boolean norm){
         double[][][]  m_yData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
         CCurveShowPolyFit cCurveShow =  CCurveShowPolyFit.getInstance();
       /*  int minCt=13;
         int threshold=10;*/
-        int minCt=5;
-        int threshold=8;
+        int minCt=CtParamInputLayout.DEFALUT_MIN_CT;
+        int threshold=CtParamInputLayout.DEFALUT_THRESHHOLD_CT;
         if (ctParam!=null){
             minCt=ctParam.ctMin;
             threshold=ctParam.ctThreshhold;
@@ -40,7 +40,7 @@ public class CurveReader {
         cCurveShow.log_threshold[2] = (float)(threshold * 0.01);
         cCurveShow.log_threshold[3] = (float)(threshold * 0.01);
         cCurveShow.MIN_CT=minCt;
-
+        cCurveShow.norm_top=norm;
         cCurveShow.InitData();
         //List<String> kslist = new ArrayList<>();//定义孔数
         List<String> kslist=Well.getWell().getKsList();

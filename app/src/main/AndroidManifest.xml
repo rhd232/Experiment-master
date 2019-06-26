@@ -31,10 +31,14 @@
         <activity android:name=".SplashActivity"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:launchMode="singleTop"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.HOME"></category>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.MONKEY"></category>
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"
@@ -78,17 +82,23 @@
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
             ></activity>
+        <activity android:name="com.jz.experiment.module.data.StandardCurveActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:windowSoftInputMode="adjustPan"
+            ></activity>
+
         <service android:name="com.anitoa.service.BluetoothLeService"></service>
         <service android:name="com.anitoa.service.BluetoothService"></service>
         <service android:name="com.anitoa.service.UsbService"></service>
-
+    <!--
         <receiver android:name="com.jz.experiment.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
                 <category android:name="android.intent.category.LAUNCHER"></category>
             </intent-filter>
         </receiver>
-
+-->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.FileProvider"

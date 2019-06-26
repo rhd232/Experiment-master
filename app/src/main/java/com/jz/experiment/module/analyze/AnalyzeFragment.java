@@ -14,6 +14,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 
@@ -28,6 +30,7 @@ import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.WindChart;
 import com.jz.experiment.module.data.FilterActivity;
+import com.jz.experiment.module.data.StandardCurveActivity;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DataFileUtil;
@@ -35,6 +38,9 @@ import com.jz.experiment.widget.CtParamInputLayout;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.utils.AppUtil;
 import com.wind.base.utils.FileUtil;
+import com.wind.data.expe.bean.ExpeSettingsFirstInfo;
+import com.wind.data.expe.bean.HistoryExperiment;
+import com.wind.data.expe.bean.Sample;
 import com.wind.toastlib.ToastUtil;
 import com.wind.view.TitleBar;
 import com.yanzhenjie.permission.Action;
@@ -75,6 +81,8 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
     ExecutorService mExecutorService;
 
 
+    CheckBox cb_norm;
+
     ScrollView sv_pdf;
 
     Handler mHandler = new Handler();
@@ -106,7 +114,15 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         mExecutorService = Executors.newSingleThreadExecutor();
         EventBus.getDefault().register(this);
         layout_ctparam_input = view.findViewById(R.id.layout_ctparam_input);
-        sv_pdf=view.findViewById(R.id.sv_pdf);
+        sv_pdf = view.findViewById(R.id.sv_pdf);
+        cb_norm = view.findViewById(R.id.cb_norm);
+        cb_norm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                showChart();
+
+            }
+        });
         layout_ctparam_input.setOnCtParamChangeListener(this);
         chart_line = view.findViewById(R.id.chart_line);
         chart_line.setNoDataText("");
@@ -196,29 +212,39 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     Uri uri = data.getData();
                     String path = FileUtil.getPath(getActivity(), uri);
                     mOpenedFile = new File(path);
-                    String item = (String) spinner.getSelectedItem();
+                    cb_norm.setVisibility(View.VISIBLE);
 
+                    String item = (String) spinner.getSelectedItem();
                     double[][] ctValues;
-                    boolean [][] falsePositive;
-                    String melting=getString(R.string.setup_mode_melting);
+                    boolean[][] falsePositive;
+                    String melting = getString(R.string.setup_mode_melting);
                     if (melting.equals(item)) {
                         mChart = new MeltingChart(chart_line);
-                        ctValues = CCurveShowMet.getInstance().m_CTValue;
+
                       /*  float f=Float.parseFloat(String.format("%f",40f));
                         mChart.setAxisMinimum(f);*/
-                        falsePositive=new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+
                     } else {
                         //获取类型，是扩增曲线还是熔解曲线
                         mChart = new DtChart(chart_line, 40);
-                        ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-                        falsePositive=CCurveShowPolyFit.getInstance().m_falsePositive;
+
+
                     }
-                    mChart.show(ChanList, KSList, mOpenedFile, null);
+                    mChart.show(ChanList, KSList, mOpenedFile, layout_ctparam_input.getCtParam(),cb_norm.isChecked());
+
+                    if (melting.equals(item)) {
+                        ctValues = CCurveShowMet.getInstance().m_CTValue;
+                        falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+                    } else {
+                        ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+                        falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+                    }
+
                     KSList.clear();
                     KSList = Well.getWell().getKsList();
                     for (String chan : ChanList) {
                         for (String ks : KSList) {
-                            getCtValue(chan, ks, ctValues,falsePositive);
+                            getCtValue(chan, ks, ctValues, falsePositive);
                         }
                     }
                     notifyCtChanged();
@@ -275,7 +301,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
 
     private void showChart() {
         if (mOpenedFile != null && mChart != null)
-            mChart.show(ChanList, KSList, mOpenedFile, null);
+            mChart.show(ChanList, KSList, mOpenedFile, layout_ctparam_input.getCtParam(),cb_norm.isChecked());
     }
 
     @Override
@@ -291,7 +317,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    mChart.show(ChanList, KSList, mOpenedFile, ctParam);
+                    mChart.show(ChanList, KSList, mOpenedFile, ctParam,cb_norm.isChecked());
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -301,7 +327,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                             KSList = Well.getWell().getKsList();
                             for (String chan : ChanList) {
                                 for (String ks : KSList) {
-                                    getCtValue(chan, ks, ctValues,falsePositive);
+                                    getCtValue(chan, ks, ctValues, falsePositive);
                                 }
                             }
                             notifyCtChanged();
@@ -314,11 +340,52 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         }
     }
 
-    @OnClick(R.id.iv_pdf)
+    private HistoryExperiment buildExpe() {
+       /* KSList.clear();
+        KSList = Well.getWell().getKsList();
+        for (String chan : ChanList) {
+            for (String ks : KSList) {
+                List<com.jz.experiment.chart.ChartData> cdlist = CommData.GetChartData(chan, 4, ks);
+                if (cdlist.size() == 0){
+
+                }
+            }
+        }
+       */
+
+        HistoryExperiment experiment = new HistoryExperiment();
+        ExpeSettingsFirstInfo firstInfo = new ExpeSettingsFirstInfo();
+        List<Sample> samplesA = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            Sample sample = new Sample();
+            sample.setType(Sample.TYPE_A);
+            samplesA.add(sample);
+        }
+        firstInfo.setSamplesA(samplesA);
+        List<Sample> samplesB = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            Sample sample = new Sample();
+            sample.setType(Sample.TYPE_B);
+            samplesB.add(sample);
+        }
+        firstInfo.setSamplesB(samplesB);
+        experiment.setSettingsFirstInfo(firstInfo);
+        return experiment;
+    }
+
+    @OnClick({R.id.iv_pdf, R.id.iv_std_curve})
     public void onViewClick(View view) {
         switch (view.getId()) {
+            case R.id.iv_std_curve:
+
+                if (mOpenedFile != null) {
+                    HistoryExperiment experiment = buildExpe();
+                    StandardCurveActivity.start(getActivity(), experiment);
+                }
+
+                break;
             case R.id.iv_pdf:
-                if(mOpenedFile==null){
+                if (mOpenedFile == null) {
                     return;
                 }
                 AndPermission.with(this)
@@ -328,7 +395,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                         .onGranted(new Action<List<String>>() {
                             @Override
                             public void onAction(List<String> data) {
-                                String msg=getString(R.string.dialog_msg_pdf);
+                                String msg = getString(R.string.dialog_msg_pdf);
                                 AppDialogHelper.showNormalDialog(getActivity(),
                                         msg, new AppDialogHelper.DialogOperCallback() {
                                             @Override
@@ -339,13 +406,14 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                                                 mHandler.postDelayed(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        StringBuilder sPdfNameBuilder=new StringBuilder();
-                                                        sPdfNameBuilder.append(mOpenedFile.getName().replace(".txt",""));
-;                                                        if (mChart instanceof DtChart){
-                                                            String dt=getString(R.string.setup_mode_dt);
+                                                        StringBuilder sPdfNameBuilder = new StringBuilder();
+                                                        sPdfNameBuilder.append(mOpenedFile.getName().replace(".txt", ""));
+                                                        ;
+                                                        if (mChart instanceof DtChart) {
+                                                            String dt = getString(R.string.setup_mode_dt);
                                                             sPdfNameBuilder.append(dt);
-                                                        }else {
-                                                            String melting=getString(R.string.setup_mode_melting);
+                                                        } else {
+                                                            String melting = getString(R.string.setup_mode_melting);
                                                             sPdfNameBuilder.append(melting);
                                                         }
                                                         sPdfNameBuilder.append(".pdf");

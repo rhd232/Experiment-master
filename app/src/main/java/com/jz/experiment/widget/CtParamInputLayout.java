@@ -19,6 +19,10 @@ import rx.functions.Action1;
 
 public class CtParamInputLayout extends FrameLayout {
 
+
+    public static int DEFALUT_MIN_CT=13;
+    public static int DEFALUT_THRESHHOLD_CT=10;
+
     public CtParamInputLayout(@NonNull Context context) {
         this(context, null);
     }
@@ -67,12 +71,14 @@ public class CtParamInputLayout extends FrameLayout {
         String ctThreshold = et_ct_threshold.getText().toString().trim();
 
         if (TextUtils.isEmpty(ctMin)) {
-            param.ctMin = 13;
+            param.ctMin = DEFALUT_MIN_CT;
+            et_ct_min.setText(DEFALUT_MIN_CT+"");
         } else {
             param.ctMin = Integer.parseInt(ctMin);
         }
         if (TextUtils.isEmpty(ctThreshold)) {
-            param.ctThreshhold = 12;
+            param.ctThreshhold = DEFALUT_THRESHHOLD_CT;
+            et_ct_threshold.setText(DEFALUT_THRESHHOLD_CT+"");
         } else {
             param.ctThreshhold = Integer.parseInt(ctThreshold);
         }

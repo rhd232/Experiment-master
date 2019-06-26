@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:orientation="horizontal"
+    android:background="@drawable/selector_a5v8d6_efefef"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color333333"
+        android:gravity="center"
+        />
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        />
+    <TextView
+        android:id="@+id/tv_concentration"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:textColor="@color/color333333"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        />
+
+    <EditText
+        android:id="@+id/et_concentration"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:gravity="center"
+        android:text="1"
+        android:inputType="numberDecimal"
+        android:textColor="@color/color333333"
+        />
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        />
+    <TextView
+        android:id="@+id/tv_ct"
+        android:layout_width="50dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color333333"
+        />
+</LinearLayout>

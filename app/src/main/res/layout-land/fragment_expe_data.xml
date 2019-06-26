@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sv"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_weight="1"
     android:background="@color/white">
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -133,7 +140,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp">
+                    android:layout_marginTop="5dp">
 
                     <TextView
                         android:id="@+id/tv_dt"
@@ -174,7 +181,29 @@
                             android:id="@+id/iv_save"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/icon_save" />
+                            android:src="@drawable/icon_save"
+                            android:visibility="gone"/>
+
+                        <ImageView
+                            android:id="@+id/iv_std_curve"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+
+                            android:src="@drawable/icon_standard_curve" />
+                       <!-- <TextView
+                            android:id="@+id/btn_standard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:gravity="center"
+                            android:background="@color/color1F4E99"
+                            android:textColor="#ffffff"
+                            android:paddingLeft="6dp"
+                            android:paddingRight="6dp"
+                            android:text="@string/standard_curve" />-->
 
                         <ImageView
                             android:id="@+id/iv_pdf"
@@ -205,6 +234,10 @@
                     android:visibility="gone" />
 
             </LinearLayout>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorF5F5F5" />
             <!--表格信息-->
             <LinearLayout
                 android:layout_width="0dp"
@@ -217,7 +250,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginRight="12dp"
                     android:numColumns="9" />
 
@@ -226,7 +259,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginRight="12dp"
                     android:numColumns="9" />
             </LinearLayout>
@@ -236,3 +269,8 @@
     </LinearLayout>
 
 </ScrollView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorF6F6F6" />
+</LinearLayout>

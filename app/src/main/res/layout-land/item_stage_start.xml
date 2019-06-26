@@ -73,15 +73,15 @@
 
     <ImageView
         android:id="@+id/iv_start_add"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:scaleType="centerInside"
         android:src="@drawable/icon_add" />
 
     <ImageView
         android:id="@+id/iv_start_del"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_gravity="right"
         android:scaleType="centerInside"
         android:src="@drawable/icon_minus" />

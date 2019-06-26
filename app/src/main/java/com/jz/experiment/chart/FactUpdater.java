@@ -137,14 +137,15 @@ public class FactUpdater {
             case 0:
                 int_time1 = int_time_1;
                 //int_time1 = (float)Math.round(int_time1 * factor);
-                int_time1 = Float.parseFloat(String.format("%.2f", int_time1 * factor));
+
+                int_time1 = Float.parseFloat(String.format("%.2f", Math.floor(int_time1 * factor)));
                 SetSensor(0, int_time1);
                 return int_time1 / int_time_1;
             // break;
             case 1:
                 int_time2 = int_time_2;
                 //  int_time2 = (float)Math.round(int_time2 * factor);
-                int_time2 = Float.parseFloat(String.format("%.2f", int_time2 * factor));
+                int_time2 = Float.parseFloat(String.format("%.2f",  Math.floor(int_time2 * factor)));
                 SetSensor(1, int_time2);
                 return int_time2 / int_time_2;
             //		break;
@@ -152,7 +153,7 @@ public class FactUpdater {
             case 2:
                 int_time3 = int_time_3;
                 // int_time3 = (float)Math.round(int_time3 * factor);
-                int_time3 = Float.parseFloat(String.format("%.2f", int_time3 * factor));
+                int_time3 = Float.parseFloat(String.format("%.2f",  Math.floor(int_time3 * factor)));
                 SetSensor(2, int_time3);
                 return int_time3 / int_time_3;
             //		break;
@@ -160,7 +161,7 @@ public class FactUpdater {
             case 3:
                 int_time4 = int_time_4;
                 //int_time4 = (float)Math.round(int_time4 * factor);
-                int_time4 = Float.parseFloat(String.format("%.2f", int_time4 * factor));
+                int_time4 = Float.parseFloat(String.format("%.2f",  Math.floor(int_time4 * factor)));
                 SetSensor(3, int_time4);
                 return int_time4 / int_time_4;
             //		break;

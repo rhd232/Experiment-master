@@ -80,8 +80,8 @@ public class ImageDataReader {
                     opt_int_time[i] = 1;
                     max_read_list[i] = 30;
                     inc_factor[i] = 0;
-                    max_read_0[i] = 100;
-                    setSensorAndInTime(i,opt_int_time[i]);
+                    max_read_0[i] =20;
+                    setSensorAndInTime(i,Math.round(opt_int_time[i]));
                 }
                 readAllImg();
 
@@ -372,10 +372,10 @@ public class ImageDataReader {
 
                 mCommunicationService.sendPcrCommandSync(gainCmd);
 
-                mFactUpdater.int_time_1= (float) Math.ceil(opt_int_time[0]);
-                mFactUpdater.int_time_2= (float) Math.ceil(opt_int_time[1]);
-                mFactUpdater.int_time_3= (float) Math.ceil(opt_int_time[2]);
-                mFactUpdater.int_time_4= (float) Math.ceil(opt_int_time[3]);
+                mFactUpdater.int_time_1= (float) (opt_int_time[0]);
+                mFactUpdater.int_time_2= (float) (opt_int_time[1]);
+                mFactUpdater.int_time_3= (float) (opt_int_time[2]);
+                mFactUpdater.int_time_4= (float) (opt_int_time[3]);
 
                 sleep(50);
                 setSensorAndInTime(0, mFactUpdater.int_time_1);
@@ -443,7 +443,8 @@ public class ImageDataReader {
 
 
             //inc = (float)Math.Round(Convert.ToDouble((AutoInt_Target - max_read) * inc_factor[i]), 2);    // slowly approach the opt int time to avoid saturation
-            inc = Float.parseFloat(String.format("%.2f", (AutoInt_Target - max_read) * inc_factor[i]));
+            double v=Math.round((AutoInt_Target - max_read) * inc_factor[i]);
+            inc = Float.parseFloat(String.format("%.2f",v));
             if (inc<0)
                 inc=0;
 
@@ -460,7 +461,8 @@ public class ImageDataReader {
                 opt_int_time[i] = 600;
 
 
-            setSensorAndInTime(i,opt_int_time[i]);
+            setSensorAndInTime(i,Math.round(opt_int_time[i]));
+            opt_int_time[i] = (float)Math.round(opt_int_time[i]);
         }
 
         StringBuilder sBuilder=new StringBuilder();

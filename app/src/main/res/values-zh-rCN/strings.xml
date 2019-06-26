@@ -151,5 +151,18 @@
     <string name="op_del">删除</string>
 
     <string name="negative">阴性</string>
+    <string name="standard_curve">标准曲线</string>
+    <string name="standard_point">标准点</string>
+    <string name="unknow_point">未知点</string>
+
+    <string name="standard_sample">样本</string>
+    <string name="standard_type">类型</string>
+    <string name="standard_concentration">浓度</string>
+    <string name="standard_ct">Ct值</string>
+    <string name="standard_draw_curve">计算标准曲线</string>
+    <string name="standard_find_unknown">计算未知点</string>
+    <string name="standard_illegal">含有非法参数</string>
+
+    <string name="norm">归一化</string>
 
 </resources>

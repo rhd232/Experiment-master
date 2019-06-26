@@ -26,9 +26,6 @@ public class DeviceRepo {
                 PrefsUtil.setString(context, C.PREF_KEY.PREF_KEY_USB_DEVICE_NAME, deviceInfo.getDeviceName());
 
             }
-
-
-
         }
 
     }

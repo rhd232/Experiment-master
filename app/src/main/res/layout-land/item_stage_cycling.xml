@@ -128,16 +128,16 @@
 
     <ImageView
         android:id="@+id/iv_cycling_add"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:scaleType="centerInside"
         android:src="@drawable/icon_add"
        />
 
     <ImageView
         android:id="@+id/iv_cycling_del"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:scaleType="centerInside"
         android:layout_gravity="right"
         android:src="@drawable/icon_minus"

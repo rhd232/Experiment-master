@@ -340,10 +340,13 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
     private long time;
     private Handler mHandler=new Handler();
-    @OnClick({R.id.iv_pdf, R.id.iv_save, R.id.tv_dt, R.id.tv_melt})
+    @OnClick({R.id.iv_pdf, R.id.iv_save, R.id.tv_dt, R.id.tv_melt,R.id.iv_std_curve})
     public void onViewClick(View view) {
         long now = System.currentTimeMillis();
         switch (view.getId()) {
+            case R.id.iv_std_curve:
+                StandardCurveActivity.start(getActivity(),mExeperiment);
+                break;
             case R.id.tv_dt:
 
                 time = now;
