@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.anitoa.bean.FlashData;
+import com.anitoa.util.ByteUtil;
 import com.anitoa.well.Well;
 import com.wind.base.C;
 
@@ -228,8 +229,21 @@ public class CommData {
                 String[] strs = strlist.get(0).split(" ");
 
                 //为方便调试暂时注释掉的
-                if (strs.length < 14) continue;
-                cd.x = strs[13];//横坐标为温度
+                if (strs.length < imgFrame+5){
+                    cd.x="0.0";
+                }else {
+
+                    byte[] buffers = new byte[4];
+
+                    buffers[0] =   Byte.valueOf(strs[imgFrame + 1]);
+                    buffers[1] = Byte.valueOf(strs[imgFrame + 2]);
+                    buffers[2] = Byte.valueOf(strs[imgFrame + 3]);
+                    buffers[3] = Byte.valueOf(strs[imgFrame + 4]);
+                    //float t = BitConverter.ToSingle(buffers, 0);
+                    float t = ByteUtil.getFloat(buffers);
+                    cd.x = t+"";//横坐标为温度
+                }
+
 
                 //cd.x = i+"";//测试用//横坐标为循环次数
 

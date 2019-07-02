@@ -15,4 +15,6 @@
 
     <dimen name="device_statebar_height">20dp</dimen>
     <dimen name="titlebar_height">44dp</dimen>
+
+    <dimen name="print_text_size">28dp</dimen>
 </resources>

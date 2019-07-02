@@ -10,7 +10,7 @@
     <string name="melting_stage">Melting Stage</string>
     <array name="spinner_values">
         <item>PCR</item>
-        <item>MeltingCurve</item>
+        <item>Melting Curve</item>
     </array>analyze_select_file
 
     <string name="title_analyze">Analyze</string>
@@ -51,7 +51,7 @@
     <string name="test_status_finished">Finished</string>
 
     <string name="title_setup_1">Setup-Channels</string>
-    <string name="setup_test_name">Test Name:</string>
+    <string name="setup_test_name">Test Name: </string>
     <string name="setup_input_test_name">Enter Test Name</string>
     <string name="setup_test_time">Date Tested</string>
     <string name="setup_selelct_test_channel">Channel</string>
@@ -60,7 +60,7 @@
     <string name="setup_input_desc">Optional Description Here</string>
     <string name="setup_channel">Channel</string>
     <string name="setup_channel_select_tip">Please Select Dye</string>
-
+    <string name="setup_well_select_tip">Please Select Well</string>
     <string name="setup_int_time">IntegrationTime(ms)</string>
     <string name="setup_auto_int_time">Auto</string>
 
@@ -151,5 +151,15 @@
     <string name="standard_find_unknown">Find Unknown</string>
     <string name="standard_illegal">Illegal Arguments</string>
 
+
     <string name="norm">norm</string>
+    <string name="print">Print</string>
+    <string name="print_preview">Print Preview</string>
+    <string name="print_company_name">Company Name: </string>
+
+    <string name="print_conclusion">Conclusion</string>
+    <string name="print_user">User</string>
+    <string name="print_auditor">Auditor</string>
+    <string name="print_unit">Unit</string>
+    <string name="print_date">Date</string>
 </resources>

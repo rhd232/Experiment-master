@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jz.experiment.widget.A4PageLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/holo_red_light">
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorA5B8D6"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setup_test_name"
+                android:textColor="@color/color333333" />
+
+            <TextView
+                android:id="@+id/tv_test_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/color333333" />
+
+        </LinearLayout>
+
+        <!--扩增曲线-->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/dt_chart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="50dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="right"
+                android:layout_marginRight="50dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/data_ct_lower"
+                        android:textColor="@color/color333333" />
+
+                    <TextView
+                        android:id="@+id/tv_ct_low_limit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="@string/data_ct_lower"
+                        android:textColor="@color/color333333" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/data_ct_threshold"
+                        android:textColor="@color/color333333" />
+
+                    <TextView
+                        android:id="@+id/tv_ct_threshold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="@string/data_ct_lower"
+                        android:textColor="@color/color333333" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <ListView
+            android:id="@+id/lv_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <!--标准曲线-->
+
+        <!--熔解曲线-->
+
+
+        <!--结论-->
+
+        <!--尾部-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/data_by"/>
+                <TextView
+                    android:id="@+id/tv_test_by"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentRight="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setup_test_time"/>
+                <TextView
+                    android:id="@+id/tv_test_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</com.jz.experiment.widget.A4PageLayout>

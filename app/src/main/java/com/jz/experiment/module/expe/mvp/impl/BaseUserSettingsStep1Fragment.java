@@ -478,6 +478,29 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
             ToastUtil.showToast(getActivity(), tips);
             return false;
         }
+
+        //
+        List<Sample> samplesA=mSampleAdapterA.getData();
+
+        boolean named=false;
+        for (Sample sample:samplesA){
+            if (!TextUtils.isEmpty(sample.getName())){
+                named=true;
+            }
+        }
+        if (!named){
+            List<Sample> samplesB=mSampleAdapterB.getData();
+            for (Sample sample:samplesB){
+                if (!TextUtils.isEmpty(sample.getName())){
+                    named=true;
+                }
+            }
+        }
+        if (!named){
+            String tips=getString(R.string.setup_channel_select_tip);
+            ToastUtil.showToast(getActivity(), tips);
+        }
+
         return true;
     }
 

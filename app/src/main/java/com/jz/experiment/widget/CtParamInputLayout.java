@@ -1,6 +1,8 @@
 package com.jz.experiment.widget;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -86,9 +88,37 @@ public class CtParamInputLayout extends FrameLayout {
         return param;
     }
 
-    public static class CtParam {
+    public static class CtParam implements Parcelable {
         public int ctMin;
         public int ctThreshhold;
+        public CtParam(){}
+        protected CtParam(Parcel in) {
+            ctMin = in.readInt();
+            ctThreshhold = in.readInt();
+        }
+
+        public static final Creator<CtParam> CREATOR = new Creator<CtParam>() {
+            @Override
+            public CtParam createFromParcel(Parcel in) {
+                return new CtParam(in);
+            }
+
+            @Override
+            public CtParam[] newArray(int size) {
+                return new CtParam[size];
+            }
+        };
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(ctMin);
+            dest.writeInt(ctThreshhold);
+        }
     }
 
 }

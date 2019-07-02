@@ -67,4 +67,8 @@ public class FlashData {
      */
     public static boolean flash_inited=false;
 
+
+    public static final int AutoInt_Target_PCR=1600;
+    public static final int AutoInt_Target_MELTING=3200;
+
 }

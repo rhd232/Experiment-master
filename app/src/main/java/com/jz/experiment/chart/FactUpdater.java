@@ -2,6 +2,7 @@ package com.jz.experiment.chart;
 
 import android.text.TextUtils;
 
+import com.anitoa.bean.FlashData;
 import com.anitoa.cmd.PcrCommand;
 import com.anitoa.service.CommunicationService;
 import com.anitoa.util.AnitoaLogUtil;
@@ -24,6 +25,11 @@ public class FactUpdater {
     private CommunicationService mCommunicationService;
     private static FactUpdater sInstance;
     private DecimalFormat mDecimalFormat;
+    private boolean isPcr=true;
+
+    public void setPcr(boolean pcr) {
+        isPcr = pcr;
+    }
 
     public static FactUpdater getInstance(CommunicationService service) {
         if (sInstance == null) {
@@ -75,7 +81,12 @@ public class FactUpdater {
         for (int i = 0; i < CCurveShow.MAX_CHAN; i++) {
             m_dynIntTime[i] = false;
             m_factorIntTime[i] = (float) 1.0;
-            m_maxPixVal[i] = 100;
+            if (isPcr){
+                m_maxPixVal[i] = FlashData.AutoInt_Target_PCR;
+            }else {
+                m_maxPixVal[i] = FlashData.AutoInt_Target_MELTING;
+            }
+
 
             for (int n = 0; n < 200; n++) {
                 m_factorData[i][n] = 1;

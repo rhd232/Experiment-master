@@ -146,7 +146,9 @@ public abstract class WindChart {
                     mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                         @Override
                         public void onValueSelected(Entry e, Highlight h) {
-                            if (thisChart() instanceof TempChart || thisChart() instanceof StandardChart){
+                            if (thisChart() instanceof TempChart
+                                    || thisChart() instanceof MeltingChart
+                                    || thisChart() instanceof StandardChart){
                                 mChart.setDrawMarkers(false);
                             }else {
                                 mChart.setDrawMarkers(true);

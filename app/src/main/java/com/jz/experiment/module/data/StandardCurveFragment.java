@@ -3,7 +3,7 @@ package com.jz.experiment.module.data;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -11,15 +11,17 @@ import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.CombinedChart;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CCurveShowPolyFit;
-import com.jz.experiment.chart.StandardChart;
+import com.jz.experiment.chart.StandardCurveChart;
 import com.jz.experiment.module.data.adapter.SampleStatefulAdapter;
 import com.jz.experiment.module.data.adapter.SeqAdapter;
 import com.jz.experiment.module.data.adapter.TableAdapter;
 import com.jz.experiment.module.data.adapter.TableUnknowAdapter;
 import com.jz.experiment.module.data.bean.SampleRow;
+import com.jz.experiment.module.report.StandardCurvePrintPreviewActivity;
+import com.jz.experiment.module.report.bean.StdLineData;
 import com.jz.experiment.util.Utils;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.data.expe.bean.HistoryExperiment;
@@ -54,15 +56,16 @@ public class StandardCurveFragment extends BaseFragment {
     TableUnknowAdapter unknowAdapter;
 
     @BindView(R.id.chart_standard)
-    LineChart chart_standard;
+    CombinedChart chart_standard;
+    //LineChart chart_standard;
 
     @BindView(R.id.tv_equation)
     TextView tv_equation;
     @BindView(R.id.tv_r2)
     TextView tv_r2;
 
-    public static Fragment newInstance(HistoryExperiment experiment) {
-        Fragment f = new StandardCurveFragment();
+    public static StandardCurveFragment newInstance(HistoryExperiment experiment) {
+        StandardCurveFragment f = new StandardCurveFragment();
         Bundle args = new Bundle();
         args.putParcelable(ExpeDataFragment.ARGS_KEY_EXPE, experiment);
         f.setArguments(args);
@@ -74,13 +77,14 @@ public class StandardCurveFragment extends BaseFragment {
         return R.layout.fragment_standard_curve;
     }
 
-    StandardChart mStandardChart;
+    StandardCurveChart mStandardChart;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        mStandardChart = new StandardChart(chart_standard);
+       // mStandardChart = new StandardChart(chart_standard);
+        mStandardChart=new StandardCurveChart(chart_standard);
         mExeperiment = getArguments().getParcelable(ExpeDataFragment.ARGS_KEY_EXPE);
         List<Sample> samplesA = mExeperiment.getSettingsFirstInfo().getSamplesA();
         List<Sample> samplesB = mExeperiment.getSettingsFirstInfo().getSamplesB();
@@ -105,7 +109,12 @@ public class StandardCurveFragment extends BaseFragment {
                 mSampleStatefulAdapterA.notifyDataSetChanged();
                 mSampleStatefulAdapterB.notifyDataSetChanged();
                 standardAdapter.clear();
+                standardAdapter.add(new SampleRow());
                 unknowAdapter.clear();
+                unknowAdapter.add(new SampleRow());
+
+                //清除标准曲线
+                mStandardChart.clear();
             }
         });
 
@@ -372,6 +381,7 @@ public class StandardCurveFragment extends BaseFragment {
 
     }
 
+    private StdLineData mStdLineData;
     private void drawStdCurve() {
 
 
@@ -423,8 +433,34 @@ public class StandardCurveFragment extends BaseFragment {
         //TODO 计算相关系数
         double R2 = caculateR(xx, yy);
         format = new DecimalFormat("#.######");
-        tv_r2.setText("R2:" + format.format(R2));
-        mStandardChart.addPoints(fitxx, fityy, xx, yy);
+        String nR2="R<sup>2</sup>:"+format.format(R2);
+        tv_r2.setText(Html.fromHtml(nR2));
+        //计算未知点
+        List<SampleRow> unknownRows = new ArrayList<>(unknowAdapter.getData());
+        unknownRows.remove(0);
+        size = unknownRows.size();
+        double[] unknownYY = new double[size];
+        double[] unknownXX = new double[size];
+
+
+        for (int i = 0; i < unknownRows.size(); i++) {
+            double ct = 0;
+            SampleRow sampleRow = unknownRows.get(i);
+            try {
+                ct = Double.parseDouble(sampleRow.getCtValue());
+                unknownXX[i]=ct;
+                double conc = Utils.getPolyY(coefficients, ct);
+                sampleRow.setConcentration(format.format(Math.pow(10, conc)));
+                unknownYY[i]=conc;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        mStdLineData=new StdLineData(fitxx, fityy, xx, yy,unknownXX,unknownYY,equation.toString(),format.format(R2));
+        //
+
+        mStandardChart.addPoints(fitxx, fityy, xx, yy,unknownXX,unknownYY);
 
 
     }
@@ -460,5 +496,26 @@ public class StandardCurveFragment extends BaseFragment {
             sum += arr[i];
         }
         return sum;
+    }
+
+    public void toPrintPreview() {
+
+        if (mStdLineData!=null){
+            List<SampleRow> stdRows = new ArrayList<>(standardAdapter.getData());
+            List<SampleRow> unknownRows = new ArrayList<>(unknowAdapter.getData());
+
+
+            mStdLineData.setStdRows(stdRows);
+            mStdLineData.setUnknownRows(unknownRows);
+
+            StandardCurvePrintPreviewActivity.start(getActivity(),mStdLineData);
+        }
+
+
+
+
+
+
+
     }
 }

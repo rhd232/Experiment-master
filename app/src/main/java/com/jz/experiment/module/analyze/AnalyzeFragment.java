@@ -16,10 +16,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.GridView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 
-import com.anitoa.exception.UnsupportedDeviceException;
 import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.R;
@@ -32,7 +32,8 @@ import com.jz.experiment.chart.WindChart;
 import com.jz.experiment.module.data.FilterActivity;
 import com.jz.experiment.module.data.StandardCurveActivity;
 import com.jz.experiment.module.expe.event.FilterEvent;
-import com.jz.experiment.util.AppDialogHelper;
+import com.jz.experiment.module.report.PcrPrintPreviewActivity;
+import com.jz.experiment.module.report.bean.InputParams;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.widget.CtParamInputLayout;
 import com.wind.base.dialog.LoadingDialogHelper;
@@ -71,8 +72,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
 
     LineChart chart_line;
     Spinner spinner;
-    List<String> ChanList = new ArrayList<>();
-    List<String> KSList = new ArrayList<>();
+
     TitleBar mTitleBar;
     WindChart mChart;
     File mOpenedFile;
@@ -146,36 +146,11 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
 
             }
         });
-        ChanList.add("Chip#1");
-        ChanList.add("Chip#2");
-        ChanList.add("Chip#3");
-        ChanList.add("Chip#4");
-        try {
-            KSList = Well.getWell().getKsList();
-        } catch (UnsupportedDeviceException e) {
-            //第一次安装，没有文件读取权限导致
-            e.printStackTrace();
-            KSList.add("A1");
-            KSList.add("A2");
-            KSList.add("A3");
-            KSList.add("A4");
-            KSList.add("A5");
-            KSList.add("A6");
-            KSList.add("A7");
-            KSList.add("A8");
 
-            KSList.add("B1");
-            KSList.add("B2");
-            KSList.add("B3");
-            KSList.add("B4");
-            KSList.add("B5");
-            KSList.add("B6");
-            KSList.add("B7");
-            KSList.add("B8");
-        }
-
+        initChanAndKs();
         System.out.println("AnalyzeFragment onViewCreated");
     }
+
 
     /**
      * 选择数据文件
@@ -209,6 +184,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
                     }
+                    initChanAndKs();
                     Uri uri = data.getData();
                     String path = FileUtil.getPath(getActivity(), uri);
                     mOpenedFile = new File(path);
@@ -218,9 +194,11 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     double[][] ctValues;
                     boolean[][] falsePositive;
                     String melting = getString(R.string.setup_mode_melting);
+                    chart_line.setDrawMarkers(false);
                     if (melting.equals(item)) {
                         mChart = new MeltingChart(chart_line);
-
+                        ((MeltingChart) mChart).setStartTemp(40);
+                        ((MeltingChart) mChart).setAxisMinimum(40);
                       /*  float f=Float.parseFloat(String.format("%f",40f));
                         mChart.setAxisMinimum(f);*/
 
@@ -252,6 +230,15 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                 }
             }
         }
+    }
+
+
+    @Override
+    protected boolean isPcrMode() {
+
+        String item = (String) spinner.getSelectedItem();
+        String melting = getString(R.string.setup_mode_melting);
+        return !melting.equals(item);
     }
 
     boolean mVisibleToUser;
@@ -297,6 +284,32 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                 event.getKSList();
 
         showChart();
+
+        //TODO ct值也要筛选
+        mChannelDataAdapters[0].clear();
+        mChannelDataAdapters[1].clear();
+        GridView[] gvs = new GridView[2];
+        gvs[0] = gv_a;
+        gvs[1] = gv_b;
+        String[] titles = {"A", "B"};
+        buildChannelData(gvs, titles);
+        double [][] ctValues;
+        boolean [][] falsePositive;
+        String item = (String) spinner.getSelectedItem();
+        String melting = getString(R.string.setup_mode_melting);
+        if (melting.equals(item)) {
+            ctValues = CCurveShowMet.getInstance().m_CTValue;
+            falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+        } else {
+            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+        }
+        for (String chan : ChanList) {
+            for (String ks : KSList) {
+                getCtValue(chan, ks, ctValues, falsePositive);
+            }
+        }
+        notifyCtChanged();
     }
 
     private void showChart() {
@@ -370,9 +383,52 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         }
         firstInfo.setSamplesB(samplesB);
         experiment.setSettingsFirstInfo(firstInfo);
+
         return experiment;
     }
 
+    private void deprecatedPrint(){
+        LoadingDialogHelper.showOpLoading(getActivity());
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder sPdfNameBuilder = new StringBuilder();
+                sPdfNameBuilder.append(mOpenedFile.getName().replace(".txt", ""));
+                ;
+                if (mChart instanceof DtChart) {
+                    String dt = getString(R.string.setup_mode_dt);
+                    sPdfNameBuilder.append(dt);
+                } else {
+                    String melting = getString(R.string.setup_mode_melting);
+                    sPdfNameBuilder.append(melting);
+                }
+                sPdfNameBuilder.append(".pdf");
+                String pdfName = sPdfNameBuilder.toString();
+                //DataFileUtil.getPdfFileName(mExeperiment, false);
+                //生成pdf
+                generatePdf(pdfName)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<Boolean>() {
+                            @Override
+                            public void call(Boolean aboolean) {
+
+                                LoadingDialogHelper.hideOpLoading();
+                                ToastUtil.showToast(getActivity(), getString(R.string.pdf_exported));
+
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                LoadingDialogHelper.hideOpLoading();
+                                throwable.printStackTrace();
+                                ToastUtil.showToast(getActivity(), getString(R.string.pdf_export_error));
+                            }
+                        });
+            }
+        }, 3000);
+    }
     @OnClick({R.id.iv_pdf, R.id.iv_std_curve})
     public void onViewClick(View view) {
         switch (view.getId()) {
@@ -395,58 +451,30 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                         .onGranted(new Action<List<String>>() {
                             @Override
                             public void onAction(List<String> data) {
-                                String msg = getString(R.string.dialog_msg_pdf);
+                                InputParams params = new InputParams();
+                                params.setSourceDataPath(mOpenedFile.getAbsolutePath());
+                                if (isPcrMode()) {
+                                    params.setExpeType(InputParams.EXPE_PCR);
+
+                                }else {
+                                    params.setExpeType(InputParams.EXPE_MELTING);
+                                }
+                                params.setCtParam(layout_ctparam_input.getCtParam());
+
+                                PcrPrintPreviewActivity.start(getActivity(),mExeperiment,params);
+                              /*  String msg = getString(R.string.dialog_msg_pdf);
                                 AppDialogHelper.showNormalDialog(getActivity(),
                                         msg, new AppDialogHelper.DialogOperCallback() {
                                             @Override
                                             public void onDialogConfirmClick() {
 
-                                                LoadingDialogHelper.showOpLoading(getActivity());
 
-                                                mHandler.postDelayed(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        StringBuilder sPdfNameBuilder = new StringBuilder();
-                                                        sPdfNameBuilder.append(mOpenedFile.getName().replace(".txt", ""));
-                                                        ;
-                                                        if (mChart instanceof DtChart) {
-                                                            String dt = getString(R.string.setup_mode_dt);
-                                                            sPdfNameBuilder.append(dt);
-                                                        } else {
-                                                            String melting = getString(R.string.setup_mode_melting);
-                                                            sPdfNameBuilder.append(melting);
-                                                        }
-                                                        sPdfNameBuilder.append(".pdf");
-                                                        String pdfName = sPdfNameBuilder.toString();
-                                                        //DataFileUtil.getPdfFileName(mExeperiment, false);
-                                                        //生成pdf
-                                                        generatePdf(pdfName)
-                                                                .subscribeOn(Schedulers.io())
-                                                                .observeOn(AndroidSchedulers.mainThread())
-                                                                .subscribe(new Action1<Boolean>() {
-                                                                    @Override
-                                                                    public void call(Boolean aboolean) {
-
-                                                                        LoadingDialogHelper.hideOpLoading();
-                                                                        ToastUtil.showToast(getActivity(), getString(R.string.pdf_exported));
-
-                                                                    }
-                                                                }, new Action1<Throwable>() {
-                                                                    @Override
-                                                                    public void call(Throwable throwable) {
-                                                                        LoadingDialogHelper.hideOpLoading();
-                                                                        throwable.printStackTrace();
-                                                                        ToastUtil.showToast(getActivity(), getString(R.string.pdf_export_error));
-                                                                    }
-                                                                });
-                                                    }
-                                                }, 3000);
 
 
                                             }
 
 
-                                        });
+                                        });*/
                             }
                         }).start();
                 break;

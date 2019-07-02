@@ -1,6 +1,8 @@
 package com.jz.experiment.module.data.bean;
 
-public class SampleRow {
+import java.io.Serializable;
+
+public class SampleRow implements Serializable {
     private String name;
     private String type;
 

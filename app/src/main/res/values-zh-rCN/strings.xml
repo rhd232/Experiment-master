@@ -59,6 +59,7 @@
     <string name="setup_dialog_channel_select_msg">请选择通道%1$s染料</string>
     <string name="setup_input_desc">请输入备注信息</string>
     <string name="setup_channel_select_tip">请设置通道染料</string>
+    <string name="setup_well_select_tip">请选择孔位</string>
     <string name="setup_channel">通道</string>
 
     <string name="setup_int_time">积分时间（ms）</string>
@@ -164,5 +165,12 @@
     <string name="standard_illegal">含有非法参数</string>
 
     <string name="norm">归一化</string>
-
+    <string name="print">打印</string>
+    <string name="print_preview">打印预览</string>
+    <string name="print_company_name">公司名称：</string>
+    <string name="print_conclusion">结论</string>
+    <string name="print_user">检测人</string>
+    <string name="print_auditor">审核人</string>
+    <string name="print_unit">单位</string>
+    <string name="print_date">报告日期</string>
 </resources>

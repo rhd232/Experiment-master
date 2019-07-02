@@ -7,6 +7,16 @@ import android.os.Environment;
  */
 
 public class C {
+    public static class A4{
+        public static final int WIDTH=210;//mm  需要根据屏幕密度转换成像素
+        public static final int HEIGHT=297;//mm
+        //每英寸25.4毫米
+        public static final float MM_PER_IN=25.4f; //mm
+    }
+
+    public static class Char{
+        public static final String NEW_LINE="\r\n";
+    }
     public static class Config{
         public static final String DEFAULT_USERNAME="admin";
         public static final String DEFAULT_PWD="123456";

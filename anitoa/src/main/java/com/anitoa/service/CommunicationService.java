@@ -61,6 +61,7 @@ public abstract class CommunicationService extends Service {
                 case 3: // 接受到数据
 
                     if (mListener != null) {
+
                         Data data= (Data) msg.obj;
                         mListener.onReceivedData(data);
                     }
@@ -69,6 +70,7 @@ public abstract class CommunicationService extends Service {
             }
         }
     };
+
 
 
 }

@@ -36,7 +36,7 @@ public class CCurveShowMet {
     float[] log_threshold = new float[]{0.11f, 0.11f, 0.11f, 0.11f};
 
     float[] ct_offset = new float[4];
-
+    public float start_temp = 60;
     private static CCurveShowMet INSTANCE = new CCurveShowMet();
 
     public static CCurveShowMet getInstance() {
@@ -75,6 +75,9 @@ public class CCurveShowMet {
             int datasize = m_Size[iy];
             int i;
             int size = m_Size[iy];
+            if (size ==0){
+                continue;
+            }
             for (int frameindex = 0; frameindex < numWells; frameindex++) {
                 double[] yData = new double[MAX_CYCL];
 
@@ -190,21 +193,45 @@ public class CCurveShowMet {
             z[i] = z[i + 1] + eta * (y[i] - z[i + 1]);
         }
 
-        double max = z[0];
+
         int maxi = 0;
 
-        for (i = 1; i < size; i++) {
+        while (mt[maxi] < start_temp && maxi < size - 10)
+        {
+            maxi++;
+        }
+
+
+        double max = z[maxi];
+        for (i = maxi+1; i < size; i++) {
             if (z[i] > max) {
                 max = z[i];
                 maxi = i;
             }
         }
         try {
-            double left_slop = (z[maxi] - z[maxi - 1]) / (mt[maxi] - mt[maxi - 1]);
-            double right_slop = (z[maxi + 1] - z[maxi]) / (mt[maxi + 1] - mt[maxi]);
-            double percent = -left_slop / (right_slop - left_slop);
-            double mtemp_n = mt[maxi - 1] + percent * (mt[maxi + 1] - mt[maxi]);
 
+            double mtemp_n = 0;
+
+            if (maxi == 0)
+            {
+                mtemp_n = mt[0];
+            }
+                /*else if (maxi >= size - 1)
+                {
+                    mtemp_n = mt[maxi];
+                }*/
+            else if (maxi >= size - 2)          // This is because the last point is discarded in display
+            {
+                mtemp_n = mt[maxi - 1];
+            }
+            else {
+
+                double left_slop = (z[maxi] - z[maxi - 1]) / (mt[maxi] - mt[maxi - 1]);
+                double right_slop = (z[maxi + 1] - z[maxi]) / (mt[maxi + 1] - mt[maxi]);
+                double percent = -left_slop / (right_slop - left_slop);
+                 mtemp_n = mt[maxi - 1] + percent * (mt[maxi + 1] - mt[maxi]);
+            }
             m_CTValue[iy][frameindex] = mtemp_n;
         } catch (Exception ex) {
             m_CTValue[iy][frameindex] = 0;

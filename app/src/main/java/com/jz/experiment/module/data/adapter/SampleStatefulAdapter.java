@@ -1,6 +1,7 @@
 package com.jz.experiment.module.data.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
@@ -16,22 +17,29 @@ public class SampleStatefulAdapter extends QuickAdapter<Sample> {
     @Override
     protected void convert(BaseAdapterHelper helper, Sample item) {
         TextView tv = (TextView) helper.getView(R.id.tv_sample);
-        int resId =R.drawable.shape_circle666666;
+        TextView tv_seq = (TextView) helper.getView(R.id.tv_seq);
+        tv_seq.setText((helper.getPosition()+1)+"");
+        int resId;
+        tv_seq.setTextColor(context.getResources().getColor(R.color.color686868));
         switch (item.getStatus()) {
             case Sample.CODE_DEFAULT:
-                resId =R.drawable.shape_circle666666;
+                resId =R.drawable.shape_circlef8f8f8;
                 break;
             case Sample.CODE_STANDARD:
-                resId =R.drawable.shape_circleblue;
+                resId =R.drawable.shape_circlef2bc00;
+                tv_seq.setTextColor(Color.WHITE);
                 break;
             case Sample.CODE_UNKWON:
-                resId =R.drawable.shape_circleyellow;
+                resId =R.drawable.shape_circleblue;
+                tv_seq.setTextColor(Color.WHITE);
                 break;
             default:
-                resId =R.drawable.shape_circle666666;
+                resId =R.drawable.shape_circlef8f8f8;
                 break;
         }
         tv.setBackgroundResource(resId);
+
+
 
         //tv.setActivated(item.isSelected());
 

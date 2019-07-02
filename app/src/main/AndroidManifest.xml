@@ -87,7 +87,19 @@
             android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
             android:windowSoftInputMode="adjustPan"
             ></activity>
+        <activity android:name=".module.data.ReportPreviewActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            ></activity>
+        <activity android:name=".module.report.StandardCurvePrintPreviewActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            ></activity>
 
+        <activity android:name=".module.report.PcrPrintPreviewActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            />
         <service android:name="com.anitoa.service.BluetoothLeService"></service>
         <service android:name="com.anitoa.service.BluetoothService"></service>
         <service android:name="com.anitoa.service.UsbService"></service>

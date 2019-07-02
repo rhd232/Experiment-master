@@ -9,6 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -29,6 +32,8 @@ import com.jz.experiment.module.analyze.CtFragment;
 import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
+import com.jz.experiment.module.report.PcrPrintPreviewActivity;
+import com.jz.experiment.module.report.bean.InputParams;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.widget.CtParamInputLayout;
@@ -98,7 +103,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     @BindView(R.id.chart_melt)
     LineChart chart_melt;
 
-   /* @BindView(R.id.sv)*/
+    /* @BindView(R.id.sv)*/
     ScrollView sv;
     LinearLayout ll_root;
     @BindView(R.id.iv_save)
@@ -106,13 +111,14 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
    /* LineData mLineData;
     ArrayList<ILineDataSet> mDataSets;*/
 
-   @BindView(R.id.layout_ctparam_input)
-   CtParamInputLayout layout_ctparam_input;
+    @BindView(R.id.layout_ctparam_input)
+    CtParamInputLayout layout_ctparam_input;
 
     DtChart mDtChart;
     MeltingChart mMeltingChart;
     ExecutorService mExecutorService;
-
+    @BindView(R.id.cb_norm)
+    CheckBox cb_norm;
     private boolean mSaved;
 
     @Override
@@ -126,9 +132,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
-       // mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
-       sv= view.findViewById(R.id.sv);
-        ll_root= view.findViewById(R.id.ll_root);
+        // mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
+        sv = view.findViewById(R.id.sv);
+        ll_root = view.findViewById(R.id.ll_root);
         layout_ctparam_input.setOnCtParamChangeListener(this);
       /*  GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
@@ -146,12 +152,26 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
         if (isSavedExpe()) {
             iv_save.setVisibility(View.GONE);
-        }else {
+        } else {
             iv_save.setVisibility(View.VISIBLE);
         }
         // mExecutorService.execute(mRun);
 
+
+        cb_norm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                showChart();
+
+            }
+        });
     }
+
+    @Override
+    protected boolean isPcrMode() {
+        return tv_dt.isActivated();
+    }
+
 
     private void inflateBase() {
         tv_expe_name.setText(mExeperiment.getName());
@@ -165,6 +185,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         String duringTime = new String(hh + ":" + mm + ":" + ss);
         tv_elapsed_time.setText(duringTime);
     }
+
 
     private List<String> ChanList = new ArrayList<>();
     private List<String> KSList = new ArrayList<String>();
@@ -198,11 +219,11 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         KSList.clear();
 
         try {
-            KSList=Well.getWell().getKsList();
-        }catch (UnsupportedDeviceException e){
+            KSList = Well.getWell().getKsList();
+        } catch (UnsupportedDeviceException e) {
             //第一次安装，没有文件读取权限导致
             e.printStackTrace();
-            KSList=new SixteenWell().getKsList();
+            KSList = new SixteenWell().getKsList();
           /*  KSList.add("A1");
             KSList.add("A2");
             KSList.add("A3");
@@ -225,7 +246,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     }
 
 
-
     private boolean mHasMeltingMode;
 
 
@@ -237,27 +257,27 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     };
 
 
-
     private void showChart() {
-        double [][] ctValues;
-        boolean [][] falsePositive;
+        double[][] ctValues;
+        boolean[][] falsePositive;
         if (tv_dt.isActivated()) {
 
-            mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment),layout_ctparam_input.getCtParam());
-            ctValues= CCurveShowPolyFit.getInstance().m_CTValue;
-            falsePositive=new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+            mDtChart.show(ChanList, KSList,
+                    DataFileUtil.getDtImageDataFile(mExeperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+            falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
         } else {
           /*  float t=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
             float f=Float.parseFloat(String.format("%f",t));
             mMeltingChart.setAxisMinimum(f);*/
-            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment),layout_ctparam_input.getCtParam());
-            ctValues=CCurveShowMet.getInstance().m_CTValue;
-            falsePositive=CCurveShowPolyFit.getInstance().m_falsePositive;
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+            ctValues = CCurveShowMet.getInstance().m_CTValue;
+            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
         }
 
         for (String chan : ChanList) {
             for (String ks : KSList) {
-                getCtValue(chan, ks,ctValues,falsePositive);
+                getCtValue(chan, ks, ctValues, falsePositive);
             }
         }
         notifyCtChanged();
@@ -268,36 +288,36 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (mExeperiment == null) {
             return;
         }
-       // CyclingStage cyclingStage = (CyclingStage) mExeperiment.getSettingSecondInfo().getCyclingSteps().get(0);
+        // CyclingStage cyclingStage = (CyclingStage) mExeperiment.getSettingSecondInfo().getCyclingSteps().get(0);
 
         //统计总共有多少循环（不拍照的不包括）
-        int totalCyclingCount=0;
-        List<Stage> cyclingSteps=mExeperiment.getSettingSecondInfo().getCyclingSteps();
-        for (int i=0;i<cyclingSteps.size();i++){
-            CyclingStage cyclingStage= (CyclingStage) cyclingSteps.get(i);
-            boolean pic=false;
-            for (PartStage partStage:cyclingStage.getPartStageList()){
-                if (partStage.isTakePic()){
-                    pic=true;
+        int totalCyclingCount = 0;
+        List<Stage> cyclingSteps = mExeperiment.getSettingSecondInfo().getCyclingSteps();
+        for (int i = 0; i < cyclingSteps.size(); i++) {
+            CyclingStage cyclingStage = (CyclingStage) cyclingSteps.get(i);
+            boolean pic = false;
+            for (PartStage partStage : cyclingStage.getPartStageList()) {
+                if (partStage.isTakePic()) {
+                    pic = true;
                     break;
                 }
             }
-            if (pic){
-                totalCyclingCount+=cyclingStage.getCyclingCount();
+            if (pic) {
+                totalCyclingCount += cyclingStage.getCyclingCount();
             }
         }
         mDtChart = new DtChart(chart_dt, totalCyclingCount);
         //文件读取之后孔数已经有值
-        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment),layout_ctparam_input.getCtParam());
+        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment), layout_ctparam_input.getCtParam());
 
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
         KSList.clear();
-        KSList=Well.getWell().getKsList();
+        KSList = Well.getWell().getKsList();
 
         //获取CT value
         for (String chan : ChanList) {
             for (String ks : KSList) {
-                getCtValue(chan, ks,CCurveShowPolyFit.getInstance().m_CTValue,CCurveShowPolyFit.getInstance().m_falsePositive);
+                getCtValue(chan, ks, CCurveShowPolyFit.getInstance().m_CTValue, CCurveShowPolyFit.getInstance().m_falsePositive);
             }
         }
 
@@ -308,17 +328,21 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (mHasMeltingMode) {
             //tv_melt.setVisibility(View.VISIBLE);
             mMeltingChart = new MeltingChart(chart_melt);
-            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment),layout_ctparam_input.getCtParam());
+            float start;
+            try {
+                start=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
+            }catch (Exception e){
+                e.printStackTrace();
+                start=40;
+            }
+            mMeltingChart.setStartTemp(start);
+            mMeltingChart.setAxisMinimum(start);
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment), layout_ctparam_input.getCtParam());
         } else {
             tv_melt.setVisibility(View.GONE);
         }
 
     }
-
-
-
-
-
 
 
     public static ExpeDataFragment newInstance(HistoryExperiment experiment) {
@@ -335,17 +359,93 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     }
 
     public boolean isSavedExpe() {
-        return mExeperiment!=null&&mExeperiment.getId() != HistoryExperiment.ID_NONE;
+        return mExeperiment != null && mExeperiment.getId() != HistoryExperiment.ID_NONE;
     }
 
     private long time;
-    private Handler mHandler=new Handler();
-    @OnClick({R.id.iv_pdf, R.id.iv_save, R.id.tv_dt, R.id.tv_melt,R.id.iv_std_curve})
+    private Handler mHandler = new Handler();
+
+    private void deprecatedPrint() {
+        String msg = getString(R.string.dialog_msg_pdf);
+        AppDialogHelper.showNormalDialog(getActivity(),
+                msg, new AppDialogHelper.DialogOperCallback() {
+                    @Override
+                    public void onDialogConfirmClick() {
+
+                        LoadingDialogHelper.showOpLoading(getActivity());
+                        if (!tv_dt.isActivated()) {
+                            onViewClick(tv_dt);
+                        }
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                String pdfName = DataFileUtil.getPdfFileName(getActivity(), mExeperiment, false);
+                                //生成pdf
+                                generatePdf(pdfName)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(new Action1<Boolean>() {
+                                            @Override
+                                            public void call(Boolean aboolean) {
+                                                if (mHasMeltingMode) {
+                                                    onViewClick(tv_melt);
+                                                    new Handler().postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            String pdfName = DataFileUtil.getPdfFileName(getActivity(), mExeperiment, true);
+
+                                                            generatePdf(pdfName)
+                                                                    .subscribeOn(Schedulers.io())
+                                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                                    .subscribe(new Action1<Boolean>() {
+                                                                        @Override
+                                                                        public void call(Boolean aBoolean) {
+                                                                            LoadingDialogHelper.hideOpLoading();
+
+                                                                            ToastUtil.showToast(getActivity(), getString(R.string.pdf_exported));
+                                                                        }
+                                                                    }, new Action1<Throwable>() {
+                                                                        @Override
+                                                                        public void call(Throwable throwable) {
+                                                                            throwable.printStackTrace();
+                                                                            LoadingDialogHelper.hideOpLoading();
+                                                                            ToastUtil.showToast(getActivity(), getString(R.string.pdf_export_error));
+                                                                        }
+                                                                    });
+                                                        }
+                                                    }, 3000);
+
+                                                } else {
+                                                    LoadingDialogHelper.hideOpLoading();
+                                                    ToastUtil.showToast(getActivity(), getString(R.string.pdf_exported));
+                                                }
+
+                                            }
+                                        }, new Action1<Throwable>() {
+                                            @Override
+                                            public void call(Throwable throwable) {
+                                                LoadingDialogHelper.hideOpLoading();
+                                                throwable.printStackTrace();
+                                                ToastUtil.showToast(getActivity(), getString(R.string.pdf_export_error));
+                                            }
+                                        });
+                            }
+                        }, 3000);
+
+
+                    }
+
+
+                });
+    }
+
+    @Deprecated
+    @OnClick({R.id.iv_pdf, R.id.iv_save, R.id.tv_dt, R.id.tv_melt, R.id.iv_std_curve})
     public void onViewClick(View view) {
         long now = System.currentTimeMillis();
         switch (view.getId()) {
             case R.id.iv_std_curve:
-                StandardCurveActivity.start(getActivity(),mExeperiment);
+                StandardCurveActivity.start(getActivity(), mExeperiment);
                 break;
             case R.id.tv_dt:
 
@@ -375,10 +475,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 break;
             case R.id.iv_save:
 
-
-
-               doSaveExpe();
-
+                doSaveExpe();
 
                 break;
             case R.id.iv_pdf:
@@ -389,77 +486,19 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                         .onGranted(new Action<List<String>>() {
                             @Override
                             public void onAction(List<String> data) {
-                                String msg=getString(R.string.dialog_msg_pdf);
-                                AppDialogHelper.showNormalDialog(getActivity(),
-                                        msg, new AppDialogHelper.DialogOperCallback() {
-                                            @Override
-                                            public void onDialogConfirmClick() {
+                                InputParams params = new InputParams();
 
-                                                LoadingDialogHelper.showOpLoading(getActivity());
-                                                if (!tv_dt.isActivated()) {
-                                                    onViewClick(tv_dt);
-                                                }
-                                                mHandler.postDelayed(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        String pdfName = DataFileUtil.getPdfFileName(getActivity(),mExeperiment, false);
-                                                        //生成pdf
-                                                        generatePdf(pdfName)
-                                                                .subscribeOn(Schedulers.io())
-                                                                .observeOn(AndroidSchedulers.mainThread())
-                                                                .subscribe(new Action1<Boolean>() {
-                                                                    @Override
-                                                                    public void call(Boolean aboolean) {
-                                                                        if (mHasMeltingMode) {
-                                                                            onViewClick(tv_melt);
-                                                                            new Handler().postDelayed(new Runnable() {
-                                                                                @Override
-                                                                                public void run() {
-                                                                                    String pdfName = DataFileUtil.getPdfFileName(getActivity(),mExeperiment, true);
+                                if (tv_dt.isActivated()) {
+                                    params.setExpeType(InputParams.EXPE_PCR);
+                                    params.setSourceDataPath(DataFileUtil.getDtImageDataFile(mExeperiment).getAbsolutePath());
+                                }else {
+                                    params.setExpeType(InputParams.EXPE_MELTING);
+                                    params.setSourceDataPath(DataFileUtil.getMeltImageDateFile(mExeperiment).getAbsolutePath());
+                                }
+                                params.setCtParam(layout_ctparam_input.getCtParam());
 
-                                                                                    generatePdf(pdfName)
-                                                                                            .subscribeOn(Schedulers.io())
-                                                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                                                            .subscribe(new Action1<Boolean>() {
-                                                                                                @Override
-                                                                                                public void call(Boolean aBoolean) {
-                                                                                                    LoadingDialogHelper.hideOpLoading();
+                                PcrPrintPreviewActivity.start(getActivity(),mExeperiment,params);
 
-                                                                                                    ToastUtil.showToast(getActivity(), getString(R.string.pdf_exported));
-                                                                                                }
-                                                                                            }, new Action1<Throwable>() {
-                                                                                                @Override
-                                                                                                public void call(Throwable throwable) {
-                                                                                                    throwable.printStackTrace();
-                                                                                                    LoadingDialogHelper.hideOpLoading();
-                                                                                                    ToastUtil.showToast(getActivity(),  getString(R.string.pdf_export_error));
-                                                                                                }
-                                                                                            });
-                                                                                }
-                                                                            },3000);
-
-                                                                        } else {
-                                                                            LoadingDialogHelper.hideOpLoading();
-                                                                            ToastUtil.showToast(getActivity(),  getString(R.string.pdf_exported));
-                                                                        }
-
-                                                                    }
-                                                                }, new Action1<Throwable>() {
-                                                                    @Override
-                                                                    public void call(Throwable throwable) {
-                                                                        LoadingDialogHelper.hideOpLoading();
-                                                                        throwable.printStackTrace();
-                                                                        ToastUtil.showToast(getActivity(),  getString(R.string.pdf_export_error));
-                                                                    }
-                                                                });
-                                                    }
-                                                },3000);
-
-
-                                            }
-
-
-                                        });
                             }
                         }).start();
 
@@ -467,6 +506,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 break;
         }
     }
+
     private void doSaveExpe() {
         if (!isSavedExpe() && !mSaved) {
             mSaved = true;
@@ -483,7 +523,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                                 tab.setIndex(MainActivity.TAB_INDEX_EXPE);
                                 MainActivity.start(getActivity(), tab);
                             } else {
-                                ToastUtil.showToast(getActivity(),   getString(R.string.setup_save_error));
+                                ToastUtil.showToast(getActivity(), getString(R.string.setup_save_error));
                             }
 
                         }
@@ -491,11 +531,12 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                         @Override
                         public void call(Throwable throwable) {
                             throwable.printStackTrace();
-                            ToastUtil.showToast(getActivity(),   getString(R.string.setup_save_error));
+                            ToastUtil.showToast(getActivity(), getString(R.string.setup_save_error));
                         }
                     });
         }
     }
+
     private Observable<InsertExpeResponse> saveExpe() {
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_COMPLETED);
@@ -523,13 +564,13 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 PdfDocument document = new PdfDocument();
                 int width = AppUtil.getScreenWidth(getActivity());
                 int height = 0;// AppUtil.getScreenHeight(getActivity());
-                if (sv!=null) {
+                if (sv != null) {
                     //计算scrollview的高度
                     for (int i = 0; i < sv.getChildCount(); i++) {
                         height += sv.getChildAt(i).getHeight();
                     }
-                }else {
-                    height=ll_root.getHeight();
+                } else {
+                    height = ll_root.getHeight();
                 }
 
                 PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo
@@ -538,9 +579,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
                 PdfDocument.Page page = document.startPage(pageInfo);
                 Canvas canvas = page.getCanvas();
-                if (sv!=null) {
+                if (sv != null) {
                     sv.draw(canvas);
-                }else {
+                } else {
                     ll_root.draw(canvas);
                 }
               /*  chart.draw(canvas);
@@ -615,9 +656,38 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 event.getKSList();
 
 
-
         //mExecutorService.execute(mRun);
         showChart();
+
+        inflateCt();
+    }
+
+
+    private void inflateCt() {
+        mChannelDataAdapters[0].clear();
+        mChannelDataAdapters[1].clear();
+        GridView[] gvs = new GridView[2];
+        gvs[0] = gv_a;
+        gvs[1] = gv_b;
+        String[] titles = {"A", "B"};
+        buildChannelData(gvs, titles);
+        double[][] ctValues;
+        boolean[][] falsePositive;
+
+
+        if (!tv_dt.isActivated()) {
+            ctValues = CCurveShowMet.getInstance().m_CTValue;
+            falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+        } else {
+            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+        }
+        for (String chan : ChanList) {
+            for (String ks : KSList) {
+                getCtValue(chan, ks, ctValues, falsePositive);
+            }
+        }
+        notifyCtChanged();
     }
 
     @Override

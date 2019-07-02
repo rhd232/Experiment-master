@@ -179,6 +179,17 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             />
+        <CheckBox
+            android:id="@+id/cb_norm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:checked="true"
+            android:text="@string/norm"
+            android:visibility="gone" />
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart_dt"
             android:layout_width="match_parent"

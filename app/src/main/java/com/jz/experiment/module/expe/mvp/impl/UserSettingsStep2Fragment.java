@@ -16,6 +16,7 @@ import com.aigestudio.wheelpicker.utils.WheelPickerFactory;
 import com.aigestudio.wheelpicker.widget.IWheelVo;
 import com.aigestudio.wheelpicker.widget.WheelSimpleVo;
 import com.anitoa.Anitoa;
+import com.anitoa.ExpeType;
 import com.anitoa.bean.Data;
 import com.anitoa.bean.FlashData;
 import com.anitoa.cmd.PcrCommand;
@@ -585,7 +586,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
             AnitoaLogUtil.writeFileLog("===========开始自动积分==========", mExecutorService);
             ImageDataReader imageDataReader = new ImageDataReader(mCommunicationService,
-                    mHistoryExperiment, factUpdater, mExecutorService);
+                    mHistoryExperiment, factUpdater, mExecutorService, ExpeType.PCR);
             imageDataReader.autoInt()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

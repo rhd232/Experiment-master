@@ -23,7 +23,10 @@ public class CCurveShowPolyFit {
 
     //float log_threshold = 0.11f;
 
-    float cheat_factor = 0.06f;
+//    float cheat_factor = 0.06f;
+//    float cheat_factor2 = 0.5f;
+//    float cheat_factorNeg = 0.33f;             // not used
+    float cheat_factor = 0.1f;
     float cheat_factor2 = 0.5f;
     float cheat_factorNeg = 0.33f;             // not used
 
@@ -242,7 +245,7 @@ public class CCurveShowPolyFit {
             val2[i] = val[i];
 
             yData[i] -= mean;
-            val[i] += cheat_factor * (yData[i] - val[i]) * k[frameindex][iy] / 8;        // Some cheating :)
+            val[i] += cheat_factor * (yData[i] - val[i]); //* k[frameindex][iy] / 8;        // Some cheating :)
             val2[i] += cheat_factor2 * (yData[i] - val2[i]);       // Some cheating :)
         }
 
@@ -597,6 +600,19 @@ public class CCurveShowPolyFit {
                 max_i = frameindex;
             }
         }
+        double[] eff = new double[numWells];
+        double max_eff = 0;
+        int max_ei = 0;
+        for (int frameindex = 0; frameindex < numWells; frameindex++)
+        {
+            eff[frameindex] = Math.exp(r[frameindex][iy]) - 1;         // amplification efficiency
+
+            if (max_eff < eff[frameindex])
+            {
+                max_eff = eff[frameindex];
+                max_ei = frameindex;
+            }
+        }
 
         for (int frameindex = 0; frameindex < numWells; frameindex++) {
             m_falsePositive[iy][frameindex] = false;
@@ -604,8 +620,10 @@ public class CCurveShowPolyFit {
 
             double ratio = 0;
             double confi = 0;
+            double ratio_eff = 0;
 
             if (max_k > 0) ratio = k[frameindex][iy] / max_k;
+            if (max_eff>0) ratio_eff=eff[frameindex]/max_eff;
 
             if (r[max_i][iy] < r_th) {
                 ratio *= 0.3;    // ratio discounted. If the max curve have a very slow slope
@@ -616,8 +634,8 @@ public class CCurveShowPolyFit {
 //                      m_Confidence[iy, frameindex] = "可信度: " + (confi * 100).ToString("0") + "%";       // full confidence is 100
 //                }
 
-            confi = (ratio - 0.1) * 1.11 * 0.4 +
-                    (r[frameindex][iy] - 0.19) * 2.17 * 0.6; // Weighted average of 2 score, r generally range 0.19 to 0.65
+           // confi = (ratio - 0.1) * 1.11 * 0.4 + (r[frameindex][iy] - 0.19) * 2.17 * 0.6; // Weighted average of 2 score, r generally range 0.19 to 0.65
+            confi = (ratio - 0.1) * 1.11 * 0.5 + (ratio_eff - 0.1) * 1.11 * 0.5; // Weighted average of 2 score, r generally range 0.19 to 0.65
 
             if (confi < 0)
                 confi = 0;
@@ -627,15 +645,15 @@ public class CCurveShowPolyFit {
 
             double myr = r[frameindex][iy];
 
-            double eff = Math.exp(myr);         // amplification efficiency
+        //    double eff = Math.exp(myr);         // amplification efficiency
 
 //                m_Confidence[iy, frameindex] = "阳性可信度: "
 //                                                    + "sat_ratio: " + (ratio * 100).ToString("0") + "%  " + "rise rate: " + r[frameindex, iy].ToString("0.00") + "(efficiency: " + (eff*100).ToString("0.0") + "%) " + " sat_multiple " + (k[frameindex, iy] * 100 / m_stdev[iy, frameindex]).ToString("0.00") + " (stdev: " + m_stdev[iy, frameindex].ToString("0.00") + ")";       // full confidence is 100
 
             m_Confidence[iy][frameindex] = " -- 饱和值比例: " + (ratio * 100) + "%  " + "扩增效率: "
-                    + ((eff - 1) * 100) + "% " + " 信噪比 "
+                    + ((eff[frameindex] * 100) + "% " + " 信噪比 "
                     + (k[frameindex][iy] * 100 / m_stdev[iy][frameindex])
-                    + " (本底噪音: " + m_stdev[iy][frameindex] + ")";       // full confidence is 100
+                    + " (本底噪音: " + m_stdev[iy][frameindex] + ")");       // full confidence is 100
 
 
             if (confi < 0.12) {

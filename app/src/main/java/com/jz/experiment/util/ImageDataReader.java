@@ -2,7 +2,9 @@ package com.jz.experiment.util;
 
 import android.text.TextUtils;
 
+import com.anitoa.ExpeType;
 import com.anitoa.bean.Data;
+import com.anitoa.bean.FlashData;
 import com.anitoa.cmd.PcrCommand;
 import com.anitoa.listener.AnitoaConnectionListener;
 import com.anitoa.listener.SimpleConnectionListener;
@@ -49,10 +51,11 @@ public class ImageDataReader {
     int[] max_read_0 = new int[CCurveShow.MAX_CHAN];
     public static final String FILE_NAME = "auth_int_time.txt";
     private ExecutorService mExecutorService;
+    private boolean pcr;
     public ImageDataReader(
-                           CommunicationService communicationService,
-                           HistoryExperiment experiment, FactUpdater factUpdater,
-                          ExecutorService executorService) {
+            CommunicationService communicationService,
+            HistoryExperiment experiment, FactUpdater factUpdater,
+            ExecutorService executorService, ExpeType expeType) {
         this.mCommunicationService = communicationService;
         this.mExperiment = experiment;
         mImageMode = PcrCommand.IMAGE_MODE.IMAGE_12;
@@ -66,6 +69,18 @@ public class ImageDataReader {
         mAutoIntFile = DataFileUtil.getOrCreateFile(FILE_NAME);
 
         mCommunicationService.setNotify(mListener);
+
+
+        switch (expeType){
+            case PCR:
+                AutoInt_Target= FlashData.AutoInt_Target_PCR;
+                pcr=true;
+                break;
+            case MELTING:
+                AutoInt_Target=FlashData.AutoInt_Target_MELTING;
+                pcr=false;
+                break;
+        }
     }
 
 
@@ -197,7 +212,7 @@ public class ImageDataReader {
                 }
 
 
-                String imageData = transferImageData(channelIndex, curRowIndex, reveicedBytes, true);
+                String imageData = transferImageData(channelIndex, curRowIndex, reveicedBytes, pcr);
 
                 if (mItemData.get(chip) == null) {
                     mItemData.put(chip, new ArrayList<String>());
@@ -400,7 +415,7 @@ public class ImageDataReader {
 
 
     private int jfindex;
-    private final float AutoInt_Target = 1600;
+    private float AutoInt_Target;
     private void AutocalibInt() {
         int max_read;
         float inc;

@@ -10,4 +10,11 @@
         android:background="@drawable/selector_666666_blue_circle">
 
     </TextView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_seq"
+        android:layout_gravity="center"
+        />
 </com.wind.base.widget.WidthRatioFrameLayout>

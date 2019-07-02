@@ -15,7 +15,7 @@ public class MeltCurveReader {
     public static MeltCurveReader getInstance(){
         return INSTANCE;
     }
-    public void readCurve(double[][] factorValues){
+    public void readCurve(double[][] factorValues,float startTemp){
 
         double [][][]m_yData = new double[CCurveShowMet.MAX_CHAN][CCurveShowMet.MAX_WELL][ CCurveShowMet.MAX_CYCL];
         CCurveShowMet cCurveShowMet = CCurveShowMet.getInstance();
@@ -43,9 +43,9 @@ public class MeltCurveReader {
                 for (int k = 0; k < cdlist.size(); k++)
                 {
                     mtemp[i][ k] = Double.parseDouble(cdlist.get(k).x);
-
-                    double factorValue=factorValues[GetChan(tdlist.get(i))][k];
-                    m_yData[i][ n][ k] = Double.parseDouble(cdlist.get(k).y) /factorValue;
+                    m_yData[i][ n][ k] = Double.parseDouble(cdlist.get(k).y);
+                /*    double factorValue=factorValues[GetChan(tdlist.get(i))][k];
+                    m_yData[i][ n][ k] = Double.parseDouble(cdlist.get(k).y) /factorValue;*/
                 }
             }
             if (CommData.diclist.size() > 0&& CommData.diclist.get(tdlist.get(i))!=null)
@@ -66,6 +66,7 @@ public class MeltCurveReader {
             cCurveShowMet.m_Size = m_Size;
             cCurveShowMet.mtemp = mtemp;
             cCurveShowMet.ifactor = factorValues;
+            cCurveShowMet.start_temp=startTemp;
             cCurveShowMet.UpdateAllcurve();
             m_zData = cCurveShowMet.m_zData;
             m_zdData = cCurveShowMet.m_zdData;

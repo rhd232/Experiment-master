@@ -7,6 +7,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.GridView;
 
+import com.anitoa.exception.UnsupportedDeviceException;
+import com.anitoa.well.Well;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.module.data.ExpeDataFragment;
@@ -27,9 +29,9 @@ import butterknife.ButterKnife;
 public abstract class CtFragment extends BaseFragment {
 
     @BindView(R.id.gv_a)
-    GridView gv_a;
+    protected GridView gv_a;
     @BindView(R.id.gv_b)
-    GridView gv_b;
+    protected GridView gv_b;
     protected ChannelDataAdapter[] mChannelDataAdapters;
     protected HistoryExperiment mExeperiment;
     @Override
@@ -48,7 +50,41 @@ public abstract class CtFragment extends BaseFragment {
 
 
     }
-    private void buildChannelData(GridView[] gvs, String[] titles) {
+    protected List<String> ChanList = new ArrayList<>();
+    protected List<String> KSList = new ArrayList<>();
+    protected void initChanAndKs(){
+        ChanList.clear();
+        ChanList.add("Chip#1");
+        ChanList.add("Chip#2");
+        ChanList.add("Chip#3");
+        ChanList.add("Chip#4");
+        try {
+            KSList = Well.getWell().getKsList();
+        } catch (UnsupportedDeviceException e) {
+            //第一次安装，没有文件读取权限导致
+            e.printStackTrace();
+            KSList.clear();
+
+            KSList.add("A1");
+            KSList.add("A2");
+            KSList.add("A3");
+            KSList.add("A4");
+            KSList.add("A5");
+            KSList.add("A6");
+            KSList.add("A7");
+            KSList.add("A8");
+
+            KSList.add("B1");
+            KSList.add("B2");
+            KSList.add("B3");
+            KSList.add("B4");
+            KSList.add("B5");
+            KSList.add("B6");
+            KSList.add("B7");
+            KSList.add("B8");
+        }
+    }
+    protected void buildChannelData(GridView[] gvs, String[] titles) {
         String [] channelAlias=new String[4];
         String [][] sampleAlias=new String[2][8];
 
@@ -194,7 +230,7 @@ public abstract class CtFragment extends BaseFragment {
         //还需要判断是否是假阳性
         String negative=getString(R.string.negative);
         String ctValue;
-        if (falsePositive[currChan][ksindex]){
+        if (falsePositive[currChan][ksindex] && isPcrMode()){
             //假阳性
 
             ctValue = "["+negative+"]";
@@ -204,7 +240,12 @@ public abstract class CtFragment extends BaseFragment {
                 DecimalFormat format = new DecimalFormat("#0.00");
                 ctValue = format.format(val);
             }else {
-                ctValue = negative;
+                if (isPcrMode()) {
+                    ctValue = negative;
+                }else {
+                    DecimalFormat format = new DecimalFormat("#0.00");
+                    ctValue = format.format(val);
+                }
             }
 
         }
@@ -213,6 +254,8 @@ public abstract class CtFragment extends BaseFragment {
 
         mChannelDataAdapters[gvIndex].getItem(ksIndexInAdapter).setSampleVal(ctValue);
     }
+
+    protected abstract boolean isPcrMode();
 
 
     protected void notifyCtChanged(){

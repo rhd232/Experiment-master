@@ -10,6 +10,7 @@ import android.view.WindowManager;
 
 import com.jz.experiment.R;
 import com.wind.base.BaseActivity;
+import com.wind.base.C;
 import com.wind.base.utils.Navigator;
 
 public class LoginActivity extends BaseActivity{
@@ -53,7 +54,11 @@ public class LoginActivity extends BaseActivity{
         Log.d("h_bl", "屏幕宽度（dp）：" + screenWidth);
         Log.d("h_bl", "屏幕高度（dp）：" + screenHeight);
 
+        int widthPxInA4= (int) (C.A4.WIDTH/C.A4.MM_PER_IN  *densityDpi);
+        int heightPxInA4= (int) (C.A4.HEIGHT/C.A4.MM_PER_IN  *densityDpi);
 
+        Log.d("widthPxInA4", widthPxInA4+"");
+        Log.d("heightPxInA4", heightPxInA4+"");
 
 
     }

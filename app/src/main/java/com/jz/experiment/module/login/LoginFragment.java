@@ -181,8 +181,7 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.tv_login:
-              /*  String filePath = C.Value.REPORT_FOLDER + "2019_03_03_20_08_00变温扩增.pdf";
-                doPdfPrint(filePath);*/
+               // ReportPreviewActivity.start(getActivity());
                 login();
                 break;
             case R.id.iv_pwd_toggle:

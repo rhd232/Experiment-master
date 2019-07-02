@@ -41,6 +41,7 @@ public class UsbService extends CommunicationService {
     private PendingIntent mRequestPermissionPendingIntent;
     private UsbManager mUsbManager;
 
+
     public class LocalBinder extends Binder {
         public UsbService getService() {
             return UsbService.this;
@@ -317,6 +318,12 @@ public class UsbService extends CommunicationService {
         }
     }
 
+    public void clearSyncBuffer() {
+        mSync=false;
+        if (mReadThread!=null){
+            mReadThread.mSyncReceivedBytes=null;
+        }
+    }
     private int bulk(ArrayList<Byte> command) {
         if (command != null && !command.isEmpty()) {
 
@@ -468,6 +475,7 @@ public class UsbService extends CommunicationService {
 
                 connect(device.getDeviceName());
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
+                AnitoaLogUtil.writeFileLog("接收到USB断开连接通知");
                 mTargetDevice = null;
                 if (mReadThread != null) {
                     mReadThread.stopRun();

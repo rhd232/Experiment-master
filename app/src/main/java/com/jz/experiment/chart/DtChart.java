@@ -36,7 +36,7 @@ public class DtChart extends WindChart {
         xAxis.setAxisMaximum(cylingCount);
 
         YAxis yAxis=chart.getAxisLeft();
-      //  yAxis.setAxisMinimum(-500);
+        yAxis.setAxisMinimum(-500);
         yAxis.setDrawGridLines(true);
     }
     public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam){
@@ -83,7 +83,9 @@ public class DtChart extends WindChart {
         //读取图像文件数据
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
         if (mRunning) {
+            mFactUpdater.setPcr(true);
             mFactUpdater.updateFact();
+            norm=false;//运行时norm始终为false
            // CommData.m_factorData=DataFileReader.getInstance().factorValue;
            // recordFactorData("运行",CommData.m_factorData);
         }else {

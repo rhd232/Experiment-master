@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color333333"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/print_company_name"
+                android:textColor="@color/white" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="200dp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setup_test_name"
+                android:textColor="@color/white" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="200dp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.jz.experiment.widget.A4PageLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_a4"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <ScrollView
+            android:id="@+id/sv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="50dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginRight="50dp"
+                android:orientation="vertical">
+
+                <com.jz.experiment.widget.PrintTitleLayout
+                    android:id="@+id/layout_print_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.github.mikephil.charting.charts.CombinedChart
+                        android:id="@+id/chart_std"
+                        android:layout_width="match_parent"
+                        android:layout_height="500dp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_equation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/color333333" />
+
+                        <TextView
+                            android:id="@+id/tv_r2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/color333333" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
+                    android:orientation="horizontal">
+
+
+                    <com.wind.base.widget.NoFlexibleListView
+                        android:id="@+id/lv_standard"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_weight="1"
+                        android:divider="@color/color999999"
+                        android:dividerHeight="1dp" />
+
+                    <com.wind.base.widget.NoFlexibleListView
+                        android:id="@+id/lv_unknow"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="2dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_weight="1"
+                        android:divider="@color/color999999"
+                        android:dividerHeight="1dp" />
+                </LinearLayout>
+
+                <com.jz.experiment.widget.PrintTailLayout
+                    android:id="@+id/layout_print_tail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp" />
+
+
+
+                <View
+                    android:id="@+id/view_placeholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="1800dp"/>
+            </LinearLayout>
+        </ScrollView>
+
+
+    </com.jz.experiment.widget.A4PageLayout>
+
+</LinearLayout>
+

@@ -79,7 +79,7 @@ public class DataFileUtil {
                 dirFile.mkdirs();
             }
             File pdfFile = new File(dir, pdfName);
-            if (pdfFile.exists()) {
+            if (!pdfFile.exists()) {
                 pdfFile.createNewFile();
             }
             return pdfFile.getAbsolutePath();
