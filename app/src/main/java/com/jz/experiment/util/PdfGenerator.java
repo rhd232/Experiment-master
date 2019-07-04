@@ -26,6 +26,7 @@ public class PdfGenerator {
                                    final OnPdfGenerateListener listener){
         generatePdf(layout_a4,pdfName)
                 .subscribeOn(Schedulers.io())
+                //.subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<String>() {
                     @Override

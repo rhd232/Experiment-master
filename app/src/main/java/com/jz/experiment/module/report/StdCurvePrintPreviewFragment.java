@@ -39,7 +39,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class StdCurvePrintPreviewFragment extends BaseFragment {
 
@@ -162,7 +161,8 @@ public class StdCurvePrintPreviewFragment extends BaseFragment {
         layout_print_tail.setReportDate(DateUtil.get(time,"yyyy-MM-dd HH:mm:ss"));
         String pdfName = prefix+tag+".pdf";
         generatePdf(pdfName)
-                .subscribeOn(Schedulers.io())
+                //.subscribeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<String>() {
                     @Override

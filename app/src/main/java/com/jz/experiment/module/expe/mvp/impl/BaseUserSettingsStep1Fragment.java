@@ -215,20 +215,7 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
                         List<Sample> samplesA=mExperiment.getSettingsFirstInfo().getSamplesA();
                         List<Sample> samplesB=mExperiment.getSettingsFirstInfo().getSamplesB();
                         cb_int.setChecked(mExperiment.isAutoIntegrationTime());
-                        /*if (FlashData.NUM_WELLS==4){
-                            //4孔机只有A，没有B
-                            for (int i=0;i<8;i++){
-                                if (i<4) {
-                                    samplesA.get(i).setEnabled(true);
-                                }else {
-                                    samplesA.get(i).setEnabled(false);
-                                }
-                                samplesB.get(i).setEnabled(false);
-                            }
-                        }else {
-                            enableSamples(samplesA);
-                            enableSamples(samplesB);
-                        }*/
+
                         doEnableSamples(samplesA,samplesB);
                         inflateData();
 

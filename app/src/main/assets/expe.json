@@ -1,0 +1,169 @@
+{
+  "name": "test",
+  "device": "hid",
+  "millitime": "实验创建时间的毫秒值",
+  "finish_millitime": "实验结束时间的毫秒值",
+  "during": "实验持续时间",
+  "mode":"",
+
+  "autoIntTime": 1,
+  "channels": [
+    {
+      "name": "",
+      "value": "",
+      "remark": "",
+      "integration_time": 10
+    },
+    {
+      "name": "",
+      "value": "",
+      "remark": "",
+      "integration_time": 10
+    },
+    {
+      "name": "",
+      "value": "",
+      "remark": "",
+      "integration_time": 10
+    },
+    {
+      "name": "",
+      "value": "",
+      "remark": "",
+      "integration_time": 10
+    }
+  ],
+  "samplesA": [
+    {
+      "code": "A1",
+      "name": "xx"
+    },
+    {
+      "code": "A2",
+      "name": "xx"
+    },
+    {
+      "code": "A3",
+      "name": "xx"
+    },
+    {
+      "code": "A4",
+      "name": "xx"
+    },
+    {
+      "code": "A5",
+      "name": ""
+    },
+    {
+      "code": "A6",
+      "name": ""
+    },
+    {
+      "code": "A7",
+      "name": ""
+    },
+    {
+      "code": "A8",
+      "name": ""
+    }
+
+
+  ],
+  "samplesB": [
+    {
+      "code": "B1",
+      "name": "xx"
+    },
+    {
+      "code": "B2",
+      "name": "xx"
+    },
+    {
+      "code": "B3",
+      "name": "xx"
+    },
+    {
+      "code": "B4",
+      "name": "xx"
+    },
+    {
+      "code": "B5",
+      "name": ""
+    },
+    {
+      "code": "B6",
+      "name": ""
+    },
+    {
+      "code": "B7",
+      "name": ""
+    },
+    {
+      "code": "A8",
+      "name": ""
+    }
+
+  ],
+  "stage": {
+    "denaturatings_stage": [
+      {
+        "temp": 95,
+        "during": 10
+      },
+      {
+        "temp": 95,
+        "during": 10
+      }
+    ],
+    "clycling_stages": [
+      {
+        "cycling_count": 40,
+        "part_stage": [
+          {
+            "temp": 66,
+            "during": 10,
+            "take_pic": 1
+          },
+          {
+            "temp": 66,
+            "during": 10,
+            "take_pic": 1
+          }
+        ]
+      },
+      {
+        "cycling_count": 40,
+        "part_stage": [
+          {
+            "temp": 66,
+            "during": 10,
+            "take_pic": 1
+          },
+          {
+            "temp": 66,
+            "during": 10,
+            "take_pic": 1
+          }
+        ]
+      }
+    ],
+    "extension_stage": {
+      "temp": 95,
+      "during": 10
+    },
+    "melting_stage": [
+      {
+        "temp": 60
+      },
+      {
+        "temp": 80
+      }
+    ]
+  },
+  "pcr":{
+      "data_file_path": "./pcr.txt"
+    },
+  "melting":{
+    "data_file_path": "./melting.txt"
+  }
+}

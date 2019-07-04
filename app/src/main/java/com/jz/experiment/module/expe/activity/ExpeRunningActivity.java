@@ -1429,12 +1429,17 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
         InsertExpeRequest request = new InsertExpeRequest();
         request.setExperiment(experiment);
+
+        //TODO 还需保存到json文件中
+
         //TODO 保存实验数据
         return ExpeDataStore
                 .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))
                 .insertExpe(request);
 
     }
+
+
 
     private void checkHasNewParam(byte[] reveicedBytes) {
         int dataIndex = 5;

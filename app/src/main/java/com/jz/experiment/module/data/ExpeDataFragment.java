@@ -479,6 +479,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
                 break;
             case R.id.iv_pdf:
+
                 AndPermission.with(this)
                         .runtime()
                         .permission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
