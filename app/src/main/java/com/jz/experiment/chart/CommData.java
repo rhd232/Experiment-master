@@ -2,7 +2,6 @@ package com.jz.experiment.chart;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.anitoa.bean.FlashData;
 import com.anitoa.util.ByteUtil;
@@ -330,7 +329,7 @@ public class CommData {
                 return cdlist;
             }
             int n = (diclist.get(chan).size() / imgFrame);
-            Log.e("ChartData","n:"+n);
+            //Log.e("ChartData","n:"+n);
 
             int ksindex= Well.getWell().getWellIndex(currks);
             if (ksindex == -1) {

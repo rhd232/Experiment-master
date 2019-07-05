@@ -1,17 +1,17 @@
 package com.wind.data.expe.request;
 
 import com.wind.base.request.BaseRequest;
-import com.wind.data.expe.bean.ExpeJsonBean;
+import com.wind.data.expe.bean.HistoryExperiment;
 
 public class GenerateExpeJsonRequest extends BaseRequest {
 
-    private ExpeJsonBean expeJsonBean;
+    private HistoryExperiment experiment;
 
-    public ExpeJsonBean getExpeJsonBean() {
-        return expeJsonBean;
+    public HistoryExperiment getExperiment() {
+        return experiment;
     }
 
-    public void setExpeJsonBean(ExpeJsonBean expeJsonBean) {
-        this.expeJsonBean = expeJsonBean;
+    public void setExperiment(HistoryExperiment experiment) {
+        this.experiment = experiment;
     }
 }

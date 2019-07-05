@@ -5,6 +5,7 @@ import android.graphics.pdf.PdfDocument;
 import android.text.TextUtils;
 import android.widget.ScrollView;
 
+import com.anitoa.util.ThreadUtil;
 import com.jz.experiment.module.report.OnPdfGenerateListener;
 import com.jz.experiment.widget.A4PageLayout;
 import com.wind.base.utils.A4Util;
@@ -31,11 +32,18 @@ public class PdfGenerator {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String path) {
-                        if (!TextUtils.isEmpty(path)){
+                        if (!TextUtils.isEmpty(path)) {
                             listener.onGeneratePdfSuccess(path);
-                        }else {
+                        } else {
                             listener.onGeneratePdfError();
                         }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
+                        generatePdf(layout_a4,pdfName,listener);
+
                     }
                 });
     }
@@ -46,7 +54,7 @@ public class PdfGenerator {
 
             @Override
             public void call(Subscriber<? super String> subscriber) {
-
+                ThreadUtil.sleep(500);
                 PdfDocument document = new PdfDocument();
                 int width = layout_a4.getWidth();// AppUtil.getScreenWidth(getActivity());
                 int height = 0;// AppUtil.getScreenHeight(getActivity());
@@ -77,6 +85,8 @@ public class PdfGenerator {
                     subscriber.onError(e);
                 }
                 document.close();
+
+
 
             }
         });

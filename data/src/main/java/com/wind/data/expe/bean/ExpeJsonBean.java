@@ -81,8 +81,8 @@ public class ExpeJsonBean {
         /**程序模式名称*/
         public String name;
         /**文件存放路径，请使用相对路径*/
-        @JSONField(name = "data_file_path")
-        public String dataFilePath;
+        @JSONField(name = "data_file_name")
+        public String dataFileName;
         /**是否自动积分*/
         @JSONField(name = "auto_int")
         public boolean autoInt;

@@ -265,6 +265,7 @@ public class ExpeDataStore {
                                         .cycling_id(cycling_id)
                                         .during((long) partStage.getDuring())
                                         .part_takepic(takePic)
+                                        .temperature(Double.valueOf(partStage.getTemp()))
                                         .asContentValues();
                                 mBriteDb.insert(StageInfo.TABLE_NAME, stageValues);
                             }
@@ -275,6 +276,7 @@ public class ExpeDataStore {
                                     .startScale((double) stage.getStartScale())
                                     .curScale((double) stage.getCurScale())
                                     .during((long) stage.getDuring())
+                                    .temperature(Double.valueOf(stage.getTemp()))
                                     .asContentValues();
                             mBriteDb.insert(StageInfo.TABLE_NAME, stageValues);
                         }
@@ -400,6 +402,10 @@ public class ExpeDataStore {
                                 if (stageInfo.serialNumber()!=null){
                                     serialNumber=stageInfo.serialNumber();
                                 }
+                                float temperature=0;
+                                if (stageInfo.temperature()!=null){
+                                    temperature=stageInfo.temperature().floatValue();
+                                }
 
                                 long during=0;
                                 if (stageInfo.during()!=null){
@@ -411,19 +417,21 @@ public class ExpeDataStore {
                                         meltingStage.setStartScale((float) startScale);
                                         meltingStage.setCurScale((float) curScale);
                                         meltingStage.setDuring((short) during);
+                                        meltingStage.setTemp( temperature);
                                         meltingStages.add(meltingStage);
                                         break;
                                     case Stage.TYPE_END:
                                         endStage.setStartScale((float) startScale);
                                         endStage.setCurScale((float) curScale);
                                         endStage.setDuring((short) during);
+                                        endStage.setTemp( temperature);
                                         break;
                                     case Stage.TYPE_START:
                                         StartStage startStage=new StartStage();
                                         startStage.setStartScale((float) startScale);
                                         startStage.setCurScale((float) curScale);
                                         startStage.setDuring((short) during);
-
+                                        startStage.setTemp( temperature);
                                         startStages.add(startStage);
                                         break;
                                     case Stage.TYPE_CYCLING:
@@ -447,6 +455,7 @@ public class ExpeDataStore {
                                         partStage.setCyclingId((int) cyclingId);
                                         partStage.setTakePic(takepic==1?true:false);
                                         partStage.setDuring((short) during);
+                                        partStage.setTemp(temperature);
                                         partStageList.add(partStage);
                                         break;
                                 }
@@ -663,6 +672,12 @@ public class ExpeDataStore {
                                 if (stageInfo.serialNumber()!=null){
                                      serialNumber=stageInfo.serialNumber();
                                 }
+
+                                float temperature=50;
+                                if (stageInfo.temperature()!=null){
+                                    temperature=stageInfo.temperature().floatValue();
+                                }
+
                                 long during=0;
                                 if (stageInfo.during()!=null){
                                     during=stageInfo.during();
@@ -673,18 +688,21 @@ public class ExpeDataStore {
                                         meltingStage.setStartScale((float) startScale);
                                         meltingStage.setCurScale((float) curScale);
                                         meltingStage.setDuring((short) during);
+                                        meltingStage.setTemp(temperature);
                                         meltingStages.add(meltingStage);
                                         break;
                                     case Stage.TYPE_END:
                                         endStage.setStartScale((float) startScale);
                                         endStage.setCurScale((float) curScale);
                                         endStage.setDuring((short) during);
+                                        endStage.setTemp(temperature);
                                         break;
                                     case Stage.TYPE_START:
                                         StartStage startStage=new StartStage();
                                         startStage.setStartScale((float) startScale);
                                         startStage.setCurScale((float) curScale);
                                         startStage.setDuring((short) during);
+                                        startStage.setTemp(temperature);
                                         startStages.add(startStage);
                                         break;
                                     case Stage.TYPE_CYCLING:
@@ -708,6 +726,7 @@ public class ExpeDataStore {
                                         partStage.setCyclingId((int) cyclingId);
                                         partStage.setTakePic(takepic==1?true:false);
                                         partStage.setDuring((short) during);
+                                        partStage.setTemp(temperature);
                                         partStageList.add(partStage);
                                         break;
                                 }

@@ -19,7 +19,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "w_db";
 
-    private static final int VERSION = 3;
+    private static final int VERSION = 4;
     public static DbOpenHelper instance;
 
     public static DbOpenHelper getInstance(Context context) {
@@ -75,6 +75,11 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                         upgradeToVersion2(db);
                         upgradeToVersion3(db);
                         break;
+                    case 4:
+                        upgradeToVersion2(db);
+                        upgradeToVersion3(db);
+                        upgradeToVersion4(db);
+                        break;
                     default:
                         break;
                 }
@@ -84,7 +89,18 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                     case 3:
                         upgradeToVersion3(db);
                         break;
+                    case 4:
+                        upgradeToVersion3(db);
+                        upgradeToVersion4(db);
+                        break;
                     default:
+                        break;
+                }
+                break;
+            case 3:
+                switch (newVersion) {
+                    case 4:
+                        upgradeToVersion4(db);
                         break;
                 }
                 break;
@@ -104,6 +120,14 @@ public class DbOpenHelper extends SQLiteOpenHelper {
      */
     private void upgradeToVersion3(SQLiteDatabase db) {
         String sql = "ALTER TABLE " + ExpeInfo.TABLE_NAME + " ADD COLUMN autoIntTime INTEGER";
+        db.execSQL(sql);
+    }
+    /**
+     *    version为4 时stage_info表新增了一个字段temperature
+     * @param db
+     */
+    private void upgradeToVersion4(SQLiteDatabase db) {
+        String sql = "ALTER TABLE " + StageInfo.TABLE_NAME + " ADD COLUMN temperature REAL";
         db.execSQL(sql);
     }
 }

@@ -25,15 +25,21 @@ public class DataFileUtil {
         }
         return DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + name + ".pdf";
     }
-
-    public static File getDtImageDataFile(HistoryExperiment experiment) {
+    public static String getDtImageDataFileName(HistoryExperiment experiment){
         String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + "_dt.txt";
+        return fileName;
+    }
+    public static File getDtImageDataFile(HistoryExperiment experiment) {
+        String fileName = getDtImageDataFileName(experiment);
         //String filePath = C.Value.IMAGE_DATA + fileName;
         return getOrCreateFile(fileName);
     }
-
-    public static File getMeltImageDateFile(HistoryExperiment experiment) {
+    public static String getMeltImageDataFileName(HistoryExperiment experiment) {
         String fileName = DateUtil.get(experiment.getMillitime(), "yyyy_MM_dd_HH_mm_ss") + "_melting.txt";
+        return fileName;
+    }
+    public static File getMeltImageDateFile(HistoryExperiment experiment) {
+        String fileName = getMeltImageDataFileName(experiment);
         //String filePath = C.Value.IMAGE_DATA + fileName;
         return getOrCreateFile(fileName);
     }

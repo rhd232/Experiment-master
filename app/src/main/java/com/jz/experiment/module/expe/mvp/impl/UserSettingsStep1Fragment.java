@@ -58,7 +58,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class BaseUserSettingsStep1Fragment extends BaseFragment {
+public class UserSettingsStep1Fragment extends BaseFragment {
 
     public static final String ARG_KEY_EXPE="arg_key_expe";
     @BindView(R.id.et_expe_name)
@@ -117,8 +117,8 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
     private HistoryExperiment mExperiment;
     Subscription findSubscription;
 
-    public static BaseUserSettingsStep1Fragment newInstance(HistoryExperiment experiment) {
-        BaseUserSettingsStep1Fragment f=new BaseUserSettingsStep1Fragment();
+    public static UserSettingsStep1Fragment newInstance(HistoryExperiment experiment) {
+        UserSettingsStep1Fragment f=new UserSettingsStep1Fragment();
         Bundle args=new Bundle();
         args.putParcelable(ARG_KEY_EXPE,experiment);
         f.setArguments(args);
@@ -410,7 +410,7 @@ public class BaseUserSettingsStep1Fragment extends BaseFragment {
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.tv_next:
-                if (validate()) {//validate()
+                if (true) {//validate()
 
 /*
                     String integrationTime= buildIntegrationTime();

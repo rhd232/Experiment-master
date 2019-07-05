@@ -96,7 +96,7 @@ public class VernierView extends View {
     protected void onDraw(Canvas canvas) {
         //  float height =getDragHeight();
         int width = getMeasuredWidth();
-       // System.out.println("onDraw->height:" + getMeasuredHeight());
+        System.out.println("onDraw->height:" + getMeasuredHeight());
         float lineWidth = width / 2f;
 
         mPaint.setStrokeWidth(DisplayUtil.dip2px(getContext(), 1));

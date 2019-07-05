@@ -13,10 +13,14 @@ CREATE TABLE stage_info(
     cycling_id INTEGER,--part对应的cyclingstage
 
     during INTEGER,--4.15增加
-    --next_id INTEGER,
+
     --外键
     expe_id INTEGER NOT NULL,
+    --7.4增加
+    temperature REAL,
     FOREIGN KEY(expe_id) REFERENCES expe_info(_id)
+
+
 
 );
 

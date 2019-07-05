@@ -44,7 +44,7 @@ public class ExpeJsonGenerator {
         return sInstance;
     }
 
-    public ExpeJsonBean experimentToExpeJsonBean(HistoryExperiment experiment){
+    private ExpeJsonBean experimentToExpeJsonBean(HistoryExperiment experiment){
         ExpeJsonBean expeJsonBean=new ExpeJsonBean();
         expeJsonBean.setName(experiment.getName());
         expeJsonBean.setCreateMillitime(experiment.getMillitime());
@@ -66,7 +66,7 @@ public class ExpeJsonGenerator {
         int seq=1;
         for (Sample sample:experiment.getSettingsFirstInfo().getSamplesA()){
             sample.setType(Sample.TYPE_A);
-
+            sample.setSeq(seq);
             ExpeJsonBean.Sample s=new ExpeJsonBean.Sample();
             s.code=sample.getSeqName();
             s.name=sample.getName();
@@ -80,7 +80,7 @@ public class ExpeJsonGenerator {
         seq=1;
         for (Sample sample:experiment.getSettingsFirstInfo().getSamplesB()){
             sample.setType(Sample.TYPE_B);
-
+            sample.setSeq(seq);
             ExpeJsonBean.Sample s=new ExpeJsonBean.Sample();
             s.code=sample.getSeqName();
             s.name=sample.getName();
@@ -94,15 +94,15 @@ public class ExpeJsonGenerator {
         ExpeJsonBean.ExpeMode pcr=new ExpeJsonBean.ExpeMode();
         pcr.autoInt=experiment.isAutoIntegrationTime();
         pcr.name=modes.get(0).getName();
-        pcr.dataFilePath=DataFileUtil.getDtImageDataFile(experiment).getAbsolutePath();
+        pcr.dataFileName=DataFileUtil.getDtImageDataFileName(experiment);
         //TODO  数据库中需要存入ctMin和ctThreshold
         expeJsonBean.setPcr(pcr);
 
         if (modes.size()>1){
             ExpeJsonBean.ExpeMode melting=new ExpeJsonBean.ExpeMode();
             melting.autoInt=experiment.isAutoIntegrationTime();
-            melting.name=modes.get(0).getName();
-            melting.dataFilePath=DataFileUtil.getMeltImageDateFile(experiment).getAbsolutePath();
+            melting.name=modes.get(1).getName();
+            melting.dataFileName=DataFileUtil.getMeltImageDataFileName(experiment);
             //TODO  数据库中需要存入ctMin和ctThreshold
             expeJsonBean.setMelting(melting);
         }
@@ -112,6 +112,7 @@ public class ExpeJsonGenerator {
         List<ExpeJsonBean.DenaturationStage> denaturationStages=new ArrayList<>();
         List<ExpeJsonBean.MeltingStage> meltingStages=new ArrayList<>();
         List<ExpeJsonBean.CyclingStage> cyclingStages=new ArrayList<>();
+        //温度没有值
         for (Stage stage:experiment.getSettingSecondInfo().getSteps()){
 
             if (stage instanceof StartStage){
@@ -169,8 +170,8 @@ public class ExpeJsonGenerator {
                 BaseResponse response = new BaseResponse();
                 response.setErr(-1);
                 try {
+                    ExpeJsonBean expeJsonBean=experimentToExpeJsonBean(request.getExperiment());
 
-                    ExpeJsonBean expeJsonBean=request.getExpeJsonBean();
                     String json=JsonParser.object2Json(expeJsonBean);
                     //实验名+时间
                     String formatTime = DateUtil.get(expeJsonBean.getCreateMillitime(), "yyyy_MM_dd_HH_mm_ss");

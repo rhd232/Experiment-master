@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.anitoa.well.Well;
@@ -188,8 +187,8 @@ public class PcrPrintPreviewFragment extends CtFragment {
 
 
     public void print() {
-        ScrollView sv= (ScrollView) layout_a4.getChildAt(0);
 
+       // ScrollView sv= (ScrollView) layout_a4.getChildAt(0);
         LoadingDialogHelper.showOpLoading(getActivity());
         long time = System.currentTimeMillis();
         String prefix = DateUtil.get(time, "yyyy_MM_dd_HH_mm_ss");

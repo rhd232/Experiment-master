@@ -40,6 +40,7 @@ import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.util.AppDialogHelper;
 import com.jz.experiment.util.ByteHelper;
 import com.jz.experiment.util.DataFileUtil;
+import com.jz.experiment.util.ExpeJsonGenerator;
 import com.jz.experiment.util.ImageDataReader;
 import com.jz.experiment.util.StatusChecker;
 import com.jz.experiment.util.TrimReader;
@@ -61,6 +62,7 @@ import com.wind.data.expe.bean.ExperimentStatus;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.bean.Mode;
 import com.wind.data.expe.datastore.ExpeDataStore;
+import com.wind.data.expe.request.GenerateExpeJsonRequest;
 import com.wind.data.expe.request.InsertExpeRequest;
 import com.wind.data.expe.response.InsertExpeResponse;
 import com.wind.toastlib.ToastUtil;
@@ -1385,9 +1387,9 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         //直接保存实验
         saveExpe(mHistoryExperiment).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<InsertExpeResponse>() {
+                .subscribe(new Action1<BaseResponse>() {
                     @Override
-                    public void call(InsertExpeResponse response) {
+                    public void call(BaseResponse response) {
                         if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                             EventBus.getDefault().post(new SavedExpeDataEvent());
                            // ToastUtil.showToast(getActivity(), "已保存到本地");
@@ -1418,7 +1420,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
 
-    private Observable<InsertExpeResponse> saveExpe(HistoryExperiment experiment) {
+    private Observable<BaseResponse> saveExpe(HistoryExperiment experiment) {
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_COMPLETED);
         String finished=getString(R.string.test_status_finished);
@@ -1430,12 +1432,19 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         InsertExpeRequest request = new InsertExpeRequest();
         request.setExperiment(experiment);
 
-        //TODO 还需保存到json文件中
 
-        //TODO 保存实验数据
-        return ExpeDataStore
+        //TODO 还需保存到json文件中
+        GenerateExpeJsonRequest jsonRequest=new GenerateExpeJsonRequest();
+        jsonRequest.setExperiment(mHistoryExperiment);
+        Observable<BaseResponse> jsonObservable=
+                ExpeJsonGenerator.getInstance().generateExpeJson(jsonRequest);
+
+        // 保存实验数据
+        Observable<InsertExpeResponse> dbObservable=ExpeDataStore
                 .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))
                 .insertExpe(request);
+
+        return Observable.merge(jsonObservable,dbObservable);
 
     }
 

@@ -89,6 +89,10 @@ import rx.schedulers.Schedulers;
 
 import static com.anitoa.util.ThreadUtil.sleep;
 
+/**
+ * 温控程序，目前数据库未保存每个step的温度，会导致下次执行时温度变为初始50度，由于recyclerView 不显示的地方不加载导致
+ * 7月5日 fix 数据库中保存每个step的温度。
+ */
 public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaConnectionListener {
 
     RecyclerView rv;
@@ -113,7 +117,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
         UserSettingsStep2Fragment f = new UserSettingsStep2Fragment();
         Bundle args = new Bundle();
-        args.putParcelable(BaseUserSettingsStep1Fragment.ARG_KEY_EXPE, experiment);
+        args.putParcelable(UserSettingsStep1Fragment.ARG_KEY_EXPE, experiment);
         f.setArguments(args);
         return f;
     }
@@ -128,7 +132,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         mExecutorService = Executors.newSingleThreadExecutor();
-        mHistoryExperiment = getArguments().getParcelable(BaseUserSettingsStep1Fragment.ARG_KEY_EXPE);
+        mHistoryExperiment = getArguments().getParcelable(UserSettingsStep1Fragment.ARG_KEY_EXPE);
 
         mCommunicationService = Anitoa.getInstance(getActivity())
                 .getCommunicationService();
@@ -150,6 +154,15 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         int stageItemWidth;
         if (isLandscape){
              stageItemWidth=AppUtil.getScreenWidth(getActivity())/4;
+
+             int titleBarHeight=getActivity().getResources().getDimensionPixelSize(R.dimen.titlebar_height);
+             int deviceBarHeight=getActivity().getResources().getDimensionPixelSize(R.dimen.device_statebar_height);
+             int knownHeightDp=44+8+44+1+90+1+45+1+1;
+             int knownHeightPx=DisplayUtil.dip2px(getActivity(),knownHeightDp);
+             //TODO 计算VernierDragLayout充满屏幕的高度
+            int vernierDragLayoutHeight=AppUtil.getScreenHeight(getActivity())
+                    -knownHeightPx-titleBarHeight-deviceBarHeight-AppUtil.getStatusBarHeight(getActivity());
+            System.out.println("vernierDragLayoutHeight:"+vernierDragLayoutHeight);
         }else {
             stageItemWidth= DisplayUtil.dip2px(getActivity(),120);
         }
@@ -184,7 +197,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             @Override
             public void run() {
                 mStageAdapter.buildLink();
-                System.out.println("============after link =======");
+                //System.out.println("============after link =======");
                 //mStageAdapter.notifyDataSetChanged();
             }
         }, 500);
@@ -381,6 +394,10 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
                 break;
             case R.id.tv_next:
+                if (true) {
+                    printHistoryInfo();
+                    return;
+                }
                 if (validate()) {
 
                     LoadingDialogHelper.showOpLoading(getActivity());
@@ -1053,5 +1070,37 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         }
         mReadTrimSubscription = null;
         EventBus.getDefault().unregister(this);
+    }
+
+
+
+    private void printHistoryInfo() {
+        ExpeSettingSecondInfo secondInfo = mHistoryExperiment.getSettingSecondInfo();
+        StringBuilder sBuilder = new StringBuilder();
+        for (int i = 0; i < secondInfo.getSteps().size(); i++) {
+            Stage stage = secondInfo.getSteps().get(i);
+
+
+            if (stage instanceof CyclingStage) {
+                CyclingStage cyclingStage = (CyclingStage) stage;
+                sBuilder.append("循环数:" + cyclingStage.getCyclingCount());
+                List<PartStage> partStages = cyclingStage.getPartStageList();
+                for (int j = 0; j < partStages.size(); j++) {
+                    PartStage partStage = partStages.get(j);
+                    partStage.getTemp();
+                    partStage.getDuring();
+
+                    sBuilder.append("第" + i + "-" + j + "个温度:" + partStage.getTemp())
+                            .append("时间:" + partStage.getDuring());
+                }
+
+            } else {
+                sBuilder.append("第" + i + "个温度:" + stage.getTemp())
+                        .append("时间:" + stage.getDuring());
+            }
+            sBuilder.append("\n");
+
+        }
+        System.out.println(sBuilder.toString());
     }
 }

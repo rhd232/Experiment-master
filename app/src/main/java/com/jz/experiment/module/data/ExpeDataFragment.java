@@ -330,10 +330,13 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             mMeltingChart = new MeltingChart(chart_melt);
             float start;
             try {
-                start=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
-            }catch (Exception e){
+               // start = Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
+                List<Stage> stages=mExeperiment.getSettingSecondInfo().getSteps();
+                start=stages.get(stages.size()-2).getTemp();
+                //start = Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
+            } catch (Exception e) {
                 e.printStackTrace();
-                start=40;
+                start = 40;
             }
             mMeltingChart.setStartTemp(start);
             mMeltingChart.setAxisMinimum(start);
@@ -479,6 +482,23 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
                 break;
             case R.id.iv_pdf:
+               /* GenerateExpeJsonRequest request = new GenerateExpeJsonRequest();
+                request.setExperiment(mExeperiment);
+                ExpeJsonGenerator
+                        .getInstance()
+                        .generateExpeJson(request)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<BaseResponse>() {
+                            @Override
+                            public void call(BaseResponse response) {
+                                if (response.getErrCode()== BaseResponse.CODE_SUCCESS){
+                                    ToastUtil.showToast(getActivity(),"导出json成功");
+                                }else {
+                                    ToastUtil.showToast(getActivity(),"导出json失败");
+                                }
+                            }
+                        });*/
 
                 AndPermission.with(this)
                         .runtime()

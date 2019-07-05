@@ -126,7 +126,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 .getInstance(getActivity());
 
 
-        System.out.println("HistoryExperimentFragment onViewCreated");
+        //System.out.println("HistoryExperimentFragment onViewCreated");
     }
 
 
@@ -289,7 +289,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                             TrimReader.getInstance().ReadTrimFile(getActivity());
                             mNeedReadTrimFile=false;
                         }*/
-                        LoadingDialogHelper.showOpLoading(getActivity());
+                       /* LoadingDialogHelper.showOpLoading(getActivity());
                         //读取下位机是否插入了电源以及热盖的开闭
                         readLid().subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -297,10 +297,9 @@ public class HistoryExperimentsFragment extends BaseFragment {
                                     @Override
                                     public void call(Integer status) {
                                         doNextByStatus(status, event);
-
                                     }
-                                });
-                      //  UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                                });*/
+                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
 
 
                     }

@@ -167,12 +167,17 @@ public class StdCurvePrintPreviewFragment extends BaseFragment {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String path) {
-                        if (!TextUtils.isEmpty(path)){
-                           // ToastUtil.showToast(getActivity(),"输出成功");
+                        if (!TextUtils.isEmpty(path)) {
+                            // ToastUtil.showToast(getActivity(),"输出成功");
                             listener.onGeneratePdfSuccess(path);
-                        }else {
+                        } else {
                             listener.onGeneratePdfError();
                         }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        listener.onGeneratePdfError();
                     }
                 });
 
@@ -184,7 +189,7 @@ public class StdCurvePrintPreviewFragment extends BaseFragment {
 
             @Override
             public void call(Subscriber<? super String> subscriber) {
-
+                //ThreadUtil.sleep(1000);
                 PdfDocument document = new PdfDocument();
                 int width = layout_a4.getWidth();// AppUtil.getScreenWidth(getActivity());
                 int height = 0;// AppUtil.getScreenHeight(getActivity());
