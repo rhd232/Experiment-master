@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.GridView;
 
 import com.anitoa.exception.UnsupportedDeviceException;
+import com.anitoa.well.SixteenWell;
 import com.anitoa.well.Well;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
@@ -42,11 +43,8 @@ public abstract class CtFragment extends BaseFragment {
             mExeperiment = getArguments().getParcelable(ExpeDataFragment.ARGS_KEY_EXPE);
         }
         mChannelDataAdapters = new ChannelDataAdapter[2];
-        GridView[] gvs = new GridView[2];
-        gvs[0] = gv_a;
-        gvs[1] = gv_b;
-        String[] titles = {"A", "B"};
-        buildChannelData(gvs, titles);
+
+        buildChannelData();
 
 
     }
@@ -64,27 +62,16 @@ public abstract class CtFragment extends BaseFragment {
             //第一次安装，没有文件读取权限导致
             e.printStackTrace();
             KSList.clear();
-
-            KSList.add("A1");
-            KSList.add("A2");
-            KSList.add("A3");
-            KSList.add("A4");
-            KSList.add("A5");
-            KSList.add("A6");
-            KSList.add("A7");
-            KSList.add("A8");
-
-            KSList.add("B1");
-            KSList.add("B2");
-            KSList.add("B3");
-            KSList.add("B4");
-            KSList.add("B5");
-            KSList.add("B6");
-            KSList.add("B7");
-            KSList.add("B8");
+            KSList=new SixteenWell().getKsList();
         }
     }
-    protected void buildChannelData(GridView[] gvs, String[] titles) {
+    protected void buildChannelData() {
+
+        GridView[] gvs = new GridView[2];
+        gvs[0] = gv_a;
+        gvs[1] = gv_b;
+        String[] titles = {"A", "B"};
+
         String [] channelAlias=new String[4];
         String [][] sampleAlias=new String[2][8];
 

@@ -121,7 +121,6 @@ public class FactUpdater {
 
         for (int i = 0; i < CCurveShow.MAX_CHAN; i++) {
 
-
             if (m_dynIntTime[i] && m_factorIntTime[i] > 0.03) {
                 m_factorIntTime[i] *= 0.5f;
 
@@ -133,7 +132,6 @@ public class FactUpdater {
             }
             //存储下个循环使用的积分因子
             m_factorData[i][xhindex] = m_factorIntTime[i];
-
 
         }
 
@@ -193,7 +191,9 @@ public class FactUpdater {
     }
 
     private byte[] SetSensor(int c, float InTime) {
-
+        if(InTime<1){
+            InTime=1;
+        }
         PcrCommand cmd = new PcrCommand();
         cmd.setSensor(c);
         byte[] rev_bytes = mCommunicationService.sendPcrCommandSync(cmd);
@@ -202,8 +202,9 @@ public class FactUpdater {
             SetIntergrationTime(InTime);
         }*/
 
-        ThreadUtil.sleep(10);
+        ThreadUtil.sleep(50);
         SetIntergrationTime(InTime);
+        ThreadUtil.sleep(50);
         String txt = "通道" + (c + 1) + "积分时间：" + InTime;
         AnitoaLogUtil.writeFileLog(txt);
         return rev_bytes;

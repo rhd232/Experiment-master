@@ -3,6 +3,6 @@
     <string name="network_error">网络连接不可用，请检查网络</string>
 
 
-    <string name="dialog_btn_ok">OK</string>
-    <string name="temperature_ranges">The temperature ranges from 40℃ to 100℃</string>
+    <string name="dialog_btn_ok">确定</string>
+    <string name="temperature_ranges">温度范围为 40℃ 到 100℃</string>
 </resources>

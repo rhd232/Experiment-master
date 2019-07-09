@@ -3,6 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+
+    <com.wind.base.widget.VernierView
+        android:id="@+id/vernier_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -10,7 +17,7 @@
         android:id="@+id/layout_temperature"
         >
 
-        <TextView
+       <TextView
             android:id="@+id/tv_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,7 +30,7 @@
             android:maxLength="3"
             android:inputType="number"
             android:textColor="@color/color333333"
-            android:text="95" />
+            android:text="95" />-->
 
         <TextView
             android:layout_width="wrap_content"
@@ -32,12 +39,6 @@
             android:layout_marginLeft="3dp"
             android:textColor="@color/color333333" />
     </LinearLayout>
-
-    <com.wind.base.widget.VernierView
-        android:id="@+id/vernier_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

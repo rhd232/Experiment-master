@@ -410,7 +410,7 @@ public class UserSettingsStep1Fragment extends BaseFragment {
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.tv_next:
-                if (true) {//validate()
+                if (validate()) {//validate()
 
 /*
                     String integrationTime= buildIntegrationTime();

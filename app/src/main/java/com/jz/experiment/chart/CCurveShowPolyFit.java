@@ -656,7 +656,7 @@ public class CCurveShowPolyFit {
                     + " (本底噪音: " + m_stdev[iy][frameindex] + ")");       // full confidence is 100
 
 
-            if (confi < 0.12) {
+            if (confi < 0.2) {//之前0.12
                 m_falsePositive[iy][frameindex] = true;
             }
 

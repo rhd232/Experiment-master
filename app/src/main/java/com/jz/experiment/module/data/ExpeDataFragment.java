@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -224,23 +223,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             //第一次安装，没有文件读取权限导致
             e.printStackTrace();
             KSList = new SixteenWell().getKsList();
-          /*  KSList.add("A1");
-            KSList.add("A2");
-            KSList.add("A3");
-            KSList.add("A4");
-            KSList.add("A5");
-            KSList.add("A6");
-            KSList.add("A7");
-            KSList.add("A8");
 
-            KSList.add("B1");
-            KSList.add("B2");
-            KSList.add("B3");
-            KSList.add("B4");
-            KSList.add("B5");
-            KSList.add("B6");
-            KSList.add("B7");
-            KSList.add("B8");*/
         }
 
     }
@@ -261,7 +244,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         double[][] ctValues;
         boolean[][] falsePositive;
         if (tv_dt.isActivated()) {
-
+            mExeperiment.getSettingSecondInfo().getModes().get(0).setCtMin(layout_ctparam_input.getCtParam().ctMin);
+            mExeperiment.getSettingSecondInfo().getModes().get(0).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
             mDtChart.show(ChanList, KSList,
                     DataFileUtil.getDtImageDataFile(mExeperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
             ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
@@ -270,6 +254,10 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
           /*  float t=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
             float f=Float.parseFloat(String.format("%f",t));
             mMeltingChart.setAxisMinimum(f);*/
+            mExeperiment.getSettingSecondInfo().getModes().get(1).setCtMin(layout_ctparam_input.getCtParam().ctMin);
+            mExeperiment.getSettingSecondInfo().getModes().get(1).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
+
+
             mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
             ctValues = CCurveShowMet.getInstance().m_CTValue;
             falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
@@ -482,7 +470,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
                 break;
             case R.id.iv_pdf:
-               /* GenerateExpeJsonRequest request = new GenerateExpeJsonRequest();
+             /*   GenerateExpeJsonRequest request = new GenerateExpeJsonRequest();
                 request.setExperiment(mExeperiment);
                 ExpeJsonGenerator
                         .getInstance()
@@ -508,6 +496,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                             @Override
                             public void onAction(List<String> data) {
                                 InputParams params = new InputParams();
+                                params.setChanList(ChanList);
+                                params.setKsList(KSList);
 
                                 if (tv_dt.isActivated()) {
                                     params.setExpeType(InputParams.EXPE_PCR);
@@ -687,11 +677,11 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     private void inflateCt() {
         mChannelDataAdapters[0].clear();
         mChannelDataAdapters[1].clear();
-        GridView[] gvs = new GridView[2];
+      /*  GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
         gvs[1] = gv_b;
-        String[] titles = {"A", "B"};
-        buildChannelData(gvs, titles);
+        String[] titles = {"A", "B"};*/
+        buildChannelData();
         double[][] ctValues;
         boolean[][] falsePositive;
 

@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.expe.event.RefreshExpeItemsEvent;
 import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.wind.base.mvp.view.TabLayoutFragment;
@@ -186,6 +187,13 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     public void reload() {
         if (layout_loading!=null)
             loadExpe();
+    }
+
+
+    @Subscribe
+    public void onRefreshExpeItemsEvent(RefreshExpeItemsEvent event){
+
+        reload();
     }
 }
 

@@ -20,6 +20,7 @@ import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.expe.activity.DeviceListActivity;
 import com.jz.experiment.module.expe.activity.UserSettingsStep1Activity;
 import com.jz.experiment.module.expe.adapter.HistoryExperimentAdapter;
+import com.jz.experiment.module.expe.event.RefreshExpeItemsEvent;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.jz.experiment.module.settings.UserSettingsActivity;
 import com.jz.experiment.util.AppDialogHelper;
@@ -289,7 +290,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                             TrimReader.getInstance().ReadTrimFile(getActivity());
                             mNeedReadTrimFile=false;
                         }*/
-                       /* LoadingDialogHelper.showOpLoading(getActivity());
+                        LoadingDialogHelper.showOpLoading(getActivity());
                         //读取下位机是否插入了电源以及热盖的开闭
                         readLid().subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -298,8 +299,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
                                     public void call(Integer status) {
                                         doNextByStatus(status, event);
                                     }
-                                });*/
-                        UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                                });
+                       // UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
 
 
                     }
@@ -418,6 +419,8 @@ public class HistoryExperimentsFragment extends BaseFragment {
                     public void call(DelExpeResponse response) {
 
                         loadData();
+
+                        EventBus.getDefault().post(new RefreshExpeItemsEvent());
                     }
                 });
     }

@@ -37,7 +37,9 @@ public class VernierView extends View {
 
     private boolean initialized;
     private float spaceTopHeight;
-
+    public float getSpaceTopHeight(){
+        return spaceTopHeight;
+    }
     private void init() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStrokeWidth(DisplayUtil.dip2px(getContext(), 4));
@@ -96,7 +98,7 @@ public class VernierView extends View {
     protected void onDraw(Canvas canvas) {
         //  float height =getDragHeight();
         int width = getMeasuredWidth();
-        System.out.println("onDraw->height:" + getMeasuredHeight());
+       // System.out.println("onDraw->height:" + getMeasuredHeight());
         float lineWidth = width / 2f;
 
         mPaint.setStrokeWidth(DisplayUtil.dip2px(getContext(), 1));

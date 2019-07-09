@@ -88,6 +88,10 @@ public class CtParamInputLayout extends FrameLayout {
         return param;
     }
 
+    public void set(int ctMin,int ctThreshhold){
+        et_ct_min.setText(ctMin+"");
+        et_ct_threshold.setText(ctThreshhold+"");
+    }
     public static class CtParam implements Parcelable {
         public int ctMin;
         public int ctThreshhold;

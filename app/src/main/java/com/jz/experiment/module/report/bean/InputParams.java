@@ -5,20 +5,29 @@ import android.os.Parcelable;
 
 import com.jz.experiment.widget.CtParamInputLayout;
 
+import java.util.List;
+
 public class InputParams implements Parcelable {
     public static final int EXPE_PCR=1;
     public static final int EXPE_MELTING=2;
     private CtParamInputLayout.CtParam ctParam;
     private int expeType;
     private String sourceDataPath;
+
+    private List<String> ChanList;
+    private List<String> KsList;
+
     public InputParams(){
 
     }
+
 
     protected InputParams(Parcel in) {
         ctParam = in.readParcelable(CtParamInputLayout.CtParam.class.getClassLoader());
         expeType = in.readInt();
         sourceDataPath = in.readString();
+        ChanList = in.createStringArrayList();
+        KsList = in.createStringArrayList();
     }
 
     @Override
@@ -26,6 +35,8 @@ public class InputParams implements Parcelable {
         dest.writeParcelable(ctParam, flags);
         dest.writeInt(expeType);
         dest.writeString(sourceDataPath);
+        dest.writeStringList(ChanList);
+        dest.writeStringList(KsList);
     }
 
     @Override
@@ -67,5 +78,21 @@ public class InputParams implements Parcelable {
 
     public void setSourceDataPath(String sourceDataPath) {
         this.sourceDataPath = sourceDataPath;
+    }
+
+    public List<String> getChanList() {
+        return ChanList;
+    }
+
+    public void setChanList(List<String> chanList) {
+        ChanList = chanList;
+    }
+
+    public List<String> getKsList() {
+        return KsList;
+    }
+
+    public void setKsList(List<String> ksList) {
+        KsList = ksList;
     }
 }

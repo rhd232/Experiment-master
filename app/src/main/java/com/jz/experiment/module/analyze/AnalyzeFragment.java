@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.GridView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 
@@ -35,10 +34,13 @@ import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.module.report.PcrPrintPreviewActivity;
 import com.jz.experiment.module.report.bean.InputParams;
 import com.jz.experiment.util.DataFileUtil;
+import com.jz.experiment.util.ExpeJsonGenerator;
 import com.jz.experiment.widget.CtParamInputLayout;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.utils.AppUtil;
 import com.wind.base.utils.FileUtil;
+import com.wind.base.utils.JsonParser;
+import com.wind.data.expe.bean.ExpeJsonBean;
 import com.wind.data.expe.bean.ExpeSettingsFirstInfo;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.bean.Sample;
@@ -47,12 +49,14 @@ import com.wind.view.TitleBar;
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 
+import org.apache.commons.io.FileUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -107,7 +111,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
             }
         });
     }
-
+    private String mCurMode;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -139,6 +143,8 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 //System.out.println("onItemSelected:" + position);
+
+               switchMode();
             }
 
             @Override
@@ -160,7 +166,8 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
     public void selectDataFile(View view) {
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("text/plain");
+        //intent.setType("text/plain");
+        intent.setType("application/json");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         try {
@@ -170,7 +177,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         }
 
     }
-
+    private ExpeJsonBean mExpeJsonBean=null;
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -189,47 +196,106 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     String path = FileUtil.getPath(getActivity(), uri);
                     mOpenedFile = new File(path);
                     cb_norm.setVisibility(View.VISIBLE);
+                  //  ExpeJsonBean expeJsonBean=null;
+                    try {
+                        //TODO 解析json文件
+                        String fileContent=FileUtils.readFileToString(mOpenedFile, Charset.forName("utf-8"));
+                        mExpeJsonBean= JsonParser.parserObject(fileContent, ExpeJsonBean.class);
 
-                    String item = (String) spinner.getSelectedItem();
-                    double[][] ctValues;
-                    boolean[][] falsePositive;
-                    String melting = getString(R.string.setup_mode_melting);
-                    chart_line.setDrawMarkers(false);
-                    if (melting.equals(item)) {
-                        mChart = new MeltingChart(chart_line);
-                        ((MeltingChart) mChart).setStartTemp(40);
-                        ((MeltingChart) mChart).setAxisMinimum(40);
-                      /*  float f=Float.parseFloat(String.format("%f",40f));
-                        mChart.setAxisMinimum(f);*/
-
-                    } else {
-                        //获取类型，是扩增曲线还是熔解曲线
-                        mChart = new DtChart(chart_line, 40);
-
-
+                        //TODO 转换成Experiment
+                        mExeperiment=ExpeJsonGenerator
+                                .getInstance()
+                                .expeJsonBeanToExperiment(mExpeJsonBean);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    mChart.show(ChanList, KSList, mOpenedFile, layout_ctparam_input.getCtParam(),cb_norm.isChecked());
-
-                    if (melting.equals(item)) {
-                        ctValues = CCurveShowMet.getInstance().m_CTValue;
-                        falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
-                    } else {
-                        ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-                        falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+                    if (mExpeJsonBean==null){
+                        return;
                     }
+                    mCurMode=null;
+                    switchMode();
 
-                    KSList.clear();
-                    KSList = Well.getWell().getKsList();
-                    for (String chan : ChanList) {
-                        for (String ks : KSList) {
-                            getCtValue(chan, ks, ctValues, falsePositive);
-                        }
-                    }
-                    notifyCtChanged();
+
 
                 }
             }
         }
+    }
+    private String mCurDataPath;
+    private void switchMode() {
+        if (mExpeJsonBean==null){
+            return;
+        }
+        String selectItem= (String) spinner.getSelectedItem();
+        if(selectItem.equals(mCurMode)){
+            return;
+        }
+        String melting = getString(R.string.setup_mode_melting);
+
+      //  showChart();
+
+        double[][] ctValues;
+        boolean[][] falsePositive;
+
+        chart_line.setDrawMarkers(false);
+
+        String dataFileName="";
+        if (melting.equals(mCurMode)) {
+            if (mExpeJsonBean.getMelting()!=null) {
+                layout_ctparam_input.set(mExpeJsonBean.getMelting().ctMin,mExpeJsonBean.getMelting().ctThreshold);
+                mChart = new MeltingChart(chart_line);
+                dataFileName = mExpeJsonBean.getMelting().dataFileName;
+                float startTemp=mExpeJsonBean.getStages().meltingStages.get(0).temp;
+                ((MeltingChart) mChart).setStartTemp(startTemp);
+                ((MeltingChart) mChart).setAxisMinimum(startTemp);
+            }else {
+                return;
+            }
+        } else {
+            int totalCyclingCount=0;
+            List<ExpeJsonBean.CyclingStage> cyclingSteps=mExpeJsonBean.getStages().cyclingStages;
+            for (int i=0;i<cyclingSteps.size();i++){
+                ExpeJsonBean.CyclingStage cyclingStage=cyclingSteps.get(i);
+                boolean pic=false;
+                for (ExpeJsonBean.PartStage partStage:cyclingStage.partStages){
+                    if (partStage.takePic){
+                        pic=true;
+                        break;
+                    }
+                }
+                if (pic){
+                    totalCyclingCount+=cyclingStage.cyclingCount;
+                }
+            }
+            layout_ctparam_input.set(mExpeJsonBean.getPcr().ctMin,mExpeJsonBean.getPcr().ctThreshold);
+
+            dataFileName = mExpeJsonBean.getPcr().dataFileName;
+            //获取类型，是扩增曲线还是熔解曲线
+            mChart = new DtChart(chart_line, totalCyclingCount);
+        }
+        mCurDataPath=mOpenedFile.getParentFile().getAbsolutePath()+"/"+dataFileName;
+        mChart.show(ChanList, KSList, new File(mCurDataPath), layout_ctparam_input.getCtParam(),cb_norm.isChecked());
+
+
+        buildChannelData();
+
+        if (melting.equals(mCurMode)) {
+            ctValues = CCurveShowMet.getInstance().m_CTValue;
+            falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+        } else {
+            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+        }
+
+        KSList.clear();
+        KSList = Well.getWell().getKsList();
+        for (String chan : ChanList) {
+            for (String ks : KSList) {
+                getCtValue(chan, ks, ctValues, falsePositive);
+            }
+        }
+        notifyCtChanged();
+
     }
 
 
@@ -288,11 +354,11 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         //TODO ct值也要筛选
         mChannelDataAdapters[0].clear();
         mChannelDataAdapters[1].clear();
-        GridView[] gvs = new GridView[2];
+      /*  GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
         gvs[1] = gv_b;
-        String[] titles = {"A", "B"};
-        buildChannelData(gvs, titles);
+        String[] titles = {"A", "B"};*/
+        buildChannelData();
         double [][] ctValues;
         boolean [][] falsePositive;
         String item = (String) spinner.getSelectedItem();
@@ -313,8 +379,8 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
     }
 
     private void showChart() {
-        if (mOpenedFile != null && mChart != null)
-            mChart.show(ChanList, KSList, mOpenedFile, layout_ctparam_input.getCtParam(),cb_norm.isChecked());
+        if (mCurDataPath != null && mChart != null)
+            mChart.show(ChanList, KSList, new File(mCurDataPath), layout_ctparam_input.getCtParam(),cb_norm.isChecked());
     }
 
     @Override
@@ -435,8 +501,8 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
             case R.id.iv_std_curve:
 
                 if (mOpenedFile != null) {
-                    HistoryExperiment experiment = buildExpe();
-                    StandardCurveActivity.start(getActivity(), experiment);
+
+                    StandardCurveActivity.start(getActivity(), mExeperiment);
                 }
 
                 break;
@@ -452,7 +518,10 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                             @Override
                             public void onAction(List<String> data) {
                                 InputParams params = new InputParams();
-                                params.setSourceDataPath(mOpenedFile.getAbsolutePath());
+                                params.setKsList(KSList);
+                                params.setChanList(ChanList);
+
+                                params.setSourceDataPath(mCurDataPath);
                                 if (isPcrMode()) {
                                     params.setExpeType(InputParams.EXPE_PCR);
 

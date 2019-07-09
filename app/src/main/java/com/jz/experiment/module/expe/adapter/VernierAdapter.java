@@ -63,7 +63,7 @@ public class VernierAdapter extends BaseRecyclerAdapter<PartStage,VernierAdapter
             @Override
             public void onClick(View v) {
                 PartStage partStage=new PartStage();
-                mParentStage.addChildStage(position,partStage);
+                mParentStage.addChildStage(position+1,partStage);
                 add(position,partStage);
                 EventBus.getDefault().post(new RefreshStageAdapterEvent());
 

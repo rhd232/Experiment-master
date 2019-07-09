@@ -214,7 +214,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             //ToastUtil.showToast(getActivity(), "最多两个预变性阶段");
             return;
         }
-        mStageAdapter.add(event.getPosition(), new StartStage());
+        mStageAdapter.add(event.getPosition()+1, new StartStage());
         buildLink();
         Log.i("StartStage", "onAddStartStageEvent");
 
@@ -264,7 +264,9 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
     @Subscribe
     public void onAddCyclingStage(AddCyclingStageEvent event) {
-        mStageAdapter.add(event.getPosition(), new CyclingStage());
+        CyclingStage cyclingStage=new CyclingStage();
+        cyclingStage.addChildStage(0, new PartStage());
+        mStageAdapter.add(event.getPosition()+1,cyclingStage);
 
         buildLink();
 
@@ -394,10 +396,11 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
                 break;
             case R.id.tv_next:
-                if (true) {
+               /* if (true) {
+                    buildExperiment();
                     printHistoryInfo();
                     return;
-                }
+                }*/
                 if (validate()) {
 
                     LoadingDialogHelper.showOpLoading(getActivity());

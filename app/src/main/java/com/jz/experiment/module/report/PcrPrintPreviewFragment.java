@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
-import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CCurveShowMet;
@@ -16,6 +15,7 @@ import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.WindChart;
 import com.jz.experiment.module.analyze.CtFragment;
+import com.jz.experiment.module.data.ExpeDataFragment;
 import com.jz.experiment.module.report.bean.InputParams;
 import com.jz.experiment.util.PdfGenerator;
 import com.jz.experiment.util.SysPrintUtil;
@@ -36,7 +36,7 @@ import butterknife.ButterKnife;
 
 public class PcrPrintPreviewFragment extends CtFragment {
 
-    public static final String ARG_KEY_EXPE = "arg_key_expe";
+   // public static final String ARG_KEY_EXPE = "arg_key_expe";
     public static final String ARG_KEY_CT_PARAM = "arg_key_ct_param";
     @BindView(R.id.layout_print_tail)
     PrintTailLayout layout_print_tail;
@@ -57,7 +57,7 @@ public class PcrPrintPreviewFragment extends CtFragment {
     public static PcrPrintPreviewFragment newInstance(HistoryExperiment experiment, InputParams params) {
         PcrPrintPreviewFragment f = new PcrPrintPreviewFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_KEY_EXPE, experiment);
+        args.putParcelable(ExpeDataFragment.ARGS_KEY_EXPE, experiment);
         args.putParcelable(ARG_KEY_CT_PARAM, params);
         f.setArguments(args);
         return f;
@@ -73,7 +73,7 @@ public class PcrPrintPreviewFragment extends CtFragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        mExperiment = getArguments().getParcelable(ARG_KEY_EXPE);
+        //mExperiment = getArguments().getParcelable(ARG_KEY_EXPE);
         mInputParams = getArguments().getParcelable(ARG_KEY_CT_PARAM);
 
        /* LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -92,6 +92,7 @@ public class PcrPrintPreviewFragment extends CtFragment {
 
         mStageAdapter = new StageAdapter(getActivity(), stageItemWidth);
         rv.setAdapter(mStageAdapter);*/
+
 
         if (isPcrMode()){
             tv_expe_type.setText(getString(R.string.setup_mode_dt));
@@ -151,7 +152,9 @@ public class PcrPrintPreviewFragment extends CtFragment {
             }
 
         }
-        initChanAndKs();
+      //  initChanAndKs();
+        KSList=mInputParams.getKsList();
+        ChanList=mInputParams.getChanList();
         if (isPcrMode()) {
             windChart = new DtChart(chart, totalCyclingCount);
         } else {
@@ -172,8 +175,8 @@ public class PcrPrintPreviewFragment extends CtFragment {
             falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
         }
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
-        KSList.clear();
-        KSList = Well.getWell().getKsList();
+       // KSList.clear();
+        //KSList = Well.getWell().getKsList();
 
         //获取CT value
         for (String chan : ChanList) {
@@ -181,6 +184,7 @@ public class PcrPrintPreviewFragment extends CtFragment {
                 getCtValue(chan, ks, ctValues, falsePositive);
             }
         }
+
         mChannelDataAdapters[0].notifyDataSetChanged();
         mChannelDataAdapters[1].notifyDataSetChanged();
     }
