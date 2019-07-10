@@ -44,8 +44,8 @@ public abstract class CtFragment extends BaseFragment {
         }
         mChannelDataAdapters = new ChannelDataAdapter[2];
 
-        buildChannelData();
 
+        buildChannelData();
 
     }
     protected List<String> ChanList = new ArrayList<>();
@@ -66,7 +66,7 @@ public abstract class CtFragment extends BaseFragment {
         }
     }
     protected void buildChannelData() {
-
+        long start=System.currentTimeMillis();
         GridView[] gvs = new GridView[2];
         gvs[0] = gv_a;
         gvs[1] = gv_b;
@@ -170,6 +170,9 @@ public abstract class CtFragment extends BaseFragment {
             }
             mChannelDataAdapters[k].replaceAll(channelDataAList);
         }
+
+        long during=System.currentTimeMillis()-start;
+       // System.out.println("buildChannelData during:"+during);
     }
 
 

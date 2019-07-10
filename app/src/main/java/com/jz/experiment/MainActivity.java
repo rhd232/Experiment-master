@@ -17,14 +17,12 @@ import android.view.View;
 import com.anitoa.Anitoa;
 import com.anitoa.event.AnitoaConnectedEvent;
 import com.anitoa.service.CommunicationService;
-import com.jz.experiment.chart.CommData;
 import com.jz.experiment.module.analyze.AnalyzeFragment;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
 import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.module.settings.event.LogoutEvent;
 import com.jz.experiment.util.DataFileUtil;
-import com.jz.experiment.util.TrimReader;
 import com.jz.experiment.util.UsbManagerHelper;
 import com.jz.experiment.widget.DeviceStateBar;
 import com.wind.base.BaseActivity;
@@ -43,6 +41,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends BaseActivity {
     public static final int TAB_INDEX_EXPE = 0;
@@ -68,13 +71,16 @@ public class MainActivity extends BaseActivity {
     public static void start(Context context, Tab tab) {
         Navigator.navigate(context, MainActivity.class, tab);
     }
-    private Handler mHandler=new Handler();
+
+    private Handler mHandler = new Handler();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
+
 
         fragments = new Fragment[3];
         fragments[0] = new HistoryExperimentsFragment();
@@ -86,21 +92,23 @@ public class MainActivity extends BaseActivity {
         view_pager.setOffscreenPageLimit(3);
         onViewClick(layout_expe);
 
-        // startBluetoothService();
+
         Anitoa.getInstance(getActivity());
 
-        mHandler.postDelayed(mRonnectRunnable, 500);
+        mHandler.postDelayed(mConnectRunnable, 500);
 
         checkStoragePermission();
+
     }
 
-    private Runnable mRonnectRunnable=new Runnable() {
+    private Runnable mConnectRunnable = new Runnable() {
         @Override
         public void run() {
             tryConnectDevice();
         }
     };
     private int mTryConnectCount;
+
     private void tryConnectDevice() {
         if (!ActivityUtil.isFinish(getActivity())) {
             //判断是否已经连接
@@ -114,9 +122,9 @@ public class MainActivity extends BaseActivity {
                     AnitoaConnectedEvent event = new AnitoaConnectedEvent(service.getConnectedDevice().getDeviceName());
                     main_device_state_bar.onBluetoothConnectedEvent(event);
                 }
-            }else {
-                if (mTryConnectCount<=3)
-                    mHandler.postDelayed(mRonnectRunnable, 500);
+            } else {
+                if (mTryConnectCount <= 3)
+                    mHandler.postDelayed(mConnectRunnable, 500);
             }
         }
     }
@@ -128,11 +136,12 @@ public class MainActivity extends BaseActivity {
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
-                        DataFileUtil.createAppFolder();
+
+                        createAppFolderAsync();
                         //读取dataposition文件
-                        CommData.ReadDatapositionFile(getActivity());
+                        // CommData.ReadDatapositionFile(getActivity());
                         //trim文件读取到CommonData中
-                        TrimReader.getInstance().ReadTrimFile(getActivity());
+                        //TrimReader.getInstance().ReadTrimFile(getActivity());
                     }
                 }).onDenied(new Action<List<String>>() {
             @Override
@@ -140,6 +149,22 @@ public class MainActivity extends BaseActivity {
                 ToastUtil.showToast(getActivity(), getString(R.string.tip_sd_permission));
             }
         }).start();
+    }
+
+    private void createAppFolderAsync() {
+        Observable.create(new Observable.OnSubscribe<Void>() {
+            @Override
+            public void call(Subscriber<? super Void> subscriber) {
+                DataFileUtil.createAppFolder();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+
+                    }
+                });
     }
 
     private void connectUsbDevice() {
@@ -271,8 +296,7 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    public void CreateMenu(Menu menu)
-    {
+    public void CreateMenu(Menu menu) {
 
         menu.add(getString(R.string.op_del));
     }
@@ -280,7 +304,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        HistoryExperimentsFragment f= (HistoryExperimentsFragment) fragments[0];
+        HistoryExperimentsFragment f = (HistoryExperimentsFragment) fragments[0];
 
         f.doItemLongClick();
 

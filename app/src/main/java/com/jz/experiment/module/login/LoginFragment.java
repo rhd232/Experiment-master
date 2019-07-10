@@ -394,11 +394,14 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
 
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         setNofity(null);
         if (mNeedStopService) {
             Anitoa.getInstance(getActivity().getApplicationContext()).unbindService(getActivity().getApplicationContext());
         }
+        System.out.println("LoginFragment onDestroyView mNeedStopService"+mNeedStopService);
     }
+
+
 }

@@ -223,9 +223,11 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
     }
     private String mCurDataPath;
     private void switchMode() {
+
         if (mExpeJsonBean==null){
             return;
         }
+        System.out.println("switchMode");
         String selectItem= (String) spinner.getSelectedItem();
         if(selectItem.equals(mCurMode)){
             return;

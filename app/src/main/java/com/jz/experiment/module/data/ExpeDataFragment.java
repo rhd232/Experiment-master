@@ -41,6 +41,7 @@ import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.response.BaseResponse;
+import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.AppUtil;
 import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.Channel;
@@ -119,7 +120,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     @BindView(R.id.cb_norm)
     CheckBox cb_norm;
     private boolean mSaved;
-
+    private Handler mHandler=new Handler();
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_expe_data;
@@ -147,7 +148,21 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         mExecutorService = Executors.newSingleThreadExecutor();
         init();
         inflateBase();
-        inflateChart();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!ActivityUtil.isFinish(getActivity()))
+                    inflateChart();
+            }
+        },500);
+      /*  Observable.timer(500, TimeUnit.MILLISECONDS,AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        inflateChart();
+                    }
+                });*/
+
 
         if (isSavedExpe()) {
             iv_save.setVisibility(View.GONE);
@@ -164,6 +179,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
             }
         });
+
+        //System.out.println("ExpeDataFragment onViewCreated");
     }
 
     @Override
@@ -354,7 +371,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     }
 
     private long time;
-    private Handler mHandler = new Handler();
 
     private void deprecatedPrint() {
         String msg = getString(R.string.dialog_msg_pdf);

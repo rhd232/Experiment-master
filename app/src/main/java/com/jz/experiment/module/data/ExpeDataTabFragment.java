@@ -24,8 +24,10 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import ezy.ui.layout.LoadingLayout;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -59,14 +61,20 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         initTitleBar();
 
 
-        mExpeDataStore =
-                ExpeDataStore
-                        .getInstance(ProviderModule.getInstance()
-                                .getBriteDb(getActivity().getApplicationContext()));
+        Observable.timer(300, TimeUnit.MILLISECONDS,Schedulers.io())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        mExpeDataStore =
+                                ExpeDataStore
+                                        .getInstance(ProviderModule.getInstance()
+                                                .getBriteDb(getActivity().getApplicationContext()));
+                        //TODO 获取之前已经完成且保存的历史实验
+                        loadExpe();
+                    }
+                });
 
-        //TODO 获取之前已经完成且保存的历史实验
-        loadExpe();
-
+        System.out.println("ExpeDataTabFragment onViewCreated");
 
     }
 
@@ -91,8 +99,13 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     private Subscription mFindSubscription;
 
     private void loadExpe() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                layout_loading.showLoading();
+            }
+        });
 
-        layout_loading.showLoading();
         mFindSubscription = mExpeDataStore
                 .findAllCompleted()
                 .subscribeOn(Schedulers.io())

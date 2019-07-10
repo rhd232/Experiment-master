@@ -1,7 +1,5 @@
 package com.anitoa.well;
 
-import android.util.Log;
-
 import com.anitoa.bean.FlashData;
 
 import java.util.List;
@@ -41,7 +39,7 @@ public abstract class Well {
                 break;
         }
         if (well==null){
-            Log.e("Well","UnsupportedDeviceException-->" + "Unsupported Device numWell :" + numWell);
+           // Log.e("Well","UnsupportedDeviceException-->" + "Unsupported Device numWell :" + numWell);
             well = new SixteenWell();
             //throw new UnsupportedDeviceException("Unsupported Device numWell :"+numWell);
         }

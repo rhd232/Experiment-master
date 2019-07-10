@@ -15,7 +15,9 @@ public class Anitoa {
     private boolean mBinding;//是否正在bindService
     private static Anitoa sInstance = null;
 
-    public static Anitoa getInstance(Context context) {
+    public static synchronized Anitoa getInstance(Context context) {
+        long time=System.currentTimeMillis();
+        System.out.println("Anitoa"+time);
         if (sInstance == null) {
             synchronized (Anitoa.class) {
                 if (sInstance == null) {
@@ -60,15 +62,15 @@ public class Anitoa {
         sInstance=null;
     }
     private Anitoa(Context context) {
-        if (mBluetoothService == null) {
+        if (mUsbService == null) {
             if (!mBinding) {
                 mBinding = true;
-                Intent service = new Intent(context.getApplicationContext(), BluetoothService.class);
+               /* Intent service = new Intent(context.getApplicationContext(), BluetoothService.class);
                 context.getApplicationContext().bindService(service, mBluetoothServiceConnection, Context.BIND_AUTO_CREATE);
-
+*/
                 Intent usbService = new Intent(context.getApplicationContext(), UsbService.class);
                 context.getApplicationContext().bindService(usbService, mUsbServiceConnection, Context.BIND_AUTO_CREATE);
-
+                //System.out.println("request bindService");
             }
 
         }
@@ -95,6 +97,7 @@ public class Anitoa {
             UsbService.LocalBinder binder = (UsbService.LocalBinder) service;
             mUsbService = binder.getService();
             mUsbService.initialize();
+            //System.out.println("bindService success");
         }
 
         @Override
