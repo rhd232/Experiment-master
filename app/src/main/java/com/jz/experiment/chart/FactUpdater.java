@@ -32,6 +32,7 @@ public class FactUpdater {
     }
 
     public static FactUpdater getInstance(CommunicationService service) {
+        System.out.println("FactUpdater==null->"+(sInstance == null));
         if (sInstance == null) {
             synchronized (FactUpdater.class) {
                 if (sInstance == null) {
@@ -39,6 +40,14 @@ public class FactUpdater {
                 }
             }
         }
+        /*
+         mCommunicationService重新赋值重要  原因：https://blog.csdn.net/denghwen/article/details/51448290
+         *
+         *直接杀死一个应用：所有的内存都会被回收，重新启动应用程序时，需要重新调用Application的OnCreate方法，会调用onSaveInstanceState方法。
+         *退出键退出程序：退出程序后，一些加载过的静态变量并没有被回收，重新启动也不需要调用Application的OnCreate方法。
+         *
+         */
+        sInstance.mCommunicationService=service;
         return sInstance;
     }
 
@@ -53,7 +62,6 @@ public class FactUpdater {
         for (int i = 1; i <= CCurveShow.MAX_CHAN; i++) {
             UpdatePCRCurve(i, 0);
         }
-
 
         DynamicUpdateIntTime();
         CommData.m_factorData = m_factorData;

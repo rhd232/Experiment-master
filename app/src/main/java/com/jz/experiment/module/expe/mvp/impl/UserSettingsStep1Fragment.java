@@ -446,13 +446,13 @@ public class UserSettingsStep1Fragment extends BaseFragment {
 
     private boolean validate() {
         if (!et_expe_name.validate(true)) {
-
             ToastUtil.showToast(getActivity(), getString(R.string.setup_input_test_name));
             return false;
         }
         boolean channelSetted = false;
         //检查通道
         List<Channel> channels = mChannelAdapter.getData();
+
         for (int i = 0; i < channels.size(); i++) {
             Channel channel = channels.get(i);
             String value = channel.getValue();
@@ -460,13 +460,13 @@ public class UserSettingsStep1Fragment extends BaseFragment {
                 channelSetted = true;
             }
         }
+
         if (!channelSetted) {
             String tips=getString(R.string.setup_channel_select_tip);
             ToastUtil.showToast(getActivity(), tips);
             return false;
         }
 
-        //
         List<Sample> samplesA=mSampleAdapterA.getData();
 
         boolean named=false;
@@ -484,8 +484,9 @@ public class UserSettingsStep1Fragment extends BaseFragment {
             }
         }
         if (!named){
-            String tips=getString(R.string.setup_channel_select_tip);
+            String tips=getString(R.string.setup_well_select_tip);
             ToastUtil.showToast(getActivity(), tips);
+            return false;
         }
 
         return true;

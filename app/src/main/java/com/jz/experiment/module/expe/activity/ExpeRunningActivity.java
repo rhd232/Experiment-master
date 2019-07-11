@@ -275,7 +275,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void bindService() {
-        mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
+
 //        mBluetoothService = Anitoa.getInstance(getActivity()).getBluetoothService();
 //        mUsbService = Anitoa.getInstance(getActivity()).getUsbService();
         mCommunicationService.setNotify(this);
@@ -348,6 +348,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void initChart() {
+        mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
         mFactUpdater = FactUpdater.getInstance(mCommunicationService);
         mFactUpdater.SetInitData();
         //统计总共有多少循环（不拍照的不包括）

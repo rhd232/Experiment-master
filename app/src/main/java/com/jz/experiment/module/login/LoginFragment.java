@@ -143,6 +143,7 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
             public void run() {
                 if (!ActivityUtil.isFinish(getActivity())) {
                     mCommunicationService = sAnitoa.getCommunicationService();
+
                     if (mCommunicationService != null) {
                         setNofity(LoginFragment.this);
                         UsbManagerHelper.connectUsbDevice(getActivity());
