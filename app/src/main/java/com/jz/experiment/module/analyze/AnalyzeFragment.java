@@ -206,8 +206,9 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                         mExeperiment=ExpeJsonGenerator
                                 .getInstance()
                                 .expeJsonBeanToExperiment(mExpeJsonBean);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
+                        ToastUtil.showToast(getActivity(),R.string.tip_illegal_file);
                     }
                     if (mExpeJsonBean==null){
                         return;

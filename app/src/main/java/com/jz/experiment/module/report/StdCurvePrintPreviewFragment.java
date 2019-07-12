@@ -128,7 +128,7 @@ public class StdCurvePrintPreviewFragment extends BaseFragment {
     private void initStandardTable() {
         standardAdapter = new TableAdapter(getContext(), R.layout.item_sample_table);
         lv_standard.setAdapter(standardAdapter);
-
+        standardAdapter.setConcentrationNeedInput(false);
         List<SampleRow> rows = data.getStdRows();
         standardAdapter.replace(rows);
 

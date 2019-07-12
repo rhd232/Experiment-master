@@ -2,8 +2,8 @@ package com.jz.experiment.module.data;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -158,11 +158,19 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         return null;
     }
 
-
+    private Handler mHandler=new Handler();
     public void setExpe(HistoryExperiment expe) {
-
+        //TODO reload就行了。
+        mFragmentAdapter.getFragments().clear();
+        mFragmentAdapter.notifyDataSetChanged();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadExpe();
+            }
+        },350);
         //增加一个tab显示本实验
-        ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
+       /* ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
         List<Fragment> fragments = mFragmentAdapter.getFragments();
         List<String> titles = mFragmentAdapter.getTitles();
         if (fragments == null) {
@@ -183,7 +191,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
             layout_tab.setTabMode(TabLayout.MODE_SCROLLABLE);
         }
 
-        layout_loading.showContent();
+        layout_loading.showContent();*/
     }
 
     @Subscribe

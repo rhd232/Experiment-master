@@ -115,6 +115,8 @@ public class StandardCurveFragment extends BaseFragment {
 
                 //清除标准曲线
                 mStandardChart.clear();
+                tv_equation.setText("");
+                tv_r2.setText("");
             }
         });
 
@@ -392,12 +394,16 @@ public class StandardCurveFragment extends BaseFragment {
         double[] yy = new double[size];
         double[] xx = new double[size];
 
-        double[] fitxx = new double[20];
 
+
+        double maxX=0;
         for (int i = 0; i < size; i++) {
 
             try {
                 xx[i] = Double.parseDouble(stdRows.get(i).getCtValue());
+                if (xx[i]>maxX){
+                    maxX=xx[i];
+                }
                 double conc = Double.parseDouble(stdRows.get(i).getConcentration());
                 yy[i] = Math.log10(conc);
             } catch (Exception e) {
@@ -407,10 +413,16 @@ public class StandardCurveFragment extends BaseFragment {
             }
 
         }
-
+       /*
         for (int i = 0; i < 20; i++) {
             fitxx[i] = (double) (20 + i);
+        }*/
+        int intMax= (int) (maxX+10);
+        double[] fitxx = new double[intMax];
+        for (int i = 0; i < intMax; i++) {
+            fitxx[i] = (double) ( i);
         }
+
 
         double[] fityy = Utils.getPolyfit(1, xx, yy, fitxx);
 

@@ -173,4 +173,6 @@
     <string name="print_auditor">审核人</string>
     <string name="print_unit">单位</string>
     <string name="print_date">报告日期</string>
+
+    <string name="tip_illegal_file">文件非法</string>
 </resources>

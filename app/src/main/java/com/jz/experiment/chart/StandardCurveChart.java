@@ -38,10 +38,12 @@ public class StandardCurveChart {
         xAxis.setAxisMinimum(20);
 
         YAxis yAxisRight = mCombinedChart.getAxisRight();
+        yAxisRight.setAxisMinimum(0);
         yAxisRight.setEnabled(false);
 
         YAxis yAxisLeft = mCombinedChart.getAxisLeft();
         yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        yAxisLeft.setAxisMinimum(0);
         yAxisLeft.setDrawGridLines(false);
 
         Legend legend = mCombinedChart.getLegend();
@@ -60,6 +62,10 @@ public class StandardCurveChart {
         mCombinedChart.setScaleEnabled(false);
     }
 
+    public void setXAxisMinimum(float min){
+        XAxis xAxis = mCombinedChart.getXAxis();
+        xAxis.setAxisMinimum(min);
+    }
 
     public void addPoints(double[] xx, double[] yy, double[] stdXX, double[] stdYY,double[] unknowXX, double[] unknowYY) {
 
@@ -81,11 +87,18 @@ public class StandardCurveChart {
         lineData.addDataSet(dataSet);
         data.setData(lineData);
 
-
+        double minX=0;
+        if (stdXX.length>0) {
+             minX = stdXX[0];
+        }
         List<Entry> pointList = new ArrayList<>();
         for (int i = 0; i < stdXX.length; i++) {
             Entry entry = new Entry((float) stdXX[i],(float) stdYY[i]);
             pointList.add(entry);
+
+            if (stdXX[i]<minX){
+                minX=stdXX[i];
+            }
         }
         ScatterData scatterData = new ScatterData();
         ScatterDataSet scatterDataSet=new ScatterDataSet(pointList,"标准点");
@@ -104,7 +117,13 @@ public class StandardCurveChart {
         for (int i = 0; i < unknowXX.length; i++) {
             Entry entry = new Entry((float) unknowXX[i],(float) unknowYY[i]);
             unknownPointList.add(entry);
+
+            if (unknowXX[i]<minX){
+                minX=unknowXX[i];
+            }
         }
+
+
         ScatterData unknownScatterData = new ScatterData();
         ScatterDataSet unknownScatterDataSet=new ScatterDataSet(unknownPointList,"未知点");
         unknownScatterDataSet.setColor(Color.parseColor("#1f4e99"));
@@ -115,6 +134,9 @@ public class StandardCurveChart {
         scatterData.addDataSet(unknownScatterDataSet);
 
         data.setData(scatterData);
+
+        //设置x轴最小值，
+        setXAxisMinimum((int)(minX-1));
 
         mCombinedChart.setData(data);
         data.notifyDataChanged();

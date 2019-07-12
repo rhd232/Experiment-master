@@ -20,8 +20,12 @@ View.OnTouchListener{
     public TableAdapter(Context context, int layoutResId) {
         super(context, layoutResId);
         itemColor=context.getResources().getColor(R.color.color333333);
+        concentrationNeedInput=true;
     }
-
+    private boolean concentrationNeedInput=true;
+    public void setConcentrationNeedInput(boolean concentrationNeedInput){
+        this.concentrationNeedInput=concentrationNeedInput;
+    }
     @Override
     protected void convert(BaseAdapterHelper helper, SampleRow item) {
         String name;
@@ -46,8 +50,14 @@ View.OnTouchListener{
             helper.setTextColor(R.id.tv_concentration, Color.WHITE);
             helper.setTextColor(R.id.tv_ct, Color.WHITE);
         } else {
-            helper.getView(R.id.et_concentration).setVisibility(View.VISIBLE);
-            helper.getView(R.id.tv_concentration).setVisibility(View.GONE);
+            if (concentrationNeedInput){
+                helper.getView(R.id.et_concentration).setVisibility(View.VISIBLE);
+                helper.getView(R.id.tv_concentration).setVisibility(View.GONE);
+            }else {
+                helper.getView(R.id.et_concentration).setVisibility(View.GONE);
+                helper.getView(R.id.tv_concentration).setVisibility(View.VISIBLE);
+            }
+
             name = item.getName();
             type = item.getType();
             concentration = item.getConcentration();

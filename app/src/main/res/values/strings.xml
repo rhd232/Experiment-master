@@ -162,4 +162,6 @@
     <string name="print_auditor">Auditor</string>
     <string name="print_unit">Unit</string>
     <string name="print_date">Date</string>
+
+    <string name="tip_illegal_file">Illegal File</string>
 </resources>

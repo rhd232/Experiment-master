@@ -308,7 +308,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                                         doNextByStatus(status, event);
                                     }
                                 });
-                       // UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                        //UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
 
 
                     }
