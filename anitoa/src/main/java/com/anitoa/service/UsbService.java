@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.anitoa.bean.Data;
@@ -224,8 +225,13 @@ public class UsbService extends CommunicationService {
             data[i] = bytes.get(i).byteValue();
         }
         String hex = ByteUtil.getHexStr(data, data.length);
+        //TODO 显示中文命令
+        StringBuilder desc=new StringBuilder("发送：");
+        if (!TextUtils.isEmpty(cmd.getCmdDescription())){
+            desc.append(cmd.getCmdDescription()).append("-->");
+        }
 
-        AnitoaLogUtil.writeFileLog("发送：" + hex);
+        AnitoaLogUtil.writeFileLog(desc + hex);
     }
 
     public int sendPcrCommand(PcrCommand command) {
@@ -242,9 +248,15 @@ public class UsbService extends CommunicationService {
             for (int i = 0; i < bytes.size(); i++) {
                 data[i] = bytes.get(i).byteValue();
             }
-            return bulk(bytes);
+            err= bulk(bytes);
+            if (err!=0){
+                //非0为异常情况
+                AnitoaLogUtil.writeFileLog("bulk方法执行失败了");
+            }
+            return err;
         } catch (Exception e) {
             e.printStackTrace();
+            AnitoaLogUtil.writeFileLog("expection in sendPcrCommand--->"+e.getMessage());
             err = -1;
         }
         return err;
@@ -255,6 +267,7 @@ public class UsbService extends CommunicationService {
         //停止读取线程。
         if (mReadThread == null || !mReadThread.mRun) {
             startReadThread();
+            ThreadUtil.sleep(100);
         }
         //stopReadThread();
         toByteString(command);
@@ -272,6 +285,13 @@ public class UsbService extends CommunicationService {
         if (command != null && !command.isEmpty()) {
 
             if (mUsbEndpointOut == null || mUsbDeviceConnection == null) {
+                StringBuilder sBuilder=new StringBuilder();
+                boolean endpointOutNull=mUsbEndpointOut == null;
+                boolean deviceConnectionNull=mUsbDeviceConnection == null;
+                sBuilder.append("bulkSync:")
+                        .append("mUsbEndpointOut == null-->").append(endpointOutNull)
+                        .append("mUsbDeviceConnection == null-->").append(deviceConnectionNull);
+                AnitoaLogUtil.writeFileLog(sBuilder.toString());
                 return null;
             }
             byte[] data = new byte[command.size()];
@@ -328,6 +348,12 @@ public class UsbService extends CommunicationService {
         if (command != null && !command.isEmpty()) {
 
             if (mUsbEndpointOut == null || mUsbDeviceConnection == null) {
+                StringBuilder sBuilder=new StringBuilder();
+                boolean endpointOutNull=mUsbEndpointOut == null;
+                boolean deviceConnectionNull=mUsbDeviceConnection == null;
+                sBuilder.append("mUsbEndpointOut == null-->").append(endpointOutNull)
+                        .append("mUsbDeviceConnection == null-->").append(deviceConnectionNull);
+                AnitoaLogUtil.writeFileLog(sBuilder.toString());
                 return -1;
             }
             byte[] data = new byte[command.size()];
@@ -339,6 +365,8 @@ public class UsbService extends CommunicationService {
             int ret = mUsbDeviceConnection.bulkTransfer(mUsbEndpointOut, data, data.length, 5000);
             if (ret >= 0) {
                 return 0;
+            }else {
+                AnitoaLogUtil.writeFileLog("bulkTransfer 方法执行失败了，返回值为"+ret);
             }
 
             return -1;

@@ -90,6 +90,7 @@ public class AnitoaLogUtil {
     public static void writeFileLog(String txt) {
         //拼上一个发送时间
         long milliTime=new Date().getTime();
+
         txt=getDateTime(milliTime)+" "+txt;
         writeFileLog(txt,null);
 

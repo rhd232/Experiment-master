@@ -933,6 +933,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void step5() {
+
         mInReadingImg = false;
         PcrCommand command = new PcrCommand();
         command.step5();

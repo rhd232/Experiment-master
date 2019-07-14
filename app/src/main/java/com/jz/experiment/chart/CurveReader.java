@@ -20,7 +20,7 @@ public class CurveReader {
 
     }
     public void readCurve(double[][] factorValues, CtParamInputLayout.CtParam ctParam,boolean norm){
-        double[][][]  m_yData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
+        double[][][]  m_yData = new double[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL][CCurveShowPolyFit.MAX_CYCL];
         CCurveShowPolyFit cCurveShow =  CCurveShowPolyFit.getInstance();
       /*  int minCt=13;
         int threshold=10;*/

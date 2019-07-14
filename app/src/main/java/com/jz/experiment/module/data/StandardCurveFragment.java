@@ -417,6 +417,7 @@ public class StandardCurveFragment extends BaseFragment {
         for (int i = 0; i < 20; i++) {
             fitxx[i] = (double) (20 + i);
         }*/
+       //生成的标准曲线的点数
         int intMax= (int) (maxX+10);
         double[] fitxx = new double[intMax];
         for (int i = 0; i < intMax; i++) {
@@ -447,6 +448,8 @@ public class StandardCurveFragment extends BaseFragment {
         format = new DecimalFormat("#.######");
         String nR2="R<sup>2</sup>:"+format.format(R2);
         tv_r2.setText(Html.fromHtml(nR2));
+
+
         //计算未知点
         List<SampleRow> unknownRows = new ArrayList<>(unknowAdapter.getData());
         unknownRows.remove(0);

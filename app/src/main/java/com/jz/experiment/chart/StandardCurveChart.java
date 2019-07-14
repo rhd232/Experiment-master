@@ -70,7 +70,7 @@ public class StandardCurveChart {
     public void addPoints(double[] xx, double[] yy, double[] stdXX, double[] stdYY,double[] unknowXX, double[] unknowYY) {
 
         CombinedData data = new CombinedData();
-
+        /*******直线数据*****************/
         int count = xx.length;
         List<Entry> expeData = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -87,6 +87,8 @@ public class StandardCurveChart {
         lineData.addDataSet(dataSet);
         data.setData(lineData);
 
+        /*******标准点*****************/
+        ScatterData scatterData = new ScatterData();
         double minX=0;
         if (stdXX.length>0) {
              minX = stdXX[0];
@@ -100,17 +102,16 @@ public class StandardCurveChart {
                 minX=stdXX[i];
             }
         }
-        ScatterData scatterData = new ScatterData();
         ScatterDataSet scatterDataSet=new ScatterDataSet(pointList,"标准点");
         scatterDataSet.setColor(Color.parseColor("#ffff8800"));
         scatterDataSet.setScatterShapeSize(7.5f);
         scatterDataSet.setDrawValues(false);
         scatterDataSet.setValueTextSize(10f);
+
         scatterData.addDataSet(scatterDataSet);
 
 
-
-
+        /*******未知点*****************/
         //每种类型数据只能增加一次
         //===================未知点=======
         List<Entry> unknownPointList = new ArrayList<>();
@@ -123,14 +124,12 @@ public class StandardCurveChart {
             }
         }
 
-
-        ScatterData unknownScatterData = new ScatterData();
         ScatterDataSet unknownScatterDataSet=new ScatterDataSet(unknownPointList,"未知点");
         unknownScatterDataSet.setColor(Color.parseColor("#1f4e99"));
         unknownScatterDataSet.setScatterShapeSize(7.5f);
         unknownScatterDataSet.setDrawValues(false);
         unknownScatterDataSet.setValueTextSize(10f);
-        unknownScatterData.addDataSet(unknownScatterDataSet);
+
         scatterData.addDataSet(unknownScatterDataSet);
 
         data.setData(scatterData);

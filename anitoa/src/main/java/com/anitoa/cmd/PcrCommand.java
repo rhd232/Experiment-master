@@ -37,6 +37,12 @@ public class PcrCommand {
         return commandList;
     }
 
+    private String cmdDescription;
+
+    public String getCmdDescription() {
+        return cmdDescription;
+    }
+
     /**
      * 读取版本号
      * @return
@@ -53,6 +59,7 @@ public class PcrCommand {
         bytes.add((byte) type);
 
         PcrCommand cmd=new PcrCommand();
+        cmd.cmdDescription="读取下位机版本号";
         cmd.addCommonBytes(bytes);
         cmd.addCommand(listToByteArray(bytes));
 
@@ -488,6 +495,7 @@ public class PcrCommand {
      *              21          2         1      0
      */
     public void step6(){
+        cmdDescription="查询图像版有无中断";
         int length=2;
         List<Byte> bytes = new ArrayList<>();
         bytes.add((byte) 0xaa);
@@ -510,6 +518,7 @@ public class PcrCommand {
      *                         0x38
      */
     public void step7(PCR_IMAGE pcr_image){
+        cmdDescription="获取图像板数据";
         List<Byte> bytes = new ArrayList<>();
         bytes.add((byte) 0xaa);
         bytes.add((byte) 0x2);
@@ -531,6 +540,7 @@ public class PcrCommand {
      *        20                21
      */
     public void step5(){
+        cmdDescription="查询下位机循环状态";
         int length=2;
         //byte[] cmd=new byte[]{20,(byte) length,21,0};
         List<Byte> bytes = new ArrayList<>();
@@ -547,6 +557,7 @@ public class PcrCommand {
      * 获取当前阶段,循环数
      */
     public void getCyclingInfo(){
+        cmdDescription="获取当前阶段,循环数";
         List<Byte> bytes = new ArrayList<>();
         bytes.add((byte) 0xaa);
         bytes.add((byte) 0x14);
@@ -570,6 +581,7 @@ public class PcrCommand {
      * aa130e0b010000484200005c420000803f141717  回复aa0013010b1f1717
      */
     public void meltingCurve(Control control,float startTemp,float endTemp,float speed){
+        cmdDescription="溶解曲线开启/停止";
         List<Byte> bytes = new ArrayList<>();
         int length=4+4+4+1+1;
         bytes.add((byte)0xaa);
