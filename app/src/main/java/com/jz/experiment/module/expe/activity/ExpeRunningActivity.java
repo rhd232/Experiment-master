@@ -12,6 +12,7 @@ import com.anitoa.Anitoa;
 import com.anitoa.ExpeType;
 import com.anitoa.bean.Data;
 import com.anitoa.cmd.PcrCommand;
+import com.anitoa.event.AnitoaConnectedEvent;
 import com.anitoa.event.AnitoaDisConnectedEvent;
 import com.anitoa.listener.AnitoaConnectionListener;
 import com.anitoa.receiver.BluetoothReceiver;
@@ -629,6 +630,18 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     /**
+     * 重新连接设备
+     * @param event
+     */
+    @Subscribe(threadMode =ThreadMode.MAIN)
+    public void onAnitoaConnectedEvent(AnitoaConnectedEvent event){
+        mCommunicationService=Anitoa.getInstance(getActivity()).getCommunicationService();
+        if (mInReadingImg){
+            //如果是在读取图像数据阶段丢失的，那么继续查询循环状态吧
+            step5();
+        }
+    }
+    /**
      * 筛选图像
      *
      * @param event
@@ -1064,7 +1077,6 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             }
             mTempChart.addTemp(lidTemp, peltierTemp);
         }
-
 
     }
 

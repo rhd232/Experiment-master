@@ -112,6 +112,7 @@ public class PcrCommand {
         PcrCommand cmd=new PcrCommand();
         cmd.addCommonBytes(bytes);
         cmd.addCommand(listToByteArray(bytes));
+        cmd.cmdDescription="读取下位机温度";
         return cmd;
     }
 

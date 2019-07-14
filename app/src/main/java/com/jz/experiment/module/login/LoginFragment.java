@@ -16,6 +16,7 @@ import com.anitoa.bean.Data;
 import com.anitoa.cmd.PcrCommand;
 import com.anitoa.listener.AnitoaConnectionListener;
 import com.anitoa.service.CommunicationService;
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +59,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -147,7 +150,11 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
                     if (mCommunicationService != null) {
                         setNofity(LoginFragment.this);
                         UsbManagerHelper.connectUsbDevice(getActivity());
+
+                       // readVersionAlong();
                     }
+
+
                 }
 
             }
@@ -155,17 +162,31 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
 
         String appVersion = AppUtil.getAppVersionName(getActivity());
         tv_app_version.setText("App：" + appVersion);
-        /*mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                CommunicationService service=sAnitoa.getCommunicationService();
-                if (service!=null){
-                    service.setNotify(LoginFragment.this);
-                    service.sendPcrCommand(PcrCommand.ofVersionCmd());
-                }
-            }
-        },1500);*/
 
+
+    }
+
+
+    private void readVersionAlong() {
+            Subscription subscription= Observable.interval(10, 2000, TimeUnit.MILLISECONDS)
+
+                    .onBackpressureLatest()
+                    .subscribe(new Action1<Long>() {
+                        @Override
+                        public void call(Long aLong) {
+                           // System.out.println("readVersionAlong:"+mCommunicationService);
+                            if (mCommunicationService!=null){
+                                mCommunicationService.sendPcrCommand(PcrCommand.ofVersionCmd());
+                            }
+
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            throwable.printStackTrace();
+                            AnitoaLogUtil.writeFileLog(throwable.getMessage());
+                        }
+                    });
     }
 
     private void doPdfPrint(String filePath) {
@@ -337,6 +358,7 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
     @Override
     public void onConnectSuccess() {
         if (sAnitoa != null) {
+           // System.out.println("onConnectSuccess:"+mCommunicationService);
             if (mCommunicationService != null) {
                 mCommunicationService.sendPcrCommand(PcrCommand.ofVersionCmd());
             }
