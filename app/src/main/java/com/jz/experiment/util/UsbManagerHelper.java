@@ -7,6 +7,7 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 
 import com.anitoa.Anitoa;
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.module.bluetooth.DeviceRepo;
 import com.jz.experiment.module.expe.bean.UsbDeviceInfo;
 
@@ -39,7 +40,10 @@ public class UsbManagerHelper {
             for (UsbDevice device : usbManager.getDeviceList().values()) {
                 for (int i = 0; i < device.getInterfaceCount(); i++) {
                     UsbInterface usbInterface = device.getInterface(i);
-
+                    int vendorId=device.getVendorId();
+                    int productId=device.getProductId();
+                   // System.out.println("vendorId:"+vendorId+"   productId:"+productId);
+                    AnitoaLogUtil.writeFileLog("vendorId:"+vendorId+"   productId:"+productId);
                     UsbDeviceInfo info = new UsbDeviceInfo();
                     info.setDeviceName(device.getDeviceName());
                     DeviceRepo.getInstance().store(context, info);

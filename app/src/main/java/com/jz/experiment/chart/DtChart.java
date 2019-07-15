@@ -211,4 +211,11 @@ public class DtChart extends WindChart {
         }
         return contains;
     }
+
+
+    public static class DtData{
+
+        public double[][][] m_zData;
+        public double[][] m_CTValue;
+    }
 }

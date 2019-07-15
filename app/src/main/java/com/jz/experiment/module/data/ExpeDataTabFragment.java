@@ -43,6 +43,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         EventBus.getDefault().register(this);
+        view_pager.setOffscreenPageLimit(1);
         layout_loading = view.findViewById(R.id.layout_loading);
         layout_loading.setEmpty(R.layout.layout_expe_empty);
         layout_loading.setOnEmptyInflateListener(new LoadingLayout.OnInflateListener() {

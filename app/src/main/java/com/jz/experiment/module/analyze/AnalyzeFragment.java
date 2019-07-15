@@ -135,6 +135,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         view.findViewById(R.id.btn_select).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+               // AppDialogHelper.showSelectJsonTip();
                 selectDataFile(v);
             }
         });
@@ -166,8 +167,8 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
     public void selectDataFile(View view) {
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        //intent.setType("text/plain");
-        intent.setType("application/json");
+        intent.setType("*/*");
+       // intent.setType("application/json");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         try {
@@ -505,7 +506,9 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
 
                 if (mOpenedFile != null) {
 
-                    StandardCurveActivity.start(getActivity(), mExeperiment);
+                    InputParams params=new InputParams();
+                    params.setCtParam(layout_ctparam_input.getCtParam());
+                    StandardCurveActivity.start(getActivity(), mExeperiment,params);
                 }
 
                 break;

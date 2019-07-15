@@ -7,16 +7,19 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.jz.experiment.R;
+import com.jz.experiment.module.report.bean.InputParams;
 import com.wind.base.BaseActivity;
 import com.wind.data.expe.bean.HistoryExperiment;
 
 public class StandardCurveActivity extends BaseActivity {
-    public static void start(Context context,HistoryExperiment experiment){
+    public static void start(Context context,HistoryExperiment experiment,InputParams inputParams){
         Intent intent=new Intent(context,StandardCurveActivity.class);
         intent.putExtra(EXTRA_KEY_EXPE,experiment);
+        intent.putExtra(EXTRA_KEY_INPUT_PARAMS,inputParams);
         context.startActivity(intent);
     }
     public static final String EXTRA_KEY_EXPE="extra_key_expe";
+    public static final String EXTRA_KEY_INPUT_PARAMS="extra_key_input_params";
 
     private StandardCurveFragment mStandardCurveFragment;
     @Override
@@ -24,7 +27,8 @@ public class StandardCurveActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_container_with_toolbar);
         HistoryExperiment experiment=getIntent().getParcelableExtra(EXTRA_KEY_EXPE);
-        replaceFragment(mStandardCurveFragment=StandardCurveFragment.newInstance(experiment));
+        InputParams inputParams=getIntent().getParcelableExtra(EXTRA_KEY_INPUT_PARAMS);
+        replaceFragment(mStandardCurveFragment=StandardCurveFragment.newInstance(experiment,inputParams));
 
     }
 

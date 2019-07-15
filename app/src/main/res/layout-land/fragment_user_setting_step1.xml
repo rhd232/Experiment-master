@@ -45,17 +45,18 @@
                         android:layout_height="wrap_content"
                         android:text="@string/setup_test_name"
                         android:textColor="@color/color333333"
-                        android:textSize="14sp" />
+                        android:textSize="16sp" />
 
                     <com.wind.view.ValidateEditText
                         android:id="@+id/et_expe_name"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:background="@null"
+                        android:gravity="center_vertical"
                         android:hint="@string/setup_input_test_name"
                         android:textColor="@color/color333333"
                         android:textColorHint="@color/color999999"
-                        android:textSize="14sp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
                 <!-- 实验时间 -->
                 <RelativeLayout

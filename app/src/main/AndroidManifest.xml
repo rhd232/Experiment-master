@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.jz.experiment">
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
@@ -35,23 +36,34 @@
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.HOME"></category>
                 <category android:name="android.intent.category.DEFAULT"></category>
                 <category android:name="android.intent.category.MONKEY"></category>
+
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
         </activity>
         <activity android:name=".MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
             android:windowSoftInputMode="adjustPan">
-
         </activity>
 
         <activity android:name=".module.login.LoginActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
+            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize">
+
+        </activity>
 
         <activity android:name=".module.settings.UserSettingsActivity"
             android:screenOrientation="landscape"

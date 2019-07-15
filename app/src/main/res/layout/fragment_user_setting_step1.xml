@@ -52,6 +52,7 @@
             </LinearLayout>
 
             <RelativeLayout
+                android:id="@+id/rl_item_expe_time"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:layout_marginTop="1dp"
@@ -80,6 +81,7 @@
             </RelativeLayout>
 
             <LinearLayout
+                android:id="@+id/ll_item_expe_channel"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:layout_marginTop="8dp"
@@ -112,6 +114,7 @@
                 android:dividerHeight="1dp" />
 
             <LinearLayout
+                android:id="@+id/ll_item_expe_int"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:layout_marginTop="8dp"
@@ -162,6 +165,7 @@
                 >
 
                 <LinearLayout
+                    android:id="@+id/ll_int_line_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -228,7 +232,11 @@
 
                     </LinearLayout>
                 </LinearLayout>
-
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:id="@+id/ll_int_line_2"
+                    />
                 <LinearLayout
                     android:id="@+id/ll_integration_time_3"
                     android:layout_width="match_parent"

@@ -180,7 +180,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             }
         });
 
-        //System.out.println("ExpeDataFragment onViewCreated");
+        System.out.println("ExpeDataFragment onViewCreated");
     }
 
     @Override
@@ -452,7 +452,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         long now = System.currentTimeMillis();
         switch (view.getId()) {
             case R.id.iv_std_curve:
-                StandardCurveActivity.start(getActivity(), mExeperiment);
+                InputParams params=new InputParams();
+                params.setCtParam(layout_ctparam_input.getCtParam());
+                StandardCurveActivity.start(getActivity(), mExeperiment,params);
                 break;
             case R.id.tv_dt:
 

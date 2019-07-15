@@ -14,20 +14,29 @@ import android.widget.TextView;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CCurveShowPolyFit;
+import com.jz.experiment.chart.CommData;
+import com.jz.experiment.chart.CurveReader;
+import com.jz.experiment.chart.DataFileReader;
 import com.jz.experiment.chart.StandardCurveChart;
 import com.jz.experiment.module.data.adapter.SampleStatefulAdapter;
 import com.jz.experiment.module.data.adapter.SeqAdapter;
 import com.jz.experiment.module.data.adapter.TableAdapter;
 import com.jz.experiment.module.data.adapter.TableUnknowAdapter;
 import com.jz.experiment.module.data.bean.SampleRow;
+import com.jz.experiment.module.report.PcrPrintPreviewFragment;
 import com.jz.experiment.module.report.StandardCurvePrintPreviewActivity;
+import com.jz.experiment.module.report.bean.InputParams;
 import com.jz.experiment.module.report.bean.StdLineData;
+import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.Utils;
+import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.mvp.view.BaseFragment;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.bean.Sample;
 import com.wind.toastlib.ToastUtil;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +44,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 public class StandardCurveFragment extends BaseFragment {
     @BindView(R.id.gv_a)
@@ -64,10 +78,11 @@ public class StandardCurveFragment extends BaseFragment {
     @BindView(R.id.tv_r2)
     TextView tv_r2;
 
-    public static StandardCurveFragment newInstance(HistoryExperiment experiment) {
+    public static StandardCurveFragment newInstance(HistoryExperiment experiment, InputParams inputParams) {
         StandardCurveFragment f = new StandardCurveFragment();
         Bundle args = new Bundle();
         args.putParcelable(ExpeDataFragment.ARGS_KEY_EXPE, experiment);
+        args.putParcelable(PcrPrintPreviewFragment.ARG_KEY_CT_PARAM, inputParams);
         f.setArguments(args);
         return f;
     }
@@ -78,14 +93,17 @@ public class StandardCurveFragment extends BaseFragment {
     }
 
     StandardCurveChart mStandardChart;
+    InputParams mInputParams;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-       // mStandardChart = new StandardChart(chart_standard);
-        mStandardChart=new StandardCurveChart(chart_standard);
+        // mStandardChart = new StandardChart(chart_standard);
+        mStandardChart = new StandardCurveChart(chart_standard);
         mExeperiment = getArguments().getParcelable(ExpeDataFragment.ARGS_KEY_EXPE);
+        mInputParams = getArguments().getParcelable(PcrPrintPreviewFragment.ARG_KEY_CT_PARAM);
+
         List<Sample> samplesA = mExeperiment.getSettingsFirstInfo().getSamplesA();
         List<Sample> samplesB = mExeperiment.getSettingsFirstInfo().getSamplesB();
         for (int i = 0; i < samplesA.size(); i++) {
@@ -126,6 +144,43 @@ public class StandardCurveFragment extends BaseFragment {
 
         initStandardTable();
         initUnknowTable();
+
+        chart_standard.post(new Runnable() {
+            @Override
+            public void run() {
+                LoadingDialogHelper.showOpLoading(getActivity());
+                loadDtFile()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<Boolean>() {
+                            @Override
+                            public void call(Boolean aBoolean) {
+                                LoadingDialogHelper.hideOpLoading();
+                            }
+                        });
+            }
+        });
+
+
+    }
+
+    private Observable<Boolean> loadDtFile() {
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                //重新读取生成ct值
+                InputStream ips = null;
+                try {
+                    ips = new FileInputStream(DataFileUtil.getDtImageDataFile(mExeperiment));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                DataFileReader.getInstance().ReadFileData(ips, false);
+                CommData.m_factorData = DataFileReader.getInstance().factorValue;
+                CurveReader.getInstance().readCurve(CommData.m_factorData, mInputParams.getCtParam(), false);
+                subscriber.onNext(true);
+            }
+        });
     }
 
     private void initUnknowTable() {
@@ -384,6 +439,7 @@ public class StandardCurveFragment extends BaseFragment {
     }
 
     private StdLineData mStdLineData;
+
     private void drawStdCurve() {
 
 
@@ -395,14 +451,13 @@ public class StandardCurveFragment extends BaseFragment {
         double[] xx = new double[size];
 
 
-
-        double maxX=0;
+        double maxX = 0;
         for (int i = 0; i < size; i++) {
 
             try {
                 xx[i] = Double.parseDouble(stdRows.get(i).getCtValue());
-                if (xx[i]>maxX){
-                    maxX=xx[i];
+                if (xx[i] > maxX) {
+                    maxX = xx[i];
                 }
                 double conc = Double.parseDouble(stdRows.get(i).getConcentration());
                 yy[i] = Math.log10(conc);
@@ -417,11 +472,11 @@ public class StandardCurveFragment extends BaseFragment {
         for (int i = 0; i < 20; i++) {
             fitxx[i] = (double) (20 + i);
         }*/
-       //生成的标准曲线的点数
-        int intMax= (int) (maxX+10);
+        //生成的标准曲线的点数
+        int intMax = (int) (maxX + 10);
         double[] fitxx = new double[intMax];
         for (int i = 0; i < intMax; i++) {
-            fitxx[i] = (double) ( i);
+            fitxx[i] = (double) (i);
         }
 
 
@@ -446,7 +501,7 @@ public class StandardCurveFragment extends BaseFragment {
         //TODO 计算相关系数
         double R2 = caculateR(xx, yy);
         format = new DecimalFormat("#.######");
-        String nR2="R<sup>2</sup>:"+format.format(R2);
+        String nR2 = "R<sup>2</sup>:" + format.format(R2);
         tv_r2.setText(Html.fromHtml(nR2));
 
 
@@ -463,19 +518,19 @@ public class StandardCurveFragment extends BaseFragment {
             SampleRow sampleRow = unknownRows.get(i);
             try {
                 ct = Double.parseDouble(sampleRow.getCtValue());
-                unknownXX[i]=ct;
+                unknownXX[i] = ct;
                 double conc = Utils.getPolyY(coefficients, ct);
                 sampleRow.setConcentration(format.format(Math.pow(10, conc)));
-                unknownYY[i]=conc;
+                unknownYY[i] = conc;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        mStdLineData=new StdLineData(fitxx, fityy, xx, yy,unknownXX,unknownYY,equation.toString(),format.format(R2));
+        mStdLineData = new StdLineData(fitxx, fityy, xx, yy, unknownXX, unknownYY, equation.toString(), format.format(R2));
         //
 
-        mStandardChart.addPoints(fitxx, fityy, xx, yy,unknownXX,unknownYY);
+        mStandardChart.addPoints(fitxx, fityy, xx, yy, unknownXX, unknownYY);
 
 
     }
@@ -515,7 +570,7 @@ public class StandardCurveFragment extends BaseFragment {
 
     public void toPrintPreview() {
 
-        if (mStdLineData!=null){
+        if (mStdLineData != null) {
             List<SampleRow> stdRows = new ArrayList<>(standardAdapter.getData());
             List<SampleRow> unknownRows = new ArrayList<>(unknowAdapter.getData());
 
@@ -523,13 +578,8 @@ public class StandardCurveFragment extends BaseFragment {
             mStdLineData.setStdRows(stdRows);
             mStdLineData.setUnknownRows(unknownRows);
 
-            StandardCurvePrintPreviewActivity.start(getActivity(),mStdLineData);
+            StandardCurvePrintPreviewActivity.start(getActivity(), mStdLineData);
         }
-
-
-
-
-
 
 
     }

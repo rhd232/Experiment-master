@@ -483,12 +483,12 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                     @Override
                     public void call(Long aLong) {
                         if (mReadTrimCount == 3) {
-                            mReadTrimSubscription.unsubscribe();
+                            unsubscribeTrim();
                             showConnectionTip();
                             return;
                         }
                         if (mReadTrimCount >= 2) {
-                            mReadTrimSubscription.unsubscribe();
+                            unsubscribeTrim();
                             verifyConnection();
                         } else {
                             mReadTrimCount++;
@@ -1066,15 +1066,18 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             mCommunicationService.setNotify(null);
         }
 
+        unsubscribeTrim();
+        EventBus.getDefault().unregister(this);
+    }
+
+    private void unsubscribeTrim(){
         if (mReadTrimSubscription != null) {
             if (!mReadTrimSubscription.isUnsubscribed()) {
                 mReadTrimSubscription.unsubscribe();
             }
         }
         mReadTrimSubscription = null;
-        EventBus.getDefault().unregister(this);
     }
-
 
 
     private void printHistoryInfo() {
