@@ -2,6 +2,7 @@ package com.jz.experiment.module.expe.activity;
 
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -164,6 +165,12 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        AnitoaLogUtil.writeFileLog("ExpeRunActivity onConfigurationChanged");
+    }
+
+    @Override
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expe_running);
@@ -191,13 +198,12 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
         initChart();
 
-
         bindService();
         init();
 
 
         mExecutorService = Executors.newCachedThreadPool();
-
+        AnitoaLogUtil.writeFileLog("实验运行页面开启",mExecutorService);
         //mDtChart.show(ChanList,KSList,null);
        /* Thread thread = new Thread(mRun);
         thread.start();*/
@@ -274,12 +280,18 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         }
         AnitoaLogUtil.writeFileLog(sBuilder.toString());
     }
-
+    private void setNotity(){
+        if (mCommunicationService!=null) {
+            mCommunicationService.setNotify(this);
+        }else {
+            ThreadUtil.sleep(50);
+            mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
+            setNotity();
+        }
+    }
     private void bindService() {
 
-//        mBluetoothService = Anitoa.getInstance(getActivity()).getBluetoothService();
-//        mUsbService = Anitoa.getInstance(getActivity()).getUsbService();
-        mCommunicationService.setNotify(this);
+        setNotity();
         chart_dt.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -698,7 +710,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        if (mExecutorService!=null) {
+            AnitoaLogUtil.writeFileLog("实验运行页面关闭",mExecutorService);
+        }else {
+            AnitoaLogUtil.writeFileLog("实验运行页面关闭");
+        }
         if (mCommunicationService!=null){
             mCommunicationService.setNotify(null);
 

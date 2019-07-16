@@ -19,6 +19,7 @@
         android:icon="@drawable/app_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:largeHeap="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ChartActivity">
 
@@ -31,7 +32,7 @@
             />
         <activity android:name=".SplashActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             android:launchMode="singleTop"
             >
             <intent-filter>
@@ -43,7 +44,7 @@
                 <category android:name="android.intent.category.MONKEY"></category>
 
             </intent-filter>
-
+            <!--
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
@@ -51,70 +52,72 @@
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
+                -->
         </activity>
         <activity android:name=".MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             android:windowSoftInputMode="adjustPan">
         </activity>
 
         <activity android:name=".module.login.LoginActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize">
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize">
 
         </activity>
 
         <activity android:name=".module.settings.UserSettingsActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"/>
 
         <activity android:name=".module.settings.EditPwdActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"/>
 
         <activity android:name=".module.expe.activity.UserSettingsStep2Activity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             android:windowSoftInputMode="adjustPan"/>
 
         <activity android:name=".module.expe.activity.UserSettingsStep1Activity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"/>
 
         <activity android:name=".module.expe.activity.DeviceListActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"/>
 
         <activity android:name=".module.expe.activity.ExpeRunningActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"/>
+            android:launchMode="singleTop"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"/>
 
         <activity android:name=".module.data.FilterActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             ></activity>
         <activity android:name="com.jz.experiment.module.data.StandardCurveActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             android:windowSoftInputMode="adjustPan"
             ></activity>
         <activity android:name=".module.data.ReportPreviewActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             ></activity>
         <activity android:name=".module.report.StandardCurvePrintPreviewActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             ></activity>
 
         <activity android:name=".module.report.PcrPrintPreviewActivity"
             android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             />
         <service android:name="com.anitoa.service.BluetoothLeService"></service>
         <service android:name="com.anitoa.service.BluetoothService"></service>
-        <service android:name="com.anitoa.service.UsbService"></service>
+        <service android:name="com.anitoa.service.UsbService" ></service>
     <!--
         <receiver android:name="com.jz.experiment.BootReceiver">
             <intent-filter>

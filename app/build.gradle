@@ -71,7 +71,8 @@ dependencies {
     //implementation 'com.google.dagger:dagger-android:2.16'
     //implementation 'com.google.dagger:dagger-android-support:2.16' // if you use the support libraries
     //annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
-
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 
     /****butterKnife注解处理器*******/
     annotationProcessor baseDependencies.butterKnifeProcessor

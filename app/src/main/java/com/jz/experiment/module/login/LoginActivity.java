@@ -1,6 +1,7 @@
 package com.jz.experiment.module.login;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,9 +9,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.anitoa.Anitoa;
 import com.jz.experiment.R;
-import com.jz.experiment.chart.FactUpdater;
 import com.wind.base.BaseActivity;
 import com.wind.base.C;
 import com.wind.base.utils.Navigator;
@@ -27,10 +26,15 @@ public class LoginActivity extends BaseActivity{
 
 
         getAndroiodScreenProperty();
-
+        System.out.println("LoginActivity onCreate");
 
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        System.out.println("LoginActivity onConfigurationChanged");
+    }
 
     @Override
     public int getStatusBarColor() {
@@ -68,4 +72,9 @@ public class LoginActivity extends BaseActivity{
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("LoginActivity onDestroy");
+    }
 }

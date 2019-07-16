@@ -16,8 +16,8 @@ public class Anitoa {
     private static Anitoa sInstance = null;
 
     public static synchronized Anitoa getInstance(Context context) {
-        long time=System.currentTimeMillis();
-        System.out.println("Anitoa"+time);
+       // long time=System.currentTimeMillis();
+       // System.out.println("Anitoa"+time);
         if (sInstance == null) {
             synchronized (Anitoa.class) {
                 if (sInstance == null) {
