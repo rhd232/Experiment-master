@@ -9,6 +9,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.R;
 import com.wind.base.BaseActivity;
 import com.wind.base.C;
@@ -26,14 +27,14 @@ public class LoginActivity extends BaseActivity{
 
 
         getAndroiodScreenProperty();
-        System.out.println("LoginActivity onCreate");
+        AnitoaLogUtil.writeFileLog("LoginActivity onCreate");
 
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        System.out.println("LoginActivity onConfigurationChanged");
+        AnitoaLogUtil.writeFileLog("LoginActivity onConfigurationChanged");
     }
 
     @Override
@@ -75,6 +76,6 @@ public class LoginActivity extends BaseActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("LoginActivity onDestroy");
+        AnitoaLogUtil.writeFileLog("LoginActivity onDestroy");
     }
 }

@@ -9,9 +9,9 @@
   "autoIntTime": 1,
   "channels": [
     {
-      "name": "",
-      "value": "",
-      "remark": "",
+      "name": "Channel1",
+      "value": "FAM",
+      "remark": "备注",
       "integration_time": 10
     },
     {

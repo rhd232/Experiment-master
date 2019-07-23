@@ -27,7 +27,13 @@ public class Anitoa {
         }
         return sInstance;
     }
+    public static synchronized void reset(){
+        if (sInstance!=null) {
+            sInstance.mBinding = false;
+        }
+        sInstance=null;
 
+    }
     public void unbindService(Context context){
         if (mBinding){
             try {

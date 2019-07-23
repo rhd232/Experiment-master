@@ -99,8 +99,16 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
 
     @Override
     protected int getLayoutRes() {
+        AnitoaLogUtil.writeFileLog("LoginFragment onCreateView");
         return R.layout.activity_login;
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AnitoaLogUtil.writeFileLog("LoginFragment onCreate");
+    }
+
 
 
     @Override
@@ -164,6 +172,7 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
         tv_app_version.setText("App：" + appVersion);
 
 
+        AnitoaLogUtil.writeFileLog("LoginFragment onViewCreate");
     }
 
 
@@ -417,13 +426,32 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
 
 
     @Override
+    public void onPause() {
+        super.onPause();
+        AnitoaLogUtil.writeFileLog("LoginFragment onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        AnitoaLogUtil.writeFileLog("LoginFragment onStop");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AnitoaLogUtil.writeFileLog("LoginFragment onResume");
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         setNofity(null);
         if (mNeedStopService) {
             Anitoa.getInstance(getActivity().getApplicationContext()).unbindService(getActivity().getApplicationContext());
         }
-        System.out.println("LoginFragment onDestroyView mNeedStopService"+mNeedStopService);
+        AnitoaLogUtil.writeFileLog("LoginFragment onDestroyView");
+        //System.out.println("LoginFragment onDestroyView mNeedStopService"+mNeedStopService);
     }
 
 

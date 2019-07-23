@@ -17,6 +17,7 @@ import android.view.View;
 import com.anitoa.Anitoa;
 import com.anitoa.event.AnitoaConnectedEvent;
 import com.anitoa.service.CommunicationService;
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.module.analyze.AnalyzeFragment;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
@@ -81,7 +82,7 @@ public class MainActivity extends BaseActivity {
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
 
-
+        mOnSaveInstanceStateCalled=false;
         fragments = new Fragment[3];
         fragments[0] = new HistoryExperimentsFragment();
         fragments[1] = new ExpeDataTabFragment();
@@ -100,6 +101,8 @@ public class MainActivity extends BaseActivity {
         checkStoragePermission();
 
     }
+
+
 
     private Runnable mConnectRunnable = new Runnable() {
         @Override
@@ -259,12 +262,24 @@ public class MainActivity extends BaseActivity {
         ActivityUtil.finish(getActivity());
     }
 
+    private boolean mOnSaveInstanceStateCalled;
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        mOnSaveInstanceStateCalled=true;
+        super.onSaveInstanceState(outState);
+        AnitoaLogUtil.writeFileLog("MainActivity onSaveInstanceState");
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Anitoa.getInstance(getApplicationContext()).unbindService(getApplicationContext());
-        // stopService(mServiceIntent);
-        EventBus.getDefault().unregister(this);
+        AnitoaLogUtil.writeFileLog("MainActivity onDestroy");
+        //引起bug ExpeRunActivity 运行时MainActivity可能会被系统回收，导致usb断开连接。 ExpeRunActivity不更新的情况
+        if (!mOnSaveInstanceStateCalled) {
+            AnitoaLogUtil.writeFileLog("MainActivity onDestroy unbindService");
+            Anitoa.getInstance(getApplicationContext()).unbindService(getApplicationContext());
+            // stopService(mServiceIntent);
+            EventBus.getDefault().unregister(this);
+        }
     }
 
 

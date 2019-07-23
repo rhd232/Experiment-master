@@ -284,8 +284,14 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         if (mCommunicationService!=null) {
             mCommunicationService.setNotify(this);
         }else {
-            ThreadUtil.sleep(50);
+
+
             mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
+            if (mCommunicationService==null){
+                Anitoa.reset();
+                Anitoa.getInstance(getActivity());
+                ThreadUtil.sleep(200);
+            }
             setNotity();
         }
     }

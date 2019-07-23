@@ -3,10 +3,12 @@ package com.jz.experiment.module.data;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.expe.event.RefreshExpeItemsEvent;
@@ -14,6 +16,7 @@ import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
 import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.wind.base.mvp.view.TabLayoutFragment;
 import com.wind.base.response.BaseResponse;
+import com.wind.base.utils.ActivityUtil;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.datastore.ExpeDataStore;
 import com.wind.data.expe.response.FindExpeResponse;
@@ -41,8 +44,12 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        AnitoaLogUtil.writeFileLog("ExpeDataTabFragment onViewCreated savedInstanceState==null?"+(savedInstanceState==null));
         super.onViewCreated(view, savedInstanceState);
         EventBus.getDefault().register(this);
+       /*if (savedInstanceState!=null){
+           mFragmentAdapter.getFragments().clear();
+       }*/
         view_pager.setOffscreenPageLimit(1);
         layout_loading = view.findViewById(R.id.layout_loading);
         layout_loading.setEmpty(R.layout.layout_expe_empty);
@@ -79,6 +86,12 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     }
 
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        AnitoaLogUtil.writeFileLog("ExpeDataTabFragment onSaveInstanceState");
+    }
 
     private void initTitleBar() {
         mTitleBar.setTextColor(Color.WHITE);
@@ -161,15 +174,18 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     private Handler mHandler=new Handler();
     public void setExpe(HistoryExperiment expe) {
+        AnitoaLogUtil.writeFileLog("ExpeDataTabFragment setExpe方法");
+
         //TODO reload就行了。
         mFragmentAdapter.getFragments().clear();
         mFragmentAdapter.notifyDataSetChanged();
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                loadExpe();
+                if (!ActivityUtil.isFinish(getActivity()))
+                    loadExpe();
             }
-        },350);
+        },500);
         //增加一个tab显示本实验
        /* ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
         List<Fragment> fragments = mFragmentAdapter.getFragments();

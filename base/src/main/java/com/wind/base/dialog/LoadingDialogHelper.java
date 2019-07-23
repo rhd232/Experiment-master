@@ -20,6 +20,7 @@ public class LoadingDialogHelper {
         mDialog=new OpLoadingDialog(context);
         mDialog.setMsg(msg);
         mDialog.setCancelable(false);
+        mDialog.setCanceledOnTouchOutside(false);
         mDialog.show();
     }
     public static void showOpLoadingCanCancel(Context context) {

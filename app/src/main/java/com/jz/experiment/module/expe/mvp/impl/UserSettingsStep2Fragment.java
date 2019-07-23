@@ -136,6 +136,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
         mCommunicationService = Anitoa.getInstance(getActivity())
                 .getCommunicationService();
+        //
 
         mExpeDataStore = new ExpeDataStore(
                 ProviderModule
@@ -764,6 +765,9 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
     }
 
     private boolean validate() {
+
+
+
         if (mModes == null) {
             //ToastUtil.showToast(getActivity(), "请选择程序模式");
             return false;

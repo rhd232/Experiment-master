@@ -1,10 +1,12 @@
 package com.jz.experiment.module.expe.activity;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.R;
 import com.jz.experiment.module.expe.mvp.impl.UserSettingsStep2Fragment;
 import com.wind.base.BaseActivity;
@@ -40,8 +42,31 @@ public class UserSettingsStep2Activity extends BaseActivity {
         mFragment=UserSettingsStep2Fragment.newInstance(historyExperiment);
         replaceFragment(mFragment);
 
-
+        AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onCreate");
     }
 
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onStop");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onResume");
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onConfigurationChanged");
+    }
 }
