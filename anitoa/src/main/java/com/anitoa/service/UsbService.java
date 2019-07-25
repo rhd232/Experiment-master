@@ -277,6 +277,7 @@ public class UsbService extends CommunicationService {
     public byte[] sendPcrCommandSync(PcrCommand command) {
         //停止读取线程。
         if (mReadThread == null   || !mReadThread.isInRunning()/*|| !mReadThread.mRun*/) {
+            AnitoaLogUtil.writeFileLog("sendPcrCommand: mReadThread= null ");
             startReadThread();
             ThreadUtil.sleep(100);
         }
@@ -529,6 +530,7 @@ public class UsbService extends CommunicationService {
                 connect(device.getDeviceName());
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
                 AnitoaLogUtil.writeFileLog("接收到USB断开连接通知");
+
                 mTargetDevice = null;
                 if (mReadThread != null) {
                     mReadThread.stopRun();
@@ -543,6 +545,7 @@ public class UsbService extends CommunicationService {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     name = device.getProductName();
                 }
+                mListener=null;
                 AnitoaDisConnectedEvent event = new AnitoaDisConnectedEvent(name,device.getDeviceName());
                 EventBus.getDefault().post(event);
 

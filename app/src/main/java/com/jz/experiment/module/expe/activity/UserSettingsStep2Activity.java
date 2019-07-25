@@ -59,6 +59,12 @@ public class UserSettingsStep2Activity extends BaseActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onDestroy");
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onResume");

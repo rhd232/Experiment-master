@@ -654,6 +654,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     @Subscribe(threadMode =ThreadMode.MAIN)
     public void onAnitoaConnectedEvent(AnitoaConnectedEvent event){
         mCommunicationService=Anitoa.getInstance(getActivity()).getCommunicationService();
+        mCommunicationService.setNotify(this);
         if (mInReadingImg){
             //如果是在读取图像数据阶段丢失的，那么继续查询循环状态吧
             step5();
@@ -716,16 +717,17 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         if (mExecutorService!=null) {
             AnitoaLogUtil.writeFileLog("实验运行页面关闭",mExecutorService);
         }else {
             AnitoaLogUtil.writeFileLog("实验运行页面关闭");
         }
+
         if (mCommunicationService!=null){
             mCommunicationService.setNotify(null);
-
+            mCommunicationService.stopReadThread();
         }
-
 
         if (tv_duration != null) {
             tv_duration.stop();
@@ -1172,8 +1174,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             int cycling_cmd = bytes[2];
             int cycling_type = bytes[4];
             if (cycling_cmd == 0x14 && cycling_type == 0x1) {
-                int cyclingNum = bytes[5];
-                int cyclingStep = bytes[6];
+                int cyclingNum = bytes[5] & 0xFF;
+                int cyclingStep = bytes[6] & 0xFF;
                 System.out.println("cyclingStep:" + cyclingStep + " cyclingNum:" + cyclingNum);
 
                 mRunningCyclingStageIndex= bytes[7];

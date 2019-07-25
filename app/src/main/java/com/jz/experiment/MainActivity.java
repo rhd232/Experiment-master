@@ -274,12 +274,16 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
         AnitoaLogUtil.writeFileLog("MainActivity onDestroy");
         //引起bug ExpeRunActivity 运行时MainActivity可能会被系统回收，导致usb断开连接。 ExpeRunActivity不更新的情况
-        if (!mOnSaveInstanceStateCalled) {
+      /*  if (!mOnSaveInstanceStateCalled) {
             AnitoaLogUtil.writeFileLog("MainActivity onDestroy unbindService");
             Anitoa.getInstance(getApplicationContext()).unbindService(getApplicationContext());
-            // stopService(mServiceIntent);
-            EventBus.getDefault().unregister(this);
-        }
+        }*/
+
+      /*  CommunicationService communicationService=Anitoa.getInstance(getApplicationContext()).getCommunicationService();
+        if (communicationService!=null) {
+            communicationService.stopReadThread();
+        }*/
+        EventBus.getDefault().unregister(this);
     }
 
 

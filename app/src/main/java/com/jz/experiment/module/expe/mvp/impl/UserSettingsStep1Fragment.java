@@ -492,6 +492,10 @@ public class UserSettingsStep1Fragment extends BaseFragment {
         return true;
     }
 
+    /**
+     * 实验结束时关闭该页面
+     * @param event
+     */
     @Subscribe
     public void onExpeNormalFinishEvent(ExpeNormalFinishEvent event) {
         ActivityUtil.finish(getActivity());

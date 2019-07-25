@@ -359,7 +359,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
     private List<Mode> mModes;
     CommunicationService mCommunicationService;
-
+    private boolean mExpeStarting;
     @OnClick({R.id.rl_mode_sel, R.id.tv_next, R.id.tv_start_temp, R.id.tv_end_temp})
     public void onViewClick(View v) {
         int start = 20;
@@ -402,8 +402,11 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                     printHistoryInfo();
                     return;
                 }*/
+               if (mExpeStarting){
+                   return;
+               }
                 if (validate()) {
-
+                    mExpeStarting=true;
                     LoadingDialogHelper.showOpLoading(getActivity());
                     buildExperiment();
 
@@ -1067,9 +1070,13 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
     public void onDestroyView() {
         super.onDestroyView();
         if (mCommunicationService != null) {
-            mCommunicationService.setNotify(null);
+            boolean instanceOf=mCommunicationService.instanceOf(this.getClass());
+            System.out.println("instanceOf:"+instanceOf);
+            if (instanceOf){
+                mCommunicationService.setNotify(null);
+            }
         }
-
+        System.out.println("UserSettingsStep2Fragment onDestroyView");
         unsubscribeTrim();
         EventBus.getDefault().unregister(this);
     }

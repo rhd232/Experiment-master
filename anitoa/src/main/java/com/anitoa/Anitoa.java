@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import com.anitoa.event.AnitoaDisConnectedEvent;
 import com.anitoa.service.BluetoothService;
 import com.anitoa.service.CommunicationService;
 import com.anitoa.service.UsbService;
+
+import org.greenrobot.eventbus.EventBus;
 
 public class Anitoa {
 
@@ -36,6 +39,8 @@ public class Anitoa {
     }
     public void unbindService(Context context){
         if (mBinding){
+            AnitoaDisConnectedEvent event = new AnitoaDisConnectedEvent("MyHid From Main","");
+            EventBus.getDefault().post(event);
             try {
                 context.getApplicationContext().unbindService(mUsbServiceConnection);
                 mUsbServiceConnection=null;

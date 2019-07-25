@@ -35,6 +35,7 @@ public class FlashTrimReader {
         }
         mReadTrimSubscription=null;
         communicationService.setNotify(mListener);
+        mReadTrimCount=0;
         mReadTrimSubscription= Observable.interval(1000, TimeUnit.MILLISECONDS)
                 .subscribe(new Action1<Long>() {
                     @Override

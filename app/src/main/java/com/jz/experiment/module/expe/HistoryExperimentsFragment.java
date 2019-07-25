@@ -212,7 +212,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 break;
         }
     }
-
+    private boolean mReadLiding;
     private Observable<Integer> readLid() {
         return Observable.create(new Observable.OnSubscribe<Integer>() {
 
@@ -291,6 +291,10 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
+                        if (mReadLiding){
+                            return;
+                        }
+                        mReadLiding=true;
                         /*if (mNeedReadTrimFile) {
                             //读取dataposition文件
                             CommData.ReadDatapositionFile(getActivity());
@@ -332,6 +336,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 //TODO 判断是否读取了下位机的trim
                 if (CommData.sTrimFromFile) {
                     UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
+                    mReadLiding=false;
                 } else {
                     if (FlashData.flash_inited) {
                         UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
@@ -343,15 +348,17 @@ public class HistoryExperimentsFragment extends BaseFragment {
 
             case CODE_LID_ERROR:
                 LoadingDialogHelper.hideOpLoading();
-
+                mReadLiding=false;
                 ToastUtil.showToast(getActivity(), getResString(R.string.tip_close_heating_cover));
                 break;
             case CODE_ADAPTOR_ERROR:
                 LoadingDialogHelper.hideOpLoading();
+                mReadLiding=false;
                 ToastUtil.showToast(getActivity(), getResString(R.string.tip_power_cord));
                 break;
             case CODE_NOT_CONECTED:
                 LoadingDialogHelper.hideOpLoading();
+                mReadLiding=false;
                 ToastUtil.showToast(getActivity(), getResString(R.string.check_hid_connection));
                 break;
         }
@@ -369,6 +376,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
             @Override
             public void onReadFlashSuccess() {
                 reader.destroy();
+                mReadLiding=false;
                 UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
             }
 

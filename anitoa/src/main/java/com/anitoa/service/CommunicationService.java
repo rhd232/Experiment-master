@@ -38,6 +38,12 @@ public abstract class CommunicationService extends Service {
         this.mListener=listener;
     }
 
+    public  boolean instanceOf(Class clazz){
+        if (mListener!=null) {
+            return mListener.getClass().isInstance(clazz);
+        }
+        return false;
+    }
     protected final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -59,7 +65,7 @@ public abstract class CommunicationService extends Service {
                     }
                     break;
                 case 3: // 接受到数据
-
+                  //  System.out.println("mListener:"+mListener);
                     if (mListener != null) {
 
                         Data data= (Data) msg.obj;

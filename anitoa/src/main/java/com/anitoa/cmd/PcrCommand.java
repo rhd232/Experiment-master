@@ -89,7 +89,7 @@ public class PcrCommand {
         PcrCommand cmd=new PcrCommand();
         cmd.addCommonBytes(bytes);
         cmd.addCommand(listToByteArray(bytes));
-
+        cmd.cmdDescription="读取热盖以及是否插入电源适配器";
         return cmd;
     }
 
@@ -840,6 +840,7 @@ public class PcrCommand {
 
 
     public void trimData() {
+        cmdDescription="读取flash中的trim";
         byte[] TxData = new byte[11];
         TxData[0] = (byte) 0xaa;		//preamble code
         TxData[1] = 0x04;		//command

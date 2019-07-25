@@ -7,6 +7,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.di.AppComponent;
 import com.jz.experiment.di.DaggerAppComponent;
+import com.squareup.leakcanary.LeakCanary;
 
 import javax.inject.Inject;
 
@@ -28,6 +29,14 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
         CaocConfig.Builder.create()
                 .errorActivity(DefaultErrorActivity.class)
                 .apply();
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {//1
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
+
         mAppComponent = createComponent();
         mAppComponent.inject(this);
 
