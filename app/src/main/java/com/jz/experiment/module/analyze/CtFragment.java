@@ -34,13 +34,13 @@ public abstract class CtFragment extends BaseFragment {
     @BindView(R.id.gv_b)
     protected GridView gv_b;
     protected ChannelDataAdapter[] mChannelDataAdapters;
-    protected HistoryExperiment mExeperiment;
+    protected HistoryExperiment mExperiment;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this,view);
         if (getArguments()!=null) {
-            mExeperiment = getArguments().getParcelable(ExpeDataFragment.ARGS_KEY_EXPE);
+            mExperiment = getArguments().getParcelable(ExpeDataFragment.ARGS_KEY_EXPE);
         }
         mChannelDataAdapters = new ChannelDataAdapter[2];
 
@@ -75,8 +75,8 @@ public abstract class CtFragment extends BaseFragment {
         String [] channelAlias=new String[4];
         String [][] sampleAlias=new String[2][8];
 
-        if (mExeperiment!=null){
-            List<Channel> channels=mExeperiment.getSettingsFirstInfo().getChannels();
+        if (mExperiment!=null){
+            List<Channel> channels=mExperiment.getSettingsFirstInfo().getChannels();
             for (int i=0;i<channels.size();i++){
                 String val=channels.get(i).getValue();
                 if (TextUtils.isEmpty(val)){
@@ -93,7 +93,7 @@ public abstract class CtFragment extends BaseFragment {
                 channelAlias[i]=val;
             }
 
-            List<Sample> sampleAs=mExeperiment.getSettingsFirstInfo().getSamplesA();
+            List<Sample> sampleAs=mExperiment.getSettingsFirstInfo().getSamplesA();
             for (int i=0;i<sampleAs.size();i++){
                 String val=sampleAs.get(i).getName();
                 if (TextUtils.isEmpty(val)){
@@ -101,7 +101,7 @@ public abstract class CtFragment extends BaseFragment {
                 }
                 sampleAlias[0][i]=val;
             }
-            List<Sample> sampleBs=mExeperiment.getSettingsFirstInfo().getSamplesB();
+            List<Sample> sampleBs=mExperiment.getSettingsFirstInfo().getSamplesB();
             for (int i=0;i<sampleBs.size();i++){
                 String val=sampleBs.get(i).getName();
                 if (TextUtils.isEmpty(val)){

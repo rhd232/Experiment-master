@@ -637,7 +637,7 @@ public class CCurveShowPolyFit {
            // confi = (ratio - 0.1) * 1.11 * 0.4 + (r[frameindex][iy] - 0.19) * 2.17 * 0.6; // Weighted average of 2 score, r generally range 0.19 to 0.65
             confi = (ratio - 0.1) * 1.11 * 0.5 + (ratio_eff - 0.1) * 1.11 * 0.5; // Weighted average of 2 score, r generally range 0.19 to 0.65
 
-            if (confi < 0)
+            if (confi < 0 || ratio<0.03 || ratio_eff<0.05)
                 confi = 0;
 
             //                m_Confidence[iy, frameindex] = "阳性可信度:" + (confi * 100).ToString("0") + "% "

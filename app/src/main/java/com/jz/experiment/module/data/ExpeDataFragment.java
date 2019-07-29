@@ -132,7 +132,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
-        // mExeperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
+        // mExperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
         sv = view.findViewById(R.id.sv);
         ll_root = view.findViewById(R.id.ll_root);
         layout_ctparam_input.setOnCtParamChangeListener(this);
@@ -190,11 +190,11 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
 
     private void inflateBase() {
-        tv_expe_name.setText(mExeperiment.getName());
+        tv_expe_name.setText(mExperiment.getName());
         tv_worker_name.setText("admin");
-        String finishTime = DateUtil.getDateTime(mExeperiment.getFinishMilliTime());
+        String finishTime = DateUtil.getDateTime(mExperiment.getFinishMilliTime());
         tv_finish_time.setText(finishTime);
-        long during = mExeperiment.getDuring();
+        long during = mExperiment.getDuring();
         String hh = new DecimalFormat("00").format(during / 3600);
         String mm = new DecimalFormat("00").format(during % 3600 / 60);
         String ss = new DecimalFormat("00").format(during % 60);
@@ -208,7 +208,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
     public void init() {
         CommData.diclist.clear();
-        List<Channel> channels = mExeperiment.getSettingsFirstInfo().getChannels();
+        List<Channel> channels = mExperiment.getSettingsFirstInfo().getChannels();
         CommData.cboChan1 = 0;
         CommData.cboChan2 = 0;
         CommData.cboChan3 = 0;
@@ -261,21 +261,21 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         double[][] ctValues;
         boolean[][] falsePositive;
         if (tv_dt.isActivated()) {
-            mExeperiment.getSettingSecondInfo().getModes().get(0).setCtMin(layout_ctparam_input.getCtParam().ctMin);
-            mExeperiment.getSettingSecondInfo().getModes().get(0).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
+            mExperiment.getSettingSecondInfo().getModes().get(0).setCtMin(layout_ctparam_input.getCtParam().ctMin);
+            mExperiment.getSettingSecondInfo().getModes().get(0).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
             mDtChart.show(ChanList, KSList,
-                    DataFileUtil.getDtImageDataFile(mExeperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+                    DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
             ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
             falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
         } else {
-          /*  float t=Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
+          /*  float t=Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
             float f=Float.parseFloat(String.format("%f",t));
             mMeltingChart.setAxisMinimum(f);*/
-            mExeperiment.getSettingSecondInfo().getModes().get(1).setCtMin(layout_ctparam_input.getCtParam().ctMin);
-            mExeperiment.getSettingSecondInfo().getModes().get(1).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
+            mExperiment.getSettingSecondInfo().getModes().get(1).setCtMin(layout_ctparam_input.getCtParam().ctMin);
+            mExperiment.getSettingSecondInfo().getModes().get(1).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
 
 
-            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
             ctValues = CCurveShowMet.getInstance().m_CTValue;
             falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
         }
@@ -290,14 +290,14 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
 
     private void inflateChart() {
-        if (mExeperiment == null) {
+        if (mExperiment == null) {
             return;
         }
-        // CyclingStage cyclingStage = (CyclingStage) mExeperiment.getSettingSecondInfo().getCyclingSteps().get(0);
+        // CyclingStage cyclingStage = (CyclingStage) mExperiment.getSettingSecondInfo().getCyclingSteps().get(0);
 
         //统计总共有多少循环（不拍照的不包括）
         int totalCyclingCount = 0;
-        List<Stage> cyclingSteps = mExeperiment.getSettingSecondInfo().getCyclingSteps();
+        List<Stage> cyclingSteps = mExperiment.getSettingSecondInfo().getCyclingSteps();
         for (int i = 0; i < cyclingSteps.size(); i++) {
             CyclingStage cyclingStage = (CyclingStage) cyclingSteps.get(i);
             boolean pic = false;
@@ -313,7 +313,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         }
         mDtChart = new DtChart(chart_dt, totalCyclingCount);
         //文件读取之后孔数已经有值
-        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExeperiment), layout_ctparam_input.getCtParam());
+        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam());
 
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
         KSList.clear();
@@ -329,23 +329,23 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         mChannelDataAdapters[0].notifyDataSetChanged();
         mChannelDataAdapters[1].notifyDataSetChanged();
 
-        mHasMeltingMode = mExeperiment.getSettingSecondInfo().getModes().size() > 1;
+        mHasMeltingMode = mExperiment.getSettingSecondInfo().getModes().size() > 1;
         if (mHasMeltingMode) {
             //tv_melt.setVisibility(View.VISIBLE);
             mMeltingChart = new MeltingChart(chart_melt);
             float start;
             try {
-               // start = Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
-                List<Stage> stages=mExeperiment.getSettingSecondInfo().getSteps();
+               // start = Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
+                List<Stage> stages=mExperiment.getSettingSecondInfo().getSteps();
                 start=stages.get(stages.size()-2).getTemp();
-                //start = Float.parseFloat(mExeperiment.getSettingSecondInfo().getStartTemperature());
+                //start = Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
             } catch (Exception e) {
                 e.printStackTrace();
                 start = 40;
             }
             mMeltingChart.setStartTemp(start);
             mMeltingChart.setAxisMinimum(start);
-            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExeperiment), layout_ctparam_input.getCtParam());
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExperiment), layout_ctparam_input.getCtParam());
         } else {
             tv_melt.setVisibility(View.GONE);
         }
@@ -363,11 +363,11 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     }
 
     public HistoryExperiment getExeperiment() {
-        return mExeperiment;
+        return mExperiment;
     }
 
     public boolean isSavedExpe() {
-        return mExeperiment != null && mExeperiment.getId() != HistoryExperiment.ID_NONE;
+        return mExperiment != null && mExperiment.getId() != HistoryExperiment.ID_NONE;
     }
 
     private long time;
@@ -386,7 +386,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                         mHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                String pdfName = DataFileUtil.getPdfFileName(getActivity(), mExeperiment, false);
+                                String pdfName = DataFileUtil.getPdfFileName(getActivity(), mExperiment, false);
                                 //生成pdf
                                 generatePdf(pdfName)
                                         .subscribeOn(Schedulers.io())
@@ -399,7 +399,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                                                     new Handler().postDelayed(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            String pdfName = DataFileUtil.getPdfFileName(getActivity(), mExeperiment, true);
+                                                            String pdfName = DataFileUtil.getPdfFileName(getActivity(), mExperiment, true);
 
                                                             generatePdf(pdfName)
                                                                     .subscribeOn(Schedulers.io())
@@ -454,7 +454,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             case R.id.iv_std_curve:
                 InputParams params=new InputParams();
                 params.setCtParam(layout_ctparam_input.getCtParam());
-                StandardCurveActivity.start(getActivity(), mExeperiment,params);
+                StandardCurveActivity.start(getActivity(), mExperiment,params);
                 break;
             case R.id.tv_dt:
 
@@ -489,7 +489,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 break;
             case R.id.iv_pdf:
              /*   GenerateExpeJsonRequest request = new GenerateExpeJsonRequest();
-                request.setExperiment(mExeperiment);
+                request.setExperiment(mExperiment);
                 ExpeJsonGenerator
                         .getInstance()
                         .generateExpeJson(request)
@@ -519,14 +519,14 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
                                 if (tv_dt.isActivated()) {
                                     params.setExpeType(InputParams.EXPE_PCR);
-                                    params.setSourceDataPath(DataFileUtil.getDtImageDataFile(mExeperiment).getAbsolutePath());
+                                    params.setSourceDataPath(DataFileUtil.getDtImageDataFile(mExperiment).getAbsolutePath());
                                 }else {
                                     params.setExpeType(InputParams.EXPE_MELTING);
-                                    params.setSourceDataPath(DataFileUtil.getMeltImageDateFile(mExeperiment).getAbsolutePath());
+                                    params.setSourceDataPath(DataFileUtil.getMeltImageDateFile(mExperiment).getAbsolutePath());
                                 }
                                 params.setCtParam(layout_ctparam_input.getCtParam());
 
-                                PcrPrintPreviewActivity.start(getActivity(),mExeperiment,params);
+                                PcrPrintPreviewActivity.start(getActivity(),mExperiment,params);
 
                             }
                         }).start();
@@ -571,12 +571,12 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         status.setStatus(ExperimentStatus.STATUS_COMPLETED);
 
         status.setDesc(getString(R.string.test_status_finished));
-        mExeperiment.setStatus(status);
+        mExperiment.setStatus(status);
         //新插入一条数据
-        mExeperiment.setId(HistoryExperiment.ID_NONE);
+        mExperiment.setId(HistoryExperiment.ID_NONE);
 
         InsertExpeRequest request = new InsertExpeRequest();
-        request.setExperiment(mExeperiment);
+        request.setExperiment(mExperiment);
         //TODO 保存实验数据
         return ExpeDataStore
                 .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))

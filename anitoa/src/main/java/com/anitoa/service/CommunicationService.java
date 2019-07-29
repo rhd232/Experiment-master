@@ -20,6 +20,7 @@ public abstract class CommunicationService extends Service {
     public abstract int sendPcrCommand(PcrCommand command);
     public abstract byte[] sendPcrCommandSync(PcrCommand command);
     public abstract void stopReadThread();
+    public abstract void startReadThread();
     /**
      * 设备连接成功时调用
      */

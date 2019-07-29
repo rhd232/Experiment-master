@@ -6,8 +6,8 @@ android {
         applicationId "com.jz.experiment"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 116
-        versionName "1.1.6"
+        versionCode 120
+        versionName "1.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
        /* externalNativeBuild {
@@ -48,6 +48,7 @@ dependencies {
     implementation project (path: ':location')
     implementation project (path: ':wview')
     implementation project (path: ':toastlib')
+    implementation project (path: ':lfilepickerlibrary')
   //  implementation project (path: ':usbSerialForAndroid')
 
     implementation project(path:':aop-annotations')
@@ -67,6 +68,8 @@ dependencies {
 
     implementation presentationDependencies.dagger
     provided presentationDependencies.javaxAnnotation
+
+
 
     //implementation 'com.google.dagger:dagger-android:2.16'
     //implementation 'com.google.dagger:dagger-android-support:2.16' // if you use the support libraries

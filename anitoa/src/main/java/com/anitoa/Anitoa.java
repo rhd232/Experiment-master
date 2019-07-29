@@ -10,6 +10,7 @@ import com.anitoa.event.AnitoaDisConnectedEvent;
 import com.anitoa.service.BluetoothService;
 import com.anitoa.service.CommunicationService;
 import com.anitoa.service.UsbService;
+import com.anitoa.util.AnitoaLogUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -109,11 +110,13 @@ public class Anitoa {
             mUsbService = binder.getService();
             mUsbService.initialize();
             //System.out.println("bindService success");
+            AnitoaLogUtil.writeFileLog("UsbServiceConnection onServiceConnected");
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mUsbService = null;
+            AnitoaLogUtil.writeFileLog("UsbServiceConnection onServiceDisconnected");
         }
     };
     public BluetoothService getBluetoothService() {

@@ -25,3 +25,5 @@ project(':aop-plugin').projectDir = new File(rootDir, 'modules/aop-plugin')
 include ':PullToRefreshLib'
 project(':PullToRefreshLib').projectDir = new File(rootDir, 'modules/PullToRefreshLib')
 
+include ':lfilepickerlibrary'
+project(':lfilepickerlibrary').projectDir = new File(rootDir, 'modules/lfilepickerlibrary')

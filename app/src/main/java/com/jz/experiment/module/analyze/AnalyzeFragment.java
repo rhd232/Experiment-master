@@ -204,7 +204,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                         mExpeJsonBean= JsonParser.parserObject(fileContent, ExpeJsonBean.class);
 
                         //TODO 转换成Experiment
-                        mExeperiment=ExpeJsonGenerator
+                        mExperiment=ExpeJsonGenerator
                                 .getInstance()
                                 .expeJsonBeanToExperiment(mExpeJsonBean);
                     } catch (Exception e) {
@@ -508,7 +508,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
 
                     InputParams params=new InputParams();
                     params.setCtParam(layout_ctparam_input.getCtParam());
-                    StandardCurveActivity.start(getActivity(), mExeperiment,params);
+                    StandardCurveActivity.start(getActivity(), mExperiment,params);
                 }
 
                 break;
@@ -536,7 +536,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                                 }
                                 params.setCtParam(layout_ctparam_input.getCtParam());
 
-                                PcrPrintPreviewActivity.start(getActivity(),mExeperiment,params);
+                                PcrPrintPreviewActivity.start(getActivity(),mExperiment,params);
                               /*  String msg = getString(R.string.dialog_msg_pdf);
                                 AppDialogHelper.showNormalDialog(getActivity(),
                                         msg, new AppDialogHelper.DialogOperCallback() {

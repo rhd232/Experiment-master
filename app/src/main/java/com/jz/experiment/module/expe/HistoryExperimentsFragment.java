@@ -13,6 +13,7 @@ import com.anitoa.bean.FlashData;
 import com.anitoa.cmd.PcrCommand;
 import com.anitoa.event.AnitoaDisConnectedEvent;
 import com.anitoa.service.CommunicationService;
+import com.anitoa.util.AnitoaLogUtil;
 import com.anitoa.util.ThreadUtil;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
@@ -131,8 +132,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                 });
 
 
-        System.out.println("HistoryExperimentsFragment onViewCreated");
-        //System.out.println("HistoryExperimentFragment onViewCreated");
+        AnitoaLogUtil.writeFileLog("HistoryExperimentsFragment onViewCreated");
     }
 
 
@@ -339,6 +339,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                     mReadLiding=false;
                 } else {
                     if (FlashData.flash_inited) {
+                        mReadLiding=false;
                         UserSettingsStep1Activity.start(getActivity(), event.getExperiment());
                     } else {
                         readTrimDataFromInstrument(event);
@@ -409,7 +410,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
+        AnitoaLogUtil.writeFileLog("HistoryExperimentsFragment onDestroyView");
         EventBus.getDefault().unregister(this);
     }
 

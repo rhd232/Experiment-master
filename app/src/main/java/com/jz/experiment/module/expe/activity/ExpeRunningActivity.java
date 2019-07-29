@@ -46,6 +46,7 @@ import com.jz.experiment.util.ExpeJsonGenerator;
 import com.jz.experiment.util.ImageDataReader;
 import com.jz.experiment.util.StatusChecker;
 import com.jz.experiment.util.TrimReader;
+import com.jz.experiment.util.UsbManagerHelper;
 import com.jz.experiment.widget.DuringView;
 import com.wind.base.BaseActivity;
 import com.wind.base.C;
@@ -124,6 +125,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     @BindView(R.id.tv_cycling_desc)
     TextView tv_cycling_desc;
 
+    @BindView(R.id.tv_easter_egg)
+    TextView tv_easter_egg;
 
     private HistoryExperiment mHistoryExperiment;
     BluetoothReceiver mBluetoothReceiver;
@@ -1649,9 +1652,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         }
     }
 
+    private int mStep5Count;
     private void step5Subscription(long period) {
         if (step5Subscription == null) {
             mStep5Responsed = false;
+            mStep5Count=1;
             step5Subscription = Observable.interval(10, period, TimeUnit.MILLISECONDS)
                     /* .subscribeOn(Schedulers.io())
                      .observeOn(AndroidSchedulers.mainThread())*/
@@ -1660,7 +1665,14 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                         @Override
                         public void call(Long aLong) {
                             if (!mStep5Responsed) {
+                                System.out.println("mStep5Count:"+mStep5Count);
+                                if (mStep5Count>1){
+                                    //考虑下位机没响应了
+                                    rescueStep5();
+                                }
                                 step5();
+
+                                mStep5Count++;
                             }
 
                         }
@@ -1672,6 +1684,45 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                         }
                     });
         }
+    }
+
+    private void rescueStep5() {
+        AnitoaLogUtil.writeFileLog("rescueStep5 mCommunicationService==null?"+(mCommunicationService==null));
+        if (mCommunicationService!=null){
+            mCommunicationService.setNotify(this);
+            mCommunicationService.stopReadThread();
+            ThreadUtil.sleep(500);
+           // mCommunicationService.startReadThread();
+            //探测是否能连接上
+            PcrCommand cmd=PcrCommand.ofVersionCmd();
+            byte [] reveicedBytes=mCommunicationService.sendPcrCommandSync(cmd);
+            int count=0;
+            while (reveicedBytes==null || reveicedBytes[0]==0){
+                if (count>=3){
+                    break;
+                }
+                reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
+                count++;
+                ThreadUtil.sleep(100);
+            }
+
+            if (reveicedBytes==null || reveicedBytes[0]==0){
+                //还是没有连接上
+                //Anitoa.reset();
+                AnitoaLogUtil.writeFileLog("unknown error occur");
+                //ToastUtil.showToast(getActivity(),"unknown error occur");
+                UsbManagerHelper.connectUsbDevice(getActivity());
+            }
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tv_easter_egg.setVisibility(View.VISIBLE);
+            }
+        });
+
+
     }
 
     private void step5Subscription() {
@@ -1873,10 +1924,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     step5Subscription.unsubscribe();
                     step5Subscription = null;
                 }
-                //step5Subscription(500);
 
-                step5();
-              /*  if (step5Subscription != null && !step5Subscription.isUnsubscribed()) {
+                step5Subscription(1000);
+
+                 /* step5();
+              if (step5Subscription != null && !step5Subscription.isUnsubscribed()) {
                     step5Subscription.unsubscribe();
                     step5Subscription=null;
                 }

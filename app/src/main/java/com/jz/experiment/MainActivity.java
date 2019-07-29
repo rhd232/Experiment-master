@@ -100,6 +100,8 @@ public class MainActivity extends BaseActivity {
 
         checkStoragePermission();
 
+        AnitoaLogUtil.writeFileLog("MainActivity onCreate");
+
     }
 
 
@@ -298,6 +300,7 @@ public class MainActivity extends BaseActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        AnitoaLogUtil.writeFileLog("MainActivity onNewIntent");
         tab = Navigator.getParcelableExtra(this);
         if (tab == null) {
             return;

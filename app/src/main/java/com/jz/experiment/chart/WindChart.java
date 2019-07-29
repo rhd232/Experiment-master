@@ -118,6 +118,11 @@ public abstract class WindChart {
     }
     public static final int WHAT_REFRESH_CHART = 1234;
 
+
+    private boolean mDrawMarkers=true;
+    public void setDrawMarkers(boolean drawMarkers){
+        this.mDrawMarkers=drawMarkers;
+    }
     protected Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -146,6 +151,10 @@ public abstract class WindChart {
                     mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                         @Override
                         public void onValueSelected(Entry e, Highlight h) {
+                            if (!mDrawMarkers){
+                                mChart.setDrawMarkers(false);
+                                return;
+                            }
                             if (thisChart() instanceof TempChart
                                     || thisChart() instanceof MeltingChart
                                     || thisChart() instanceof StandardChart){

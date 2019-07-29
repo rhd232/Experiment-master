@@ -186,8 +186,9 @@
 
                         <ImageView
                             android:id="@+id/iv_std_curve"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:scaleType="centerInside"
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="10dp"
 
@@ -207,9 +208,10 @@
 
                         <ImageView
                             android:id="@+id/iv_pdf"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="22dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginLeft="12dp"
+                            android:scaleType="centerInside"
                             android:src="@drawable/icon_pdf" />
                     </LinearLayout>
                 </RelativeLayout>

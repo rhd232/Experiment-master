@@ -978,6 +978,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                             public void call(Boolean aBoolean) {
                                 LoadingDialogHelper.hideOpLoading();
                                 ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
+                                ActivityUtil.finish(getActivity());
                             }
                         });
 

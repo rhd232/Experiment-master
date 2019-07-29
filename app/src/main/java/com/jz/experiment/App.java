@@ -2,7 +2,6 @@ package com.jz.experiment;
 
 import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationManagerCompat;
 
 import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.di.AppComponent;
@@ -24,7 +23,6 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
     @Override
     public void onCreate() {
         super.onCreate();
-        NotificationManagerCompat notificationManagerCompat= NotificationManagerCompat.from(this);
         sInstance = this;
         CaocConfig.Builder.create()
                 .errorActivity(DefaultErrorActivity.class)
@@ -43,6 +41,7 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
         AnitoaLogUtil.sDebug=true;
 
 
+
     }
 
 
@@ -53,8 +52,6 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
     private AppComponent createComponent() {
         return DaggerAppComponent
                 .builder()
-                //.appModule(new AppModule(this))
-                //.providerModule(new ProviderModule())
                 .build();
     }
 

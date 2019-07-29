@@ -1,8 +1,10 @@
 package com.jz.experiment.module.report;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,9 +20,11 @@ import com.jz.experiment.module.analyze.CtFragment;
 import com.jz.experiment.module.data.ExpeDataFragment;
 import com.jz.experiment.module.report.bean.InputParams;
 import com.jz.experiment.util.PdfGenerator;
+import com.jz.experiment.util.ReportRepo;
 import com.jz.experiment.util.SysPrintUtil;
 import com.jz.experiment.widget.A4PageLayout;
 import com.jz.experiment.widget.PrintTailLayout;
+import com.jz.experiment.widget.PrintTitleLayout;
 import com.wind.base.bean.CyclingStage;
 import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
@@ -49,8 +53,11 @@ public class PcrPrintPreviewFragment extends CtFragment {
      StageAdapter mStageAdapter;*/
      @BindView(R.id.tv_expe_type)
     TextView tv_expe_type;
+
+    @BindView(R.id.layout_print_title)
+    PrintTitleLayout layout_print_title;
+
     WindChart windChart;
-    HistoryExperiment mExperiment;
 
     InputParams mInputParams;
 
@@ -67,31 +74,21 @@ public class PcrPrintPreviewFragment extends CtFragment {
     protected int getLayoutRes() {
         return R.layout.fragment_pcr_print_preview;
     }
-
+    private Handler mHandler=new Handler();
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        //mExperiment = getArguments().getParcelable(ARG_KEY_EXPE);
         mInputParams = getArguments().getParcelable(ARG_KEY_CT_PARAM);
-
-       /* LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        rv.setLayoutManager(manager);
-        rv.setNestedScrollingEnabled(false);
-
-        //动态计算stage宽度
-        boolean isLandscape = ActivityUtil.isLandscape(getActivity());
-        int stageItemWidth;
-        if (isLandscape) {
-            stageItemWidth = AppUtil.getScreenWidth(getActivity()) / 4;
-        } else {
-            stageItemWidth = DisplayUtil.dip2px(getActivity(), 120);
+        if (!TextUtils.isEmpty(mExperiment.getName())){
+            layout_print_title.setExpeName(mExperiment.getName());
+        }else {
+            String expeName= ReportRepo.getInstance().get(getContext()).getExpeName();
+            layout_print_title.setExpeName(expeName);
         }
 
-        mStageAdapter = new StageAdapter(getActivity(), stageItemWidth);
-        rv.setAdapter(mStageAdapter);*/
+        //获取实验名称
 
 
         if (isPcrMode()){
@@ -99,15 +96,15 @@ public class PcrPrintPreviewFragment extends CtFragment {
         }else {
             tv_expe_type.setText(getString(R.string.setup_mode_melting));
         }
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initChart();
+            }
+        },300);
 
-        initChart();
-      /*  if (mExperiment != null && mExperiment.getSettingSecondInfo() != null) {
-            int size = mExperiment.getSettingSecondInfo().getModes().size();
-            List<DisplayItem> list = new ArrayList<>();
-            List<Stage> stageList = mExperiment.getSettingSecondInfo().getSteps();
-            list.addAll(stageList);
-            mStageAdapter.replace(list);
-        }*/
+
+
 
 
     }
@@ -118,10 +115,11 @@ public class PcrPrintPreviewFragment extends CtFragment {
         return mInputParams.getExpeType() == InputParams.EXPE_PCR;
     }
 
-
+    int totalCyclingCount;
+    String sourcePath;
     private void initChart() {
-        int totalCyclingCount = 0;
-        String sourcePath = mInputParams.getSourceDataPath();
+        totalCyclingCount = 0;
+        sourcePath = mInputParams.getSourceDataPath();
         if (mExperiment != null && mExperiment.getSettingSecondInfo() != null) {
             List<Stage> cyclingSteps = mExperiment.getSettingSecondInfo().getCyclingSteps();
             for (int i = 0; i < cyclingSteps.size(); i++) {
@@ -155,6 +153,7 @@ public class PcrPrintPreviewFragment extends CtFragment {
       //  initChanAndKs();
         KSList=mInputParams.getKsList();
         ChanList=mInputParams.getChanList();
+
         if (isPcrMode()) {
             windChart = new DtChart(chart, totalCyclingCount);
         } else {
@@ -162,9 +161,12 @@ public class PcrPrintPreviewFragment extends CtFragment {
             ((MeltingChart) windChart).setStartTemp(40);
             ((MeltingChart) windChart).setAxisMinimum(40);
         }
+        windChart.setDrawMarkers(false);
         //文件读取之后孔数已经有值
         windChart.show(ChanList, KSList, new File(sourcePath),
                 mInputParams.getCtParam());
+
+
         double[][] ctValues;
         boolean[][] falsePositive;
         if (!isPcrMode()) {
@@ -208,10 +210,11 @@ public class PcrPrintPreviewFragment extends CtFragment {
         PdfGenerator.generatePdf(layout_a4, pdfName, new OnPdfGenerateListener() {
             @Override
             public void onGeneratePdfSuccess(String path) {
+                //保存公司名称
+                layout_print_title.save();
                 SysPrintUtil.printPdf(getActivity(), path);
                 //TODO 执行打印
                 LoadingDialogHelper.hideOpLoading();
-
             }
 
             @Override

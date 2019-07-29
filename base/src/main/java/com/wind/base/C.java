@@ -91,6 +91,12 @@ public class C {
 
         public static final String PREF_KEY_USB_DEVICE_NAME="pref_key_usb_device_name";
 
+
+        /**
+         * 报告中的字段
+         */
+        public static final String REPORT_COMPANY="report_company";
+        public static final String REPORT_EXPE_NAME="report_expe_name";
     }
     public static class Api{
         /**

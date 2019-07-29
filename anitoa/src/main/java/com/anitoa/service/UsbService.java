@@ -177,9 +177,11 @@ public class UsbService extends CommunicationService {
         int interfaceCount = device.getInterfaceCount();
         UsbInterface usbInterface = null;
         for (int i = 0; i < interfaceCount; i++) {
-            usbInterface = device.getInterface(i);
+
             //获取interfaceClass为USB_CLASS_HID的 interface
-            if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_HID) {
+            int interfaceClass= device.getInterface(i).getInterfaceClass();
+            if (interfaceClass == UsbConstants.USB_CLASS_HID) {
+                usbInterface = device.getInterface(i);
                 break;
             }
         }
@@ -401,19 +403,22 @@ public class UsbService extends CommunicationService {
         }
 
     }
-
+    @Override
     public void stopReadThread() {
         if (mReadThread != null) {
             mReadThread.stopRun();
             mReadThread = null;
 
+            AnitoaLogUtil.writeFileLog("stopReadThread");
         }
     }
 
+    @Override
     public void startReadThread() {
         stopReadThread();
         mReadThread = new ReadThread();
         mReadThread.start();
+        AnitoaLogUtil.writeFileLog("startReadThread");
     }
 
 
