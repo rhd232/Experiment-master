@@ -4,6 +4,7 @@
 
 
 
+    <string name="predenature_stage">预变性阶段</string>
     <string name="holding_stage">保持阶段</string>
     <string name="cycling_stage">循环阶段</string>
     <string name="step">步骤%1$s</string>
@@ -50,7 +51,7 @@
     <string name="running_lid_temp">热盖温度</string>
     <string name="running_heater_temp">加热器温度</string>
     <string name="running_stage">阶段</string>
-    <string name="title_setup_1">用户设置1</string>
+    <string name="title_setup_1">实验设置1</string>
     <string name="setup_test_name">实验名称：</string>
     <string name="setup_input_test_name">请输入实验名称</string>
     <string name="setup_test_time">实验时间</string>
@@ -68,7 +69,7 @@
 
 
 
-    <string name="title_setup_2">用户设置2</string>
+    <string name="title_setup_2">实验设置2</string>
     <string name="setup_operation">程序模式设置</string>
     <string name="setup_mode_dt">变温扩增</string>
     <string name="setup_mode_melting">熔解曲线</string>

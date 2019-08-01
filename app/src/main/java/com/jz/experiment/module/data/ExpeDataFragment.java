@@ -136,11 +136,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         sv = view.findViewById(R.id.sv);
         ll_root = view.findViewById(R.id.ll_root);
         layout_ctparam_input.setOnCtParamChangeListener(this);
-      /*  GridView[] gvs = new GridView[2];
-        gvs[0] = gv_a;
-        gvs[1] = gv_b;
-        String[] titles = {"A", "B"};
-        buildChannelData(gvs, titles);*/
+
         tv_dt.setActivated(true);
         tv_melt.setActivated(false);
         chart_melt.setVisibility(View.GONE);
@@ -155,20 +151,13 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                     inflateChart();
             }
         },500);
-      /*  Observable.timer(500, TimeUnit.MILLISECONDS,AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(Long aLong) {
-                        inflateChart();
-                    }
-                });*/
 
-
-        if (isSavedExpe()) {
+        iv_save.setVisibility(View.GONE);
+        /*if (isSavedExpe()) {
             iv_save.setVisibility(View.GONE);
         } else {
             iv_save.setVisibility(View.VISIBLE);
-        }
+        }*/
         // mExecutorService.execute(mRun);
 
 
@@ -176,11 +165,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 showChart();
-
             }
         });
 
-        System.out.println("ExpeDataFragment onViewCreated");
     }
 
     @Override
@@ -258,34 +245,58 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
 
     private void showChart() {
-        double[][] ctValues;
-        boolean[][] falsePositive;
-        if (tv_dt.isActivated()) {
-            mExperiment.getSettingSecondInfo().getModes().get(0).setCtMin(layout_ctparam_input.getCtParam().ctMin);
-            mExperiment.getSettingSecondInfo().getModes().get(0).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
-            mDtChart.show(ChanList, KSList,
-                    DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
-            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-            falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
-        } else {
+        LoadingDialogHelper.showOpLoading(getActivity());
+        mExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                double[][] ctValues;
+                boolean[][] falsePositive;
+                if (tv_dt.isActivated()) {
+                    mExperiment.getSettingSecondInfo().getModes().get(0).setCtMin(layout_ctparam_input.getCtParam().ctMin);
+                    mExperiment.getSettingSecondInfo().getModes().get(0).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
+                    mDtChart.show(ChanList, KSList,
+                            DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+                    ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+                    falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+                } else {
           /*  float t=Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
             float f=Float.parseFloat(String.format("%f",t));
             mMeltingChart.setAxisMinimum(f);*/
-            mExperiment.getSettingSecondInfo().getModes().get(1).setCtMin(layout_ctparam_input.getCtParam().ctMin);
-            mExperiment.getSettingSecondInfo().getModes().get(1).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
+                    mExperiment.getSettingSecondInfo().getModes().get(1).setCtMin(layout_ctparam_input.getCtParam().ctMin);
+                    mExperiment.getSettingSecondInfo().getModes().get(1).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
 
 
-            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
-            ctValues = CCurveShowMet.getInstance().m_CTValue;
-            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
-        }
+                    mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+                    ctValues = CCurveShowMet.getInstance().m_CTValue;
+                    falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+                }
 
-        for (String chan : ChanList) {
-            for (String ks : KSList) {
-                getCtValue(chan, ks, ctValues, falsePositive);
+                showCt(ctValues,falsePositive);
             }
-        }
-        notifyCtChanged();
+        });
+
+
+
+
+
+
+
+    }
+
+    private void showCt(final double[][] ctValues,final boolean[][] falsePositive){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for (String chan : ChanList) {
+                    for (String ks : KSList) {
+                        getCtValue(chan, ks, ctValues, falsePositive);
+                    }
+                }
+                notifyCtChanged();
+
+                LoadingDialogHelper.hideOpLoading();
+            }
+        });
     }
 
 
@@ -728,6 +739,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
     @Override
     public void onCtParamChanged(CtParamInputLayout.CtParam ctParam) {
+
         showChart();
     }
 }

@@ -1,13 +1,12 @@
 package com.leon.lfilepickerlibrary.ui;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
+import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,15 +18,12 @@ import com.github.mjdev.libaums.UsbMassStorageDevice;
 import com.github.mjdev.libaums.fs.FileSystem;
 import com.github.mjdev.libaums.fs.UsbFile;
 import com.leon.lfilepickerlibrary.R;
-import com.leon.lfilepickerlibrary.adapter.PathAdapter;
-import com.leon.lfilepickerlibrary.filter.LFileFilter;
-import com.leon.lfilepickerlibrary.model.ParamEntity;
-import com.leon.lfilepickerlibrary.utils.Fat32FileUtils;
-import com.leon.lfilepickerlibrary.utils.FileUtils;
+import com.leon.lfilepickerlibrary.adapter.Fat32PathAdapter;
 import com.leon.lfilepickerlibrary.utils.StringUtils;
+import com.leon.lfilepickerlibrary.utils.USBBroadCastReceiver;
+import com.leon.lfilepickerlibrary.utils.USBMassStorageHelper;
 import com.leon.lfilepickerlibrary.widget.EmptyRecyclerView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,22 +36,26 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
     private TextView mTvBack;
     private Button mBtnAddBook;
     private String mPath;
-    private List<File> mListFiles;
+    private List<UsbFile> mListFiles;
     private ArrayList<String> mListNumbers = new ArrayList<String>();//存放选中条目的数据地址
-    private PathAdapter mPathAdapter;
-    private Toolbar mToolbar;
-    private ParamEntity mParamEntity;
-    private LFileFilter mFilter;
+    private Fat32PathAdapter mPathAdapter;
     private boolean mIsAllSelected = false;
     private Menu mMenu;
     UsbFile usbRootFile;
+    USBMassStorageHelper mUSBMassStorageHelper;
+
+    public static void startForResult(Activity context,int requestCode){
+        Intent intent=new Intent(context,Fat32LFilePickerActivity.class);
+        context.startActivityForResult(intent,requestCode);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mParamEntity = (ParamEntity) getIntent().getExtras().getSerializable("param");
-        setTheme(mParamEntity.getTheme());
+       // mParamEntity = (ParamEntity) getIntent().getExtras().getSerializable("param");
+        //setTheme(mParamEntity.getTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lfile_picker);
         initView();
+        mUSBMassStorageHelper=new USBMassStorageHelper(this);
 
         UsbMassStorageDevice[] devices = UsbMassStorageDevice.getMassStorageDevices(this);
         for(UsbMassStorageDevice device: devices) {
@@ -70,76 +70,57 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
             }
         }
 
-     /*   setSupportActionBar(mToolbar);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        initToolbar();*/
+
         updateAddButton();
         if (!checkSDState()) {
             Toast.makeText(this, R.string.lfile_NotFoundPath, Toast.LENGTH_SHORT).show();
             return;
         }
-        mPath = mParamEntity.getPath();
+        mPath ="";
         if (StringUtils.isEmpty(mPath)) {
             //如果没有指定路径，则使用默认路径
-            mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+            mPath = "/";
         }
         mTvPath.setText(mPath);
-        mFilter = new LFileFilter(mParamEntity.getFileTypes());
-        mListFiles = Fat32FileUtils.getFileList(mPath, mFilter, mParamEntity.isGreater(), mParamEntity.getFileSize());
-        mPathAdapter = new PathAdapter(mListFiles, this, mFilter, mParamEntity.isMutilyMode(), mParamEntity.isGreater(), mParamEntity.getFileSize());
+       // mFilter = new LFileFilter(mParamEntity.getFileTypes());
+        mListFiles =mUSBMassStorageHelper.getUsbFolderFileList(usbRootFile);
+
+        mPathAdapter = new Fat32PathAdapter(mListFiles,mUSBMassStorageHelper, this);
         mRecylerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mPathAdapter.setmIconStyle(mParamEntity.getIconStyle());
+      //  mPathAdapter.setmIconStyle(mParamEntity.getIconStyle());
         mRecylerView.setAdapter(mPathAdapter);
         mRecylerView.setmEmptyView(mEmptyView);
         initListener();
     }
 
-    /**
-     * 更新Toolbar展示
-     */
-    private void initToolbar() {
-        if (mParamEntity.getTitle() != null) {
-            mToolbar.setTitle(mParamEntity.getTitle());
+    private USBBroadCastReceiver.UsbListener mUsbListener=new USBBroadCastReceiver.UsbListener() {
+        @Override
+        public void insertUsb(UsbDevice device_add) {
+
         }
-        if (mParamEntity.getTitleStyle() != 0) {
-            mToolbar.setTitleTextAppearance(this, mParamEntity.getTitleStyle());
+
+        @Override
+        public void removeUsb(UsbDevice device_remove) {
+
         }
-        if (mParamEntity.getTitleColor() != null) {
-            mToolbar.setTitleTextColor(Color.parseColor(mParamEntity.getTitleColor())); //设置标题颜色
+
+        @Override
+        public void getReadUsbPermission(UsbDevice usbDevice) {
+
         }
-        if (mParamEntity.getBackgroundColor() != null) {
-            mToolbar.setBackgroundColor(Color.parseColor(mParamEntity.getBackgroundColor()));
+
+        @Override
+        public void failedReadUsb(UsbDevice usbDevice) {
+
         }
-//        switch (mParamEntity.getBackIcon()) {
-//            case Constant.BACKICON_STYLEONE:
-//                mToolbar.setNavigationIcon(R.mipmap.lfile_back1);
-//                break;
-//            case Constant.BACKICON_STYLETWO:
-//                mToolbar.setNavigationIcon(R.mipmap.lfile_back2);
-//                break;
-//            case Constant.BACKICON_STYLETHREE:
-//                //默认风格
-//                break;
-//        }
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-    }
+    };
+
 
     private void updateAddButton() {
-        if (!mParamEntity.isMutilyMode()) {
-            mBtnAddBook.setVisibility(View.GONE);
-        }
-        if (!mParamEntity.isChooseMode()) {
-            mBtnAddBook.setVisibility(View.VISIBLE);
-            mBtnAddBook.setText(getString(R.string.lfile_OK));
-            //文件夹模式默认为单选模式
-            mParamEntity.setMutilyMode(false);
-        }
+        mBtnAddBook.setVisibility(View.GONE);
+        mBtnAddBook.setVisibility(View.VISIBLE);
+        mBtnAddBook.setText(getString(R.string.lfile_OK));
+
     }
 
     /**
@@ -150,12 +131,22 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
         mTvBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String tempPath = new File(mPath).getParent();
-                if (tempPath == null) {
+                //String tempPath = new File(mPath).getParent();
+                UsbFile parentFile=mUSBMassStorageHelper.getParentFolder();
+                if (parentFile==null  ){
                     return;
                 }
-                mPath = tempPath;
-                mListFiles = FileUtils.getFileList(mPath, mFilter, mParamEntity.isGreater(), mParamEntity.getFileSize());
+              /*  parentFile=parentFile.getParent();
+                if (parentFile == null ) {
+                    return;
+                }*/
+                if (parentFile.isRoot()){
+                    mPath="/";
+                }else {
+                    mPath = parentFile.getAbsolutePath();
+                }
+
+                mListFiles = mUSBMassStorageHelper.getUsbFolderFileList(parentFile);
                 mPathAdapter.setmListData(mListFiles);
                 mPathAdapter.updateAllSelelcted(false);
                 mIsAllSelected = false;
@@ -163,76 +154,31 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
                 mBtnAddBook.setText(getString(R.string.lfile_Selected));
                 mRecylerView.scrollToPosition(0);
                 setShowPath(mPath);
+             //   Toast.makeText(Fat32LFilePickerActivity.this,"mPath->"+mPath,Toast.LENGTH_SHORT).show();
+
                 //清除添加集合中数据
                 mListNumbers.clear();
-                if (mParamEntity.getAddText() != null) {
-                    mBtnAddBook.setText(mParamEntity.getAddText());
-                } else {
-                    mBtnAddBook.setText(R.string.lfile_Selected);
-                }
+                mBtnAddBook.setText(R.string.lfile_Selected);
             }
         });
-        mPathAdapter.setOnItemClickListener(new PathAdapter.OnItemClickListener() {
+        mPathAdapter.setOnItemClickListener(new Fat32PathAdapter.OnItemClickListener() {
             @Override
             public void click(int position) {
-                if (mParamEntity.isMutilyMode()) {
-                    if (mListFiles.get(position).isDirectory()) {
-                        //如果当前是目录，则进入继续查看目录
-                        chekInDirectory(position);
-                        mPathAdapter.updateAllSelelcted(false);
-                        mIsAllSelected = false;
-                        updateMenuTitle();
-                        mBtnAddBook.setText(getString(R.string.lfile_Selected));
-                    } else {
-                        //如果已经选择则取消，否则添加进来
-                        if (mListNumbers.contains(mListFiles.get(position).getAbsolutePath())) {
-                            mListNumbers.remove(mListFiles.get(position).getAbsolutePath());
-                        } else {
-                            mListNumbers.add(mListFiles.get(position).getAbsolutePath());
-                        }
-                        if (mParamEntity.getAddText() != null) {
-                            mBtnAddBook.setText(mParamEntity.getAddText() + "( " + mListNumbers.size() + " )");
-                        } else {
-                            mBtnAddBook.setText(getString(R.string.lfile_Selected) + "( " + mListNumbers.size() + " )");
-                        }
-                        //先判断是否达到最大数量，如果数量达到上限提示，否则继续添加
-                        if (mParamEntity.getMaxNum() > 0 && mListNumbers.size() > mParamEntity.getMaxNum()) {
-                            Toast.makeText(Fat32LFilePickerActivity.this, R.string.lfile_OutSize, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                    }
-                } else {
+
                     //单选模式直接返回
                     if (mListFiles.get(position).isDirectory()) {
                         chekInDirectory(position);
                         return;
                     }
-                    if (mParamEntity.isChooseMode()) {
-                        //选择文件模式,需要添加文件路径，否则为文件夹模式，直接返回当前路径
-                        mListNumbers.add(mListFiles.get(position).getAbsolutePath());
-                        chooseDone();
-                    } else {
-                        Toast.makeText(Fat32LFilePickerActivity.this, R.string.lfile_ChooseTip, Toast.LENGTH_SHORT).show();
-                    }
+                Toast.makeText(Fat32LFilePickerActivity.this, R.string.lfile_ChooseTip, Toast.LENGTH_SHORT).show();
                 }
 
-            }
         });
 
         mBtnAddBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mParamEntity.isChooseMode() && mListNumbers.size() < 1) {
-                    String info = mParamEntity.getNotFoundFiles();
-                    if (TextUtils.isEmpty(info)) {
-                        Toast.makeText(Fat32LFilePickerActivity.this, R.string.lfile_NotFoundBooks, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(Fat32LFilePickerActivity.this, info, Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    //返回
-                    chooseDone();
-                }
+                chooseDone();
             }
         });
     }
@@ -247,7 +193,7 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
         mPath = mListFiles.get(position).getAbsolutePath();
         setShowPath(mPath);
         //更新数据源
-        mListFiles = FileUtils.getFileList(mPath, mFilter, mParamEntity.isGreater(), mParamEntity.getFileSize());
+        mListFiles = mUSBMassStorageHelper.getUsbFolderFileList(mListFiles.get(position));//FileUtils.getFileList(mPath, mFilter, mParamEntity.isGreater(), mParamEntity.getFileSize());
         mPathAdapter.setmListData(mListFiles);
         mPathAdapter.notifyDataSetChanged();
         mRecylerView.scrollToPosition(0);
@@ -258,12 +204,12 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
      */
     private void chooseDone() {
         //判断是否数量符合要求
-        if (mParamEntity.isChooseMode()) {
+     /*   if (mParamEntity.isChooseMode()) {
             if (mParamEntity.getMaxNum() > 0 && mListNumbers.size() > mParamEntity.getMaxNum()) {
                 Toast.makeText(Fat32LFilePickerActivity.this, R.string.lfile_OutSize, Toast.LENGTH_SHORT).show();
                 return;
             }
-        }
+        }*/
         Intent intent = new Intent();
         intent.putStringArrayListExtra("paths", mListNumbers);
         intent.putExtra("path", mTvPath.getText().toString().trim());
@@ -281,9 +227,9 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
         mBtnAddBook = (Button) findViewById(R.id.btn_addbook);
         mEmptyView = findViewById(R.id.empty_view);
        // mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (mParamEntity.getAddText() != null) {
+       /* if (mParamEntity.getAddText() != null) {
             mBtnAddBook.setText(mParamEntity.getAddText());
-        }
+        }*/
     }
 
     /**
@@ -316,7 +262,7 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
      * @param menu
      */
     private void updateOptionsMenu(Menu menu) {
-        mMenu.findItem(R.id.action_selecteall_cancel).setVisible(mParamEntity.isMutilyMode());
+        mMenu.findItem(R.id.action_selecteall_cancel).setVisible(false);
     }
 
     @Override
@@ -326,16 +272,17 @@ public class Fat32LFilePickerActivity extends FragmentActivity {
             mPathAdapter.updateAllSelelcted(!mIsAllSelected);
             mIsAllSelected = !mIsAllSelected;
             if (mIsAllSelected) {
-                for (File mListFile : mListFiles) {
+                for (UsbFile mListFile : mListFiles) {
                     //不包含再添加，避免重复添加
                     if (!mListFile.isDirectory() && !mListNumbers.contains(mListFile.getAbsolutePath())) {
                         mListNumbers.add(mListFile.getAbsolutePath());
                     }
-                    if (mParamEntity.getAddText() != null) {
+                    mBtnAddBook.setText(getString(R.string.lfile_Selected) + "( " + mListNumbers.size() + " )");
+                   /* if (mParamEntity.getAddText() != null) {
                         mBtnAddBook.setText(mParamEntity.getAddText() + "( " + mListNumbers.size() + " )");
                     } else {
                         mBtnAddBook.setText(getString(R.string.lfile_Selected) + "( " + mListNumbers.size() + " )");
-                    }
+                    }*/
                 }
             } else {
                 mListNumbers.clear();

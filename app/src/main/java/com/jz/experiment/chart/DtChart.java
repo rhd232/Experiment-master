@@ -37,6 +37,7 @@ public class DtChart extends WindChart {
 
         YAxis yAxis=chart.getAxisLeft();
         yAxis.setAxisMinimum(-500);
+        yAxis.setAxisMaximum(5000);
         yAxis.setDrawGridLines(true);
     }
     public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam){

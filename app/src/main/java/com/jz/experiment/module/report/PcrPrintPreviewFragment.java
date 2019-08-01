@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mjdev.libaums.UsbMassStorageDevice;
+import com.github.mjdev.libaums.fs.UsbFile;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CCurveShowMet;
 import com.jz.experiment.chart.CCurveShowPolyFit;
@@ -25,12 +27,15 @@ import com.jz.experiment.util.SysPrintUtil;
 import com.jz.experiment.widget.A4PageLayout;
 import com.jz.experiment.widget.PrintTailLayout;
 import com.jz.experiment.widget.PrintTitleLayout;
+import com.leon.lfilepickerlibrary.utils.USBMassStorageHelper;
 import com.wind.base.bean.CyclingStage;
 import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.dialog.LoadingDialogHelper;
+import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.HistoryExperiment;
+import com.wind.toastlib.ToastUtil;
 
 import java.io.File;
 import java.util.List;
@@ -99,7 +104,9 @@ public class PcrPrintPreviewFragment extends CtFragment {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                initChart();
+                if (!ActivityUtil.isFinish(getActivity()) && !isDetached()) {
+                    initChart();
+                }
             }
         },300);
 
@@ -192,24 +199,61 @@ public class PcrPrintPreviewFragment extends CtFragment {
     }
 
 
-    public void print() {
+    public void print(final String usbStoragePath) {
 
-       // ScrollView sv= (ScrollView) layout_a4.getChildAt(0);
+
         LoadingDialogHelper.showOpLoading(getActivity());
         long time = System.currentTimeMillis();
-        String prefix = DateUtil.get(time, "yyyy_MM_dd_HH_mm_ss");
+        final String prefix = DateUtil.get(time, "yyyy_MM_dd_HH_mm_ss");
         String tag;
         if (isPcrMode()) {
             tag = getString(R.string.setup_mode_dt);
         } else {
             tag = getString(R.string.setup_mode_melting);
         }
+        final USBMassStorageHelper usbMassStorageHelper =new USBMassStorageHelper(getActivity());
+
+
 
         layout_print_tail.setReportDate(DateUtil.get(time, "yyyy-MM-dd HH:mm:ss"));
         String pdfName = prefix + tag + ".pdf";
         PdfGenerator.generatePdf(layout_a4, pdfName, new OnPdfGenerateListener() {
             @Override
             public void onGeneratePdfSuccess(String path) {
+
+                //保存到usbStoragePath中
+                if (!TextUtils.isEmpty(usbStoragePath)){
+                    UsbFile targetUsbFile=null;
+                    UsbMassStorageDevice []devices=usbMassStorageHelper.getDeviceList();
+                    UsbMassStorageDevice device=null;
+                    if (devices!=null && devices.length>0){
+                        device=devices[0];
+                        usbMassStorageHelper.readDevice(device);
+                        if ("/".equals(usbStoragePath)){
+                            targetUsbFile=usbMassStorageHelper.getCurrentFolder();
+                        }else {
+
+                            String paths[]=usbStoragePath.substring(1).split("/");
+                            //ToastUtil.showToast(getActivity(),"usbStoragePath:"+usbStoragePath);
+                            targetUsbFile=getTargetUsbFile(paths,0,usbMassStorageHelper,usbMassStorageHelper.getCurrentFolder());
+                           // ToastUtil.showToast(getActivity(),"targetUsbFile==null?"+(targetUsbFile=null));
+                         }
+                        if (targetUsbFile==null){
+                            targetUsbFile=usbMassStorageHelper.getCurrentFolder();
+                        }
+                        usbMassStorageHelper.saveSDFileToUsb(new File(path), targetUsbFile, new USBMassStorageHelper.DownloadProgressListener() {
+                            @Override
+                            public void downloadProgress(int progress) {
+                                if(progress==1) {
+                                    ToastUtil.showToast(getActivity(), R.string.setup_save_success);
+                                }
+                            }
+                        });
+                    }
+
+
+                }
+
                 //保存公司名称
                 layout_print_title.save();
                 SysPrintUtil.printPdf(getActivity(), path);
@@ -222,5 +266,25 @@ public class PcrPrintPreviewFragment extends CtFragment {
                 LoadingDialogHelper.hideOpLoading();
             }
         });
+    }
+
+    private UsbFile getTargetUsbFile(String []paths,int level,USBMassStorageHelper storageHelper,UsbFile parentUsbFile){
+
+        //String [] paths=usbStoragePath.split("/");
+        if (paths.length==level){
+            return parentUsbFile;
+        }
+        List<UsbFile> usbFiles =storageHelper.getUsbFolderFileList(parentUsbFile);
+
+        for (UsbFile usbFile :usbFiles){
+            if (usbFile.isDirectory()){
+                String name=usbFile.getName();
+                if (paths[level].equals(name)){
+                    return getTargetUsbFile(paths,++level,storageHelper,usbFile);
+                }
+            }
+        }
+        return null;
+
     }
 }

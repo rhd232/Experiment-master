@@ -27,7 +27,7 @@ public class LoginActivity extends BaseActivity{
 
 
         getAndroiodScreenProperty();
-        AnitoaLogUtil.writeFileLog("LoginActivity onCreate");
+       // AnitoaLogUtil.writeFileLog("LoginActivity onCreate");
 
     }
 

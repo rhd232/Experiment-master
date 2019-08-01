@@ -103,6 +103,24 @@ public class UsbService extends CommunicationService {
         return device;
     }
 
+    private boolean classHid(UsbDevice device) {
+        int interfaceCount = device.getInterfaceCount();
+        UsbInterface usbInterface = null;
+        for (int i = 0; i < interfaceCount; i++) {
+
+            //获取interfaceClass为USB_CLASS_HID的 interface
+            int interfaceClass = device.getInterface(i).getInterfaceClass();
+            if (interfaceClass == UsbConstants.USB_CLASS_HID) {
+                usbInterface = device.getInterface(i);
+                break;
+            }
+        }
+        if (usbInterface == null) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 连接deviceName指定的设备
      *
@@ -119,7 +137,10 @@ public class UsbService extends CommunicationService {
                 break;
             }
         }
-        mTargetDevice = targetDevice;
+
+        if (targetDevice!=null && classHid(targetDevice)) {
+            mTargetDevice = targetDevice;
+        }
         //连接设备需要用户同意
         if (targetDevice != null) {
             if (mUsbManager.hasPermission(targetDevice)) {
@@ -179,11 +200,14 @@ public class UsbService extends CommunicationService {
         for (int i = 0; i < interfaceCount; i++) {
 
             //获取interfaceClass为USB_CLASS_HID的 interface
-            int interfaceClass= device.getInterface(i).getInterfaceClass();
+            int interfaceClass = device.getInterface(i).getInterfaceClass();
             if (interfaceClass == UsbConstants.USB_CLASS_HID) {
                 usbInterface = device.getInterface(i);
                 break;
             }
+        }
+        if (usbInterface == null) {
+            return;
         }
         if (usbInterface != null) {
             //mUsbInterfaceMap.put(device.getDeviceName(), usbInterface);
@@ -203,9 +227,9 @@ public class UsbService extends CommunicationService {
                 mReadThread = new ReadThread();
                 mReadThread.start();*/
             }
-            System.out.println("连接成功:mUsbDeviceConnection"+mUsbDeviceConnection);
-            System.out.println("连接成功:mUsbEndpointOut"+mUsbEndpointOut);
-            System.out.println("连接成功:mUsbEndpointIn"+mUsbEndpointIn);
+            System.out.println("连接成功:mUsbDeviceConnection" + mUsbDeviceConnection);
+            System.out.println("连接成功:mUsbEndpointOut" + mUsbEndpointOut);
+            System.out.println("连接成功:mUsbEndpointIn" + mUsbEndpointIn);
 
             String name = "HID";
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -232,8 +256,8 @@ public class UsbService extends CommunicationService {
         }
         String hex = ByteUtil.getHexStr(data, data.length);
         //TODO 显示中文命令
-        StringBuilder desc=new StringBuilder("发送：");
-        if (!TextUtils.isEmpty(cmd.getCmdDescription())){
+        StringBuilder desc = new StringBuilder("发送：");
+        if (!TextUtils.isEmpty(cmd.getCmdDescription())) {
             desc.append(cmd.getCmdDescription()).append("-->");
         }
 
@@ -261,15 +285,15 @@ public class UsbService extends CommunicationService {
             for (int i = 0; i < bytes.size(); i++) {
                 data[i] = bytes.get(i).byteValue();
             }
-            err= bulk(bytes);
-            if (err!=0){
+            err = bulk(bytes);
+            if (err != 0) {
                 //非0为异常情况
                 AnitoaLogUtil.writeFileLog("bulk方法执行失败了");
             }
             return err;
         } catch (Exception e) {
             e.printStackTrace();
-            AnitoaLogUtil.writeFileLog("expection in sendPcrCommand--->"+e.getMessage());
+            AnitoaLogUtil.writeFileLog("expection in sendPcrCommand--->" + e.getMessage());
             err = -1;
         }
         return err;
@@ -278,7 +302,7 @@ public class UsbService extends CommunicationService {
 
     public byte[] sendPcrCommandSync(PcrCommand command) {
         //停止读取线程。
-        if (mReadThread == null   || !mReadThread.isInRunning()/*|| !mReadThread.mRun*/) {
+        if (mReadThread == null || !mReadThread.isInRunning()/*|| !mReadThread.mRun*/) {
             AnitoaLogUtil.writeFileLog("sendPcrCommand: mReadThread= null ");
             startReadThread();
             ThreadUtil.sleep(100);
@@ -299,9 +323,9 @@ public class UsbService extends CommunicationService {
         if (command != null && !command.isEmpty()) {
 
             if (mUsbEndpointOut == null || mUsbDeviceConnection == null) {
-                StringBuilder sBuilder=new StringBuilder();
-                boolean endpointOutNull=mUsbEndpointOut == null;
-                boolean deviceConnectionNull=mUsbDeviceConnection == null;
+                StringBuilder sBuilder = new StringBuilder();
+                boolean endpointOutNull = mUsbEndpointOut == null;
+                boolean deviceConnectionNull = mUsbDeviceConnection == null;
                 sBuilder.append("bulkSync:")
                         .append("mUsbEndpointOut == null-->").append(endpointOutNull)
                         .append("mUsbDeviceConnection == null-->").append(deviceConnectionNull);
@@ -353,20 +377,21 @@ public class UsbService extends CommunicationService {
     }
 
     public void clearSyncBuffer() {
-        mSync=false;
-        if (mReadThread!=null){
-            mReadThread.mSyncReceivedBytes=null;
+        mSync = false;
+        if (mReadThread != null) {
+            mReadThread.mSyncReceivedBytes = null;
         }
     }
+
     private int bulk(ArrayList<Byte> command) {
         if (command != null && !command.isEmpty()) {
-           // System.out.println("bulk mUsbEndpointOut:"+mUsbEndpointOut);
-           // System.out.println("bulk mUsbDeviceConnection:"+mUsbDeviceConnection);
-           // System.out.println("bulk mUsbEndpointIn:"+mUsbEndpointIn);
+            // System.out.println("bulk mUsbEndpointOut:"+mUsbEndpointOut);
+            // System.out.println("bulk mUsbDeviceConnection:"+mUsbDeviceConnection);
+            // System.out.println("bulk mUsbEndpointIn:"+mUsbEndpointIn);
             if (mUsbEndpointOut == null || mUsbDeviceConnection == null) {
-                StringBuilder sBuilder=new StringBuilder();
-                boolean endpointOutNull=mUsbEndpointOut == null;
-                boolean deviceConnectionNull=mUsbDeviceConnection == null;
+                StringBuilder sBuilder = new StringBuilder();
+                boolean endpointOutNull = mUsbEndpointOut == null;
+                boolean deviceConnectionNull = mUsbDeviceConnection == null;
                 sBuilder.append("mUsbEndpointOut == null-->").append(endpointOutNull)
                         .append("mUsbDeviceConnection == null-->").append(deviceConnectionNull);
                 AnitoaLogUtil.writeFileLog(sBuilder.toString());
@@ -381,8 +406,8 @@ public class UsbService extends CommunicationService {
             int ret = mUsbDeviceConnection.bulkTransfer(mUsbEndpointOut, data, data.length, 5000);
             if (ret >= 0) {
                 return 0;
-            }else {
-                AnitoaLogUtil.writeFileLog("bulkTransfer 方法执行失败了，返回值为"+ret);
+            } else {
+                AnitoaLogUtil.writeFileLog("bulkTransfer 方法执行失败了，返回值为" + ret);
             }
 
             return -1;
@@ -403,6 +428,7 @@ public class UsbService extends CommunicationService {
         }
 
     }
+
     @Override
     public void stopReadThread() {
         if (mReadThread != null) {
@@ -425,9 +451,9 @@ public class UsbService extends CommunicationService {
     private class ReadThread extends Thread {
         //private String deviceName;
         public byte[] mSyncReceivedBytes;
-      /*  UsbEndpoint mmEndIn;
-        UsbEndpoint mmEndOut;
-        UsbDeviceConnection mmConnection;*/
+        /*  UsbEndpoint mmEndIn;
+          UsbEndpoint mmEndOut;
+          UsbDeviceConnection mmConnection;*/
         boolean mRun;
 
         private boolean inRunning;
@@ -452,16 +478,16 @@ public class UsbService extends CommunicationService {
 
         @Override
         public void run() {
-            boolean canRun=mUsbEndpointOut != null && mUsbEndpointIn != null;
-           // System.out.println("canRun:"+canRun);
+            boolean canRun = mUsbEndpointOut != null && mUsbEndpointIn != null;
+            // System.out.println("canRun:"+canRun);
             if (canRun) {
 
                 while (mRun) {
                     try {
-                        inRunning=true;
-                      //  System.out.println("mRun:"+mRun);
+                        inRunning = true;
+                        //  System.out.println("mRun:"+mRun);
                         byte[] buffer = new byte[64];
-                        if (mUsbDeviceConnection!=null && mUsbEndpointIn!=null) {
+                        if (mUsbDeviceConnection != null && mUsbEndpointIn != null) {
                             int bytes = mUsbDeviceConnection.bulkTransfer(mUsbEndpointIn, buffer, 64, 1000);//before 5000
                             //  System.out.println("mmEndIn:"+bytes);
                             if (bytes > 0) {
@@ -497,7 +523,7 @@ public class UsbService extends CommunicationService {
                     }
                 }
 
-               // mReadThread=null;
+                // mReadThread=null;
                 Log.d("UsbPortService", "Closing Usb work");
             } else {
               /*  UsbPort.this.stop();
@@ -542,16 +568,16 @@ public class UsbService extends CommunicationService {
                     mReadThread = null;
                 }
 
-                mUsbEndpointOut=null;
-                mUsbEndpointIn=null;
-                mUsbDeviceConnection=null;
+                mUsbEndpointOut = null;
+                mUsbEndpointIn = null;
+                mUsbDeviceConnection = null;
 
                 String name = "HID";
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     name = device.getProductName();
                 }
-                mListener=null;
-                AnitoaDisConnectedEvent event = new AnitoaDisConnectedEvent(name,device.getDeviceName());
+                mListener = null;
+                AnitoaDisConnectedEvent event = new AnitoaDisConnectedEvent(name, device.getDeviceName());
                 EventBus.getDefault().post(event);
 
 

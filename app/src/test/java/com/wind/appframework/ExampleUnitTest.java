@@ -43,6 +43,12 @@ public class ExampleUnitTest {
             }
         }
     }*/
+   @Test
+   public void testSplit_(){
+       String paths[]="root".split("/");
+       System.out.println(paths.length);
+   }
+
     @Test
     public void testI(){
         Outer.method().show();

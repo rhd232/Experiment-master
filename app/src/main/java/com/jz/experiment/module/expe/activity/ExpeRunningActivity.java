@@ -25,7 +25,6 @@ import com.anitoa.util.ByteUtil;
 import com.anitoa.util.ThreadUtil;
 import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
-import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
@@ -33,9 +32,9 @@ import com.jz.experiment.chart.FactUpdater;
 import com.jz.experiment.chart.MeltingChart;
 import com.jz.experiment.chart.TempChart;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.data.ExpeResultActivity;
 import com.jz.experiment.module.data.FilterActivity;
 import com.jz.experiment.module.expe.bean.ChannelImageStatus;
-import com.jz.experiment.module.expe.bean.Tab;
 import com.jz.experiment.module.expe.event.ExpeNormalFinishEvent;
 import com.jz.experiment.module.expe.event.FilterEvent;
 import com.jz.experiment.module.expe.event.SavedExpeDataEvent;
@@ -1422,6 +1421,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void toAnalyzePage() {
+        System.out.println("toAnalyzePage");
         mHistoryExperiment.setDuring(tv_duration.getDuring());
         mHistoryExperiment.setFinishMilliTime(System.currentTimeMillis());
 
@@ -1434,10 +1434,12 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                         if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                             EventBus.getDefault().post(new SavedExpeDataEvent());
                            // ToastUtil.showToast(getActivity(), "已保存到本地");
-                            Tab tab = new Tab();
+                         /*   Tab tab = new Tab();
                             tab.setIndex(MainActivity.TAB_INDEX_DATA);
                             tab.setExtra(mHistoryExperiment);
-                            MainActivity.start(getActivity(), tab);
+                            MainActivity.start(getActivity(), tab);*/
+                            System.out.println("ExpeResultActivity start");
+                            ExpeResultActivity.start(getActivity(),mHistoryExperiment);
                         } else {
                             String saveError=getString(R.string.setup_save_error);
                             ToastUtil.showToast(getActivity(), saveError);
@@ -1453,10 +1455,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     }
                 });
 
-       /* Tab tab = new Tab();
-        tab.setIndex(MainActivity.TAB_INDEX_DATA);
-        tab.setExtra(mHistoryExperiment);
-        MainActivity.start(getActivity(), tab);*/
+
 
     }
 
@@ -1485,7 +1484,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))
                 .insertExpe(request);
 
-        return Observable.merge(jsonObservable,dbObservable);
+        return Observable.merge(jsonObservable,dbObservable).debounce(1000,TimeUnit.MILLISECONDS);
 
     }
 
@@ -1698,7 +1697,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             byte [] reveicedBytes=mCommunicationService.sendPcrCommandSync(cmd);
             int count=0;
             while (reveicedBytes==null || reveicedBytes[0]==0){
-                if (count>=3){
+                if (count>=1){
                     break;
                 }
                 reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
@@ -1708,10 +1707,25 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
             if (reveicedBytes==null || reveicedBytes[0]==0){
                 //还是没有连接上
-                //Anitoa.reset();
                 AnitoaLogUtil.writeFileLog("unknown error occur");
-                //ToastUtil.showToast(getActivity(),"unknown error occur");
-                UsbManagerHelper.connectUsbDevice(getActivity());
+                //解绑service
+                Anitoa.getInstance(getActivity()).unbindService(getActivity());
+
+                //重新去绑定service
+                Anitoa.reset();
+                Anitoa.getInstance(getActivity());
+
+                mHander.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!ActivityUtil.isFinish(getActivity())){
+                            mCommunicationService= Anitoa.getInstance(getActivity()).getCommunicationService();
+                            UsbManagerHelper.connectUsbDevice(getActivity());
+                        }
+
+                    }
+                },1000);
+
             }
         }
 

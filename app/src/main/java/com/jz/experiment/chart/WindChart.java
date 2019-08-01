@@ -151,7 +151,7 @@ public abstract class WindChart {
                     mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                         @Override
                         public void onValueSelected(Entry e, Highlight h) {
-                            if (!mDrawMarkers){
+                           /* if (!mDrawMarkers){
                                 mChart.setDrawMarkers(false);
                                 return;
                             }
@@ -161,7 +161,7 @@ public abstract class WindChart {
                                 mChart.setDrawMarkers(false);
                             }else {
                                 mChart.setDrawMarkers(true);
-                            }
+                            }*/
 
                         }
 

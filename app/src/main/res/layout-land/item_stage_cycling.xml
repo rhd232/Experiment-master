@@ -58,9 +58,22 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/setup_total_cycles"
-
                             android:textColor="@color/color333333" />
-                        <EditText
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/et_cycling_cnt"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:text="40"
+                            android:textSize="12dp"
+                            android:inputType="number"
+                            android:textColor="@color/color333333"
+                            android:maxLength="3"
+                            android:paddingTop="4dp"
+                            android:background="@drawable/shape_solidffffff_strokecbcbcb"
+                            android:paddingBottom="4dp"/>
+                        <!--<EditText
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/et_cycling_cnt"
@@ -72,10 +85,11 @@
                             android:maxLength="3"
                             android:paddingTop="4dp"
                             android:background="@drawable/shape_solidffffff_strokecbcbcb"
-                            android:paddingBottom="4dp"/>
+                            android:paddingBottom="4dp"/>-->
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/ll_pic_step"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"

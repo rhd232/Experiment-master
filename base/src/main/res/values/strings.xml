@@ -6,5 +6,5 @@
     <string name="dialog_btn_ok">OK</string>
     <string name="temperature_ranges">The temperature ranges from 40℃ to 100℃</string>
 
-    <string name="input_temperature">Enter Temperature</string>
+    <string name="input_temperature">Enter</string>
 </resources>

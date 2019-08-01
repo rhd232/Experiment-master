@@ -44,13 +44,16 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        AnitoaLogUtil.writeFileLog("ExpeDataTabFragment onViewCreated savedInstanceState==null?"+(savedInstanceState==null));
+        AnitoaLogUtil.writeFileLog("ExpeDataTabFragment onViewCreated savedInstanceState==null?" + (savedInstanceState == null));
         super.onViewCreated(view, savedInstanceState);
         EventBus.getDefault().register(this);
-       /*if (savedInstanceState!=null){
-           mFragmentAdapter.getFragments().clear();
-       }*/
-        view_pager.setOffscreenPageLimit(1);
+        if (savedInstanceState != null) {
+            if (mFragmentAdapter.getFragments()!=null) {
+                mFragmentAdapter.getFragments().clear();
+                mFragmentAdapter.notifyDataSetChanged();
+            }
+        }
+        //view_pager.setOffscreenPageLimit(1);
         layout_loading = view.findViewById(R.id.layout_loading);
         layout_loading.setEmpty(R.layout.layout_expe_empty);
         layout_loading.setOnEmptyInflateListener(new LoadingLayout.OnInflateListener() {
@@ -69,7 +72,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         initTitleBar();
 
 
-        Observable.timer(300, TimeUnit.MILLISECONDS,Schedulers.io())
+        Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long aLong) {
@@ -82,7 +85,6 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                     }
                 });
 
-        System.out.println("ExpeDataTabFragment onViewCreated");
 
     }
 
@@ -98,9 +100,9 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         mTitleBar.setRightTextColor(Color.WHITE);
         mTitleBar.setLeftVisibility(View.GONE);
         mTitleBar.setBackgroundColor(getResources().getColor(R.color.color686868));
-        String title=getString(R.string.title_data);
+        String title = getString(R.string.title_data);
         mTitleBar.setTitle(title);
-        String filter=getString(R.string.running_filter);
+        String filter = getString(R.string.running_filter);
         mTitleBar.setRightText(filter);
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +121,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                 layout_loading.showLoading();
             }
         });
-
+        AnitoaLogUtil.writeFileLog("ExpeTab loadExpe");
         mFindSubscription = mExpeDataStore
                 .findAllCompleted()
                 .subscribeOn(Schedulers.io())
@@ -127,7 +129,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                 .subscribe(new Action1<FindExpeResponse>() {
                     @Override
                     public void call(FindExpeResponse response) {
-                        mFindSubscription.unsubscribe();
+
                         if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                             List<HistoryExperiment> experiments = response.getItems();
                             if (experiments == null || experiments.isEmpty()) {
@@ -145,11 +147,15 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
 
                                 }
-                                mFragmentAdapter.setFragments(fragments);
+                                mFragmentAdapter.getFragments().clear();
+                                mFragmentAdapter.getFragments().addAll(fragments);
                                 mFragmentAdapter.setTitles(titles);
                                 mFragmentAdapter.notifyDataSetChanged();
+
+                                view_pager.setCurrentItem(0,false);
                             }
                         }
+                        mFindSubscription.unsubscribe();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -169,23 +175,26 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     @Override
     protected List<Fragment> getFragments() {
-        return null;
+        return new ArrayList<>();
     }
 
-    private Handler mHandler=new Handler();
+    private Handler mHandler = new Handler();
+
     public void setExpe(HistoryExperiment expe) {
         AnitoaLogUtil.writeFileLog("ExpeDataTabFragment setExpe方法");
 
         //TODO reload就行了。
-        mFragmentAdapter.getFragments().clear();
-        mFragmentAdapter.notifyDataSetChanged();
+        if (mFragmentAdapter.getFragments()!=null) {
+            mFragmentAdapter.getFragments().clear();
+            mFragmentAdapter.notifyDataSetChanged();
+        }
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (!ActivityUtil.isFinish(getActivity()))
                     loadExpe();
             }
-        },500);
+        }, 500);
         //增加一个tab显示本实验
        /* ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
         List<Fragment> fragments = mFragmentAdapter.getFragments();
@@ -213,7 +222,12 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     @Subscribe
     public void onSavedExpeDataEvent(SavedExpeDataEvent event) {
-        loadExpe();
+        //  loadExpe();
+        if (mFragmentAdapter.getFragments()!=null) {
+            mFragmentAdapter.getFragments().clear();
+            mFragmentAdapter.notifyDataSetChanged();
+        }
+
     }
 
     @Override
@@ -223,15 +237,35 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     }
 
     public void reload() {
-        if (layout_loading!=null)
-            loadExpe();
+        //System.out.println("ExpeTab reload");
+        AnitoaLogUtil.writeFileLog("ExpeTab reload");
+        if (layout_loading != null) {
+            // loadExpe();
+            if (mFragmentAdapter.getFragments()!=null) {
+                mFragmentAdapter.getFragments().clear();
+                mFragmentAdapter.notifyDataSetChanged();
+            }
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (!ActivityUtil.isFinish(getActivity()))
+                        loadExpe();
+                }
+            }, 500);
+        }
     }
 
 
     @Subscribe
-    public void onRefreshExpeItemsEvent(RefreshExpeItemsEvent event){
+    public void onRefreshExpeItemsEvent(RefreshExpeItemsEvent event) {
 
         reload();
+    }
+
+    public void reloadIfNeeded() {
+        if (mFragmentAdapter.getFragments()==null || mFragmentAdapter.getFragments().isEmpty()) {
+            loadExpe();
+        }
     }
 }
 

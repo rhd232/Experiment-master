@@ -3,6 +3,7 @@
     <string name="channel_select_title">请选择通道%1$s染料</string>
 
 
+    <string name="predenature_stage">Pre-denature Stage</string>
     <string name="holding_stage">Holding Stage</string>
     <string name="cycling_stage">Cycling Stage</string>
     <string name="step">Step %1$s</string>

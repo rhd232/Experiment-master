@@ -421,6 +421,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                                     public void call(Boolean aBoolean) {
                                         LoadingDialogHelper.hideOpLoading();
                                         ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
+                                        ActivityUtil.finish(getActivity());
                                     }
                                 });
                     } else {
@@ -979,6 +980,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                                 LoadingDialogHelper.hideOpLoading();
                                 ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
                                 ActivityUtil.finish(getActivity());
+
                             }
                         });
 

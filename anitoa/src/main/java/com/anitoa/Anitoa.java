@@ -50,8 +50,10 @@ public class Anitoa {
             }
 
             try {
-                context.getApplicationContext().unbindService(mBluetoothServiceConnection);
-                mBluetoothServiceConnection=null;
+                if (mBluetoothServiceConnection!=null) {
+                    context.getApplicationContext().unbindService(mBluetoothServiceConnection);
+                    mBluetoothServiceConnection = null;
+                }
             }catch (Exception e){
                 e.printStackTrace();
             }

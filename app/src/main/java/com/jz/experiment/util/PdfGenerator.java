@@ -73,13 +73,17 @@ public class PdfGenerator {
 
 
                 document.finishPage(page);
+
+
                 File file = new File(DataFileUtil.getPdfFilePath(pdfName));
 
                 try {
                     FileOutputStream outputStream = new FileOutputStream(file);
                     document.writeTo(outputStream);
+
                     subscriber.onNext(file.getAbsolutePath());
                     subscriber.onCompleted();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     subscriber.onError(e);

@@ -209,14 +209,16 @@ public class MainActivity extends BaseActivity {
                 resetBottomBar();
                 layout_data.setActivated(true);
                 view_pager.setCurrentItem(TAB_INDEX_DATA, false);
-                if (tab != null) {
+                ExpeDataTabFragment expeDataTabFragment = (ExpeDataTabFragment) fragments[1];
+                expeDataTabFragment.reloadIfNeeded();
+                /*if (tab != null) {
                     ExpeDataTabFragment expeDataTabFragment = (ExpeDataTabFragment)
                             mAdapter.getItem(TAB_INDEX_DATA);
-                    /*expeDataTabFragment.setExpe(tab.getExtra());*/
+                    *//*expeDataTabFragment.setExpe(tab.getExtra());*//*
                     //直接刷新就行
                     expeDataTabFragment.reload();
                     tab = null;
-                }
+                }*/
                 break;
             case R.id.layout_analyze:
                 resetBottomBar();
@@ -296,12 +298,21 @@ public class MainActivity extends BaseActivity {
 
     private Tab tab;
 
+
+    private long time;
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        AnitoaLogUtil.writeFileLog("MainActivity onNewIntent");
+
+        boolean lt=System.currentTimeMillis()-time<1000;
+        if (lt){
+            return;
+        }
+        time=System.currentTimeMillis();
+
         tab = Navigator.getParcelableExtra(this);
+        AnitoaLogUtil.writeFileLog("MainActivity onNewIntent tab==null?"+(tab==null));
         if (tab == null) {
             return;
         }

@@ -397,6 +397,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
     public void onCtParamChanged(final CtParamInputLayout.CtParam ctParam) {
 
         if (mOpenedFile != null && mChart != null && mChart instanceof DtChart) {
+            LoadingDialogHelper.showOpLoading(getActivity());
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -404,6 +405,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             double[][] ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
                             boolean[][] falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
                             KSList.clear();
@@ -414,6 +416,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                                 }
                             }
                             notifyCtChanged();
+                            LoadingDialogHelper.hideOpLoading();
                         }
                     });
 

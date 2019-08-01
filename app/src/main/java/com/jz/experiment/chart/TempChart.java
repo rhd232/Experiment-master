@@ -3,11 +3,14 @@ package com.jz.experiment.chart;
 import android.graphics.Color;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.jz.experiment.R;
 import com.jz.experiment.widget.CtParamInputLayout;
 
@@ -22,6 +25,15 @@ public class TempChart extends WindChart {
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setAxisMinimum(0);
+
+        YAxis yAxis=chart.getAxisLeft();
+        yAxis.setAxisMaximum(110f);
+        yAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return value+"°C";
+            }
+        });
     }
 
     @Override

@@ -116,6 +116,13 @@
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             />
+        <activity android:name="com.jz.experiment.module.data.ExpeResultActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
+            />
+
+
+
         <service android:name="com.anitoa.service.BluetoothLeService"></service>
         <service android:name="com.anitoa.service.BluetoothService"></service>
         <service android:name="com.anitoa.service.UsbService" ></service>
