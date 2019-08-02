@@ -14,6 +14,7 @@
       <module fileurl="file://$PROJECT_DIR$/modules/coder-compiler/coder-compiler.iml" filepath="$PROJECT_DIR$/modules/coder-compiler/coder-compiler.iml" />
       <module fileurl="file://$PROJECT_DIR$/data/data.iml" filepath="$PROJECT_DIR$/data/data.iml" />
       <module fileurl="file://$PROJECT_DIR$/domain/domain.iml" filepath="$PROJECT_DIR$/domain/domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/lfilepickerlibrary/lfilepickerlibrary.iml" filepath="$PROJECT_DIR$/modules/lfilepickerlibrary/lfilepickerlibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/location/location.iml" filepath="$PROJECT_DIR$/modules/location/location.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/toastlib/toastlib.iml" filepath="$PROJECT_DIR$/modules/toastlib/toastlib.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/umengsharelib/umengsharelib.iml" filepath="$PROJECT_DIR$/modules/umengsharelib/umengsharelib.iml" />

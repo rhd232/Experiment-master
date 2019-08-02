@@ -263,7 +263,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     }
 
     public void reloadIfNeeded() {
-        if (mFragmentAdapter.getFragments()==null || mFragmentAdapter.getFragments().isEmpty()) {
+        if (mFragmentAdapter!=null && (mFragmentAdapter.getFragments()==null || mFragmentAdapter.getFragments().isEmpty())) {
             loadExpe();
         }
     }

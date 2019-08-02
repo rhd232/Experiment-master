@@ -19,6 +19,7 @@
             <option value="$PROJECT_DIR$/modules/aop-runtime" />
             <option value="$PROJECT_DIR$/modules/coder-annotations" />
             <option value="$PROJECT_DIR$/modules/coder-compiler" />
+            <option value="$PROJECT_DIR$/modules/lfilepickerlibrary" />
             <option value="$PROJECT_DIR$/modules/location" />
             <option value="$PROJECT_DIR$/modules/toastlib" />
             <option value="$PROJECT_DIR$/modules/umengsharelib" />
