@@ -151,7 +151,8 @@
     <string name="standard_draw_curve">Draw Std Curve</string>
     <string name="standard_find_unknown">Find Unknown</string>
     <string name="standard_illegal">Illegal Arguments</string>
-
+    <string name="standard_input_concentration">Enter Concentration of Standard Points </string>
+    <string name="concentration">concentration</string>
 
     <string name="norm">norm</string>
     <string name="print">Print</string>

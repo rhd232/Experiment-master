@@ -46,6 +46,7 @@ public class StandardCurveChart {
         yAxisLeft.setAxisMinimum(0);
         yAxisLeft.setDrawGridLines(false);
 
+
         Legend legend = mCombinedChart.getLegend();
         legend.setEnabled(false);
 

@@ -29,6 +29,7 @@
         android:layout_width="0dp"
         android:layout_weight="1.5"
         android:singleLine="true"
+
         android:ellipsize="marquee"
         android:textColor="@color/color333333"
         android:layout_height="wrap_content"
@@ -39,12 +40,11 @@
         android:id="@+id/et_concentration"
         android:layout_width="0dp"
         android:layout_weight="1.5"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@null"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:gravity="center"
-        android:text="1"
         android:inputType="numberDecimal"
         android:textColor="@color/color333333"
         />

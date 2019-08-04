@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_height="50dp"
     android:orientation="horizontal"
     android:gravity="center_vertical">
 
@@ -15,9 +15,10 @@
     <EditText
         android:id="@+id/et_ct_min"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="40dp"
+        android:layout_height="match_parent"
+        android:minWidth="50dp"
         android:maxLength="2"
+
         android:inputType="number"
         android:textColor="#616161"/>
 
@@ -31,8 +32,8 @@
     <EditText
         android:id="@+id/et_ct_threshold"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="40dp"
+        android:layout_height="match_parent"
+        android:minWidth="50dp"
         android:inputType="number"
         android:maxLength="2"
         android:textColor="#616161"/>

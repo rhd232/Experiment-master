@@ -164,6 +164,8 @@
     <string name="standard_draw_curve">计算标准曲线</string>
     <string name="standard_find_unknown">计算未知点</string>
     <string name="standard_illegal">含有非法参数</string>
+    <string name="standard_input_concentration">请输入标准点浓度值</string>
+    <string name="concentration">浓度</string>
 
     <string name="norm">归一化</string>
     <string name="print">打印</string>

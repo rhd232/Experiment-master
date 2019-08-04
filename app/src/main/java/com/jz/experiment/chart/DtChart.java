@@ -26,7 +26,10 @@ public class DtChart extends WindChart {
     public DtChart(LineChart chart,int cylingCount) {
         this(chart,cylingCount,null);
     }
+
+    private static float FIRST_AXIS_MAX=5000;
     private String channelStr;
+    YAxis yAxis;
     public DtChart(LineChart chart,int cylingCount,FactUpdater factUpdater) {
         super(chart,factUpdater);
         channelStr=chart.getContext().getString(R.string.setup_channel);
@@ -35,9 +38,9 @@ public class DtChart extends WindChart {
       //  xAxis.setAxisMaximum(60);
         xAxis.setAxisMaximum(cylingCount);
 
-        YAxis yAxis=chart.getAxisLeft();
+        yAxis=chart.getAxisLeft();
         yAxis.setAxisMinimum(-500);
-        yAxis.setAxisMaximum(5000);
+        yAxis.setAxisMaximum(FIRST_AXIS_MAX);
         yAxis.setDrawGridLines(true);
     }
     public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam){
@@ -187,6 +190,10 @@ public class DtChart extends WindChart {
 
 
             float y = (float) CurveReader.getInstance().m_zData[currChan][ksindex][i];
+
+            if (y>FIRST_AXIS_MAX){
+                yAxis.resetAxisMaximum();
+            }
             Entry entry = new Entry(i, y);
             expeData.add(entry);
 

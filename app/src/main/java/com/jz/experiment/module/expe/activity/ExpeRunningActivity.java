@@ -343,10 +343,10 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         } catch (InterruptedException e) {
             e.printStackTrace();
         }*/
-        if (mCommunicationService instanceof UsbService && !mClosedPcrProgram) {
+  /*      if (mCommunicationService instanceof UsbService && !mClosedPcrProgram) {
             UsbService usbService = (UsbService) mCommunicationService;
             usbService.startReadThread();
-        }
+        }*/
 
         // 给设备发指令 step1
         PcrCommand cmd = new PcrCommand();
@@ -547,7 +547,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     if (!mExpeFinished) {
                         stopCycling();
                     }
-                    Thread.sleep(100);
+                    Thread.sleep(200);
 
                     if (mHistoryExperiment.isAutoIntegrationTime()) {
                         autoInt(mFactUpdater);
@@ -766,25 +766,13 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         //TODO 检查返回的包是否正确
         boolean succ = StatusChecker.checkStatus(status);
         if (!succ) {
-            //readTemperature();
-            /*if (!ActivityUtil.isFinish(getActivity())) {
-                AppDialogHelper.showSingleBtnDialog(getActivity(), StatusChecker.getStatusDesc(status), new AppDialogHelper.DialogOperCallback() {
-                    @Override
-                    public void onDialogConfirmClick() {
-
-                    }
-                });
-                AnitoaLogUtil.writeFileLog("返回错误：" + ByteUtil.getHexStr(reveicedBytes, reveicedBytes.length));
-            }*/
             /*
                 报出比较多的 图像命令超时错误
                 这里的处理改为继续查询循环状态
 
                 图像命令超时 是查询图像中断的指令报出的。
              */
-            // 图像命令超时可以继续查询循环状态 避免报出图像命令超时错误
-            // step5Subscription();
-            return;
+           //return;
 
         }
 
@@ -1298,6 +1286,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     if (mHasMeltingCurve) {
                         if (!mMeltingCurveStarted && !mClosedPcrProgram) {
                             mClosedPcrProgram=true;
+                            AnitoaLogUtil.writeFileLog("开始熔解曲线实验");
                             //熔解曲线自动积分中
                             LoadingDialogHelper.showOpLoading(getActivity());
                             //TODO 执行熔解曲线自动积分时间

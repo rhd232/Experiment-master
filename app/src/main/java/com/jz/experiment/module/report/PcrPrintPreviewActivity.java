@@ -2,11 +2,14 @@ package com.jz.experiment.module.report;
 
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
 
+import com.anitoa.Anitoa;
+import com.anitoa.service.UsbService;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
 import com.jz.experiment.R;
 import com.jz.experiment.module.report.bean.InputParams;
@@ -51,32 +54,43 @@ public class PcrPrintPreviewActivity extends BaseActivity {
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //
-                devices = UsbMassStorageDevice.getMassStorageDevices(getActivity());
-                String rootPath = "/storage/emulated/0";
-                //TODO 检查usb storage是否有权限了
-                if (devices == null || devices.length == 0) {
-                   /* new LFilePicker()
-                            .withActivity(getActivity())
-                            .withRequestCode(REQUESTCODE_SYS_STORAGE)
-                            .withStartPath(rootPath)
-                            .withChooseMode(false)
-                            .start();*/
-                    f.print("");
-                } else {
-                    UsbMassStorageDevice device = devices[0];
-                    try {
-                        device.init();
-                        Fat32LFilePickerActivity.startForResult(getActivity(),REQUESTCODE_USB_STORAGE);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
 
+
+                UsbService service=Anitoa.getInstance(getActivity()).getUsbService();
+                UsbDevice storageDevice=service.getUsbStorageDevice();
+                if (storageDevice!=null){
+                    if (!service.requestPermissionIfNeed(storageDevice)){
+                        //已经拥有全新
+                        doPrint();
+                    }
+                }else {
+                    //没有插入U盘
+                    f.print("");
                 }
+
             }
         });
 
 
+    }
+
+
+    private void doPrint(){
+        devices = UsbMassStorageDevice.getMassStorageDevices(getActivity());
+        String rootPath = "/storage/emulated/0";
+        //TODO 检查usb storage是否有权限了
+        if (devices == null || devices.length == 0) {
+            f.print("");
+        } else {
+            UsbMassStorageDevice device = devices[0];
+            try {
+                device.init();
+                Fat32LFilePickerActivity.startForResult(getActivity(),REQUESTCODE_USB_STORAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     @Override

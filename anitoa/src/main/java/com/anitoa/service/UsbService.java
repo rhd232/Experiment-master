@@ -64,8 +64,15 @@ public class UsbService extends CommunicationService {
     private UsbDeviceConnection mUsbDeviceConnection;
     //当前连接的设备
     private UsbDevice mTargetDevice;
+    //外接U盘
+    private UsbDevice mUsbStorageDevice;
+
     private ReadThread mReadThread;
 
+
+    public UsbDevice getUsbStorageDevice(){
+        return mUsbStorageDevice;
+    }
     @Override
     public boolean initialize() {
 
@@ -122,6 +129,28 @@ public class UsbService extends CommunicationService {
     }
 
     /**
+     * 是否是U盘
+     * @param device
+     * @return
+     */
+    private boolean classMassStorage(UsbDevice device) {
+        int interfaceCount = device.getInterfaceCount();
+        UsbInterface usbInterface = null;
+        for (int i = 0; i < interfaceCount; i++) {
+
+            //获取interfaceClass为USB_CLASS_HID的 interface
+            int interfaceClass = device.getInterface(i).getInterfaceClass();
+            if (interfaceClass == UsbConstants.USB_CLASS_MASS_STORAGE) {
+                usbInterface = device.getInterface(i);
+                break;
+            }
+        }
+        if (usbInterface == null) {
+            return false;
+        }
+        return true;
+    }
+    /**
      * 连接deviceName指定的设备
      *
      * @param deviceName
@@ -141,6 +170,11 @@ public class UsbService extends CommunicationService {
         if (targetDevice!=null && classHid(targetDevice)) {
             mTargetDevice = targetDevice;
         }
+
+        if (targetDevice!=null && classMassStorage(targetDevice)){
+            mUsbStorageDevice=targetDevice;
+        }
+
         //连接设备需要用户同意
         if (targetDevice != null) {
             if (mUsbManager.hasPermission(targetDevice)) {
@@ -152,6 +186,13 @@ public class UsbService extends CommunicationService {
         }
     }
 
+    public boolean requestPermissionIfNeed(UsbDevice device){
+        if (!mUsbManager.hasPermission(device)) {
+            mUsbManager.requestPermission(device, mRequestPermissionPendingIntent);
+            return true;
+        }
+        return false;
+    }
 
     public boolean hasPermission() {
         if (mTargetDevice != null) {
@@ -268,11 +309,6 @@ public class UsbService extends CommunicationService {
         int err = 0;
         try {
             mSync = false;
-           /* if (mReadThread!=null) {
-                System.out.println("mReadThread.isInRunning():"+mReadThread.isInRunning());
-            }*/
-        /*    if (mReadThread == null || !mReadThread.mRun
-                    ) {*/
             if (mReadThread == null
                     || !mReadThread.isInRunning()) {
                 AnitoaLogUtil.writeFileLog("sendPcrCommand: mReadThread= null ");
@@ -560,8 +596,11 @@ public class UsbService extends CommunicationService {
 
                 connect(device.getDeviceName());
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
-                AnitoaLogUtil.writeFileLog("接收到USB断开连接通知");
 
+                if (!classHid(device)){
+                    return;
+                }
+                AnitoaLogUtil.writeFileLog("接收到USB断开连接通知");
                 mTargetDevice = null;
                 if (mReadThread != null) {
                     mReadThread.stopRun();

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -78,6 +79,10 @@ public class StandardCurveFragment extends BaseFragment {
     @BindView(R.id.tv_r2)
     TextView tv_r2;
 
+    @BindView(R.id.tv_y_desc)
+    TextView tv_y_desc;
+    @BindView(R.id.tv_x_desc)
+    TextView tv_x_desc;
     public static StandardCurveFragment newInstance(HistoryExperiment experiment, InputParams inputParams) {
         StandardCurveFragment f = new StandardCurveFragment();
         Bundle args = new Bundle();
@@ -160,6 +165,14 @@ public class StandardCurveFragment extends BaseFragment {
                         });
             }
         });
+
+        String conc=getActivity().getString(R.string.concentration);
+
+        tv_y_desc.setText("log("+conc+")");
+        tv_y_desc.setVisibility(View.GONE);
+
+        tv_x_desc.setText("Ct");
+        tv_x_desc.setVisibility(View.GONE);
 
 
     }
@@ -348,7 +361,7 @@ public class StandardCurveFragment extends BaseFragment {
     private SampleRow buildSampleRow(Sample sample) {
         SampleRow sampleRow = new SampleRow();
         sampleRow.setName(sample.getSeqName());
-        sampleRow.setConcentration("1");
+        sampleRow.setConcentration("");
         return sampleRow;
     }
 
@@ -375,10 +388,28 @@ public class StandardCurveFragment extends BaseFragment {
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.tv_draw_std:
-
+                if (standardAdapter.getCount()<=1){
+                    return;
+                }
+                boolean empty=false;
+                for (int i=1;i<standardAdapter.getCount();i++){
+                    String conc=standardAdapter.getItem(i).getConcentration();
+                    if (TextUtils.isEmpty(conc)){
+                        empty=true;
+                        break;
+                    }
+                }
+                if (empty){
+                    ToastUtil.showToast(getActivity(),R.string.standard_input_concentration);
+                    return;
+                }
                 drawStdCurve();
                 break;
             case R.id.tv_find_unknow:
+
+                if (unknowAdapter.getCount()<=1){
+                    return;
+                }
                 List<SampleRow> unknow = new ArrayList<>(unknowAdapter.getData());
                 unknow.remove(0);
 
@@ -533,6 +564,9 @@ public class StandardCurveFragment extends BaseFragment {
         mStandardChart.addPoints(fitxx, fityy, xx, yy, unknownXX, unknownYY);
 
 
+
+        tv_y_desc.setVisibility(View.VISIBLE);
+        tv_x_desc.setVisibility(View.VISIBLE);
     }
 
     private double caculateR(double[] xx, double[] yy) {
