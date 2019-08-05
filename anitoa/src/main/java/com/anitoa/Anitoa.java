@@ -75,9 +75,11 @@ public class Anitoa {
         }
         sInstance=null;
     }
+    private ServiceConnection mUsbServiceConnection;
     private Anitoa(Context context) {
         if (mUsbService == null) {
             if (!mBinding) {
+                mUsbServiceConnection=new UsbServiceConnection();
                 mBinding = true;
                /* Intent service = new Intent(context.getApplicationContext(), BluetoothService.class);
                 context.getApplicationContext().bindService(service, mBluetoothServiceConnection, Context.BIND_AUTO_CREATE);
@@ -105,7 +107,9 @@ public class Anitoa {
         }
     };
     private UsbService mUsbService;
-    private ServiceConnection mUsbServiceConnection = new ServiceConnection() {
+
+    private class UsbServiceConnection implements ServiceConnection{
+
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             UsbService.LocalBinder binder = (UsbService.LocalBinder) service;
@@ -120,7 +124,23 @@ public class Anitoa {
             mUsbService = null;
             AnitoaLogUtil.writeFileLog("UsbServiceConnection onServiceDisconnected");
         }
-    };
+    }
+   /* private ServiceConnection mUsbServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            UsbService.LocalBinder binder = (UsbService.LocalBinder) service;
+            mUsbService = binder.getService();
+            mUsbService.initialize();
+            //System.out.println("bindService success");
+            AnitoaLogUtil.writeFileLog("UsbServiceConnection onServiceConnected");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mUsbService = null;
+            AnitoaLogUtil.writeFileLog("UsbServiceConnection onServiceDisconnected");
+        }
+    };*/
     public BluetoothService getBluetoothService() {
         return mBluetoothService;
     }

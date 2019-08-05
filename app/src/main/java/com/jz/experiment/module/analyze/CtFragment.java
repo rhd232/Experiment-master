@@ -177,7 +177,7 @@ public abstract class CtFragment extends BaseFragment {
 
 
     protected void getCtValue(String chan, String currks, double[][] ctValues,boolean[][] falsePositive) {
-        if (!CommData.diclist.keySet().contains(chan) || CommData.diclist.get(chan).size() == 0)
+        if (!CommData.diclist.keySet().contains(chan) || CommData.diclist.get(chan)==null|| CommData.diclist.get(chan).size() == 0)
             return;
 
         int currChan = 0;

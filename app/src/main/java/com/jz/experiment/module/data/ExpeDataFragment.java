@@ -259,9 +259,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                     ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
                     falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
                 } else {
-          /*  float t=Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
-            float f=Float.parseFloat(String.format("%f",t));
-            mMeltingChart.setAxisMinimum(f);*/
+
                     mExperiment.getSettingSecondInfo().getModes().get(1).setCtMin(layout_ctparam_input.getCtParam().ctMin);
                     mExperiment.getSettingSecondInfo().getModes().get(1).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
 
@@ -455,6 +453,12 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
 
                 });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LoadingDialogHelper.hideOpLoading();
     }
 
     @Deprecated

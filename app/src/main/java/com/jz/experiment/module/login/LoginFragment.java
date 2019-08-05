@@ -20,7 +20,6 @@ import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
-import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.StatusChecker;
 import com.jz.experiment.util.UsbManagerHelper;
 import com.wind.base.C;
@@ -35,30 +34,11 @@ import com.wind.data.base.request.FindUserRequest;
 import com.wind.data.base.response.FindUserResponse;
 import com.wind.view.ValidateEditText;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -280,82 +260,7 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
     }
 
 
-    public void testServer() {
-        String filePath = C.Value.IMAGE_DATA + "2019_01_29_03_22_23_source.txt";
-        File file = new File(filePath);
-        List<String> data = DataFileUtil.covertToList(file);
-        Map<String, List<String>> dataMap = new HashMap<>();
-        dataMap.put("data", data);
-        JSONObject jsonObject = new JSONObject(dataMap);
-        String url = "http://114.215.195.137:55500/data";
-        OkHttpClient okHttpClient = new OkHttpClient();
-        RequestBody requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8")
-                , jsonObject.toString());
-        Request request = new Request.Builder()
-                .url(url)//请求的url
-                .post(requestBody)
-                .build();
-        okhttp3.Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
 
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String ret = response.body().string();
-                System.out.println("返回数据：" + ret);
-            }
-        });
-    }
-
-    public void testJson() {
-        String json = "[[\n" +
-                "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0],\n" +
-                "[40.54448441, 81.0617958, -16.75278455, 0.0, 0.0,0.0]\n" +
-                "]\n" +
-                ",[\n" +
-                "[30.54448441, 31.0617958, -16.75278455, 0.0, 0.0,0.0],\n" +
-                "[20.54448441, 61.0617958, -16.75278455, 0.0, 0.0,0.0]\n" +
-                "]\n" +
-                "]";
-        Map<Integer, List<List<Double>>> chanMap = new LinkedHashMap<>();
-        try {
-            JSONArray jsonArray = new JSONArray(json);
-            int length = jsonArray.length();
-            for (int i = 0; i < length; i++) {
-                List<List<Double>> listList = new ArrayList<>();
-                JSONArray subJSONArray = jsonArray.getJSONArray(i);
-                for (int j = 0; j < subJSONArray.length(); j++) {
-                    JSONArray subSubJSONArray = subJSONArray.getJSONArray(j);
-                    List<Double> yVals = new ArrayList<>();
-                    for (int k = 0; k < subSubJSONArray.length(); k++) {
-                        double y = subSubJSONArray.getDouble(k);
-                        yVals.add(y);
-                    }
-                    listList.add(yVals);
-                }
-                chanMap.put(i, listList);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        int size = chanMap.size();
-        for (int i = 0; i < size; i++) {
-            List<List<Double>> listList = chanMap.get(i);
-            for (int j = 0; j < listList.size(); j++) {
-                List<Double> vals = listList.get(j);
-                for (int k = 0; k < vals.size(); k++) {
-                    System.out.print(vals.get(k) + " ");
-                }
-                System.out.println();
-            }
-
-
-        }
-    }
 
 
     private void setNofity(AnitoaConnectionListener listener) {

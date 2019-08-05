@@ -492,7 +492,9 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         }
         mBackPressed = true;
         if (!mExpeFinished) {
-
+            if(ActivityUtil.isFinish(getActivity())){
+                return;
+            }
             String msg = getString(R.string.running_dialog_stop_msg);
             AppDialogHelper.showNormalDialog(getActivity(), msg, new AppDialogHelper.DialogOperCallback() {
                 @Override
@@ -717,6 +719,13 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+
+        LoadingDialogHelper.hideOpLoading();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -772,7 +781,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
                 图像命令超时 是查询图像中断的指令报出的。
              */
-           //return;
+           return;
 
         }
 
@@ -960,7 +969,9 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void step5() {
-
+        if (mCommunicationService==null){
+            return;
+        }
         mInReadingImg = false;
         PcrCommand command = new PcrCommand();
         command.step5();
@@ -1297,11 +1308,13 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                                     .subscribe(new Action1<Boolean>() {
                                         @Override
                                         public void call(Boolean aBoolean) {
-                                            LoadingDialogHelper.hideOpLoading();
-                                            mCommunicationService.setNotify(ExpeRunningActivity.this);
-                                            //开始熔解曲线参数设置
-                                            step0();
-                                            step1();
+                                            if (!ActivityUtil.isFinish(getActivity())) {
+                                                LoadingDialogHelper.hideOpLoading();
+                                                mCommunicationService.setNotify(ExpeRunningActivity.this);
+                                                //开始熔解曲线参数设置
+                                                step0();
+                                                step1();
+                                            }
                                         }
                                     });
 
@@ -1427,7 +1440,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                             tab.setIndex(MainActivity.TAB_INDEX_DATA);
                             tab.setExtra(mHistoryExperiment);
                             MainActivity.start(getActivity(), tab);*/
-                            System.out.println("ExpeResultActivity start");
+                            //System.out.println("ExpeResultActivity start");
                             ExpeResultActivity.start(getActivity(),mHistoryExperiment);
                         } else {
                             String saveError=getString(R.string.setup_save_error);
@@ -1653,7 +1666,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                         @Override
                         public void call(Long aLong) {
                             if (!mStep5Responsed) {
-                                System.out.println("mStep5Count:"+mStep5Count);
+                               // System.out.println("mStep5Count:"+mStep5Count);
                                 if (mStep5Count>1){
                                     //考虑下位机没响应了
                                     rescueStep5();
@@ -1673,6 +1686,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     });
         }
     }
+
 
     private void rescueStep5() {
         AnitoaLogUtil.writeFileLog("rescueStep5 mCommunicationService==null?"+(mCommunicationService==null));
@@ -1708,7 +1722,17 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     @Override
                     public void run() {
                         if (!ActivityUtil.isFinish(getActivity())){
-                            mCommunicationService= Anitoa.getInstance(getActivity()).getCommunicationService();
+                            mCommunicationService=null;
+                            int doCount=0;
+                            while (mCommunicationService==null) {
+                                mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
+                                ThreadUtil.sleep(100);
+                                doCount++;
+                                if (doCount>3){
+                                    AnitoaLogUtil.writeFileLog("重新连接了"+doCount+"次，还是没连上");
+                                }
+                            }
+                            AnitoaLogUtil.writeFileLog("获得了CommunicationService，执行连接");
                             UsbManagerHelper.connectUsbDevice(getActivity());
                         }
 
@@ -1928,7 +1952,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     step5Subscription = null;
                 }
 
-                step5Subscription(1000);
+                step5Subscription(5000);
 
                  /* step5();
               if (step5Subscription != null && !step5Subscription.isUnsubscribed()) {
@@ -2202,4 +2226,6 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     private List<Stage> getCyclingSteps() {
         return mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
     }
+
+
 }

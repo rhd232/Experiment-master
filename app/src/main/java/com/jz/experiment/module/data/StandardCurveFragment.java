@@ -471,8 +471,11 @@ public class StandardCurveFragment extends BaseFragment {
 
     private StdLineData mStdLineData;
 
+    /**
+     * x轴 log(浓度)
+     * y轴 ct值
+     */
     private void drawStdCurve() {
-
 
         List<SampleRow> stdRows = new ArrayList<>(standardAdapter.getData());
         stdRows.remove(0);
@@ -484,7 +487,6 @@ public class StandardCurveFragment extends BaseFragment {
 
         double maxX = 0;
         for (int i = 0; i < size; i++) {
-
             try {
                 xx[i] = Double.parseDouble(stdRows.get(i).getCtValue());
                 if (xx[i] > maxX) {
@@ -497,12 +499,8 @@ public class StandardCurveFragment extends BaseFragment {
                 ToastUtil.showToast(getActivity(), R.string.standard_illegal);
                 return;
             }
-
         }
-       /*
-        for (int i = 0; i < 20; i++) {
-            fitxx[i] = (double) (20 + i);
-        }*/
+
         //生成的标准曲线的点数
         int intMax = (int) (maxX + 10);
         double[] fitxx = new double[intMax];
@@ -558,8 +556,10 @@ public class StandardCurveFragment extends BaseFragment {
             }
         }
 
+
+        //x轴 ，y轴对调
+
         mStdLineData = new StdLineData(fitxx, fityy, xx, yy, unknownXX, unknownYY, equation.toString(), format.format(R2));
-        //
 
         mStandardChart.addPoints(fitxx, fityy, xx, yy, unknownXX, unknownYY);
 
