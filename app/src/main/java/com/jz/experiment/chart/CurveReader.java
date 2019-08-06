@@ -8,22 +8,18 @@ import java.util.List;
 
 public class CurveReader {
 
-    public double[][][] m_zData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][ CCurveShow.MAX_CYCL];
-    public double[][] m_CTValue = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL];
-    private CurveReader(){}
-    private static CurveReader INSTANCE=new CurveReader();
+    //public double[][][] m_zData = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL][ CCurveShow.MAX_CYCL];
+    //public double[][] m_CTValue = new double[CCurveShow.MAX_CHAN][CCurveShow.MAX_WELL];
+    public CurveReader(){}
+   /* private static CurveReader INSTANCE=new CurveReader();
     public static CurveReader getInstance(){
         return INSTANCE;
-    }
-    public void readCurveYData(){
+    }*/
 
-
-    }
-    public void readCurve(double[][] factorValues, CtParamInputLayout.CtParam ctParam,boolean norm){
+    public DtChart.DtData readCurve(/*double[][] factorValues,*/ CtParamInputLayout.CtParam ctParam, boolean norm){
         double[][][]  m_yData = new double[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL][CCurveShowPolyFit.MAX_CYCL];
-        CCurveShowPolyFit cCurveShow =  CCurveShowPolyFit.getInstance();
-      /*  int minCt=13;
-        int threshold=10;*/
+        CCurveShowPolyFit cCurveShow =  new CCurveShowPolyFit();
+
         int minCt=CtParamInputLayout.DEFALUT_MIN_CT;
         int threshold=CtParamInputLayout.DEFALUT_THRESHHOLD_CT;
         if (ctParam!=null){
@@ -81,11 +77,16 @@ public class CurveReader {
         cCurveShow.m_Size[2] = cyclenum+1;
         cCurveShow.m_Size[3] = cyclenum+1;
 
-        cCurveShow.ifactor = factorValues;
+        //cCurveShow.ifactor = factorValues;
         cCurveShow.UpdateAllcurve();
 
-        m_zData = cCurveShow.m_zData;
-        m_CTValue = cCurveShow.m_CTValue;
+      /*  m_zData = cCurveShow.m_zData;
+        m_CTValue = cCurveShow.m_CTValue;*/
+        DtChart.DtData dtData=new DtChart.DtData();
+        dtData.m_CTValue= cCurveShow.m_CTValue;
+        dtData.m_zData=cCurveShow.m_zData;
+        dtData.m_falsePositive=cCurveShow.m_falsePositive;
+        return dtData;
     }
 
     public int GetChan(String chan)

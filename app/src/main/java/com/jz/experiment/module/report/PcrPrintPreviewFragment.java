@@ -12,7 +12,6 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
 import com.github.mjdev.libaums.fs.UsbFile;
 import com.jz.experiment.R;
-import com.jz.experiment.chart.CCurveShowMet;
 import com.jz.experiment.chart.CCurveShowPolyFit;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
@@ -177,11 +176,14 @@ public class PcrPrintPreviewFragment extends CtFragment {
         double[][] ctValues;
         boolean[][] falsePositive;
         if (!isPcrMode()) {
-            ctValues = CCurveShowMet.getInstance().m_CTValue;
+            MeltingChart meltingChart= (MeltingChart) windChart;
+            ctValues = meltingChart.getMeltingData().m_CTValue;
+
             falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
         } else {
-            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+            DtChart dtChart= (DtChart) windChart;
+            ctValues = dtChart.getDtData().m_CTValue;
+            falsePositive =dtChart.getDtData().m_falsePositive;
         }
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
        // KSList.clear();

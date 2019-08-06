@@ -48,7 +48,6 @@ public class UsbManagerHelper {
                     info.setDeviceName(device.getDeviceName());
                     DeviceRepo.getInstance().store(context, info);
                     Anitoa.getInstance(context).getUsbService().connect(device.getDeviceName());
-                    // PrinterHelper.getInstance(getActivity()).connectDevice(device.getDeviceName());
                     break;
 
                 }

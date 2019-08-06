@@ -14,10 +14,9 @@ import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.jz.experiment.R;
-import com.jz.experiment.chart.CCurveShowPolyFit;
-import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.CurveReader;
 import com.jz.experiment.chart.DataFileReader;
+import com.jz.experiment.chart.DtChart;
 import com.jz.experiment.chart.StandardCurveChart;
 import com.jz.experiment.module.data.adapter.SampleStatefulAdapter;
 import com.jz.experiment.module.data.adapter.SeqAdapter;
@@ -177,6 +176,7 @@ public class StandardCurveFragment extends BaseFragment {
 
     }
 
+    private DtChart.DtData mDtData;
     private Observable<Boolean> loadDtFile() {
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
@@ -189,8 +189,10 @@ public class StandardCurveFragment extends BaseFragment {
                     e.printStackTrace();
                 }
                 DataFileReader.getInstance().ReadFileData(ips, false);
-                CommData.m_factorData = DataFileReader.getInstance().factorValue;
-                CurveReader.getInstance().readCurve(CommData.m_factorData, mInputParams.getCtParam(), false);
+              //  CommData.m_factorData = DataFileReader.getInstance().factorValue;
+               // CurveReader.getInstance().readCurve(CommData.m_factorData, mInputParams.getCtParam(), false);
+                CurveReader reader=new CurveReader();
+                mDtData=reader.readCurve(mInputParams.getCtParam(), false);
                 subscriber.onNext(true);
             }
         });
@@ -282,8 +284,8 @@ public class StandardCurveFragment extends BaseFragment {
 
                         SampleRow sampleRow = buildSampleRow(sample);
                         //获取ct值
-                        double[][] ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-                        boolean[][] falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+                        double[][] ctValues =mDtData.m_CTValue;
+                        boolean[][] falsePositive = mDtData.m_falsePositive;
                         String chan = getChannelName();
                         try {
                             //TODO 获取对应的ctValue
@@ -313,8 +315,8 @@ public class StandardCurveFragment extends BaseFragment {
                         //添加到表格
                         SampleRow sampleRow = buildSampleRow(sample);
                         //获取ct值
-                        double[][] ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-                        boolean[][] falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+                        double[][] ctValues = mDtData.m_CTValue;
+                        boolean[][] falsePositive = mDtData.m_falsePositive;
                         String chan = getChannelName();
                         try {
                             //TODO 获取对应的ctValue

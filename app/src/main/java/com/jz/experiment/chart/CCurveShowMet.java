@@ -37,13 +37,13 @@ public class CCurveShowMet {
 
     float[] ct_offset = new float[4];
     public float start_temp = 60;
-    private static CCurveShowMet INSTANCE = new CCurveShowMet();
+  /*  private static CCurveShowMet INSTANCE = new CCurveShowMet();
 
     public static CCurveShowMet getInstance() {
         return INSTANCE;
-    }
+    }*/
 
-    private CCurveShowMet() {
+    public CCurveShowMet() {
     }
 
     public void InitData() {

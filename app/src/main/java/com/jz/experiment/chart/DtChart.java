@@ -82,7 +82,14 @@ public class DtChart extends WindChart {
         //System.out.println(sBuilder.toString());
         AnitoaLogUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"),sBuilder.toString());
     }
-    public void show(List<String> ChanList, List<String> KSList,InputStream ips,CtParamInputLayout.CtParam ctParam,boolean norm) {
+    private DtData mDtData;
+
+
+    public DtData getDtData() {
+        return mDtData;
+    }
+
+    public void show(List<String> ChanList, List<String> KSList, InputStream ips, CtParamInputLayout.CtParam ctParam, boolean norm) {
 
         //读取图像文件数据
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
@@ -90,16 +97,13 @@ public class DtChart extends WindChart {
             mFactUpdater.setPcr(true);
             mFactUpdater.updateFact();
             norm=false;//运行时norm始终为false
-           // CommData.m_factorData=DataFileReader.getInstance().factorValue;
-           // recordFactorData("运行",CommData.m_factorData);
+
         }else {
             CommData.m_factorData=DataFileReader.getInstance().factorValue;
-           // recordFactorData("离线",CommData.m_factorData);
-        }
-        CurveReader.getInstance().readCurve(CommData.m_factorData,ctParam,norm);
 
-        // Map<Integer,List<List<String>>> chanMap= DataParser.parseDtData(dataFile);
-        //请求服务器，解析图像版返回的原始数据
+        }
+        CurveReader reader=new CurveReader();
+        mDtData=reader.readCurve(ctParam,norm);//CurveReader.getInstance().readCurve(/*CommData.m_factorData,*/ctParam,norm);
 
         mLegendEntries = new ArrayList<>();
         mLineColors.clear();
@@ -109,7 +113,6 @@ public class DtChart extends WindChart {
         for (String chan : ChanList) {
             for (String ks : KSList) {
                 DrawLine(chan, 4, ks);
-                // DrawLineFromServer(chan,ks,chanMap);
             }
         }
        /* Legend legend = mChart.getLegend();
@@ -125,18 +128,6 @@ public class DtChart extends WindChart {
         List<com.jz.experiment.chart.ChartData> cdlist = CommData.GetChartData(chan, 4, currks);
         if (cdlist.size() == 0) return;
 
-       /* double y_max_value=Collections.max(cdlist, new Comparator<ChartData>() {
-            @Override
-            public int compare(ChartData o1, ChartData o2) {
-                return o1.y-o2.y;
-            }
-        }).y;
-        double y_min_value=Collections.max(cdlist, new Comparator<ChartData>() {
-            @Override
-            public int compare(ChartData o1, ChartData o2) {
-                return o1.y-o2.y;
-            }
-        }).y;*/
         int currChan = 0;
         int ksindex;
 
@@ -147,25 +138,21 @@ public class DtChart extends WindChart {
             case "Chip#1":
                 currChan = 0;
                 color = Color.argb(255, 24, 60, 209);
-                // color = new Color.valueOf(Color.FromRgb(24, 60, 209));
 
                 break;
             case "Chip#2":
                 currChan = 1;
                 color = Color.argb(255, 83, 182, 97);
-                //  dxcLs1.Brush = new SolidColorBrush(Color.FromRgb(83, 182, 97));
 
                 break;
             case "Chip#3":
                 currChan = 2;
                 color = Color.argb(255, 245, 195, 66);
-                // dxcLs1.Brush = new SolidColorBrush(Color.FromRgb(245, 195, 66));
 
                 break;
             case "Chip#4":
                 currChan = 3;
                 color = Color.argb(255, 234, 51, 35);
-                // dxcLs1.Brush = new SolidColorBrush(Color.FromRgb(234, 51, 35));
                 break;
         }
         if (mLegendEntries.size() <= currChan) {
@@ -189,7 +176,7 @@ public class DtChart extends WindChart {
         for (int i = 0; i < count; i++) {
 
 
-            float y = (float) CurveReader.getInstance().m_zData[currChan][ksindex][i];
+            float y = (float) mDtData.m_zData[currChan][ksindex][i];
 
             if (y>FIRST_AXIS_MAX){
                 yAxis.resetAxisMaximum();
@@ -225,5 +212,6 @@ public class DtChart extends WindChart {
 
         public double[][][] m_zData;
         public double[][] m_CTValue;
+        public boolean [][]m_falsePositive;
     }
 }

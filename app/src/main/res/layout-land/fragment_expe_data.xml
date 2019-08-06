@@ -230,7 +230,7 @@
                         android:layout_centerVertical="true"
                         android:layout_gravity="left"
                         android:layout_marginLeft="10dp"
-                        android:checked="true"
+                        android:checked="false"
                         android:text="@string/norm" />
 
                     <com.github.mikephil.charting.charts.LineChart

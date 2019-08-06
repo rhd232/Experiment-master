@@ -21,7 +21,6 @@ import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
-import com.jz.experiment.chart.CCurveShowMet;
 import com.jz.experiment.chart.CCurveShowPolyFit;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
@@ -250,14 +249,15 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             @Override
             public void run() {
                 double[][] ctValues;
-                boolean[][] falsePositive;
+                boolean[][] falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
                 if (tv_dt.isActivated()) {
                     mExperiment.getSettingSecondInfo().getModes().get(0).setCtMin(layout_ctparam_input.getCtParam().ctMin);
                     mExperiment.getSettingSecondInfo().getModes().get(0).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
                     mDtChart.show(ChanList, KSList,
                             DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
-                    ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-                    falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+                    ctValues = mDtChart.getDtData().m_CTValue;
+                    falsePositive=mDtChart.getDtData().m_falsePositive;
+                    //falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
                 } else {
 
                     mExperiment.getSettingSecondInfo().getModes().get(1).setCtMin(layout_ctparam_input.getCtParam().ctMin);
@@ -265,8 +265,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
 
                     mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
-                    ctValues = CCurveShowMet.getInstance().m_CTValue;
-                    falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+                    ctValues =mMeltingChart.getMeltingData().m_CTValue;
+                    //falsePositive = CCurveShowMet.getInstance().m_falsePositive;
                 }
 
                 showCt(ctValues,falsePositive);
@@ -331,7 +331,8 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         //获取CT value
         for (String chan : ChanList) {
             for (String ks : KSList) {
-                getCtValue(chan, ks, CCurveShowPolyFit.getInstance().m_CTValue, CCurveShowPolyFit.getInstance().m_falsePositive);
+
+                getCtValue(chan, ks,  mDtChart.getDtData().m_CTValue,  mDtChart.getDtData().m_falsePositive);
             }
         }
 
@@ -720,11 +721,13 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
 
         if (!tv_dt.isActivated()) {
-            ctValues = CCurveShowMet.getInstance().m_CTValue;
+            ctValues = mMeltingChart.getMeltingData().m_CTValue;
             falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
         } else {
-            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+            ctValues = mDtChart.getDtData().m_CTValue;
+            falsePositive=mDtChart.getDtData().m_falsePositive;
+         /*   ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
+            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;*/
         }
         for (String chan : ChanList) {
             for (String ks : KSList) {

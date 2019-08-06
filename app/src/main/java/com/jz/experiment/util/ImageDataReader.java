@@ -517,7 +517,7 @@ public class ImageDataReader {
 
     private double[][][] ReadCCurveShow() {
         double[][][] m_yData = new double[CCurveShow.MAX_CHAN][ CCurveShow.MAX_WELL][CCurveShow.MAX_CYCL];
-        CCurveShowPolyFit cCurveShow =  CCurveShowPolyFit.getInstance();
+        CCurveShowPolyFit cCurveShow =  new CCurveShowPolyFit();//CCurveShowPolyFit.getInstance();
         cCurveShow.InitData();
 
         List<String> kslist= Well.getWell().getKsList();

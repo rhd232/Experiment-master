@@ -66,13 +66,13 @@ public class CCurveShowPolyFit {
     Random ran;
 
 
-    private static CCurveShowPolyFit sINSTANCE = new CCurveShowPolyFit();
+   /* private static CCurveShowPolyFit sINSTANCE = new CCurveShowPolyFit();
 
     public static CCurveShowPolyFit getInstance() {
         return sINSTANCE;
-    }
+    }*/
 
-    private CCurveShowPolyFit() {
+    public CCurveShowPolyFit() {
     }
 
     public void InitData() {

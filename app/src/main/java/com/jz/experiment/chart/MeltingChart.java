@@ -68,6 +68,11 @@ public class MeltingChart extends WindChart {
             e.printStackTrace();
         }
     }
+    private  MeltingData mMeltingData;
+
+    public MeltingData getMeltingData() {
+        return mMeltingData;
+    }
 
     public void show(List<String> ChanList, List<String> KSList, InputStream ips, float startTemp) {
         DataFileReader.getInstance().ReadFileData(ips, mRunning);
@@ -79,7 +84,7 @@ public class MeltingChart extends WindChart {
             CommData.m_factorData = DataFileReader.getInstance().factorValue;
         }
         //  if (!mRunning) {//读取历史文件的时候拟合曲线
-        MeltCurveReader.getInstance().readCurve(CommData.m_factorData, startTemp);
+        mMeltingData=new MeltCurveReader().readCurve(CommData.m_factorData, startTemp);
         //}
 
         mLegendEntries = new ArrayList<>();
@@ -159,7 +164,7 @@ public class MeltingChart extends WindChart {
                 Float x = Float.parseFloat(xV);
                 if (x >=40) {
                     //  float y = (float) MeltCurveReader.getInstance().m_zData[currChan][ksindex][i];
-                    float y = (float) MeltCurveReader.getInstance().m_zdData[currChan][ksindex][i];
+                    float y = (float) mMeltingData.m_zdData[currChan][ksindex][i];
 
 
                     Entry entry = new Entry(x, y);
@@ -215,5 +220,11 @@ public class MeltingChart extends WindChart {
             noDuplicateList.add(meltChartData);
         }
         return noDuplicateList;
+    }
+
+    public static class MeltingData{
+        public double [][][]m_zData;
+        public double [][][]m_zdData;
+        public double [][]m_CTValue;
     }
 }

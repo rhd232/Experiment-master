@@ -22,7 +22,6 @@ import android.widget.Spinner;
 import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
 import com.jz.experiment.R;
-import com.jz.experiment.chart.CCurveShowMet;
 import com.jz.experiment.chart.CCurveShowPolyFit;
 import com.jz.experiment.chart.CommData;
 import com.jz.experiment.chart.DtChart;
@@ -284,11 +283,13 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         buildChannelData();
 
         if (melting.equals(mCurMode)) {
-            ctValues = CCurveShowMet.getInstance().m_CTValue;
+            MeltingChart meltingChart= (MeltingChart) mChart;
+            ctValues = meltingChart.getMeltingData().m_CTValue;
             falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
         } else {
-            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+            DtChart dtChart= (DtChart) mChart;
+            ctValues = dtChart.getDtData().m_CTValue;
+            falsePositive = dtChart.getDtData().m_falsePositive;
         }
 
         KSList.clear();
@@ -363,16 +364,24 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         gvs[1] = gv_b;
         String[] titles = {"A", "B"};*/
         buildChannelData();
-        double [][] ctValues;
-        boolean [][] falsePositive;
+        double [][] ctValues=null;
+        boolean [][] falsePositive=new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
         String item = (String) spinner.getSelectedItem();
         String melting = getString(R.string.setup_mode_melting);
         if (melting.equals(item)) {
-            ctValues = CCurveShowMet.getInstance().m_CTValue;
+            MeltingChart meltingChart= (MeltingChart) mChart;
+            ctValues = meltingChart.getMeltingData().m_CTValue;
             falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
         } else {
-            ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-            falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+            DtChart dtChart= (DtChart) mChart;
+            DtChart.DtData dtData=dtChart.getDtData();
+            if (dtChart!=null) {
+                ctValues =dtData.m_CTValue;
+                falsePositive = dtData.m_falsePositive;
+            }
+        }
+        if (ctValues==null){
+            return;
         }
         for (String chan : ChanList) {
             for (String ks : KSList) {
@@ -405,9 +414,9 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
-                            double[][] ctValues = CCurveShowPolyFit.getInstance().m_CTValue;
-                            boolean[][] falsePositive = CCurveShowPolyFit.getInstance().m_falsePositive;
+                            DtChart dtChart= (DtChart) mChart;
+                            double[][] ctValues =dtChart.getDtData().m_CTValue;
+                            boolean[][] falsePositive = dtChart.getDtData().m_falsePositive;
                             KSList.clear();
                             KSList = Well.getWell().getKsList();
                             for (String chan : ChanList) {

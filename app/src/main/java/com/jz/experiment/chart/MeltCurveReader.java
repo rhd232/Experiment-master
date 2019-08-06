@@ -10,15 +10,16 @@ public class MeltCurveReader {
     public double[][][] m_zData = new double[CCurveShowMet.MAX_CHAN][CCurveShowMet.MAX_WELL][ CCurveShowMet.MAX_CYCL];
     public double[][] m_CTValue = new double[CCurveShowMet.MAX_CHAN][CCurveShowMet.MAX_WELL];
     public double[][][] m_zdData = new double[CCurveShowMet.MAX_CHAN][ CCurveShowMet.MAX_WELL][CCurveShowMet.MAX_CYCL];
-    private MeltCurveReader(){}
+  /*  private MeltCurveReader(){}
     private static MeltCurveReader INSTANCE=new MeltCurveReader();
     public static MeltCurveReader getInstance(){
         return INSTANCE;
-    }
-    public void readCurve(double[][] factorValues,float startTemp){
+    }*/
+
+    public MeltingChart.MeltingData readCurve(double[][] factorValues,float startTemp){
 
         double [][][]m_yData = new double[CCurveShowMet.MAX_CHAN][CCurveShowMet.MAX_WELL][ CCurveShowMet.MAX_CYCL];
-        CCurveShowMet cCurveShowMet = CCurveShowMet.getInstance();
+        CCurveShowMet cCurveShowMet = new CCurveShowMet();//CCurveShowMet.getInstance();
         cCurveShowMet.InitData();
        // List<String> kslist;//定义孔数
 
@@ -68,15 +69,21 @@ public class MeltCurveReader {
             cCurveShowMet.ifactor = factorValues;
             cCurveShowMet.start_temp=startTemp;
             cCurveShowMet.UpdateAllcurve();
-            m_zData = cCurveShowMet.m_zData;
+           /* m_zData = cCurveShowMet.m_zData;
             m_zdData = cCurveShowMet.m_zdData;
-            m_CTValue = cCurveShowMet.m_CTValue;
+            m_CTValue = cCurveShowMet.m_CTValue;*/
 
+            MeltingChart.MeltingData meltingData=new MeltingChart.MeltingData();
+            meltingData.m_zData=m_zData;
+            meltingData.m_zdData=m_zdData;
+            meltingData.m_CTValue=m_CTValue;
+            return meltingData;
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
         }
+        return null;
     }
 
     public int GetChan(String chan)
