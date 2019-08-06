@@ -21,6 +21,7 @@ import android.widget.Spinner;
 
 import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CCurveShowPolyFit;
 import com.jz.experiment.chart.CommData;
@@ -122,6 +123,12 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         cb_norm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (mChart instanceof DtChart) {
+
+                    YAxis yAxis=chart_line.getAxisLeft();
+                    yAxis.setAxisMaximum(5000);
+                }
                 showChart();
 
             }

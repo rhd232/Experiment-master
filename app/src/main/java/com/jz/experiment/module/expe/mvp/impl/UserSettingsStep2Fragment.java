@@ -275,6 +275,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         caculateStageItemWidth();
     }
 
+
     @Subscribe
     public void onDelCyclingStageEvent(DelCyclingStageEvent event) {
         //判断当前cycleing
@@ -669,6 +670,11 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         if (service == null) {
             return;
         }
+
+        //设置过冲温度和时间
+        PcrCommand overshotCmd=PcrCommand.ofOvershotTemperature();
+        service.sendPcrCommandSync(overshotCmd);
+        sleep(50);
 
         PcrCommand cmd = new PcrCommand();
         for (int i = 1; i <= 4; i++) {

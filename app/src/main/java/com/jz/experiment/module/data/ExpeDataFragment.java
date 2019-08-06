@@ -19,6 +19,7 @@ import com.anitoa.exception.UnsupportedDeviceException;
 import com.anitoa.well.SixteenWell;
 import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
 import com.jz.experiment.chart.CCurveShowPolyFit;
@@ -90,12 +91,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     @BindView(R.id.tv_elapsed_time)
     TextView tv_elapsed_time;
 
-   /* @BindView(R.id.gv_a)
-    GridView gv_a;
-
-    @BindView(R.id.gv_b)
-    GridView gv_b;*/
-
     @BindView(R.id.chart_dt)
     LineChart chart_dt;
 
@@ -107,8 +102,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     LinearLayout ll_root;
     @BindView(R.id.iv_save)
     View iv_save;
-   /* LineData mLineData;
-    ArrayList<ILineDataSet> mDataSets;*/
 
     @BindView(R.id.layout_ctparam_input)
     CtParamInputLayout layout_ctparam_input;
@@ -131,7 +124,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
-        // mExperiment = getArguments().getParcelable(ARGS_KEY_EXPE);
         sv = view.findViewById(R.id.sv);
         ll_root = view.findViewById(R.id.ll_root);
         layout_ctparam_input.setOnCtParamChangeListener(this);
@@ -152,17 +144,16 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         },500);
 
         iv_save.setVisibility(View.GONE);
-        /*if (isSavedExpe()) {
-            iv_save.setVisibility(View.GONE);
-        } else {
-            iv_save.setVisibility(View.VISIBLE);
-        }*/
-        // mExecutorService.execute(mRun);
 
 
         cb_norm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (tv_dt.isActivated()) {
+                    YAxis yAxis=chart_dt.getAxisLeft();
+                    yAxis.setAxisMaximum(5000);
+                }
+
                 showChart();
             }
         });
@@ -302,7 +293,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (mExperiment == null) {
             return;
         }
-        // CyclingStage cyclingStage = (CyclingStage) mExperiment.getSettingSecondInfo().getCyclingSteps().get(0);
 
         //统计总共有多少循环（不拍照的不包括）
         int totalCyclingCount = 0;
@@ -322,7 +312,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         }
         mDtChart = new DtChart(chart_dt, totalCyclingCount);
         //文件读取之后孔数已经有值
-        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam());
+        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(),cb_norm.isChecked());
 
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
         KSList.clear();

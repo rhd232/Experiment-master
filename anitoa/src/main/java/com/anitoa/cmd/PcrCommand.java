@@ -29,6 +29,8 @@ public class PcrCommand {
     public static final int READ_TRIM_CMD=4;
     public static final int READ_TRIM_TYPE=0x2d;
 
+
+
     public void reset() {
         commandList.clear();
     }
@@ -43,6 +45,55 @@ public class PcrCommand {
         return cmdDescription;
     }
 
+    /**
+     * 设置过冲温度和时间
+     */
+    public static PcrCommand ofOvershotTemperature() {
+        float positiveOvershotTime=1;
+        float positiveOvershotTemp=1;
+
+        float negativeOvershotTime=1;
+        float negativeOvershotTemp=2;
+        int command=0x13;
+        int length=18;
+        int type=0x08;
+
+        List<Byte> bytes = newListWithHeader();
+        bytes.add((byte) command);
+        bytes.add((byte) length);
+        bytes.add((byte) type);
+
+
+        bytes.add((byte)2);
+        //升温时间温度
+        byte[] duringPosBytes = ByteBufferUtil.getBytes(positiveOvershotTime,ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < duringPosBytes.length; i++) {
+            bytes.add(duringPosBytes[i]);
+        }
+
+        byte[] tempPosBytes = ByteBufferUtil.getBytes(positiveOvershotTemp,ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < tempPosBytes.length; i++) {
+            bytes.add(tempPosBytes[i]);
+        }
+        //降温时间温度
+        byte[] duringNegBytes = ByteBufferUtil.getBytes(negativeOvershotTime,ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < duringNegBytes.length; i++) {
+            bytes.add(duringNegBytes[i]);
+        }
+
+        byte[] tempNegBytes = ByteBufferUtil.getBytes(negativeOvershotTemp,ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < tempNegBytes.length; i++) {
+            bytes.add(tempNegBytes[i]);
+        }
+
+
+        PcrCommand cmd=new PcrCommand();
+        cmd.cmdDescription="设置过冲温度和时间";
+        cmd.addCommonBytes(bytes);
+        cmd.addCommand(listToByteArray(bytes));
+
+        return cmd;
+    }
     /**
      * 读取版本号
      * @return
