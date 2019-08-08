@@ -21,7 +21,8 @@
         android:supportsRtl="true"
         android:largeHeap="true"
         android:theme="@style/AppTheme"
-        android:resizeableActivity="false">
+        android:resizeableActivity="false"
+        android:hardwareAccelerated="false">
         <activity android:name=".ChartActivity">
 
         </activity>

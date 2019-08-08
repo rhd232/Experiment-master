@@ -1382,16 +1382,18 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             }
             if (status == 0 || (status==3&& !mHasMeltingCurve)) {//实验已经结束
                 if (!mBackPressed) {
-
-                    LoadingDialogHelper.showOpLoading(getActivity());
+                    if (!ActivityUtil.isFinish(getActivity()))
+                        LoadingDialogHelper.showOpLoading(getActivity());
 
                     closeDevice()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean aBoolean) {
-
-                            ToastUtil.showToast(getActivity(), getString(R.string.running_test_finished));
+                            if (!ActivityUtil.isFinish(getActivity())) {
+                                LoadingDialogHelper.hideOpLoading();
+                                ToastUtil.showToast(getActivity(), getString(R.string.running_test_finished));
+                            }
                             //顺便关闭实验
 
                             //TODO 自动跳转到实验数据分析页面
@@ -1423,7 +1425,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void toAnalyzePage() {
-        System.out.println("toAnalyzePage");
+
         mHistoryExperiment.setDuring(tv_duration.getDuring());
         mHistoryExperiment.setFinishMilliTime(System.currentTimeMillis());
 

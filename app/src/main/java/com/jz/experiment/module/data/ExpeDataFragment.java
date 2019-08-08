@@ -138,7 +138,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (!ActivityUtil.isFinish(getActivity()))
+                if (!ActivityUtil.isFinish(getActivity()) && !isDetached())
                     inflateChart();
             }
         },500);

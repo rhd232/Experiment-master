@@ -578,6 +578,10 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         AnitoaLogUtil.writeFileLog("===========开始初始化设备==========", mExecutorService);
         //初始化设备
         resetTrim();
+        //设置过冲温度和时间
+        PcrCommand overshotCmd=PcrCommand.ofOvershotTemperature();
+        mCommunicationService.sendPcrCommandSync(overshotCmd);
+        sleep(50);
         AnitoaLogUtil.writeFileLog("===========初始化设备结束==========", mExecutorService);
 
         FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
@@ -671,10 +675,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             return;
         }
 
-        //设置过冲温度和时间
-        PcrCommand overshotCmd=PcrCommand.ofOvershotTemperature();
-        service.sendPcrCommandSync(overshotCmd);
-        sleep(50);
+
 
         PcrCommand cmd = new PcrCommand();
         for (int i = 1; i <= 4; i++) {

@@ -15,6 +15,7 @@ import com.jz.experiment.chart.CommData;
 import com.jz.experiment.module.data.ExpeDataFragment;
 import com.jz.experiment.module.data.adapter.ChannelDataAdapter;
 import com.wind.base.mvp.view.BaseFragment;
+import com.wind.base.utils.ActivityUtil;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.ChannelData;
 import com.wind.data.expe.bean.HistoryExperiment;
@@ -180,6 +181,10 @@ public abstract class CtFragment extends BaseFragment {
         if (!CommData.diclist.keySet().contains(chan) || CommData.diclist.get(chan)==null|| CommData.diclist.get(chan).size() == 0)
             return;
 
+        if (ActivityUtil.isFinish(getActivity()) || isDetached()){
+            return;
+        }
+
         int currChan = 0;
 
 
@@ -218,7 +223,7 @@ public abstract class CtFragment extends BaseFragment {
         ksindex=numberVal.ksindex;
         ksIndexInAdapter=numberVal.ksIndexInAdapter;
         //还需要判断是否是假阳性
-        String negative=getString(R.string.negative);
+        String negative=getActivity().getString(R.string.negative);
         String ctValue;
         if (falsePositive[currChan][ksindex] && isPcrMode()){
             //假阳性
