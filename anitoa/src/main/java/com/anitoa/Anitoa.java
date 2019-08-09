@@ -85,6 +85,7 @@ public class Anitoa {
                 context.getApplicationContext().bindService(service, mBluetoothServiceConnection, Context.BIND_AUTO_CREATE);
 */
                 Intent usbService = new Intent(context.getApplicationContext(), UsbService.class);
+
                 context.getApplicationContext().bindService(usbService, mUsbServiceConnection, Context.BIND_AUTO_CREATE);
                 //System.out.println("request bindService");
             }

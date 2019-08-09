@@ -1177,18 +1177,9 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             if (cycling_cmd == 0x14 && cycling_type == 0x1) {
                 int cyclingNum = bytes[5] & 0xFF;
                 int cyclingStep = bytes[6] & 0xFF;
-                System.out.println("cyclingStep:" + cyclingStep + " cyclingNum:" + cyclingNum);
+                //System.out.println("cyclingStep:" + cyclingStep + " cyclingNum:" + cyclingNum);
 
                 mRunningCyclingStageIndex= bytes[7];
-                            /*if (cyclingNum == 0) {//只有一个循环时会出问题
-                                if (mStartCyclingNum) {
-                                    mRunningCyclingStageIndex++;
-                                    mStartCyclingNum = false;
-                                }
-
-                            } else {
-                                mStartCyclingNum = true;
-                            }*/
                 String c=getString(R.string.running_cycle);
                 if (mCyclingStageCount > 1) {
                     String stage=getString(R.string.running_stage);
@@ -1299,7 +1290,9 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                             mClosedPcrProgram=true;
                             AnitoaLogUtil.writeFileLog("开始熔解曲线实验");
                             //熔解曲线自动积分中
-                            LoadingDialogHelper.showOpLoading(getActivity());
+                            if (!ActivityUtil.isFinish(getActivity())) {
+                                LoadingDialogHelper.showOpLoading(getActivity());
+                            }
                             //TODO 执行熔解曲线自动积分时间
                             mFactUpdater.SetInitData();
                             closeDeviceAndMeltingAutoInt()
@@ -1668,7 +1661,10 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                         @Override
                         public void call(Long aLong) {
                             if (!mStep5Responsed) {
-                               // System.out.println("mStep5Count:"+mStep5Count);
+                               if (mInReconnecting){
+                                   AnitoaLogUtil.writeFileLog("正在执行重连");
+                                   return;
+                               }
                                 if (mStep5Count>1){
                                     //考虑下位机没响应了
                                     rescueStep5();
@@ -1689,14 +1685,15 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         }
     }
 
-
+    //是否处在重新连接中
+    private boolean mInReconnecting;
     private void rescueStep5() {
         AnitoaLogUtil.writeFileLog("rescueStep5 mCommunicationService==null?"+(mCommunicationService==null));
         if (mCommunicationService!=null){
             mCommunicationService.setNotify(this);
             mCommunicationService.stopReadThread();
             ThreadUtil.sleep(500);
-           // mCommunicationService.startReadThread();
+
             //探测是否能连接上
             PcrCommand cmd=PcrCommand.ofVersionCmd();
             byte [] reveicedBytes=mCommunicationService.sendPcrCommandSync(cmd);
@@ -1711,6 +1708,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             }
 
             if (reveicedBytes==null || reveicedBytes[0]==0){
+                mInReconnecting=true;
                 //还是没有连接上
                 AnitoaLogUtil.writeFileLog("unknown error occur");
                 //解绑service
@@ -1736,10 +1734,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                             }
                             AnitoaLogUtil.writeFileLog("获得了CommunicationService，执行连接");
                             UsbManagerHelper.connectUsbDevice(getActivity());
+                            mInReconnecting=false;
                         }
 
                     }
-                },1000);
+                },300);
 
             }
         }

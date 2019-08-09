@@ -268,10 +268,8 @@ public class UsbService extends CommunicationService {
                 mReadThread = new ReadThread();
                 mReadThread.start();*/
             }
-            System.out.println("连接成功:mUsbDeviceConnection" + mUsbDeviceConnection);
-            System.out.println("连接成功:mUsbEndpointOut" + mUsbEndpointOut);
-            System.out.println("连接成功:mUsbEndpointIn" + mUsbEndpointIn);
 
+            AnitoaLogUtil.writeFileLog("Usb设备连接上了");
             String name = "HID";
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 name = device.getProductName();
@@ -404,6 +402,8 @@ public class UsbService extends CommunicationService {
 
 
                 return buffer;
+            }else {
+                AnitoaLogUtil.writeFileLog("bulkTransfer 同步方法执行失败了，返回值为" + ret);
             }
 
             return null;
