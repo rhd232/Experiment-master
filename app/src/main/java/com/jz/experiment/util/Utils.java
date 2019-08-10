@@ -100,7 +100,8 @@ public class Utils {
             y += coefficients[i] * Math.pow(x, i);
         }
         return y;
-     /*   return coefficients[0] +
-                coefficients[1] * x;*/
+
     }
+
+
 }

@@ -167,11 +167,11 @@ public class StandardCurveFragment extends BaseFragment {
 
         String conc=getActivity().getString(R.string.concentration);
 
-        tv_y_desc.setText("log("+conc+")");
-        tv_y_desc.setVisibility(View.GONE);
-
-        tv_x_desc.setText("Ct");
+        tv_x_desc.setText("log("+conc+")");
         tv_x_desc.setVisibility(View.GONE);
+
+        tv_y_desc.setText("Ct");
+        tv_y_desc.setVisibility(View.GONE);
 
 
     }
@@ -434,7 +434,7 @@ public class StandardCurveFragment extends BaseFragment {
                     }
 
 
-                    double conc = Utils.getPolyY(coefficients, ct);
+                    double conc =(ct-coefficients[0])/coefficients[1]; //Utils.getPolyY(coefficients, ct);
                     DecimalFormat format = new DecimalFormat("#.##");
                     sampleRow.setConcentration(format.format(Math.pow(10, conc)));
                 }
@@ -454,9 +454,9 @@ public class StandardCurveFragment extends BaseFragment {
 
         for (int i = 0; i < size; i++) {
             try {
-                xx[i] = Double.parseDouble(stdRows.get(i).getCtValue());
+                yy[i] = Double.parseDouble(stdRows.get(i).getCtValue());
                 double conc = Double.parseDouble(stdRows.get(i).getConcentration());
-                yy[i] = Math.log10(conc);
+                xx[i] = Math.log10(conc);
             } catch (Exception e) {
                 e.printStackTrace();
                 ToastUtil.showToast(getActivity(), R.string.standard_illegal);
@@ -472,12 +472,11 @@ public class StandardCurveFragment extends BaseFragment {
     }
 
     private StdLineData mStdLineData;
-
     /**
      * x轴 log(浓度)
      * y轴 ct值
      */
-    private void drawStdCurve() {
+    private void drawStdCurve_() {
 
         List<SampleRow> stdRows = new ArrayList<>(standardAdapter.getData());
         stdRows.remove(0);
@@ -553,6 +552,107 @@ public class StandardCurveFragment extends BaseFragment {
                 double conc = Utils.getPolyY(coefficients, ct);
                 sampleRow.setConcentration(format.format(Math.pow(10, conc)));
                 unknownYY[i] = conc;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        //x轴 ，y轴对调
+
+        mStdLineData = new StdLineData(fitxx, fityy, xx, yy, unknownXX, unknownYY, equation.toString(), format.format(R2));
+
+        mStandardChart.addPoints(fitxx, fityy, xx, yy, unknownXX, unknownYY);
+
+
+
+        tv_y_desc.setVisibility(View.VISIBLE);
+        tv_x_desc.setVisibility(View.VISIBLE);
+    }
+    /**
+     * x轴 log(浓度)
+     * y轴 ct值
+     */
+    private void drawStdCurve() {
+
+        List<SampleRow> stdRows = new ArrayList<>(standardAdapter.getData());
+        stdRows.remove(0);
+
+        int size = stdRows.size();
+        double[] yy = new double[size];
+        double[] xx = new double[size];
+
+
+        double maxX = 0;
+        for (int i = 0; i < size; i++) {
+            try {
+                yy[i] = Double.parseDouble(stdRows.get(i).getCtValue());
+
+                double conc = Double.parseDouble(stdRows.get(i).getConcentration());
+                xx[i] = Math.log10(conc);
+
+                if (xx[i] > maxX) {
+                    maxX = xx[i];
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                ToastUtil.showToast(getActivity(), R.string.standard_illegal);
+                return;
+            }
+        }
+
+        //生成的标准曲线的点数
+        int intMax = (int) (maxX + 4);
+        double[] fitxx = new double[intMax];
+        for (int i = 0; i < intMax; i++) {
+            fitxx[i] = (double) (i);
+        }
+
+
+        double[] fityy = Utils.getPolyfit(1, xx, yy, fitxx);
+
+        double[] coefficients = Utils.getPolyCoefficients(1, xx, yy);
+
+        StringBuilder equation = new StringBuilder();
+        equation.append("y=");
+
+        DecimalFormat format = new DecimalFormat("#.##");
+        String xCoefficient = format.format(coefficients[1]);
+
+        equation.append(xCoefficient + "x");
+
+        String constCoefficient = format.format(coefficients[0]);
+        if (coefficients[0] >= 0) {
+            equation.append("+");
+        }
+        equation.append(constCoefficient);
+        tv_equation.setText(equation.toString());
+        //TODO 计算相关系数
+        double R2 = caculateR(xx, yy);
+        format = new DecimalFormat("#.######");
+        String nR2 = "R<sup>2</sup>:" + format.format(R2);
+        tv_r2.setText(Html.fromHtml(nR2));
+
+
+        //计算未知点
+        List<SampleRow> unknownRows = new ArrayList<>(unknowAdapter.getData());
+        unknownRows.remove(0);
+        size = unknownRows.size();
+        double[] unknownYY = new double[size];
+        double[] unknownXX = new double[size];
+
+
+        for (int i = 0; i < unknownRows.size(); i++) {
+            double ct = 0;
+            SampleRow sampleRow = unknownRows.get(i);
+            try {
+
+
+                ct = Double.parseDouble(sampleRow.getCtValue());
+                unknownYY[i] = ct;
+                double conc = (ct-coefficients[0])/coefficients[1];
+                sampleRow.setConcentration(format.format(Math.pow(10, conc)));
+                unknownXX[i] = conc;
             } catch (Exception e) {
                 e.printStackTrace();
             }

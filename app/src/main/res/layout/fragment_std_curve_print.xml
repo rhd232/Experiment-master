@@ -102,6 +102,20 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/color333333" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_y_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        />
+                    <TextView
+                        android:id="@+id/tv_x_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right|bottom"
+                        android:layout_marginBottom="10dp"
+                        />
                 </FrameLayout>
 
                 <LinearLayout

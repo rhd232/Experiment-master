@@ -62,7 +62,10 @@ public class StdCurvePrintPreviewFragment extends BaseFragment {
 
     @BindView(R.id.layout_print_tail)
     PrintTailLayout layout_print_tail;
-
+    @BindView(R.id.tv_y_desc)
+    TextView tv_y_desc;
+    @BindView(R.id.tv_x_desc)
+    TextView tv_x_desc;
     StandardCurveChart mStandardChart;
     TableAdapter standardAdapter;
     TableUnknowAdapter unknowAdapter;
@@ -113,6 +116,12 @@ public class StdCurvePrintPreviewFragment extends BaseFragment {
                 System.out.println("layout_a4:" + layout_a4.getWidth()+ "-"+layout_a4.getHeight());
             }
         }, 1000);*/
+        String conc=getActivity().getString(R.string.concentration);
+        tv_x_desc.setText("log("+conc+")");
+        tv_x_desc.setVisibility(View.GONE);
+
+        tv_y_desc.setText("Ct");
+        tv_y_desc.setVisibility(View.GONE);
     }
 
 

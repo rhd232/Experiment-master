@@ -56,8 +56,6 @@ public class CurveReader {
                 List<ChartData> cdlist = CommData.GetChartData(tdlist.get(i), 0, kslist.get(n));//获取选点值
                 for (int k = 0; k < cdlist.size(); k++)
                 {
-
-
                    /* double factorValue=factorValues[GetChan(tdlist.get(i))][k];
                     m_yData[i][n][k] = cdlist.get(k).y /factorValue;*/
                     m_yData[i][n][k] = cdlist.get(k).y ;

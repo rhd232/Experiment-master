@@ -16,7 +16,7 @@ public class MeltCurveReader {
         return INSTANCE;
     }*/
 
-    public MeltingChart.MeltingData readCurve(double[][] factorValues,float startTemp){
+    public MeltingChart.MeltingData readCurve(/*double[][] factorValues,*/float startTemp){
 
         double [][][]m_yData = new double[CCurveShowMet.MAX_CHAN][CCurveShowMet.MAX_WELL][ CCurveShowMet.MAX_CYCL];
         CCurveShowMet cCurveShowMet = new CCurveShowMet();//CCurveShowMet.getInstance();
@@ -66,7 +66,7 @@ public class MeltCurveReader {
             cCurveShowMet.m_yData = m_yData;
             cCurveShowMet.m_Size = m_Size;
             cCurveShowMet.mtemp = mtemp;
-            cCurveShowMet.ifactor = factorValues;
+           // cCurveShowMet.ifactor = factorValues;
             cCurveShowMet.start_temp=startTemp;
             cCurveShowMet.UpdateAllcurve();
            /* m_zData = cCurveShowMet.m_zData;

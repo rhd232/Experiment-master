@@ -1,6 +1,7 @@
 package com.jz.experiment.widget;
 
 import android.content.Context;
+import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -10,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.jz.experiment.R;
@@ -74,18 +76,31 @@ public class CtParamInputLayout extends FrameLayout {
 
         if (TextUtils.isEmpty(ctMin)) {
             param.ctMin = DEFALUT_MIN_CT;
-            et_ct_min.setText(DEFALUT_MIN_CT+"");
+            setText(et_ct_min,DEFALUT_MIN_CT+"");
+           // et_ct_min.setText(DEFALUT_MIN_CT+"");
         } else {
             param.ctMin = Integer.parseInt(ctMin);
         }
         if (TextUtils.isEmpty(ctThreshold)) {
             param.ctThreshhold = DEFALUT_THRESHHOLD_CT;
-            et_ct_threshold.setText(DEFALUT_THRESHHOLD_CT+"");
+            setText(et_ct_threshold,DEFALUT_THRESHHOLD_CT+"");
+           // et_ct_threshold.setText(DEFALUT_THRESHHOLD_CT+"");
         } else {
             param.ctThreshhold = Integer.parseInt(ctThreshold);
         }
 
         return param;
+    }
+
+    private Handler mHandler=new Handler();
+    private void setText(final TextView tv, final String text){
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                tv.setText(text);
+            }
+        });
+
     }
 
     public void set(int ctMin,int ctThreshhold){

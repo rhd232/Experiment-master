@@ -64,7 +64,7 @@ public class FactUpdater {
         }
 
         DynamicUpdateIntTime();
-        CommData.m_factorData = m_factorData;
+       // CommData.m_factorData = m_factorData;
 
         //需要在m_factorData前面插入1
       /*  double [][] temp=new double[CCurveShow.MAX_CHAN][400];

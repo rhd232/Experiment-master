@@ -81,10 +81,10 @@ public class MeltingChart extends WindChart {
             mFactUpdater.setPcr(false);
             mFactUpdater.updateFact();
         } else {
-            CommData.m_factorData = DataFileReader.getInstance().factorValue;
+           // CommData.m_factorData = DataFileReader.getInstance().factorValue;
         }
         //  if (!mRunning) {//读取历史文件的时候拟合曲线
-        mMeltingData=new MeltCurveReader().readCurve(CommData.m_factorData, startTemp);
+        mMeltingData=new MeltCurveReader().readCurve(/*CommData.m_factorData,*/ startTemp);
         //}
 
         mLegendEntries = new ArrayList<>();

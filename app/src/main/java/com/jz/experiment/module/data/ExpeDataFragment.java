@@ -41,7 +41,6 @@ import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.response.BaseResponse;
-import com.wind.base.utils.ActivityUtil;
 import com.wind.base.utils.AppUtil;
 import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.Channel;
@@ -113,6 +112,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     CheckBox cb_norm;
     private boolean mSaved;
     private Handler mHandler=new Handler();
+    private boolean mLoaded;
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_expe_data;
@@ -124,6 +124,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+        System.out.println("onViewCreated getUserVisibleHint->"+getUserVisibleHint() );
         sv = view.findViewById(R.id.sv);
         ll_root = view.findViewById(R.id.ll_root);
         layout_ctparam_input.setOnCtParamChangeListener(this);
@@ -133,15 +134,22 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         chart_melt.setVisibility(View.GONE);
 
         mExecutorService = Executors.newSingleThreadExecutor();
-        init();
+
         inflateBase();
-        mHandler.postDelayed(new Runnable() {
+      /*  mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (!ActivityUtil.isFinish(getActivity()) && !isDetached())
                     inflateChart();
             }
-        },500);
+        },500);*/
+       // inflateChart();
+
+        if (getUserVisibleHint()){
+            initKsAndChanList();
+            inflateChart();
+            mLoaded=true;
+        }
 
         iv_save.setVisibility(View.GONE);
 
@@ -153,12 +161,13 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                     YAxis yAxis=chart_dt.getAxisLeft();
                     yAxis.setAxisMaximum(5000);
                 }
-
+                System.out.println("onCheckedChanged");
                 showChart();
             }
         });
 
     }
+
 
     @Override
     protected boolean isPcrMode() {
@@ -183,7 +192,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     private List<String> ChanList = new ArrayList<>();
     private List<String> KSList = new ArrayList<String>();
 
-    public void init() {
+    public void initKsAndChanList() {
         CommData.diclist.clear();
         List<Channel> channels = mExperiment.getSettingsFirstInfo().getChannels();
         CommData.cboChan1 = 0;
@@ -288,12 +297,15 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         });
     }
 
-
+    private boolean mReadingFile;
     private void inflateChart() {
         if (mExperiment == null) {
             return;
         }
-
+        if (mReadingFile){
+            return;
+        }
+        mReadingFile=true;
         //统计总共有多少循环（不拍照的不包括）
         int totalCyclingCount = 0;
         List<Stage> cyclingSteps = mExperiment.getSettingSecondInfo().getCyclingSteps();
@@ -311,44 +323,55 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             }
         }
         mDtChart = new DtChart(chart_dt, totalCyclingCount);
-        //文件读取之后孔数已经有值
-        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(),cb_norm.isChecked());
+        mExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                //文件读取之后孔数已经有值
+                mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(),cb_norm.isChecked());
 
-        //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
-        KSList.clear();
-        KSList = Well.getWell().getKsList();
+                //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
+                KSList.clear();
+                KSList = Well.getWell().getKsList();
 
-        //获取CT value
-        for (String chan : ChanList) {
-            for (String ks : KSList) {
+                //获取CT value
+                for (String chan : ChanList) {
+                    for (String ks : KSList) {
 
-                getCtValue(chan, ks,  mDtChart.getDtData().m_CTValue,  mDtChart.getDtData().m_falsePositive);
+                        getCtValue(chan, ks,  mDtChart.getDtData().m_CTValue,  mDtChart.getDtData().m_falsePositive);
+                    }
+                }
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mChannelDataAdapters[0].notifyDataSetChanged();
+                        mChannelDataAdapters[1].notifyDataSetChanged();
+
+                        mHasMeltingMode = mExperiment.getSettingSecondInfo().getModes().size() > 1;
+                        if (mHasMeltingMode) {
+                            mMeltingChart = new MeltingChart(chart_melt);
+                            float start;
+                            try {
+                                // start = Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
+                                List<Stage> stages=mExperiment.getSettingSecondInfo().getSteps();
+                                start=stages.get(stages.size()-2).getTemp();
+                                //start = Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                start = 40;
+                            }
+                            mMeltingChart.setStartTemp(start);
+                            mMeltingChart.setAxisMinimum(start);
+                            //mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExperiment), layout_ctparam_input.getCtParam());
+                        } else {
+                            tv_melt.setVisibility(View.GONE);
+                        }
+                        mReadingFile=false;
+                    }
+                });
+
             }
-        }
+        });
 
-        mChannelDataAdapters[0].notifyDataSetChanged();
-        mChannelDataAdapters[1].notifyDataSetChanged();
-
-        mHasMeltingMode = mExperiment.getSettingSecondInfo().getModes().size() > 1;
-        if (mHasMeltingMode) {
-            //tv_melt.setVisibility(View.VISIBLE);
-            mMeltingChart = new MeltingChart(chart_melt);
-            float start;
-            try {
-               // start = Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
-                List<Stage> stages=mExperiment.getSettingSecondInfo().getSteps();
-                start=stages.get(stages.size()-2).getTemp();
-                //start = Float.parseFloat(mExperiment.getSettingSecondInfo().getStartTemperature());
-            } catch (Exception e) {
-                e.printStackTrace();
-                start = 40;
-            }
-            mMeltingChart.setStartTemp(start);
-            mMeltingChart.setAxisMinimum(start);
-            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExperiment), layout_ctparam_input.getCtParam());
-        } else {
-            tv_melt.setVisibility(View.GONE);
-        }
 
     }
 
@@ -653,7 +676,13 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         mVisibleToUser = isVisibleToUser;
-
+        System.out.println("getUserVisibleHint->"+getUserVisibleHint());
+        if (getUserVisibleHint() && !mLoaded && mExperiment!=null){
+            System.out.println("inflateChart");
+            mLoaded=true;
+            initKsAndChanList();
+            inflateChart();
+        }
     }
 
     @Subscribe
@@ -730,6 +759,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mLoaded=false;
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
     }

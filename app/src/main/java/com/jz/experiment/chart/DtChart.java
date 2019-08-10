@@ -92,18 +92,15 @@ public class DtChart extends WindChart {
     public void show(List<String> ChanList, List<String> KSList, InputStream ips, CtParamInputLayout.CtParam ctParam, boolean norm) {
 
         //读取图像文件数据
+
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
         if (mRunning) {
             mFactUpdater.setPcr(true);
             mFactUpdater.updateFact();
             norm=false;//运行时norm始终为false
-
-        }else {
-            CommData.m_factorData=DataFileReader.getInstance().factorValue;
-
         }
         CurveReader reader=new CurveReader();
-        mDtData=reader.readCurve(ctParam,norm);//CurveReader.getInstance().readCurve(/*CommData.m_factorData,*/ctParam,norm);
+        mDtData=reader.readCurve(ctParam,norm);
 
         mLegendEntries = new ArrayList<>();
         mLineColors.clear();
