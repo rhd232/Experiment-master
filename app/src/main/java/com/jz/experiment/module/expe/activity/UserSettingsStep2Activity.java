@@ -42,7 +42,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
         mFragment=UserSettingsStep2Fragment.newInstance(historyExperiment);
         replaceFragment(mFragment);
 
-        AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onCreate");
+   //     AnitoaLogUtil.writeFileLog("UserSettingsStep2Activity onCreate");
     }
 
 

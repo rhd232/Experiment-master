@@ -726,6 +726,12 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        AnitoaLogUtil.writeFileLog("ExpeRunningActivity onSaveInstanceState");
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 

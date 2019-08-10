@@ -156,14 +156,14 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         if (isLandscape){
              stageItemWidth=AppUtil.getScreenWidth(getActivity())/4;
 
-             int titleBarHeight=getActivity().getResources().getDimensionPixelSize(R.dimen.titlebar_height);
+            /* int titleBarHeight=getActivity().getResources().getDimensionPixelSize(R.dimen.titlebar_height);
              int deviceBarHeight=getActivity().getResources().getDimensionPixelSize(R.dimen.device_statebar_height);
              int knownHeightDp=44+8+44+1+90+1+45+1+1;
              int knownHeightPx=DisplayUtil.dip2px(getActivity(),knownHeightDp);
              //TODO 计算VernierDragLayout充满屏幕的高度
             int vernierDragLayoutHeight=AppUtil.getScreenHeight(getActivity())
                     -knownHeightPx-titleBarHeight-deviceBarHeight-AppUtil.getStatusBarHeight(getActivity());
-            System.out.println("vernierDragLayoutHeight:"+vernierDragLayoutHeight);
+            System.out.println("vernierDragLayoutHeight:"+vernierDragLayoutHeight);*/
         }else {
             stageItemWidth= DisplayUtil.dip2px(getActivity(),120);
         }

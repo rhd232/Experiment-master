@@ -132,6 +132,7 @@ public abstract class WindChart {
                         Legend legend = mChart.getLegend();
                         legend.setCustom(mLegendEntries);
                     }
+
                     //  synchronized (ExpeRunningActivity.this) {
                     mChart.setDrawMarkers(false);
                     mChart.setAutoScaleMinMaxEnabled(true);

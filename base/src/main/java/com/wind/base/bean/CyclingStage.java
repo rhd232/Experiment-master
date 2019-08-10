@@ -1,7 +1,6 @@
 package com.wind.base.bean;
 
 import android.os.Parcel;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,16 +21,16 @@ public class CyclingStage extends Stage {
         serialNumber=in.readInt();
         cyclingCount=in.readInt();
         partStageList=in.readArrayList(PartStage.class.getClassLoader());
-
     }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest,flags);
         dest.writeInt(serialNumber);
         dest.writeInt(cyclingCount);
         dest.writeList(partStageList);
-
     }
+
     public static final Creator<Stage> CREATOR = new Creator<Stage>() {
         @Override
         public Stage createFromParcel(Parcel in) {

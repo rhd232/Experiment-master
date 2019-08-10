@@ -53,7 +53,7 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                 mFragmentAdapter.notifyDataSetChanged();
             }
         }
-        //view_pager.setOffscreenPageLimit(1);
+        view_pager.setOffscreenPageLimit(1);
         layout_loading = view.findViewById(R.id.layout_loading);
         layout_loading.setEmpty(R.layout.layout_expe_empty);
         layout_loading.setOnEmptyInflateListener(new LoadingLayout.OnInflateListener() {

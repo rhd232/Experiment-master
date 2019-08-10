@@ -27,7 +27,7 @@ public class DtChart extends WindChart {
         this(chart,cylingCount,null);
     }
 
-    private static float FIRST_AXIS_MAX=5000;
+    private static float FIRST_AXIS_MAX=3000;
     private String channelStr;
     YAxis yAxis;
     public DtChart(LineChart chart,int cylingCount,FactUpdater factUpdater) {
@@ -186,7 +186,7 @@ public class DtChart extends WindChart {
         LineDataSet dataSet = new LineDataSet(expeData, channelStr + (currChan + 1));
         dataSet.setColor(color);
         dataSet.setDrawCircles(false);
-       // dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
         dataSet.setDrawValues(false);
         mLineColors.add(color);
         mWellNames.add(currks);
