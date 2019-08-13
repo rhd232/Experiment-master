@@ -59,10 +59,9 @@ public class MeltingChart extends WindChart {
     public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam,
                      boolean norm) {
 
-        InputStream ips = null;
+        InputStream ips;
         try {
             ips = new FileInputStream(dataFile);
-            //ips = mChart.getContext().getAssets().open("2019_02_15_01_42_12_melting.txt");
             show(ChanList, KSList, ips, startTemp);
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,7 +83,8 @@ public class MeltingChart extends WindChart {
            // CommData.m_factorData = DataFileReader.getInstance().factorValue;
         }
         //  if (!mRunning) {//读取历史文件的时候拟合曲线
-        mMeltingData=new MeltCurveReader().readCurve(/*CommData.m_factorData,*/ startTemp);
+        MeltCurveReader reader=new MeltCurveReader();
+        mMeltingData=reader.readCurve(/*CommData.m_factorData,*/ startTemp);
         //}
 
         mLegendEntries = new ArrayList<>();

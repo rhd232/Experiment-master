@@ -39,12 +39,14 @@ public class Anitoa {
 
     }
     public void unbindService(Context context){
-        if (mBinding){
+       // if (mBinding){
             AnitoaDisConnectedEvent event = new AnitoaDisConnectedEvent("MyHid From Main","");
             EventBus.getDefault().post(event);
+            onDestroy();
             try {
                 context.getApplicationContext().unbindService(mUsbServiceConnection);
                 mUsbServiceConnection=null;
+                mUsbService=null;
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -58,15 +60,15 @@ public class Anitoa {
                 e.printStackTrace();
             }
 
-            onDestroy();
-        }
+
+       // }
     }
 
     public void onDestroy(){
         if (mUsbService!=null){
             mUsbService.stopReadThread();
-            mUsbService.onDestroy();
-            mUsbService=null;
+            mUsbService.release();
+           // mUsbService=null;
         }
 
         if (mBluetoothService!=null){

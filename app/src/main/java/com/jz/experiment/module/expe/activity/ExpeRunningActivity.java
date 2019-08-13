@@ -468,7 +468,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         if (chart_dt.getVisibility() == View.VISIBLE) {
             chart_dt.setVisibility(View.GONE);
         }
-        mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mHistoryExperiment),null);
+        mMeltingChart.show(ChanList, KSList,
+                DataFileUtil.getMeltImageDateFile(mHistoryExperiment),null);
     }
 
     private void showDtChart() {
@@ -549,7 +550,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     if (!mExpeFinished) {
                         stopCycling();
                     }
-                    Thread.sleep(200);
+                    Thread.sleep(3000);
 
                     if (mHistoryExperiment.isAutoIntegrationTime()) {
                         autoInt(mFactUpdater);
@@ -1299,7 +1300,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                             if (!ActivityUtil.isFinish(getActivity())) {
                                 LoadingDialogHelper.showOpLoading(getActivity());
                             }
-                            //TODO 执行熔解曲线自动积分时间
+                            // 执行熔解曲线自动积分时间
                             mFactUpdater.SetInitData();
                             closeDeviceAndMeltingAutoInt()
                                     .subscribeOn(Schedulers.io())
@@ -1379,7 +1380,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 step6Subscription.unsubscribe();
                 step6Subscription = null;
             }
-            if (status == 0 || (status==3&& !mHasMeltingCurve)) {//实验已经结束
+            if (status == 0 || (status==3&& !mHasMeltingCurve) || (status == 3&&mMeltingCurveStarted)) {//实验已经结束
                 if (!mBackPressed) {
                     if (!ActivityUtil.isFinish(getActivity()))
                         LoadingDialogHelper.showOpLoading(getActivity());
@@ -1740,6 +1741,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                             }
                             AnitoaLogUtil.writeFileLog("获得了CommunicationService，执行连接");
                             UsbManagerHelper.connectUsbDevice(getActivity());
+                            mCommunicationService.setNotify(ExpeRunningActivity.this);
                             mInReconnecting=false;
                         }
 

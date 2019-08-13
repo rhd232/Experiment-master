@@ -368,6 +368,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 mMeltingChart.setStartTemp(start);
                 mMeltingChart.setAxisMinimum(start);
             }
+            tv_melt.setVisibility(View.VISIBLE);
         } else {
             tv_melt.setVisibility(View.GONE);
         }

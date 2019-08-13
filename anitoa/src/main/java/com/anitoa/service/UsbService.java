@@ -235,6 +235,7 @@ public class UsbService extends CommunicationService {
         }
     };
 
+    private UsbInterface mHidInterface;
     private void usbDeviceInit(UsbDevice device) {
         int interfaceCount = device.getInterfaceCount();
         UsbInterface usbInterface = null;
@@ -250,13 +251,24 @@ public class UsbService extends CommunicationService {
         if (usbInterface == null) {
             return;
         }
+        StringBuilder sBuilder=new StringBuilder("正在重新连接->");
+        sBuilder.append("usbInterface==null")
+                .append((usbInterface==null));
         if (usbInterface != null) {
+            mHidInterface=usbInterface;
             //mUsbInterfaceMap.put(device.getDeviceName(), usbInterface);
             UsbDeviceConnection connection = mUsbManager.openDevice(device);
+            sBuilder.append("==")
+                    .append("UsbDeviceConnection==null")
+                    .append((connection==null));
             if (connection != null) {
                 // mUsbDeviceConnectionMap.put(device.getDeviceName(), connection);
                 mUsbDeviceConnection = connection;
-                if (connection.claimInterface(usbInterface, true)) {
+                boolean claimed=connection.claimInterface(usbInterface, true);
+                sBuilder.append("===")
+                        .append("claimed:")
+                        .append(claimed);
+                if (claimed) {
                     //获取输入输入端点
                     mUsbEndpointOut = usbInterface.getEndpoint(1);
                     mUsbEndpointIn = usbInterface.getEndpoint(0);
@@ -268,8 +280,12 @@ public class UsbService extends CommunicationService {
                 mReadThread = new ReadThread();
                 mReadThread.start();*/
             }
-
-            AnitoaLogUtil.writeFileLog("Usb设备连接上了");
+            sBuilder.append("==")
+                    .append("mUsbEndpointOut==null")
+                    .append((mUsbEndpointOut==null))
+                    .append("mUsbEndpointIn==null")
+                    .append((mUsbEndpointIn==null));
+            AnitoaLogUtil.writeFileLog(sBuilder.toString());
             String name = "HID";
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 name = device.getProductName();
@@ -515,7 +531,7 @@ public class UsbService extends CommunicationService {
         @Override
         public void run() {
             boolean canRun = mUsbEndpointOut != null && mUsbEndpointIn != null;
-            // System.out.println("canRun:"+canRun);
+            AnitoaLogUtil.writeFileLog("ReadThread canRun->"+canRun);
             if (canRun) {
 
                 while (mRun) {
@@ -568,23 +584,42 @@ public class UsbService extends CommunicationService {
             }
         }
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void release(){
+        mListener=null;
         try {
+            StringBuilder sBuilder=new StringBuilder("release前");
+            if (mUsbDeviceConnection!=null){
+                mUsbDeviceConnection.releaseInterface(mHidInterface);
+                mUsbDeviceConnection.close();
+                mUsbDeviceConnection=null;
+                mHidInterface=null;
+                sBuilder.append("执行releaseInterface And close");
+            }
+            sBuilder.append("release 后");
+            AnitoaLogUtil.writeFileLog(sBuilder.toString());
             unregisterReceiver(mUsbEventReceiver);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        mTargetDevice = null;
+        mUsbEndpointOut = null;
+        mUsbEndpointIn = null;
+        mUsbDeviceConnection = null;
+
         try {
             unregisterReceiver(mUsbPermissionReceiver);
         } catch (Exception e) {
             e.printStackTrace();
 
         }
-
     }
+    /*@Override
+    public void onDestroy() {
+        super.onDestroy();
+
+
+    }*/
 
     private final BroadcastReceiver mUsbEventReceiver = new BroadcastReceiver() {
         @Override

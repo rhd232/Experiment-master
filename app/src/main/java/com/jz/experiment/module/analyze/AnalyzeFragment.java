@@ -111,7 +111,6 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
             }
         });
     }
-    private String mCurMode;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -220,7 +219,6 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                     if (mExpeJsonBean==null){
                         return;
                     }
-                    mCurMode=null;
                     switchMode();
 
 
@@ -235,14 +233,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         if (mExpeJsonBean==null){
             return;
         }
-        System.out.println("switchMode");
-        String selectItem= (String) spinner.getSelectedItem();
-        if(selectItem.equals(mCurMode)){
-            return;
-        }
-        String melting = getString(R.string.setup_mode_melting);
 
-      //  showChart();
 
         double[][] ctValues;
         boolean[][] falsePositive;
@@ -250,7 +241,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         chart_line.setDrawMarkers(false);
 
         String dataFileName="";
-        if (melting.equals(mCurMode)) {
+        if (!isPcrMode()) {
             if (mExpeJsonBean.getMelting()!=null) {
                 layout_ctparam_input.set(mExpeJsonBean.getMelting().ctMin,mExpeJsonBean.getMelting().ctThreshold);
                 mChart = new MeltingChart(chart_line);
@@ -283,13 +274,16 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
             //获取类型，是扩增曲线还是熔解曲线
             mChart = new DtChart(chart_line, totalCyclingCount);
         }
+
+
+
         mCurDataPath=mOpenedFile.getParentFile().getAbsolutePath()+"/"+dataFileName;
         mChart.show(ChanList, KSList, new File(mCurDataPath), layout_ctparam_input.getCtParam(),cb_norm.isChecked());
 
 
         buildChannelData();
 
-        if (melting.equals(mCurMode)) {
+        if (!isPcrMode()) {
             MeltingChart meltingChart= (MeltingChart) mChart;
             ctValues = meltingChart.getMeltingData().m_CTValue;
             falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];

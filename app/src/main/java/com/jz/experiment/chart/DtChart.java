@@ -2,7 +2,6 @@ package com.jz.experiment.chart;
 
 import android.graphics.Color;
 
-import com.anitoa.util.AnitoaLogUtil;
 import com.anitoa.well.Well;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -12,7 +11,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.jz.experiment.R;
-import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.widget.CtParamInputLayout;
 
 import java.io.File;
@@ -27,15 +25,13 @@ public class DtChart extends WindChart {
         this(chart,cylingCount,null);
     }
 
-    private static float FIRST_AXIS_MAX=3000;
+    private static float FIRST_AXIS_MAX=5000;
     private String channelStr;
     YAxis yAxis;
     public DtChart(LineChart chart,int cylingCount,FactUpdater factUpdater) {
         super(chart,factUpdater);
         channelStr=chart.getContext().getString(R.string.setup_channel);
         XAxis xAxis = chart.getXAxis();
-      //  xAxis.setLabelCount(cylingCount + 4, true);
-      //  xAxis.setAxisMaximum(60);
         xAxis.setAxisMaximum(cylingCount);
 
         yAxis=chart.getAxisLeft();
@@ -47,10 +43,9 @@ public class DtChart extends WindChart {
         show(ChanList,KSList,dataFile,ctParam,true);
     }
     public void show(List<String> ChanList, List<String> KSList, File dataFile, CtParamInputLayout.CtParam ctParam,boolean norm){
-        InputStream ips = null;
+        InputStream ips;
         try {
             ips = new FileInputStream(dataFile);
-            //ips = mChart.getContext().getAssets().open("2019_02_13_04_11_17_dt.txt");
             show(ChanList, KSList, ips,ctParam, norm);
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,32 +53,7 @@ public class DtChart extends WindChart {
 
     }
 
-    private void recordFactorData(String msg, double[][] factorData){
-        StringBuilder sBuilder=new StringBuilder();
-        sBuilder.append(msg);
-        sBuilder.append("\n");
-        sBuilder.append("[");
-        for (int j=0;j<=3;j++) {
-            if (j==0) {
-                String s = channelStr + (j + 1);
-                sBuilder.append(s);
-                sBuilder.append("\n");
-                for (int i = 0; i < 100; i++) {
-                    double d = factorData[j][i];
-                    if (i % 10 == 0) {
-                        sBuilder.append("\n");
-                    }
-                    sBuilder.append(d).append(",");
-                }
-                sBuilder.append("\n");
-            }
-        }
-        sBuilder.append("]");
-        //System.out.println(sBuilder.toString());
-        AnitoaLogUtil.writeToFile(DataFileUtil.getOrCreateFile("factor_log.txt"),sBuilder.toString());
-    }
     private DtData mDtData;
-
 
     public DtData getDtData() {
         return mDtData;
@@ -92,7 +62,6 @@ public class DtChart extends WindChart {
     public void show(List<String> ChanList, List<String> KSList, InputStream ips, CtParamInputLayout.CtParam ctParam, boolean norm) {
 
         //读取图像文件数据
-
         DataFileReader.getInstance().ReadFileData(ips,mRunning);
         if (mRunning) {
             mFactUpdater.setPcr(true);
@@ -160,9 +129,7 @@ public class DtChart extends WindChart {
                 mLegendEntries.add(legendEntry);
             }
 
-
         }
-
 
         ksindex= Well.getWell().getWellIndex(currks);
 

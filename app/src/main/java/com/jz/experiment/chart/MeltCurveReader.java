@@ -74,9 +74,9 @@ public class MeltCurveReader {
             m_CTValue = cCurveShowMet.m_CTValue;*/
 
             MeltingChart.MeltingData meltingData=new MeltingChart.MeltingData();
-            meltingData.m_zData=m_zData;
-            meltingData.m_zdData=m_zdData;
-            meltingData.m_CTValue=m_CTValue;
+            meltingData.m_zData=cCurveShowMet.m_zData;
+            meltingData.m_zdData=cCurveShowMet.m_zdData;
+            meltingData.m_CTValue=cCurveShowMet.m_CTValue;
             return meltingData;
         }
         catch (Exception ex)
