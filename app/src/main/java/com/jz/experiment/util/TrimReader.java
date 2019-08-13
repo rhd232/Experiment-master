@@ -254,7 +254,7 @@ public class TrimReader {
                                   int gain_mode, int flag) {
 
         if (FlashData.flash_loaded) {
-            //System.out.println("FlashData.flash_loaded:true");
+
             return ADCCorrectioni(numData, highByte, lowByte, pixelNum, PCRNum, gain_mode, flag);
         }
 

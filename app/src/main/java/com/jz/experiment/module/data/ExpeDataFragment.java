@@ -355,19 +355,17 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
         mHasMeltingMode = mExperiment.getSettingSecondInfo().getModes().size() > 1;
         if (mHasMeltingMode) {
-            if (mMeltingChart == null) {
-                mMeltingChart = new MeltingChart(chart_melt);
-                float start;
-                try {
-                    List<Stage> stages = mExperiment.getSettingSecondInfo().getSteps();
-                    start = stages.get(stages.size() - 2).getTemp();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    start = 40;
-                }
-                mMeltingChart.setStartTemp(start);
-                mMeltingChart.setAxisMinimum(start);
+            mMeltingChart = new MeltingChart(chart_melt);
+            float start;
+            try {
+                List<Stage> stages = mExperiment.getSettingSecondInfo().getSteps();
+                start = stages.get(stages.size() - 2).getTemp();
+            } catch (Exception e) {
+                e.printStackTrace();
+                start = 40;
             }
+            mMeltingChart.setStartTemp(start);
+            mMeltingChart.setAxisMinimum(start);
             tv_melt.setVisibility(View.VISIBLE);
         } else {
             tv_melt.setVisibility(View.GONE);
