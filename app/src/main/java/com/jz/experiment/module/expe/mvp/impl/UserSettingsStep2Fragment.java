@@ -1,5 +1,6 @@
 package com.jz.experiment.module.expe.mvp.impl;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -66,6 +67,8 @@ import com.wind.data.expe.datastore.ExpeDataStore;
 import com.wind.data.expe.request.InsertExpeRequest;
 import com.wind.data.expe.response.InsertExpeResponse;
 import com.wind.toastlib.ToastUtil;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -151,10 +154,10 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         rv.setNestedScrollingEnabled(false);
 
         //动态计算stage宽度
-        boolean isLandscape=ActivityUtil.isLandscape(getActivity());
+        boolean isLandscape = ActivityUtil.isLandscape(getActivity());
         int stageItemWidth;
-        if (isLandscape){
-             stageItemWidth=AppUtil.getScreenWidth(getActivity())/4;
+        if (isLandscape) {
+            stageItemWidth = AppUtil.getScreenWidth(getActivity()) / 4;
 
             /* int titleBarHeight=getActivity().getResources().getDimensionPixelSize(R.dimen.titlebar_height);
              int deviceBarHeight=getActivity().getResources().getDimensionPixelSize(R.dimen.device_statebar_height);
@@ -164,25 +167,25 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             int vernierDragLayoutHeight=AppUtil.getScreenHeight(getActivity())
                     -knownHeightPx-titleBarHeight-deviceBarHeight-AppUtil.getStatusBarHeight(getActivity());
             System.out.println("vernierDragLayoutHeight:"+vernierDragLayoutHeight);*/
-        }else {
-            stageItemWidth= DisplayUtil.dip2px(getActivity(),120);
+        } else {
+            stageItemWidth = DisplayUtil.dip2px(getActivity(), 120);
         }
 
-        mStageAdapter = new StageAdapter(getActivity(),stageItemWidth);
+        mStageAdapter = new StageAdapter(getActivity(), stageItemWidth);
         rv.setAdapter(mStageAdapter);
 
         ExpeSettingSecondInfo expeSettingSecondInfo = mHistoryExperiment.getSettingSecondInfo();
         if (expeSettingSecondInfo == null) {
             List<DisplayItem> list = new ArrayList<>();
             list.add(new StartStage());
-            CyclingStage cyclingStage=new CyclingStage();
+            CyclingStage cyclingStage = new CyclingStage();
             cyclingStage.addChildStage(0, new PartStage());
             cyclingStage.addChildStage(1, new PartStage());
             list.add(cyclingStage);
             list.add(new EndStage());
             mStageAdapter.addAll(list);
             mModes = new ArrayList<>();
-            String dt=getString(R.string.setup_mode_dt);
+            String dt = getString(R.string.setup_mode_dt);
             mModes.add(new DtMode(dt));
             buildModeShowName();
         } else {
@@ -204,7 +207,6 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         }, 500);
 
 
-
     }
 
     @Subscribe
@@ -215,11 +217,12 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             //ToastUtil.showToast(getActivity(), "最多两个预变性阶段");
             return;
         }
-        mStageAdapter.add(event.getPosition()+1, new StartStage());
+        mStageAdapter.add(event.getPosition() + 1, new StartStage());
         buildLink();
         Log.i("StartStage", "onAddStartStageEvent");
 
     }
+
     private void caculateStageItemWidth() {
         /*int count=mStageAdapter.getItemCount();
         //需要算出每个循环阶段下的步骤数
@@ -265,9 +268,9 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
     @Subscribe
     public void onAddCyclingStage(AddCyclingStageEvent event) {
-        CyclingStage cyclingStage=new CyclingStage();
+        CyclingStage cyclingStage = new CyclingStage();
         cyclingStage.addChildStage(0, new PartStage());
-        mStageAdapter.add(event.getPosition()+1,cyclingStage);
+        mStageAdapter.add(event.getPosition() + 1, cyclingStage);
 
         buildLink();
 
@@ -279,19 +282,19 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
     @Subscribe
     public void onDelCyclingStageEvent(DelCyclingStageEvent event) {
         //判断当前cycleing
-        int cyclingStageCount=0;
+        int cyclingStageCount = 0;
         for (int i = 0; i < mStageAdapter.getItemCount(); i++) {
             Stage stage = (Stage) mStageAdapter.getItem(i);
-            if (stage instanceof CyclingStage){
+            if (stage instanceof CyclingStage) {
                 cyclingStageCount++;
             }
         }
-        if (cyclingStageCount>1) {
+        if (cyclingStageCount > 1) {
             mStageAdapter.remove(event.getPosition());
             buildLink();
             Log.i("ChangeStage", "onDelCyclingStageEvent");
-        }else {
-            ToastUtil.showToast(getActivity(),"至少含有一个循环阶段");
+        } else {
+            ToastUtil.showToast(getActivity(), "至少含有一个循环阶段");
         }
         caculateStageItemWidth();
     }
@@ -317,7 +320,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         mHistoryExperiment.setDevice(deviceName);
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_NOT_START);
-        String unstart=getString(R.string.unstart);
+        String unstart = getString(R.string.unstart);
         status.setDesc(unstart);
         mHistoryExperiment.setStatus(status);
         if (secondInfo == null) {
@@ -358,9 +361,37 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
     }
 
+    private void doStart() {
+        if (validate()) {
+            mExpeStarting = true;
+            LoadingDialogHelper.showOpLoading(getActivity());
+            buildExperiment();
+
+            if (CommData.sTrimFromFile) {
+                FlashData.flash_loaded = false;
+                //设置积分时间
+                setIntergrationTime()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<Boolean>() {
+                            @Override
+                            public void call(Boolean aBoolean) {
+                                LoadingDialogHelper.hideOpLoading();
+                                ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
+                                ActivityUtil.finish(getActivity());
+                            }
+                        });
+            } else {
+                readTrimDataFromInstrument();
+            }
+
+        }
+    }
+
     private List<Mode> mModes;
     CommunicationService mCommunicationService;
     private boolean mExpeStarting;
+
     @OnClick({R.id.rl_mode_sel, R.id.tv_next, R.id.tv_start_temp, R.id.tv_end_temp})
     public void onViewClick(View v) {
         int start = 20;
@@ -403,40 +434,26 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                     printHistoryInfo();
                     return;
                 }*/
-               if (mExpeStarting){
-                   return;
-               }
-                if (validate()) {
-                    mExpeStarting=true;
-                    LoadingDialogHelper.showOpLoading(getActivity());
-                    buildExperiment();
-
-                    if (CommData.sTrimFromFile) {
-                        FlashData.flash_loaded = false;
-                        //设置积分时间
-                        setIntergrationTime()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Action1<Boolean>() {
-                                    @Override
-                                    public void call(Boolean aBoolean) {
-                                        LoadingDialogHelper.hideOpLoading();
-                                        ExpeRunningActivity.start(getActivity(), mHistoryExperiment);
-                                        ActivityUtil.finish(getActivity());
-                                    }
-                                });
-                    } else {
-                        readTrimDataFromInstrument();
-                    }
-
-
+                if (mExpeStarting) {
+                    return;
                 }
+
+                AndPermission.with(this)
+                        .runtime()
+                        .permission(Manifest.permission.WAKE_LOCK)
+                        .onGranted(new Action<List<String>>() {
+                            @Override
+                            public void onAction(List<String> data) {
+                                doStart();
+                            }
+                        }).start();
+
 
                 break;
             case R.id.rl_mode_sel:
                 if (mModes == null) {
                     mModes = new ArrayList<>();
-                    String dt=getString(R.string.setup_mode_dt);
+                    String dt = getString(R.string.setup_mode_dt);
                     mModes.add(new DtMode(dt));
                 }
                 AppDialogHelper.showModeSelectDialog(getActivity(), mModes, new AppDialogHelper.OnModeSelectListener() {
@@ -537,14 +554,14 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
             @Override
             public void run() {
                 LoadingDialogHelper.hideOpLoading();
-                String msg=getString(R.string.check_hid_connection);
+                String msg = getString(R.string.check_hid_connection);
                 AppDialogHelper.showNormalDialog(getActivity(), msg,
                         new AppDialogHelper.DialogOperCallback() {
-                    @Override
-                    public void onDialogConfirmClick() {
+                            @Override
+                            public void onDialogConfirmClick() {
 
-                    }
-                });
+                            }
+                        });
             }
         });
     }
@@ -579,7 +596,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         //初始化设备
         resetTrim();
         //设置过冲温度和时间
-        PcrCommand overshotCmd=PcrCommand.ofOvershotTemperature();
+        PcrCommand overshotCmd = PcrCommand.ofOvershotTemperature();
         mCommunicationService.sendPcrCommandSync(overshotCmd);
         sleep(50);
         AnitoaLogUtil.writeFileLog("===========初始化设备结束==========", mExecutorService);
@@ -674,7 +691,6 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         if (service == null) {
             return;
         }
-
 
 
         PcrCommand cmd = new PcrCommand();
@@ -778,7 +794,6 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
     private boolean validate() {
 
 
-
         if (mModes == null) {
             //ToastUtil.showToast(getActivity(), "请选择程序模式");
             return false;
@@ -786,11 +801,11 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         for (int i = 0; i < mStageAdapter.getItemCount(); i++) {
             Stage stage = (Stage) mStageAdapter.getItem(i);
 
-            if (stage instanceof CyclingStage){
-                CyclingStage cyclingStage= (CyclingStage) stage;
-                int count=cyclingStage.getCyclingCount();
-                if (count<=0){
-                    ToastUtil.showToast(getActivity(),"循环数量不能少于1个");
+            if (stage instanceof CyclingStage) {
+                CyclingStage cyclingStage = (CyclingStage) stage;
+                int count = cyclingStage.getCyclingCount();
+                if (count <= 0) {
+                    ToastUtil.showToast(getActivity(), "循环数量不能少于1个");
                     return false;
                 }
             }
@@ -859,7 +874,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                 List<Integer> clist = new ArrayList<>();      // col index
 
                 int[] trim_buff = new int[2048];
-               // byte[] trim_buff = new byte[2048];
+                // byte[] trim_buff = new byte[2048];
 
                 for (int j = 0; j < EPKT_SZ; j++) {           // parity not copied
                     //c# byte取值范围0-255 java byte取值范围-128-127  所以要& 0xff
@@ -998,7 +1013,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
     private int Buf2Int(int[] buff, int k) {
         byte[] x = {(byte) buff[k + 1],
-                (byte)buff[k]};
+                (byte) buff[k]};
         int y = ByteUtil.getShort(x);
         //int y = (int) BitConverter.ToInt16(x, 0);
 
@@ -1067,9 +1082,9 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                         String msg;
                         if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                             //保存成功
-                            msg=getString(R.string.setup_save_success);
+                            msg = getString(R.string.setup_save_success);
                         } else {
-                            msg=getString(R.string.setup_save_error);
+                            msg = getString(R.string.setup_save_error);
                         }
                         ToastUtil.showToast(getActivity(), msg);
                     }
@@ -1080,9 +1095,9 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
     public void onDestroyView() {
         super.onDestroyView();
         if (mCommunicationService != null) {
-            boolean instanceOf=mCommunicationService.instanceOf(this.getClass());
-            System.out.println("instanceOf:"+instanceOf);
-            if (instanceOf){
+            boolean instanceOf = mCommunicationService.instanceOf(this.getClass());
+            System.out.println("instanceOf:" + instanceOf);
+            if (instanceOf) {
                 mCommunicationService.setNotify(null);
             }
         }
@@ -1091,7 +1106,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
         EventBus.getDefault().unregister(this);
     }
 
-    private void unsubscribeTrim(){
+    private void unsubscribeTrim() {
         if (mReadTrimSubscription != null) {
             if (!mReadTrimSubscription.isUnsubscribed()) {
                 mReadTrimSubscription.unsubscribe();

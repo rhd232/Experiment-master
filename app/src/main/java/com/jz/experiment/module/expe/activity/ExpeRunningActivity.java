@@ -5,6 +5,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -171,13 +172,16 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         super.onConfigurationChanged(newConfig);
         AnitoaLogUtil.writeFileLog("ExpeRunActivity onConfigurationChanged");
     }
-
+    PowerManager.WakeLock mWakeLock;
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expe_running);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        // 创建唤醒锁
+        mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, getClass().getName());
         mHander=new Handler();
         mImageMode = PcrCommand.IMAGE_MODE.IMAGE_12;
         mHistoryExperiment = Navigator.getParcelableExtra(this);
@@ -717,6 +721,18 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             step6Subscription.unsubscribe();
             step6Subscription = null;
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mWakeLock.acquire();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mWakeLock.release();
     }
 
     @Override
