@@ -603,9 +603,18 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
 
         FactUpdater factUpdater = FactUpdater.getInstance(mCommunicationService);
         factUpdater.SetInitData();
+        Stage stage0=mHistoryExperiment.getSettingSecondInfo().getSteps().get(0);
+        Stage stage1=mHistoryExperiment.getSettingSecondInfo().getSteps().get(1);
+        int during =stage0.getDuring();
+        if (stage1 instanceof StartStage){
+            during+=stage1.getDuring();
+        }
 
         //TODO 判断是否是自动计算积分时间
-        if (!mHistoryExperiment.isAutoIntegrationTime()) {
+        if (!mHistoryExperiment.isAutoIntegrationTime() || during>60) {//预变性阶段时间大于60
+            if (mHistoryExperiment.isAutoIntegrationTime()){
+                mHistoryExperiment.setPcrAutoIntInRunningStep(HistoryExperiment.CODE_AUTOINT_IN_RUNNING);
+            }
             List<Channel> channels = mHistoryExperiment.getSettingsFirstInfo().getChannels();
             setChannelIntegrationTime(factUpdater, channels);
             if (mCommunicationService != null) {

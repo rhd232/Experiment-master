@@ -26,6 +26,9 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
     private ChartData dtChartData;//变温扩增曲线数据
     private ChartData meltaChartData;//溶解曲线数据
 
+    private int pcrAutoIntInRunningStep;//pcr的自动积分是否需要在运行时做 0开始前做   1running做
+
+    public static final int CODE_AUTOINT_IN_RUNNING=1;
     public HistoryExperiment(){}
 
 
@@ -42,6 +45,7 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
         settingSecondInfo = in.readParcelable(ExpeSettingSecondInfo.class.getClassLoader());
         dtChartData = in.readParcelable(ChartData.class.getClassLoader());
         meltaChartData = in.readParcelable(ChartData.class.getClassLoader());
+        pcrAutoIntInRunningStep=in.readInt();
     }
 
     @Override
@@ -58,6 +62,7 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
         dest.writeParcelable(settingSecondInfo, flags);
         dest.writeParcelable(dtChartData, flags);
         dest.writeParcelable(meltaChartData, flags);
+        dest.writeInt(pcrAutoIntInRunningStep);
     }
 
     @Override
@@ -178,5 +183,14 @@ public class HistoryExperiment implements DisplayItem,Parcelable {
 
     public boolean isAutoIntegrationTime(){
         return autoIntegrationTime==CODE_AUTO_YES;
+    }
+
+
+    public int getPcrAutoIntInRunningStep() {
+        return pcrAutoIntInRunningStep;
+    }
+
+    public void setPcrAutoIntInRunningStep(int pcrAutoIntInRunningStep) {
+        this.pcrAutoIntInRunningStep = pcrAutoIntInRunningStep;
     }
 }

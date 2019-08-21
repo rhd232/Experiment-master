@@ -240,7 +240,41 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
 
     private void showChart() {
-        LoadingDialogHelper.showOpLoading(getActivity());
+        double[][] ctValues;
+        boolean[][] falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+        if (tv_dt.isActivated()) {
+            mExperiment.getSettingSecondInfo().getModes().get(0).setCtMin(layout_ctparam_input.getCtParam().ctMin);
+            mExperiment.getSettingSecondInfo().getModes().get(0).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
+            mDtChart.show(ChanList, KSList,
+                    DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+            ctValues = mDtChart.getDtData().m_CTValue;
+            falsePositive = mDtChart.getDtData().m_falsePositive;
+            //falsePositive = new boolean[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL];
+        } else {
+
+            mExperiment.getSettingSecondInfo().getModes().get(1).setCtMin(layout_ctparam_input.getCtParam().ctMin);
+            mExperiment.getSettingSecondInfo().getModes().get(1).setCtThreshold(layout_ctparam_input.getCtParam().ctThreshhold);
+
+
+            mMeltingChart.show(ChanList, KSList, DataFileUtil.getMeltImageDateFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+            ctValues = mMeltingChart.getMeltingData().m_CTValue;
+            //falsePositive = CCurveShowMet.getInstance().m_falsePositive;
+        }
+        Activity activity = getActivity();
+        if (activity == null || isDetached()) {
+            return;
+        }
+        for (String chan : ChanList) {
+            for (String ks : KSList) {
+                getCtValue(chan, ks, ctValues, falsePositive);
+            }
+        }
+        notifyCtChanged();
+
+
+
+       /* LoadingDialogHelper.showOpLoading(getActivity());
+
         mExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -268,9 +302,9 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 showCt(ctValues, falsePositive);
             }
         });
+*/
 
-
-    }
+}
 
     private void showCt(final double[][] ctValues, final boolean[][] falsePositive) {
         Activity activity = getActivity();

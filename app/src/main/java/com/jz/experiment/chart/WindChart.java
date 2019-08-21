@@ -123,23 +123,20 @@ public abstract class WindChart {
     public void setDrawMarkers(boolean drawMarkers){
         this.mDrawMarkers=drawMarkers;
     }
-    protected Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case WHAT_REFRESH_CHART:
-                    if (mLegendEntries!=null && !mLegendEntries.isEmpty()) {
-                        Legend legend = mChart.getLegend();
-                        legend.setCustom(mLegendEntries);
-                    }
 
-                    //  synchronized (ExpeRunningActivity.this) {
-                    mChart.setDrawMarkers(false);
-                    mChart.setAutoScaleMinMaxEnabled(true);
-                    mLineData.notifyDataChanged();
-                    mChart.notifyDataSetChanged(); // let the chart know it's data changed
+    private synchronized void doRefreshSync(){
+        if (mLegendEntries!=null && !mLegendEntries.isEmpty()) {
+            Legend legend = mChart.getLegend();
+            legend.setCustom(mLegendEntries);
+        }
 
-                    mChart.invalidate(); // refresh
+        //  synchronized (ExpeRunningActivity.this) {
+        mChart.setDrawMarkers(false);
+        mChart.setAutoScaleMinMaxEnabled(true);
+        mLineData.notifyDataChanged();
+        mChart.notifyDataSetChanged(); // let the chart know it's data changed
+
+        mChart.invalidate(); // refresh
                    /* mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -149,9 +146,9 @@ public abstract class WindChart {
                         }
                     },200);*/
 
-                    mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-                        @Override
-                        public void onValueSelected(Entry e, Highlight h) {
+        mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
                            /* if (!mDrawMarkers){
                                 mChart.setDrawMarkers(false);
                                 return;
@@ -164,13 +161,18 @@ public abstract class WindChart {
                                 mChart.setDrawMarkers(true);
                             }*/
 
-                        }
-
-                        @Override
-                        public void onNothingSelected() {
-
-                        }
-                    });
+            }
+            @Override
+            public void onNothingSelected() {
+            }
+        });
+    }
+    protected Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case WHAT_REFRESH_CHART:
+                    doRefreshSync();
                     break;
             }
 

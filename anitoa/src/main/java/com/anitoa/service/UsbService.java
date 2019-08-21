@@ -530,6 +530,7 @@ public class UsbService extends CommunicationService {
 
         @Override
         public void run() {
+            inRunning = false;
             boolean canRun = mUsbEndpointOut != null && mUsbEndpointIn != null;
             AnitoaLogUtil.writeFileLog("ReadThread canRun->"+canRun);
             if (canRun) {

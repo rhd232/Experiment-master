@@ -153,10 +153,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
      */
     private boolean mHasTwoStartStage;
     private Handler mHander;
+
     @Override
     protected void setTitle() {
-        String running=getString(R.string.title_running);
-        String filter=getString(R.string.running_filter);
+        String running = getString(R.string.title_running);
+        String filter = getString(R.string.running_filter);
         mTitleBar.setTitle(running);
         mTitleBar.setRightText(filter);
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
@@ -172,9 +173,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         super.onConfigurationChanged(newConfig);
         AnitoaLogUtil.writeFileLog("ExpeRunActivity onConfigurationChanged");
     }
+
     PowerManager.WakeLock mWakeLock;
+
     @Override
-    protected void onCreate( Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expe_running);
         EventBus.getDefault().register(this);
@@ -182,7 +185,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         // 创建唤醒锁
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, getClass().getName());
-        mHander=new Handler();
+        mHander = new Handler();
         mImageMode = PcrCommand.IMAGE_MODE.IMAGE_12;
         mHistoryExperiment = Navigator.getParcelableExtra(this);
         Stage stage = mHistoryExperiment.getSettingSecondInfo().getSteps().get(1);
@@ -194,7 +197,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             mHasMeltingCurve = true;
         }
         printHistoryInfo();
-        String msg=getString(R.string.running_mode_pcr);
+        String msg = getString(R.string.running_mode_pcr);
         tv_cur_mode.setText(msg);
         tv_cycling_desc.setText("");
         tv_cycling.setText("");
@@ -209,51 +212,51 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
 
         mExecutorService = Executors.newCachedThreadPool();
-        AnitoaLogUtil.writeFileLog("实验运行页面开启",mExecutorService);
+        AnitoaLogUtil.writeFileLog("实验运行页面开启", mExecutorService);
         //mDtChart.show(ChanList,KSList,null);
        /* Thread thread = new Thread(mRun);
         thread.start();*/
 
-       mExecutorService.execute(new Runnable() {
-           @Override
-           public void run() {
-               //删除factor_log.txt文件
-               AnitoaLogUtil.getOrCreateFile("factor_log.txt").delete();
+        mExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                //删除factor_log.txt文件
+                AnitoaLogUtil.getOrCreateFile("factor_log.txt").delete();
 
-               List<Stage> cyclingSteps=mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
-               StringBuilder sb=new StringBuilder();
-               sb.append("=========================\n");
-               for (int j=0;j<cyclingSteps.size();j++){
+                List<Stage> cyclingSteps = mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
+                StringBuilder sb = new StringBuilder();
+                sb.append("=========================\n");
+                for (int j = 0; j < cyclingSteps.size(); j++) {
 
-                   CyclingStage c= (CyclingStage) cyclingSteps.get(j);
-                   sb.append("循环阶段"+(j+1));
-                   sb.append(" ");
-                   sb.append("循环数："+c.getCyclingCount());
-                   sb.append(" ");
-                   int picIndex=-1;
-                   for (int i = 0; i < c.getPartStageList().size(); i++) {
-                       PartStage partStage = c.getPartStageList().get(i);
-                       sb.append("阶段"+(i+1));
-                       sb.append(" ");
-                       sb.append("温度："+  partStage.getTemp());
-                       sb.append(" ");
-                       sb.append("持续时间："+  partStage.getDuring());
-                       sb.append(" ");
-                       if (partStage.isTakePic()){
-                           picIndex=(i+1);
-                       }
-                   }
-                   if (picIndex==-1){
-                       sb.append("拍照阶段：无");
-                   }else {
-                       sb.append("拍照阶段：" + picIndex);
-                   }
-                   sb.append("\n");
-               }
-               sb.append("=========================\n");
-               AnitoaLogUtil.writeFileLog(sb.toString());
-           }
-       });
+                    CyclingStage c = (CyclingStage) cyclingSteps.get(j);
+                    sb.append("循环阶段" + (j + 1));
+                    sb.append(" ");
+                    sb.append("循环数：" + c.getCyclingCount());
+                    sb.append(" ");
+                    int picIndex = -1;
+                    for (int i = 0; i < c.getPartStageList().size(); i++) {
+                        PartStage partStage = c.getPartStageList().get(i);
+                        sb.append("阶段" + (i + 1));
+                        sb.append(" ");
+                        sb.append("温度：" + partStage.getTemp());
+                        sb.append(" ");
+                        sb.append("持续时间：" + partStage.getDuring());
+                        sb.append(" ");
+                        if (partStage.isTakePic()) {
+                            picIndex = (i + 1);
+                        }
+                    }
+                    if (picIndex == -1) {
+                        sb.append("拍照阶段：无");
+                    } else {
+                        sb.append("拍照阶段：" + picIndex);
+                    }
+                    sb.append("\n");
+                }
+                sb.append("=========================\n");
+                AnitoaLogUtil.writeFileLog(sb.toString());
+            }
+        });
 
     }
 
@@ -286,14 +289,15 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         }
         AnitoaLogUtil.writeFileLog(sBuilder.toString());
     }
-    private void setNotity(){
-        if (mCommunicationService!=null) {
+
+    private void setNotity() {
+        if (mCommunicationService != null) {
             mCommunicationService.setNotify(this);
-        }else {
+        } else {
 
 
             mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
-            if (mCommunicationService==null){
+            if (mCommunicationService == null) {
                 Anitoa.reset();
                 Anitoa.getInstance(getActivity());
                 ThreadUtil.sleep(200);
@@ -301,6 +305,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             setNotity();
         }
     }
+
     private void bindService() {
 
         setNotity();
@@ -311,6 +316,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     AnitoaLogUtil.writeFileLog("===========开始实验==========");
                     step0();
                     step1();
+
+                    mFirstInHeatTime=System.currentTimeMillis();
                 }
             }
         }, 500);
@@ -377,32 +384,32 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         mFactUpdater = FactUpdater.getInstance(mCommunicationService);
         mFactUpdater.SetInitData();
         //统计总共有多少循环（不拍照的不包括）
-        int totalCyclingCount=0;
-        List<Stage> cyclingSteps=mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
-        for (int i=0;i<cyclingSteps.size();i++){
-            CyclingStage cyclingStage= (CyclingStage) cyclingSteps.get(i);
-            boolean pic=false;
-            for (PartStage partStage:cyclingStage.getPartStageList()){
-                if (partStage.isTakePic()){
-                    pic=true;
+        int totalCyclingCount = 0;
+        List<Stage> cyclingSteps = mHistoryExperiment.getSettingSecondInfo().getCyclingSteps();
+        for (int i = 0; i < cyclingSteps.size(); i++) {
+            CyclingStage cyclingStage = (CyclingStage) cyclingSteps.get(i);
+            boolean pic = false;
+            for (PartStage partStage : cyclingStage.getPartStageList()) {
+                if (partStage.isTakePic()) {
+                    pic = true;
                     break;
                 }
             }
-            if (pic){
-                totalCyclingCount+=cyclingStage.getCyclingCount();
+            if (pic) {
+                totalCyclingCount += cyclingStage.getCyclingCount();
             }
         }
 
-        mDtChart = new DtChart(chart_dt,totalCyclingCount, mFactUpdater);
+        mDtChart = new DtChart(chart_dt, totalCyclingCount, mFactUpdater);
         mDtChart.setRunning(true);
         mMeltingChart = new MeltingChart(chart_melt, mFactUpdater);
-        if (mHasMeltingCurve){
+        if (mHasMeltingCurve) {
             float start;
             try {
-                 start=Float.parseFloat(mHistoryExperiment.getSettingSecondInfo().getStartTemperature());
-            }catch (Exception e){
+                start = Float.parseFloat(mHistoryExperiment.getSettingSecondInfo().getStartTemperature());
+            } catch (Exception e) {
                 e.printStackTrace();
-                start=40;
+                start = 40;
             }
             mMeltingChart.setStartTemp(start);
             mMeltingChart.setAxisMinimum(start);
@@ -473,7 +480,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             chart_dt.setVisibility(View.GONE);
         }
         mMeltingChart.show(ChanList, KSList,
-                DataFileUtil.getMeltImageDateFile(mHistoryExperiment),null);
+                DataFileUtil.getMeltImageDateFile(mHistoryExperiment), null);
     }
 
     private void showDtChart() {
@@ -484,7 +491,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             chart_dt.setVisibility(View.VISIBLE);
         }
 
-        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mHistoryExperiment),null);
+        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mHistoryExperiment), null);
 
     }
 
@@ -497,7 +504,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         }
         mBackPressed = true;
         if (!mExpeFinished) {
-            if(ActivityUtil.isFinish(getActivity())){
+            if (ActivityUtil.isFinish(getActivity())) {
                 return;
             }
             String msg = getString(R.string.running_dialog_stop_msg);
@@ -510,7 +517,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
                 @Override
                 public void onDialogConfirmClick() {
-                    LoadingDialogHelper.showOpLoading(getActivity());
+                    showOpLoadingSafely();
 
                     closeDevice()
                             .subscribeOn(Schedulers.io())
@@ -531,6 +538,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             ActivityUtil.finish(getActivity());
         }
     }
+
     private Observable<Boolean> closeDeviceAndMeltingAutoInt() {
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
@@ -557,7 +565,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     Thread.sleep(3000);
 
                     if (mHistoryExperiment.isAutoIntegrationTime()) {
-                        autoInt(mFactUpdater);
+                        autoInt(mFactUpdater, false);
                     }
                     subscriber.onNext(true);
                 } catch (Exception e) {
@@ -567,6 +575,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             }
         });
     }
+
     private Observable<Boolean> closeDevice() {
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
@@ -658,17 +667,19 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
     /**
      * 重新连接设备
+     *
      * @param event
      */
-    @Subscribe(threadMode =ThreadMode.MAIN)
-    public void onAnitoaConnectedEvent(AnitoaConnectedEvent event){
-        mCommunicationService=Anitoa.getInstance(getActivity()).getCommunicationService();
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAnitoaConnectedEvent(AnitoaConnectedEvent event) {
+        mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
         mCommunicationService.setNotify(this);
-        if (mInReadingImg){
+        if (mInReadingImg) {
             //如果是在读取图像数据阶段丢失的，那么继续查询循环状态吧
             step5();
         }
     }
+
     /**
      * 筛选图像
      *
@@ -752,13 +763,13 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mExecutorService!=null) {
-            AnitoaLogUtil.writeFileLog("实验运行页面关闭",mExecutorService);
-        }else {
+        if (mExecutorService != null) {
+            AnitoaLogUtil.writeFileLog("实验运行页面关闭", mExecutorService);
+        } else {
             AnitoaLogUtil.writeFileLog("实验运行页面关闭");
         }
 
-        if (mCommunicationService!=null){
+        if (mCommunicationService != null) {
             mCommunicationService.setNotify(null);
             mCommunicationService.stopReadThread();
         }
@@ -790,7 +801,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
     @Override
     public void onReceivedData(Data data) {
-       // System.out.println("onReceivedData");
+        // System.out.println("onReceivedData");
         //接收到数据 TODO 根据command和type执行操作
         byte[] reveicedBytes = data.getBuffer();
         int statusIndex = 1;
@@ -804,7 +815,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
                 图像命令超时 是查询图像中断的指令报出的。
              */
-           return;
+            return;
 
         }
 
@@ -856,7 +867,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
 
         int type = hexToDecimal(reveicedBytes[typeIndex]);
-       // System.out.println("doReceiveStep1");
+        // System.out.println("doReceiveStep1");
         switch (type) {
             case PcrCommand.STEP_1_TYPE:
                 //System.out.println("doReceiveStep1STEP_1_TYPE");
@@ -887,7 +898,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         if (type == PcrCommand.STEP_2_TYPE) {
 
 
-            if (mHasMeltingCurve && mPcrFinished){
+            if (mHasMeltingCurve && mPcrFinished) {
                 startMeltingCurve().subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Action1<Boolean>() {
@@ -896,7 +907,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                                 step5();
                             }
                         });
-            }else {
+            } else {
                 mCyclingStageIndex = 0;
                 step3();
             }
@@ -975,14 +986,9 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 break;
             case PcrCommand.STEP_4_TYPE:
                 //启动循环返回，查询循环状态
-                //askIfContinuePolling();
-              /*  mStep4Responsed = true;
-                if (step4Subscription != null && !step4Subscription.isUnsubscribed()) {
-                    step4Subscription.unsubscribe();
-                    step4Subscription = null;
-                }*/
+                //等一定时间，再进行自动积分，自动积分结束后在查询循环状态
+
                 step5();
-                //step5Subscription();
                 break;
             case PcrCommand.STEP_MELTING_TYPE:
                 //启动溶解曲线返回，查询查询循环状态
@@ -992,7 +998,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void step5() {
-        if (mCommunicationService==null){
+        if (mCommunicationService == null) {
             return;
         }
         mInReadingImg = false;
@@ -1043,8 +1049,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         EndStage endStage;
         if (!mHasMeltingCurve) {
             endStage = (EndStage) stageList.get(stageList.size() - 1);
-        }else {
-            endStage = (EndStage) stageList.get(stageList.size() - 1-2);
+        } else {
+            endStage = (EndStage) stageList.get(stageList.size() - 1 - 2);
         }
         List<PcrCommand.TempDuringCombine> predenaturationCombines = new ArrayList<>();
         PcrCommand.TempDuringCombine predenaturationCombine = new PcrCommand.TempDuringCombine(startStage.getTemp(), startStage.getDuring());
@@ -1112,15 +1118,15 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             mPrevReadTempTime = curTime;
             float lidTemp = onReadTemperature(PcrCommand.Temperature.LID);
             float peltierTemp = onReadTemperature(PcrCommand.Temperature.PELTIER);
-            System.out.println("lidTemp:"+lidTemp+" peltierTemp:"+peltierTemp);
-            StringBuilder tempBuilder=new StringBuilder();
+            System.out.println("lidTemp:" + lidTemp + " peltierTemp:" + peltierTemp);
+            StringBuilder tempBuilder = new StringBuilder();
             if (mInMeltCurve) {
                 tempBuilder.append("熔解曲线中-->");
                 tempBuilder.append("lidTemp:" + lidTemp).append(" peltierTemp:" + peltierTemp);
                 AnitoaLogUtil.writeFileLog(tempBuilder.toString(),
                         mExecutorService);
             }
-            if (lidTemp < 10 || peltierTemp < 10  || (lidTemp==peltierTemp)) {
+            if (lidTemp < 10 || peltierTemp < 10 || (lidTemp == peltierTemp)) {
                 return;
             }
             mTempChart.addTemp(lidTemp, peltierTemp);
@@ -1128,20 +1134,22 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
     }
 
-    private void realReadTemperature(){
+    private void realReadTemperature() {
         float lidTemp = onReadTemperature(PcrCommand.Temperature.LID);
 
         float peltierTemp = onReadTemperature(PcrCommand.Temperature.PELTIER);
-        System.out.println("lidTemp:"+lidTemp+" peltierTemp:"+peltierTemp);
+        System.out.println("lidTemp:" + lidTemp + " peltierTemp:" + peltierTemp);
         if (lidTemp < 10 || peltierTemp < 10) {
             return;
         }
         mTempChart.addTemp(lidTemp, peltierTemp);
     }
-    public void readTemperatureSync(){
+
+    public void readTemperatureSync() {
         realReadTemperature();
     }
-    public void readTemperatureAsync(){
+
+    public void readTemperatureAsync() {
         mExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -1157,11 +1165,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             PcrCommand cmd = PcrCommand.ofReadTemperatureCmd(temperature);
             byte[] bytes = mCommunicationService.sendPcrCommandSync(cmd);
             int statusIndex = 1;
-            int cmdIndex=2;
-            int typeIndex=4;
-            int cmd_=bytes[cmdIndex];
-            int type_=bytes[typeIndex];
-            if (cmd_==0x10 && type_==0x02) {
+            int cmdIndex = 2;
+            int typeIndex = 4;
+            int cmd_ = bytes[cmdIndex];
+            int type_ = bytes[typeIndex];
+            if (cmd_ == 0x10 && type_ == 0x02) {
                 int status = hexToDecimal(bytes[statusIndex]);
                 boolean succ = StatusChecker.checkStatus(status);
                 if (succ) {
@@ -1174,12 +1182,12 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 }
             }
             //同步读取后将同步buffer置空
-            if (mCommunicationService instanceof UsbService){
-                UsbService usbService= (UsbService) mCommunicationService;
+            if (mCommunicationService instanceof UsbService) {
+                UsbService usbService = (UsbService) mCommunicationService;
                 usbService.clearSyncBuffer();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -1187,7 +1195,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
 
-    private void onExpeCycling(){
+    private void onExpeCycling() {
         mInCycling = true;
         PcrCommand cyclingInfoCmd = new PcrCommand();
         cyclingInfoCmd.getCyclingInfo();
@@ -1202,10 +1210,10 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 int cyclingStep = bytes[6] & 0xFF;
                 //System.out.println("cyclingStep:" + cyclingStep + " cyclingNum:" + cyclingNum);
 
-                mRunningCyclingStageIndex= bytes[7];
-                String c=getString(R.string.running_cycle);
+                mRunningCyclingStageIndex = bytes[7];
+                String c = getString(R.string.running_cycle);
                 if (mCyclingStageCount > 1) {
-                    String stage=getString(R.string.running_stage);
+                    String stage = getString(R.string.running_stage);
 
                     String stepDesc = stage + (mRunningCyclingStageIndex + 1) + c;
                     tv_cycling_desc.setText(stepDesc);
@@ -1215,20 +1223,20 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     tv_cycling_desc.setText(c);
                 }
 
-                StringBuilder sBuilder=new StringBuilder();
+                StringBuilder sBuilder = new StringBuilder();
                 sBuilder.append("====================\n");
-                sBuilder.append("下位机返回的cyclingNum："+cyclingNum+"\n");
-                sBuilder.append("下位机返回的cyclingStep："+cyclingStep+"\n");
-                sBuilder.append("计算得到的当前阶段"+(mRunningCyclingStageIndex + 1)+"\n");
+                sBuilder.append("下位机返回的cyclingNum：" + cyclingNum + "\n");
+                sBuilder.append("下位机返回的cyclingStep：" + cyclingStep + "\n");
+                sBuilder.append("计算得到的当前阶段" + (mRunningCyclingStageIndex + 1) + "\n");
                 sBuilder.append("====================\n");
-                AnitoaLogUtil.writeFileLog(sBuilder.toString(),mExecutorService);
+                AnitoaLogUtil.writeFileLog(sBuilder.toString(), mExecutorService);
 
-                try{
+                try {
                     List<Stage> stageList = getCyclingSteps();
                     CyclingStage cyclingStage = (CyclingStage) stageList.get(mRunningCyclingStageIndex);
                     tv_cycling.setText((cyclingNum + 1) + "/" + cyclingStage.getCyclingCount());
-                }catch (Exception e){
-                    AnitoaLogUtil.writeFileLog(e.getMessage(),mExecutorService);
+                } catch (Exception e) {
+                    AnitoaLogUtil.writeFileLog(e.getMessage(), mExecutorService);
                 }
 
 
@@ -1237,10 +1245,15 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private Object mLock = new Object();
-    private void autoInt(FactUpdater factUpdater) {
-        synchronized (mLock) {
 
-            AnitoaLogUtil.writeFileLog("===========开始熔解曲线自动积分==========", mExecutorService);
+    private void autoInt(FactUpdater factUpdater, boolean prc) {
+        synchronized (mLock) {
+            String mode = "扩增曲线";
+            if (prc) {
+                mode = "熔解曲线";
+            }
+            final String finalMode = mode;
+            AnitoaLogUtil.writeFileLog("===========开始" + finalMode + "自动积分==========", mExecutorService);
             ImageDataReader imageDataReader = new ImageDataReader(mCommunicationService,
                     mHistoryExperiment, factUpdater, mExecutorService, ExpeType.MELTING);
             imageDataReader.autoInt()
@@ -1252,7 +1265,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
                             synchronized (mLock) {
 
-                                AnitoaLogUtil.writeFileLog("===========结束熔解曲线自动积分==========", mExecutorService);
+                                AnitoaLogUtil.writeFileLog("===========结束" + finalMode + "自动积分==========", mExecutorService);
                                 mLock.notifyAll();
                             }
                         }
@@ -1267,8 +1280,23 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
     }
 
+
+    private void showOpLoadingSafely() {
+        try {
+            if (!ActivityUtil.isFinish(getActivity())) {
+                LoadingDialogHelper.showOpLoading(getActivity());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private boolean mPcrFinished;
     private boolean mClosedPcrProgram;
+    //第一次开始循环
+    private boolean mFirstInHeat;
+    private long mFirstInHeatTime;
     /**
      * 返回循环状态
      *
@@ -1296,26 +1324,50 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
                     tv_cycling_desc.setText(getString(R.string.running_heating));
                     tv_cycling.setText("");
+                    long interval=System.currentTimeMillis()-mFirstInHeatTime;
+                    //加热50秒后
+                    if (!mFirstInHeat &&interval>50*1000) {
+                        mFirstInHeat = true;
+
+                        //开始自动积分
+                        if (mHistoryExperiment.isAutoIntegrationTime() && mHistoryExperiment.getPcrAutoIntInRunningStep()==HistoryExperiment.CODE_AUTOINT_IN_RUNNING) {
+                            Observable.create(new Observable.OnSubscribe<Boolean>() {
+                                @Override
+                                public void call(Subscriber<? super Boolean> subscriber) {
+                                    autoInt(mFactUpdater, true);
+                                    subscriber.onNext(true);
+                                }
+                            }).subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(new Action1<Boolean>() {
+                                        @Override
+                                        public void call(Boolean aBoolean) {
+                                            mCommunicationService.setNotify(ExpeRunningActivity.this);
+                                            step5();
+                                        }
+                                    });
+                            return;
+
+                        }
+                    }
                     break;
                 case 2://CYCLING
-                    onExpeCycling();
 
+                    onExpeCycling();
                     break;
                 case 3://COOL DOWN
                     tv_cycling_desc.setText(getString(R.string.running_cooling));
                     tv_cycling.setText("");
                     mInCycling = false;
-                    mPcrFinished=true;
+                    mPcrFinished = true;
 
                     mExpeFinished = false;
                     if (mHasMeltingCurve) {
                         if (!mMeltingCurveStarted && !mClosedPcrProgram) {
-                            mClosedPcrProgram=true;
+                            mClosedPcrProgram = true;
                             AnitoaLogUtil.writeFileLog("开始熔解曲线实验");
                             //熔解曲线自动积分中
-                            if (!ActivityUtil.isFinish(getActivity())) {
-                                LoadingDialogHelper.showOpLoading(getActivity());
-                            }
+                            showOpLoadingSafely();
                             // 执行熔解曲线自动积分时间
                             mFactUpdater.SetInitData();
                             closeDeviceAndMeltingAutoInt()
@@ -1342,12 +1394,12 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     tv_cycling.setText("");
                     //熔解曲线预热阶段
 
-                    tv_cur_mode.setText( getString(R.string.running_mode_melting));
+                    tv_cur_mode.setText(getString(R.string.running_mode_melting));
                     mInCycling = false;
                     mInMeltCurve = true;
                     break;
                 case 5:
-                    tv_cur_mode.setText( getString(R.string.running_mode_melting));
+                    tv_cur_mode.setText(getString(R.string.running_mode_melting));
                     tv_cycling_desc.setText("");
                     tv_cycling.setText("");
                     //熔解曲线阶段
@@ -1396,10 +1448,10 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 step6Subscription.unsubscribe();
                 step6Subscription = null;
             }
-            if (status == 0 || (status==3&& !mHasMeltingCurve) || (status == 3&&mMeltingCurveStarted)) {//实验已经结束
+            if (status == 0 || (status == 3 && !mHasMeltingCurve) || (status == 3 && mMeltingCurveStarted)) {//实验已经结束
                 if (!mBackPressed) {
-                    if (!ActivityUtil.isFinish(getActivity()))
-                        LoadingDialogHelper.showOpLoading(getActivity());
+
+                    showOpLoadingSafely();
 
                     closeDevice()
                             .subscribeOn(Schedulers.io())
@@ -1422,12 +1474,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     });
 
 
-
                 }
 
                 return;
             }
-            if(!mClosedPcrProgram) {
+            if (!mClosedPcrProgram) {
                 checkHasNewParam(reveicedBytes);
             }
             if (mInCycling || mInMeltCurve) {
@@ -1453,15 +1504,15 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     public void call(BaseResponse response) {
                         if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                             EventBus.getDefault().post(new SavedExpeDataEvent());
-                           // ToastUtil.showToast(getActivity(), "已保存到本地");
+                            // ToastUtil.showToast(getActivity(), "已保存到本地");
                          /*   Tab tab = new Tab();
                             tab.setIndex(MainActivity.TAB_INDEX_DATA);
                             tab.setExtra(mHistoryExperiment);
                             MainActivity.start(getActivity(), tab);*/
                             //System.out.println("ExpeResultActivity start");
-                            ExpeResultActivity.start(getActivity(),mHistoryExperiment);
+                            ExpeResultActivity.start(getActivity(), mHistoryExperiment);
                         } else {
-                            String saveError=getString(R.string.setup_save_error);
+                            String saveError = getString(R.string.setup_save_error);
                             ToastUtil.showToast(getActivity(), saveError);
                         }
 
@@ -1470,11 +1521,10 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     @Override
                     public void call(Throwable throwable) {
                         throwable.printStackTrace();
-                        String saveError=getString(R.string.setup_save_error);
+                        String saveError = getString(R.string.setup_save_error);
                         ToastUtil.showToast(getActivity(), saveError);
                     }
                 });
-
 
 
     }
@@ -1483,7 +1533,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     private Observable<BaseResponse> saveExpe(HistoryExperiment experiment) {
         ExperimentStatus status = new ExperimentStatus();
         status.setStatus(ExperimentStatus.STATUS_COMPLETED);
-        String finished=getString(R.string.test_status_finished);
+        String finished = getString(R.string.test_status_finished);
         status.setDesc(finished);
         experiment.setStatus(status);
         //新插入一条数据
@@ -1494,20 +1544,19 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
 
         //TODO 还需保存到json文件中
-        GenerateExpeJsonRequest jsonRequest=new GenerateExpeJsonRequest();
+        GenerateExpeJsonRequest jsonRequest = new GenerateExpeJsonRequest();
         jsonRequest.setExperiment(mHistoryExperiment);
-        Observable<BaseResponse> jsonObservable=
+        Observable<BaseResponse> jsonObservable =
                 ExpeJsonGenerator.getInstance().generateExpeJson(jsonRequest);
 
         // 保存实验数据
-        Observable<InsertExpeResponse> dbObservable=ExpeDataStore
+        Observable<InsertExpeResponse> dbObservable = ExpeDataStore
                 .getInstance(ProviderModule.getInstance().getBriteDb(getActivity().getApplicationContext()))
                 .insertExpe(request);
 
-        return Observable.merge(jsonObservable,dbObservable).debounce(1000,TimeUnit.MILLISECONDS);
+        return Observable.merge(jsonObservable, dbObservable).debounce(1000, TimeUnit.MILLISECONDS);
 
     }
-
 
 
     private void checkHasNewParam(byte[] reveicedBytes) {
@@ -1672,10 +1721,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private int mStep5Count;
+
     private void step5Subscription(long period) {
         if (step5Subscription == null) {
             mStep5Responsed = false;
-            mStep5Count=1;
+            mStep5Count = 1;
             step5Subscription = Observable.interval(10, period, TimeUnit.MILLISECONDS)
                     /* .subscribeOn(Schedulers.io())
                      .observeOn(AndroidSchedulers.mainThread())*/
@@ -1684,11 +1734,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                         @Override
                         public void call(Long aLong) {
                             if (!mStep5Responsed) {
-                               if (mInReconnecting){
-                                   AnitoaLogUtil.writeFileLog("正在执行重连");
-                                   return;
-                               }
-                                if (mStep5Count>1){
+                                if (mInReconnecting) {
+                                    AnitoaLogUtil.writeFileLog("正在执行重连");
+                                    return;
+                                }
+                                if (mStep5Count > 1) {
                                     //考虑下位机没响应了
                                     rescueStep5();
                                 }
@@ -1710,19 +1760,20 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
     //是否处在重新连接中
     private boolean mInReconnecting;
+
     private void rescueStep5() {
-        AnitoaLogUtil.writeFileLog("rescueStep5 mCommunicationService==null?"+(mCommunicationService==null));
-        if (mCommunicationService!=null){
+        AnitoaLogUtil.writeFileLog("rescueStep5 mCommunicationService==null?" + (mCommunicationService == null));
+        if (mCommunicationService != null) {
             mCommunicationService.setNotify(this);
             mCommunicationService.stopReadThread();
             ThreadUtil.sleep(500);
 
             //探测是否能连接上
-            PcrCommand cmd=PcrCommand.ofVersionCmd();
-            byte [] reveicedBytes=mCommunicationService.sendPcrCommandSync(cmd);
-            int count=0;
-            while (reveicedBytes==null || reveicedBytes[0]==0){
-                if (count>=1){
+            PcrCommand cmd = PcrCommand.ofVersionCmd();
+            byte[] reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
+            int count = 0;
+            while (reveicedBytes == null || reveicedBytes[0] == 0) {
+                if (count >= 1) {
                     break;
                 }
                 reveicedBytes = mCommunicationService.sendPcrCommandSync(cmd);
@@ -1730,8 +1781,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 ThreadUtil.sleep(100);
             }
 
-            if (reveicedBytes==null || reveicedBytes[0]==0){
-                mInReconnecting=true;
+            if (reveicedBytes == null || reveicedBytes[0] == 0) {
+                mInReconnecting = true;
                 //还是没有连接上
                 AnitoaLogUtil.writeFileLog("unknown error occur");
                 //解绑service
@@ -1744,25 +1795,25 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 mHander.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (!ActivityUtil.isFinish(getActivity())){
-                            mCommunicationService=null;
-                            int doCount=0;
-                            while (mCommunicationService==null) {
+                        if (!ActivityUtil.isFinish(getActivity())) {
+                            mCommunicationService = null;
+                            int doCount = 0;
+                            while (mCommunicationService == null) {
                                 mCommunicationService = Anitoa.getInstance(getActivity()).getCommunicationService();
                                 ThreadUtil.sleep(100);
                                 doCount++;
-                                if (doCount>3){
-                                    AnitoaLogUtil.writeFileLog("重新连接了"+doCount+"次，还是没连上");
+                                if (doCount > 3) {
+                                    AnitoaLogUtil.writeFileLog("重新连接了" + doCount + "次，还是没连上");
                                 }
                             }
                             AnitoaLogUtil.writeFileLog("获得了CommunicationService，执行连接");
                             UsbManagerHelper.connectUsbDevice(getActivity());
                             mCommunicationService.setNotify(ExpeRunningActivity.this);
-                            mInReconnecting=false;
+                            mInReconnecting = false;
                         }
 
                     }
-                },300);
+                }, 300);
 
             }
         }
@@ -1778,7 +1829,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     }
 
     private void step5Subscription() {
-        step5Subscription(2000);
+        step5Subscription(6000);
     }
 
     private void step7(PcrCommand.PCR_IMAGE pcr_image) {
@@ -2143,10 +2194,10 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
-                try{
+                try {
                     startMeltingCurveSync();
                     subscriber.onNext(true);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     subscriber.onError(e);
                 }
@@ -2195,10 +2246,10 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         EndStage endStage;
         if (!mHasMeltingCurve) {
             endStage = (EndStage) stageList.get(stageList.size() - 1);
-        }else {
-            endStage = (EndStage) stageList.get(stageList.size() - 1-2);
+        } else {
+            endStage = (EndStage) stageList.get(stageList.size() - 1 - 2);
         }
-      //  EndStage endStage = (EndStage) stageList.get(stageList.size() - 1);
+        //  EndStage endStage = (EndStage) stageList.get(stageList.size() - 1);
 
         List<PcrCommand.TempDuringCombine> predenaturationCombines = new ArrayList<>();
         PcrCommand.TempDuringCombine predenaturationCombine = new PcrCommand.TempDuringCombine(startStage.getTemp(), startStage.getDuring());
