@@ -317,7 +317,7 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                     step0();
                     step1();
 
-                    mFirstInHeatTime=System.currentTimeMillis();
+
                 }
             }
         }, 500);
@@ -1130,7 +1130,17 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
                 return;
             }
             mTempChart.addTemp(lidTemp, peltierTemp);
+
+            if(lidTemp>=100){
+                if (mFirstInHeatTime==0){
+                    mFirstInHeatTime=System.currentTimeMillis();
+                }
+                needPcrAutoInt();
+            }
+
         }
+
+
 
     }
 
@@ -1249,13 +1259,16 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     private void autoInt(FactUpdater factUpdater, boolean prc) {
         synchronized (mLock) {
             String mode = "扩增曲线";
-            if (prc) {
+            ExpeType expeType=ExpeType.PCR;
+            if (!prc) {
                 mode = "熔解曲线";
+                expeType=ExpeType.MELTING;
             }
             final String finalMode = mode;
             AnitoaLogUtil.writeFileLog("===========开始" + finalMode + "自动积分==========", mExecutorService);
+
             ImageDataReader imageDataReader = new ImageDataReader(mCommunicationService,
-                    mHistoryExperiment, factUpdater, mExecutorService, ExpeType.MELTING);
+                    mHistoryExperiment, factUpdater, mExecutorService, expeType);
             imageDataReader.autoInt()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -1297,6 +1310,52 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     //第一次开始循环
     private boolean mFirstInHeat;
     private long mFirstInHeatTime;
+    private boolean mPcrAutoInting;
+    private void needPcrAutoInt(){
+        if(mFirstInHeat){
+            return ;
+        }
+        long interval=System.currentTimeMillis()-mFirstInHeatTime;
+        System.out.println("interval:"+interval);
+        //加热50秒后
+        Stage stage0=mHistoryExperiment.getSettingSecondInfo().getSteps().get(0);
+        Stage stage1=mHistoryExperiment.getSettingSecondInfo().getSteps().get(1);
+        int predenaturationTime =stage0.getDuring();
+        if (stage1 instanceof StartStage){
+            predenaturationTime+=stage1.getDuring();
+        }
+        int lidHeatTime=70;
+       // int time=Math.max(predenaturationTime-50,15);
+        int time=predenaturationTime-45;
+        //热盖加热70s
+        if (!mFirstInHeat && interval>time*1000) {
+            mFirstInHeat = true;
+
+            //开始自动积分
+            if (mHistoryExperiment.isAutoIntegrationTime() && mHistoryExperiment.getPcrAutoIntInRunningStep()==HistoryExperiment.CODE_AUTOINT_IN_RUNNING) {
+                mPcrAutoInting=true;
+                Observable.create(new Observable.OnSubscribe<Boolean>() {
+                    @Override
+                    public void call(Subscriber<? super Boolean> subscriber) {
+                        autoInt(mFactUpdater, true);
+                        subscriber.onNext(true);
+                    }
+                }).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<Boolean>() {
+                            @Override
+                            public void call(Boolean aBoolean) {
+                                mCommunicationService.setNotify(ExpeRunningActivity.this);
+                                mPcrAutoInting=false;
+                                step5();
+                            }
+                        });
+
+
+            }
+        }
+
+    }
     /**
      * 返回循环状态
      *
@@ -1311,7 +1370,14 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
         readTemperature();
 
+        if (mPcrAutoInting){
+            return;
+        }
         if (type == PcrCommand.STEP_5_TYPE) {
+
+
+
+
             //当前循环状态
             byte status = reveicedBytes[dataIndex];
             switch (status) {
@@ -1324,35 +1390,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
 
                     tv_cycling_desc.setText(getString(R.string.running_heating));
                     tv_cycling.setText("");
-                    long interval=System.currentTimeMillis()-mFirstInHeatTime;
-                    //加热50秒后
-                    if (!mFirstInHeat &&interval>50*1000) {
-                        mFirstInHeat = true;
 
-                        //开始自动积分
-                        if (mHistoryExperiment.isAutoIntegrationTime() && mHistoryExperiment.getPcrAutoIntInRunningStep()==HistoryExperiment.CODE_AUTOINT_IN_RUNNING) {
-                            Observable.create(new Observable.OnSubscribe<Boolean>() {
-                                @Override
-                                public void call(Subscriber<? super Boolean> subscriber) {
-                                    autoInt(mFactUpdater, true);
-                                    subscriber.onNext(true);
-                                }
-                            }).subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(new Action1<Boolean>() {
-                                        @Override
-                                        public void call(Boolean aBoolean) {
-                                            mCommunicationService.setNotify(ExpeRunningActivity.this);
-                                            step5();
-                                        }
-                                    });
-                            return;
 
-                        }
-                    }
+                   // needPcrAutoInt();
                     break;
                 case 2://CYCLING
-
                     onExpeCycling();
                     break;
                 case 3://COOL DOWN
