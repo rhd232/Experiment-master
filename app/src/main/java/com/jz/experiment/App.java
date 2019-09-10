@@ -72,6 +72,7 @@ public class App extends MultiDexApplication implements HasSupportFragmentInject
     @Override
     public void onLowMemory() {
         super.onLowMemory();
+
         AnitoaLogUtil.writeFileLog("App onLowMemory");
     }
 }
