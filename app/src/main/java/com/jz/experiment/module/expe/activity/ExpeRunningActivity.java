@@ -928,6 +928,17 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         step3(false);
     }
 
+    private float getCorrectTemperature(Stage stage){
+        float temperature=stage.getTemp();
+
+        if (temperature>=70){
+            temperature++;
+        }else {
+            temperature=temperature-2;
+        }
+        return temperature;
+    }
+
     /**
      * 设置循环参数
      */
@@ -945,11 +956,14 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             if (partStage.isTakePic()) {
                 picIndex = i + 1;
             }
-            PcrCommand.TempDuringCombine combine = new PcrCommand.TempDuringCombine(partStage.getTemp(),
+            //todo 修正温度
+            float temperature=getCorrectTemperature(partStage);
+
+            PcrCommand.TempDuringCombine combine = new PcrCommand.TempDuringCombine(temperature,
                     partStage.getDuring());
             combines.add(combine);
             StringBuilder sBuilder = new StringBuilder();
-            sBuilder.append("温度+" + i + ":" + partStage.getTemp() + "时间:" + partStage.getDuring());
+            sBuilder.append("原温度:"+partStage.getTemp()+"------修正后的温度+" + i + ":" + temperature + "-----时间:" + partStage.getDuring());
             System.out.println(sBuilder.toString());
             AnitoaLogUtil.writeFileLog(sBuilder.toString());
         }
@@ -1053,13 +1067,18 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             endStage = (EndStage) stageList.get(stageList.size() - 1 - 2);
         }
         List<PcrCommand.TempDuringCombine> predenaturationCombines = new ArrayList<>();
-        PcrCommand.TempDuringCombine predenaturationCombine = new PcrCommand.TempDuringCombine(startStage.getTemp(), startStage.getDuring());
-        PcrCommand.TempDuringCombine extendCombine = new PcrCommand.TempDuringCombine(endStage.getTemp(), endStage.getDuring());
+
+        float startTemp=getCorrectTemperature(startStage);
+        PcrCommand.TempDuringCombine predenaturationCombine = new PcrCommand.TempDuringCombine(startTemp, startStage.getDuring());
+
+        float extendTemp=getCorrectTemperature(endStage);
+        PcrCommand.TempDuringCombine extendCombine = new PcrCommand.TempDuringCombine(extendTemp, endStage.getDuring());
         predenaturationCombines.add(predenaturationCombine);
 
         if (mHasTwoStartStage) {
             StartStage startStage2 = (StartStage) stageList.get(1);
-            PcrCommand.TempDuringCombine predenaturationCombine2 = new PcrCommand.TempDuringCombine(startStage2.getTemp(),
+            float start2Temp=getCorrectTemperature(startStage2);
+            PcrCommand.TempDuringCombine predenaturationCombine2 = new PcrCommand.TempDuringCombine(start2Temp,
                     startStage2.getDuring());
             predenaturationCombines.add(predenaturationCombine2);
         }

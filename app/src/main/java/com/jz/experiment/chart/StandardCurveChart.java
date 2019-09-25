@@ -15,6 +15,8 @@ import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class StandardCurveChart {
@@ -103,6 +105,12 @@ public class StandardCurveChart {
                 minX=stdXX[i];
             }
         }
+        Collections.sort(pointList, new Comparator<Entry>() {
+            @Override
+            public int compare(Entry o1, Entry o2) {
+                return (int) (o1.getX()-o2.getX());
+            }
+        });
         ScatterDataSet scatterDataSet=new ScatterDataSet(pointList,"标准点");
         scatterDataSet.setColor(Color.parseColor("#ffff8800"));
         scatterDataSet.setScatterShapeSize(7.5f);
@@ -124,7 +132,12 @@ public class StandardCurveChart {
                 minX=unknowXX[i];
             }
         }
-
+        Collections.sort(unknownPointList, new Comparator<Entry>() {
+            @Override
+            public int compare(Entry o1, Entry o2) {
+                return (int) (o1.getX()-o2.getX());
+            }
+        });
         ScatterDataSet unknownScatterDataSet=new ScatterDataSet(unknownPointList,"未知点");
         unknownScatterDataSet.setColor(Color.parseColor("#1f4e99"));
         unknownScatterDataSet.setScatterShapeSize(7.5f);

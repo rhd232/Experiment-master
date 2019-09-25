@@ -170,7 +170,7 @@
     <string name="norm">归一化</string>
     <string name="print">打印</string>
     <string name="print_preview">打印预览</string>
-    <string name="print_company_name">公司名称：</string>
+    <string name="print_company_name">单位名称：</string>
     <string name="print_conclusion">结论</string>
     <string name="print_user">检测人</string>
     <string name="print_auditor">审核人</string>
