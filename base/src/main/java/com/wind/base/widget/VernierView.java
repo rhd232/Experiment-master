@@ -98,7 +98,7 @@ public class VernierView extends View {
     protected void onDraw(Canvas canvas) {
         //  float height =getDragHeight();
         int width = getMeasuredWidth();
-       // System.out.println("onDraw->height:" + getMeasuredHeight());
+        System.out.println("onDraw->height:" + getMeasuredHeight());
         float lineWidth = width / 2f;
 
         mPaint.setStrokeWidth(DisplayUtil.dip2px(getContext(), 1));
@@ -122,6 +122,7 @@ public class VernierView extends View {
     private float startScale;
 
     public void setStartScale(float startScale) {
+        System.out.println("setStartScale:" + startScale);
         if (startScale == -1 && getMeasuredHeight() != 0) {
             startScale = getDragHeight() / 2f + spaceTopHeight;
             setStartScale(startScale);

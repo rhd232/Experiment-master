@@ -931,11 +931,11 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
     private float getCorrectTemperature(Stage stage){
         float temperature=stage.getTemp();
 
-        if (temperature>=70){
+        /*if (temperature>=70){
             temperature++;
         }else {
             temperature=temperature-2;
-        }
+        }*/
         return temperature;
     }
 

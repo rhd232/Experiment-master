@@ -295,13 +295,7 @@ public class HistoryExperimentsFragment extends BaseFragment {
                             return;
                         }
                         mReadLiding=true;
-                        /*if (mNeedReadTrimFile) {
-                            //读取dataposition文件
-                            CommData.ReadDatapositionFile(getActivity());
-                            //trim文件读取到CommonData中
-                            TrimReader.getInstance().ReadTrimFile(getActivity());
-                            mNeedReadTrimFile=false;
-                        }*/
+
                         LoadingDialogHelper.showOpLoading(getActivity());
                         //读取下位机是否插入了电源以及热盖的开闭
                         readLid().subscribeOn(Schedulers.io())
