@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class CCurveShowPolyFit {
-
+    boolean DARK_CORRECT = true;
     boolean NORMALIZE_SIG = false;
     boolean ALL_SEL = true;
     boolean GD_MOMENTUM = true;
@@ -23,7 +23,7 @@ public class CCurveShowPolyFit {
 
     //float log_threshold = 0.11f;
 
-//    float cheat_factor = 0.06f;
+    //    float cheat_factor = 0.06f;
 //    float cheat_factor2 = 0.5f;
 //    float cheat_factorNeg = 0.33f;             // not used
     float cheat_factor = 0.1f;
@@ -37,6 +37,8 @@ public class CCurveShowPolyFit {
     public static int MAX_WELL = 16;
     public static int MAX_CYCL = 501;//400
     public double[][][] m_yData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
+    public double[][] m_bData = new double[MAX_CHAN][MAX_CYCL];
+    public double[][] m_bFactor = new double[MAX_CHAN][MAX_CYCL];
     public double[][][] m_zData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
     public double[][] m_CTValue = new double[MAX_CHAN][MAX_WELL];
     public double[][] m_mean = new double[MAX_CHAN][MAX_WELL];
@@ -85,6 +87,10 @@ public class CCurveShowPolyFit {
                 m_falsePositive[i][j] = false;
                 m_stdev[i][j] = 0;
             }
+
+            for (int k = 0; k < MAX_CYCL; k++) {
+                m_bFactor[i][k] = 0;
+            }
         }
 
         for (int i = 0; i < MAX_WELL; i++) {
@@ -99,11 +105,12 @@ public class CCurveShowPolyFit {
         for (int i = 0; i < 4; i++) {
             ct_offset[i] = (float) Math.log(1 / log_threshold[i] - 1);
         }
-
+        m_bData = new double[MAX_CHAN][MAX_CYCL];
         m_zData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         m_zData2 = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         m_yData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         ifactor = new double[MAX_CHAN][MAX_CYCL];
+
        /* x = new double[MAX_CYCL];
         y = new double[MAX_CYCL];*/
 
@@ -148,9 +155,18 @@ public class CCurveShowPolyFit {
                     yData[0] += 0.5 * (currbase - yData[0]);    // Replace the first data at index 0 with half way to base value, so the curve look better.
 
                     for (k = 0; k < size; k++) {
-                        yData[k] -= currbase;
+                        if (DARK_CORRECT) {
+                            yData[k] -= currbase + m_bFactor[iy][k];
+                        } else {
+                            yData[k] -= currbase;
+                        }
+
                         //                            yData[k] *= cheat_factor_org;			// cheating to beautify the curve
                         yData[k] *= cheat_factorNeg;               // So it is well below the threshold
+
+                        if (yData[k] < -15) {
+                            yData[k] = -15;
+                        }
                     }
                 }
 
@@ -397,6 +413,214 @@ public class CCurveShowPolyFit {
     }
 
     public void CalculateCT() {
+        for (int i = 0; i < numChannels; i++) {
+            double[][] yData = new double[MAX_WELL][MAX_CYCL];
+
+            //=============== Background correct============
+
+            double[] bData = new double[MAX_CYCL];
+            int bsize = m_Size[i];
+
+
+            for (int n = 0; n < bsize; n++) {
+                bData[n] = m_bData[i][n];
+            }
+
+            double bmean = 0;
+
+            for (int n = 0; n < MIN_CT; n++) {
+                bmean += bData[n];
+            }
+            bmean /= MIN_CT;
+
+            double[] y = new double[bsize];
+            double[] x = new double[bsize];
+            double[] bFactor = new double[bsize];
+
+            for (int k = 0; k < bsize; k++) {
+                y[k] = bData[k];
+                x[k] = (double) k;
+            }
+            PolynomialCurveFitter polynomialCurveFitter = PolynomialCurveFitter.create(3);
+            ArrayList<WeightedObservedPoint> weightedObservedPoints = new ArrayList();
+            for (int k = 0; k < bsize; k++) {
+               /* yy[k] = yData[k];
+                xx[k] = (double) k;*/
+
+                WeightedObservedPoint weightedObservedPoint = new WeightedObservedPoint(1,
+                        k, bData[k]);
+
+                weightedObservedPoints.add(weightedObservedPoint);
+            }
+            //多项式系数
+            double[] coefficients = polynomialCurveFitter.fit(weightedObservedPoints);
+            //获取拟合的y值
+            double[] bfitted = fitValue(coefficients, x);
+
+
+            for (int k = 0; k < bsize; k++) {
+                bFactor[k] = bfitted[k] - bmean;
+                m_bFactor[i][k] = bFactor[k];
+            }
+
+            //===============
+
+            for (int j = 0; j < numWells; j++) {
+                int size = m_Size[i];
+
+                for (int n = 0; n < size; n++) {
+                    if (DARK_CORRECT)
+                        yData[j][n] = m_yData[i][j][n] - bFactor[n];
+                    else
+                        yData[j][n] = m_yData[i][j][n];
+
+
+                    if (i == 0 && m_Size[1] == m_Size[0] && CommData.crossTalk21 > 0.01) {
+                        yData[j][n] -= CommData.crossTalk21 * m_yData[1][j][ n];
+                    }
+
+                    if (i == 1 && m_Size[1] == m_Size[0] && CommData.crossTalk12 > 0.01) {
+                        yData[j][n] -= CommData.crossTalk12 * m_yData[0][j][n];
+                    }
+                }
+
+                if (size < MIN_CT)      //data has not enough to perform Ct calculation
+                    continue;
+
+                if (POLYFIT_OUTLIER) {
+
+                    double[] yy = new double[size];
+                    double[] xx = new double[size];
+                    double[] diff = new double[size];
+
+                    PolynomialCurveFitter polynomialCurveFitterOutlier = PolynomialCurveFitter.create(5);
+                    ArrayList<WeightedObservedPoint> weightedObservedPointsOutlier = new ArrayList();
+                    for (int k = 0; k < size; k++) {
+                        yy[k] = yData[j][k];
+                        xx[k] = (double) k;
+
+                        WeightedObservedPoint weightedObservedPointOutlier = new WeightedObservedPoint(1,
+                                k, yy[k]);
+
+                        weightedObservedPointsOutlier.add(weightedObservedPointOutlier);
+                    }
+                    //多项式系数
+                    double[] coefficientsOutlier = polynomialCurveFitterOutlier.fit(weightedObservedPointsOutlier);
+                    //获取拟合的y值
+                    double[] fitted = fitValue(coefficientsOutlier, xx);
+  /*  var polyfit = new PolyFit(xx, yy, 5);
+    var fitted = polyfit.Fit(xx);*/
+
+                    for (int k = 0; k < size; k++) {
+                        diff[k] = yy[k] - fitted[k];
+                    }
+                    double sum = sumArray(diff);
+
+                    double mean = sum / diff.length;
+
+                    double accum = 0.0;
+
+                    for (int k = 0; k < diff.length; k++) {
+                        accum += (diff[k] - mean) * (diff[k] - mean);
+                    }
+                    double stdev = Math.sqrt(accum / diff.length);         //方差
+
+                    for (int k = 0; k < size; k++) {
+                        if (diff[k] > OUTLIER_THRESHOLD * stdev || diff[k] < -OUTLIER_THRESHOLD * stdev) {
+                            yData[j][k] = fitted[k];
+
+/*#if DEBUG
+//                            String debuginfo = "yvalue = " + yy[k].ToString() + " found the " + k.ToString() + "position outlier data( " + i.ToString() + " " + j.ToString() + ")";
+//                            MessageBox.Show(debuginfo);
+#endif*/
+                        }
+                    }
+
+
+                }
+                List<Double> tempData = new ArrayList<>();
+
+                for (int n = 3; n < MIN_CT; n++) {
+                    tempData.add(yData[j][n]);
+                }
+                double sum = sumList(tempData);
+                //sum = tempData.sum();
+                double mean = sum / tempData.size();
+
+                double accum = 0.0;
+
+                for (int t = 0; t < tempData.size(); t++) {
+                    accum += (tempData.get(t) - mean) * (tempData.get(t) - mean);
+                }
+                double stdev = Math.sqrt(accum / tempData.size()); //方差
+
+                m_stdev[i][j] = stdev;
+                m_mean[i][j] = mean;
+            }
+
+            double std_mean = 0;
+
+            for (int j = 0; j < numWells; j++)
+            {
+                std_mean += m_stdev[i][ j];
+            }
+
+            std_mean /= numWells;
+
+            for (int j = 0; j < numWells; j++)
+            {
+                int size = m_Size[i];
+
+                if (size < MIN_CT)      //data has not enough to perform Ct calculation
+                    continue;
+
+                double mean = m_mean[i][ j];
+                double stdev = std_mean; //  m_stdev[i, j];
+
+                //===============================================
+
+                //			double yvalue=stdev * CT_TH_MULTI + mean;
+
+                double multiple = log_threshold[i] * CT_TH_MULTI * 10;
+
+                if (multiple < 8) multiple = 8;
+
+                double yvalue = stdev * multiple + mean;
+
+                double first = yData[j][ 2];
+
+                int index = 0;
+
+                for (int g = 3; g < size; g++)
+                {
+                    if (yvalue > first && yvalue <= yData[j][g])
+                    {
+                        break;
+                    }
+                        else
+                    {
+                        first = yData[j][ g];
+                        index++;
+                    }
+                }
+
+                if (index == 0 || index == size - 3)
+                {
+                    m_CTValue[i][ j] = 0;
+                }
+                else
+                {
+                    index = index + 3;
+                    while (yData[j][index] - yData[j][ index - 1] == 0) index++;
+                    m_CTValue[i][ j] = index - (yData[j][ index] - yvalue) / (yData[j][ index] - yData[j][ index - 1]);
+                    m_CTValue[i][j] = m_CTValue[i][ j] > 0 ? m_CTValue[i][ j] : 0;
+                }
+            }
+
+        }
+    }
+
+    public void CalculateCT2() {
         //if(IsCT() > 0 && !m_bThChange) return;		//CT valus have been calculated,need not been calculated again.
         // No, always recalc initial Ct.
 
@@ -501,8 +725,8 @@ public class CCurveShowPolyFit {
 
                     for (int v = 0; v < tempData.size(); v++) {
                         if (tempData.get(v) - mean > 2.5 * stdev || tempData.get(v) - mean < -2.5 * stdev) {
-                           // tempData[v] = mean;
-                            tempData.set(v,mean);
+                            // tempData[v] = mean;
+                            tempData.set(v, mean);
                             yData[v + 3] = mean;
                         }
                     }
@@ -571,17 +795,17 @@ public class CCurveShowPolyFit {
 
     public double getY(double[] coefficients, double x) {
         int degree = coefficients.length - 1;
-       /* double y = 0;
+        double y = 0;
         for (int i = degree; i >= 0; i--) {
             y += coefficients[i] * Math.pow(x, i);
         }
-        return y;*/
-        return coefficients[0] +
+        return y;
+       /* return coefficients[0] +
                 coefficients[1] * x +
                 coefficients[2] * Math.pow(x, 2) +
                 coefficients[3] * Math.pow(x, 3) +
                 coefficients[4] * Math.pow(x, 4) +
-                coefficients[5] * Math.pow(x, 5);
+                coefficients[5] * Math.pow(x, 5);*/
     }
 
 
@@ -603,12 +827,10 @@ public class CCurveShowPolyFit {
         double[] eff = new double[numWells];
         double max_eff = 0;
         int max_ei = 0;
-        for (int frameindex = 0; frameindex < numWells; frameindex++)
-        {
+        for (int frameindex = 0; frameindex < numWells; frameindex++) {
             eff[frameindex] = Math.exp(r[frameindex][iy]) - 1;         // amplification efficiency
 
-            if (max_eff < eff[frameindex])
-            {
+            if (max_eff < eff[frameindex]) {
                 max_eff = eff[frameindex];
                 max_ei = frameindex;
             }
@@ -623,7 +845,7 @@ public class CCurveShowPolyFit {
             double ratio_eff = 0;
 
             if (max_k > 0) ratio = k[frameindex][iy] / max_k;
-            if (max_eff>0) ratio_eff=eff[frameindex]/max_eff;
+            if (max_eff > 0) ratio_eff = eff[frameindex] / max_eff;
 
             if (r[max_i][iy] < r_th) {
                 ratio *= 0.3;    // ratio discounted. If the max curve have a very slow slope
@@ -634,10 +856,10 @@ public class CCurveShowPolyFit {
 //                      m_Confidence[iy, frameindex] = "可信度: " + (confi * 100).ToString("0") + "%";       // full confidence is 100
 //                }
 
-           // confi = (ratio - 0.1) * 1.11 * 0.4 + (r[frameindex][iy] - 0.19) * 2.17 * 0.6; // Weighted average of 2 score, r generally range 0.19 to 0.65
+            // confi = (ratio - 0.1) * 1.11 * 0.4 + (r[frameindex][iy] - 0.19) * 2.17 * 0.6; // Weighted average of 2 score, r generally range 0.19 to 0.65
             confi = (ratio - 0.1) * 1.11 * 0.5 + (ratio_eff - 0.1) * 1.11 * 0.5; // Weighted average of 2 score, r generally range 0.19 to 0.65
 
-            if (confi < 0 || ratio<0.03 || ratio_eff<0.05)
+            if (confi < 0 || ratio < 0.03 || ratio_eff < 0.05)
                 confi = 0;
 
             //                m_Confidence[iy, frameindex] = "阳性可信度:" + (confi * 100).ToString("0") + "% "
@@ -645,7 +867,7 @@ public class CCurveShowPolyFit {
 
             double myr = r[frameindex][iy];
 
-        //    double eff = Math.exp(myr);         // amplification efficiency
+            //    double eff = Math.exp(myr);         // amplification efficiency
 
 //                m_Confidence[iy, frameindex] = "阳性可信度: "
 //                                                    + "sat_ratio: " + (ratio * 100).ToString("0") + "%  " + "rise rate: " + r[frameindex, iy].ToString("0.00") + "(efficiency: " + (eff*100).ToString("0.0") + "%) " + " sat_multiple " + (k[frameindex, iy] * 100 / m_stdev[iy, frameindex]).ToString("0.00") + " (stdev: " + m_stdev[iy, frameindex].ToString("0.00") + ")";       // full confidence is 100
