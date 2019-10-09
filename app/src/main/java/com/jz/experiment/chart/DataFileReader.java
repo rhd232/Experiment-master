@@ -101,6 +101,7 @@ public class DataFileReader {
                                 CommData.KsIndex = num_wells;
                                 FlashData.flash_loaded = true;                                                   // treated the same as flash loaded.
                                 FlashData.NUM_WELLS=num_wells;
+                                FlashData.NUM_CHANNELS=num_channels;
                                 for (int i = 0; i < num_channels; i++) {
                                     for (int j = 0; j < num_wells; j++) {
                                         int n = trim_buff[k];
@@ -119,7 +120,7 @@ public class DataFileReader {
                                         FlashData.col_index[i][j] = new ArrayList<>(clist);
                                     }
                                 }
-                                // }
+                                CommData.UpdateDarkMap();
                             }
                         }
                     }

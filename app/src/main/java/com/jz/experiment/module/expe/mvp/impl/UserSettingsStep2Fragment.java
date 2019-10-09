@@ -907,7 +907,8 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                 k++;
 
                 CommData.KsIndex = num_wells;
-
+                FlashData.NUM_WELLS=num_wells;
+                FlashData.NUM_CHANNELS=num_channels;
                 //4.13新增
                 CommData.sn1 = sn1;
                 CommData.sn2 = sn2;
@@ -935,6 +936,7 @@ public class UserSettingsStep2Fragment extends BaseFragment implements AnitoaCon
                         FlashData.col_index[i][j] = new ArrayList<>(clist);
                     }
                 }
+                CommData.UpdateDarkMap();
                 dp_str = Buf2String(trim_buff, k);
                 for (int ci = 0; ci < num_channels; ci++) {
                     int index_start = num_pages + ci * NUM_EPKT;

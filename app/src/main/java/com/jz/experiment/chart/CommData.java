@@ -40,7 +40,9 @@ public class CommData {
     public static int sn1=0;
     public static int sn2=0;
 
-
+    /**界面上可由用户输入，默认是0****/
+    public static double crossTalk21 = 0;
+    public static double crossTalk12 = 0;
 
     public static int Cycle = 0;
     public static int imgFrame = 12;
@@ -91,7 +93,8 @@ public class CommData {
     public static double[][] m_factorData = new double[4][400];
     public static int IFMet = 0;//0普通实验1溶解曲线
 
-
+    //暗像素集合
+    public static int[][][] dark_map = new int[4][12][12];
 
     public static void ReadDatapositionFile(Context context) {
         if (positionlist.get("Chip#1")!=null && !positionlist.get("Chip#1").isEmpty()){
@@ -328,10 +331,16 @@ public class CommData {
             if (diclist.get(chan)==null){
                 return cdlist;
             }
+
             int n = (diclist.get(chan).size() / imgFrame);
             //Log.e("ChartData","n:"+n);
 
-            int ksindex= Well.getWell().getWellIndex(currks);
+            int ksindex=-1;
+            if ("C0".equals(currks)) { //dark pixels
+                ksindex=16;
+            }else {
+                ksindex = Well.getWell().getWellIndex(currks);
+            }
             if (ksindex == -1) {
                 return cdlist;
             }
@@ -352,7 +361,36 @@ public class CommData {
                 int value = 0;
                 int cindex = GetChanIndex(chan);
 
-                if (FlashData.flash_loaded){
+                if (ksindex == 16)  // dark
+                {
+                    int npoint = 11;
+                    boolean dark = true;
+                    value = 0;
+                    for (int j = 1; j < npoint; j++)
+                    {
+                        value += Integer.parseInt(datalist.get(j).get(11)) - 100;    // last column
+                        if (dark_map[cindex][ j][ 11] > 0)
+                        dark = false;
+                    }
+
+                    if(!dark)
+                    {
+                        npoint = 11;
+                        dark = true;
+                        value = 0;
+                        for (int j = 1; j < npoint; j++)
+                        {
+                            value += Integer.parseInt(datalist.get(j).get(0)) - 100;  // first column
+                            if (dark_map[cindex][ j][ 0] > 0)
+                            dark = false;
+                        }
+                        //Debug.Assert(dark);
+                    }
+
+                    value = value * 4 / (npoint - 1);   // normalize to 4 pixels
+
+                }
+                else if (FlashData.flash_loaded){
                     int npoint = FlashData.row_index[cindex][ ksindex].size();
 
                     for (int j = 0; j < npoint; j++)
@@ -512,4 +550,34 @@ public class CommData {
         return cdlist;
     }
 
+
+
+    public static void UpdateDarkMap()
+    {
+        for (int i = 0; i < FlashData.NUM_CHANNELS; i++)
+        {
+            for (int j = 0; j < 12; j++)
+            {
+                for (int k = 0; k < 12; k++)
+                {
+                    dark_map[i][ j][ k] = 0;
+                }
+            }
+        }
+
+        for (int i = 0; i < FlashData.NUM_CHANNELS; i++)
+        {
+            for (int j = 0; j < KsIndex; j++)
+            {
+                int npoint = FlashData.row_index[i][ j].size();
+
+                for (int k = 0; k < npoint; k++)
+                {
+                    int row = FlashData.row_index[i][ j].get(k);
+                    int col = FlashData.col_index[i][ j].get(k);
+                    dark_map[i][row][col] += 1;
+                }
+            }
+        }
+    }
 }

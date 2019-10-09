@@ -105,7 +105,7 @@ public class CCurveShowPolyFit {
         for (int i = 0; i < 4; i++) {
             ct_offset[i] = (float) Math.log(1 / log_threshold[i] - 1);
         }
-        m_bData = new double[MAX_CHAN][MAX_CYCL];
+
         m_zData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         m_zData2 = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];
         m_yData = new double[MAX_CHAN][MAX_WELL][MAX_CYCL];

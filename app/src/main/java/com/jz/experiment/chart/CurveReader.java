@@ -15,7 +15,7 @@ public class CurveReader {
     public static CurveReader getInstance(){
         return INSTANCE;
     }*/
-
+    public double[][] m_bData = new double[CCurveShowPolyFit.MAX_CHAN][ CCurveShowPolyFit.MAX_CYCL];
     public DtChart.DtData readCurve(/*double[][] factorValues,*/ CtParamInputLayout.CtParam ctParam, boolean norm){
         double[][][]  m_yData = new double[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL][CCurveShowPolyFit.MAX_CYCL];
         CCurveShowPolyFit cCurveShow =  new CCurveShowPolyFit();
@@ -51,9 +51,11 @@ public class CurveReader {
         int cyclenum = 0;
         for (int i = 0; i < tdlist.size(); i++)
         {
+            List<ChartData> cdlist=new ArrayList<>();
             for (int n = 0; n < kslist.size(); n++)
             {
-                List<ChartData> cdlist = CommData.GetChartData(tdlist.get(i), 0, kslist.get(n));//获取选点值
+                cdlist = CommData.GetChartData(tdlist.get(i), 0, kslist.get(n));//获取选点值
+
                 for (int k = 0; k < cdlist.size(); k++)
                 {
                    /* double factorValue=factorValues[GetChan(tdlist.get(i))][k];
@@ -62,14 +64,24 @@ public class CurveReader {
 
                 }
             }
+            if (cdlist.isEmpty()){
+                continue;
+            }
+            cdlist = CommData.GetChartData(tdlist.get(i), 0, "C0"); //dark pixels
+            for (int k = 0; k < cdlist.size(); k++)
+            {
+                m_bData[i][k] = cdlist.get(k).y; //
+            }
             if (CommData.diclist.size() > 0 && CommData.diclist.get(tdlist.get(i))!=null)
             {
-                cyclenum = (CommData.diclist.get(tdlist.get(i)).size() / CommData.imgFrame);
+                int size=CommData.diclist.get(tdlist.get(i)).size();
+                cyclenum = ( size/ CommData.imgFrame);
+                // plus 1 because the point at 0 and 1 is replicated.
             }
         }
 
         cCurveShow.m_yData = m_yData;
-      //  cCurveShow.m_Size = cyclenum+1;
+        cCurveShow.m_bData = m_bData;
         cCurveShow.m_Size[0] = cyclenum+1;
         cCurveShow.m_Size[1] = cyclenum+1;
         cCurveShow.m_Size[2] = cyclenum+1;
