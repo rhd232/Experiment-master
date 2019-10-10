@@ -124,6 +124,7 @@ public class CCurveShowPolyFit {
         CalculateCT();
 
         for (int iy = 0; iy < MAX_CHAN; iy++) {
+            double ct=0;
             for (int frameindex = 0; frameindex < numWells; frameindex++) {
                 double[] yData = new double[MAX_CYCL];
 
@@ -170,7 +171,7 @@ public class CCurveShowPolyFit {
                     }
                 }
 
-                double ct = m_CTValue[iy][frameindex];
+                ct = m_CTValue[iy][frameindex];
 
                 if (hide_org && ct >= 5 && yData.length >= 20)
                     continue;//if (hide_org && ct >= 5 && yData.size() >= 20) continue;
@@ -189,7 +190,8 @@ public class CCurveShowPolyFit {
             CheckFalsePositive(iy);
 
             for (int frameindex = 0; frameindex < numWells; frameindex++) {
-                if (norm_top && !m_falsePositive[iy][frameindex]) {
+                if (norm_top && !m_falsePositive[iy][frameindex]
+                        && m_CTValue[iy][ frameindex] >= 5) {
                     int size = m_Size[iy];
 
                     for (int i = 0; i < size; i++) {

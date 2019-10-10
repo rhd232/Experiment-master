@@ -15,7 +15,7 @@ public class CurveReader {
     public static CurveReader getInstance(){
         return INSTANCE;
     }*/
-    public double[][] m_bData = new double[CCurveShowPolyFit.MAX_CHAN][ CCurveShowPolyFit.MAX_CYCL];
+    public double[][] m_bData = new double[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_CYCL];
     public DtChart.DtData readCurve(/*double[][] factorValues,*/ CtParamInputLayout.CtParam ctParam, boolean norm){
         double[][][]  m_yData = new double[CCurveShowPolyFit.MAX_CHAN][CCurveShowPolyFit.MAX_WELL][CCurveShowPolyFit.MAX_CYCL];
         CCurveShowPolyFit cCurveShow =  new CCurveShowPolyFit();
@@ -28,7 +28,7 @@ public class CurveReader {
             if (minCt < 5) minCt = 5;
             else if (minCt > 18) minCt = 25;
 
-            if (threshold < 8) threshold = 8;
+            if (threshold < 5) threshold = 5;
             else if (threshold > 50) threshold = 50;
         }
         cCurveShow.log_threshold[0] = (float)(threshold * 0.01);
@@ -82,10 +82,9 @@ public class CurveReader {
 
         cCurveShow.m_yData = m_yData;
         cCurveShow.m_bData = m_bData;
-        cCurveShow.m_Size[0] = cyclenum+1;
-        cCurveShow.m_Size[1] = cyclenum+1;
-        cCurveShow.m_Size[2] = cyclenum+1;
-        cCurveShow.m_Size[3] = cyclenum+1;
+        for (int i = 0; i < CCurveShowPolyFit.MAX_CHAN; i++) {
+            cCurveShow.m_Size[i] = cyclenum+1;
+        }
 
         //cCurveShow.ifactor = factorValues;
         cCurveShow.UpdateAllcurve();

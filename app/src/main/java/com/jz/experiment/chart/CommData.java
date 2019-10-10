@@ -369,8 +369,9 @@ public class CommData {
                     for (int j = 1; j < npoint; j++)
                     {
                         value += Integer.parseInt(datalist.get(j).get(11)) - 100;    // last column
-                        if (dark_map[cindex][ j][ 11] > 0)
-                        dark = false;
+                        if (dark_map[cindex][ j][ 11] > 0) {
+                            dark = false;
+                        }
                     }
 
                     if(!dark)
@@ -567,7 +568,7 @@ public class CommData {
 
         for (int i = 0; i < FlashData.NUM_CHANNELS; i++)
         {
-            for (int j = 0; j < KsIndex; j++)
+            for (int j = 0; j < FlashData.NUM_WELLS; j++)
             {
                 int npoint = FlashData.row_index[i][ j].size();
 
