@@ -2247,7 +2247,6 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         AnitoaLogUtil.writeFileLog("熔解曲线温度startT：" + startT + " endT:" + endT);
         mCommunicationService.sendPcrCommandSync(command);
         //mUsbService.sendPcrCommandSync(command);
-
         // delayAskTriggerStatus();
     }
 

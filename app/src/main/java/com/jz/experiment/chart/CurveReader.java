@@ -70,7 +70,7 @@ public class CurveReader {
             cdlist = CommData.GetChartData(tdlist.get(i), 0, "C0"); //dark pixels
             for (int k = 0; k < cdlist.size(); k++)
             {
-                m_bData[i][k] = cdlist.get(k).y; //
+                m_bData[i][k] = cdlist.get(k).y*4/11; //
             }
             if (CommData.diclist.size() > 0 && CommData.diclist.get(tdlist.get(i))!=null)
             {

@@ -364,6 +364,11 @@ public class CommData {
                 if (ksindex == 16)  // dark
                 {
                     int npoint = 11;
+                    for (int j = 0; j < npoint; j++)
+                    {
+                        value += Integer.parseInt(datalist.get(11).get(j)) - 100;
+                    }
+                    /*int npoint = 11;
                     boolean dark = true;
                     value = 0;
                     for (int j = 1; j < npoint; j++)
@@ -388,7 +393,7 @@ public class CommData {
                         //Debug.Assert(dark);
                     }
 
-                    value = value * 4 / (npoint - 1);   // normalize to 4 pixels
+                    value = value * 4 / (npoint - 1);   // normalize to 4 pixels*/
 
                 }
                 else if (FlashData.flash_loaded){
