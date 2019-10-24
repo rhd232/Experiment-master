@@ -41,7 +41,7 @@
                         android:layout_height="30dp"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
-                        android:background="@color/color1F4E99"
+                        android:background="@drawable/btn_selector_upload_btn"
                         android:gravity="center"
                         android:paddingLeft="6dp"
                         android:paddingRight="6dp"

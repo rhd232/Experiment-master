@@ -28,7 +28,7 @@
         android:paddingBottom="12dp"
         android:text="@string/test_new"
         android:textSize="18sp"
-        android:background="@drawable/shape_solidffffff_strokef2bc00_corner4"
+        android:background="@drawable/btn_selector_new_experiment"
         android:layout_marginTop="24dp"
         android:textColor="#F2BC00" />
 </LinearLayout>

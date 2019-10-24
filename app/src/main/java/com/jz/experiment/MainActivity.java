@@ -203,7 +203,6 @@ public class MainActivity extends BaseActivity {
                 resetBottomBar();
                 layout_expe.setActivated(true);
                 view_pager.setCurrentItem(TAB_INDEX_EXPE, false);
-
                 break;
             case R.id.layout_data:
                 resetBottomBar();

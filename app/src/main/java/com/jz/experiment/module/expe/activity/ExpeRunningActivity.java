@@ -1393,10 +1393,6 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
             return;
         }
         if (type == PcrCommand.STEP_5_TYPE) {
-
-
-
-
             //当前循环状态
             byte status = reveicedBytes[dataIndex];
             switch (status) {

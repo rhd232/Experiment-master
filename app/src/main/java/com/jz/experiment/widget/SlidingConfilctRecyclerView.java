@@ -25,9 +25,6 @@ public class SlidingConfilctRecyclerView extends RecyclerView {
         super.onFinishInflate();
     }
 
-
-
-
     int mLastXIntercept;
     int mLastYIntercept;
     @Override

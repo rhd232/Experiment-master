@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.login.LoginActivity;
@@ -60,6 +62,12 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        //读取屏幕的分辨率
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        Log.e("checkActivity", "Resolution: " + dm.widthPixels + "x" + dm.heightPixels);
+        Log.e("checkActivity", "dp: " + dm.widthPixels / dm.density + "x" + dm.heightPixels / dm.density);
+
         //安装器中打开会有这个flag，导致每次app进入后台再重新打开app都会出现闪屏页
         if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)> 0) {
             /**为了防止重复启动多个闪屏页面**/
