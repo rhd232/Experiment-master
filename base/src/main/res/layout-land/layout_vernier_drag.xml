@@ -57,7 +57,7 @@
             android:paddingBottom="6dp"
             android:textColor="@color/color333333"
             android:textSize="16dp"
-            android:maxLength="3"
+            android:maxLength="4"
             android:text="10"
             android:inputType="number"/>
 

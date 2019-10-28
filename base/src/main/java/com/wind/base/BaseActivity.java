@@ -38,7 +38,7 @@ public class BaseActivity extends UmengActivity {
         View titleBar=$(R.id.title_bar);
         mTitleBar= (TitleBar) titleBar;
         if (mTitleBar!=null) {
-            mTitleBar.setLeftIcon(R.drawable.icon_back);
+//            mTitleBar.setLeftIcon(R.drawable.icon_back_s);
             mTitleBar.setTextColor(Color.parseColor("#1a1a1a"));
             mTitleBar.setLineColor(getResources().getColor(R.color.colordbdbdb));
         }

@@ -20,6 +20,7 @@ import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.MainActivity;
 import com.jz.experiment.R;
 import com.jz.experiment.di.ProviderModule;
+import com.jz.experiment.module.update.AppUpdateActivity;
 import com.jz.experiment.util.StatusChecker;
 import com.jz.experiment.util.UsbManagerHelper;
 import com.wind.base.C;
@@ -234,6 +235,7 @@ public class LoginFragment extends BaseFragment implements AnitoaConnectionListe
                             if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                                 //登录成功
                                 MainActivity.start(getActivity());
+//                                AppUpdateActivity.start(getActivity());
                                 mNeedStopService = false;
                                 ActivityUtil.finish(getActivity());
                             } else {
