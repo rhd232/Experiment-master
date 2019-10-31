@@ -9,13 +9,11 @@
     <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
-
     <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <application
         android:name=".App"
         android:icon="@drawable/app_logo"
@@ -25,8 +23,9 @@
         android:theme="@style/AppTheme"
         android:resizeableActivity="false"
         android:hardwareAccelerated="false">
-        <activity android:name=".ChartActivity">
 
+
+        <activity android:name=".ChartActivity">
         </activity>
         <activity
             android:name=".DefaultErrorActivity"
@@ -34,7 +33,7 @@
             android:process=":error_activity"
             android:screenOrientation="landscape"
             />
-        <activity android:name=".SplashActivity"
+        <activity android:name=".module.update.AppUpdateActivity"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
             android:launchMode="singleTop"
@@ -66,6 +65,11 @@
         </activity>
 
         <activity android:name=".module.login.LoginActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize">
+        </activity>
+
+        <activity android:name=".SplashActivity"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize">
 
@@ -139,13 +143,14 @@
 -->
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.FileProvider"
+            android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
     </application>
 
 </manifest>

@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.jz.experiment.di.ProviderModule;
 import com.jz.experiment.module.login.LoginActivity;
+import com.jz.experiment.module.update.AppUpdateActivity;
 import com.wind.base.BaseActivity;
 import com.wind.base.C;
 import com.wind.base.bean.CyclingStage;
@@ -256,7 +257,6 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void next() {
-
         LoginActivity.start(getActivity());
         ActivityUtil.finish(getActivity());
     }

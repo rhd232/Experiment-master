@@ -364,8 +364,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
             return;
         }
         //文件读取之后孔数已经有值
-        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExperiment),
-                layout_ctparam_input.getCtParam(), cb_norm.isChecked());
+        mDtChart.show(ChanList, KSList, DataFileUtil.getDtImageDataFile(mExperiment), layout_ctparam_input.getCtParam(), cb_norm.isChecked());
 
         //孔数已经放在数据文件中，不在存放在/anitoa/trim目录下
         KSList.clear();
@@ -374,7 +373,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         //获取CT value
         for (String chan : ChanList) {
             for (String ks : KSList) {
-
                 getCtValue(chan, ks, mDtChart.getDtData().m_CTValue, mDtChart.getDtData().m_falsePositive);
             }
         }

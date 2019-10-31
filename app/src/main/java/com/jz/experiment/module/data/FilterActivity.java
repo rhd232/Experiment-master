@@ -40,8 +40,7 @@ public class FilterActivity extends BaseActivity {
 
     @Override
     protected void setTitle() {
-        mTitleBar.setLeftIcon(R.drawable.icon_close);
-
+        mTitleBar.setLeftIcon(R.drawable.btn_selector_close);
         mTitleBar.setTitle(getString(R.string.running_filter));
     }
     private  String channel1;

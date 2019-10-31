@@ -15,8 +15,7 @@
             android:id="@+id/iv_left"
             android:layout_width="54dp"
             android:layout_height="match_parent"
-            android:scaleType="centerInside"
-            android:src="@drawable/icon_titlebar_back_s" />
+            android:src="@drawable/btn_selector_title_back" />
 
         <TextView
             android:id="@+id/tv_title"

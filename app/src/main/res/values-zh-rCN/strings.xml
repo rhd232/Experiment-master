@@ -178,4 +178,16 @@
     <string name="print_date">报告日期</string>
 
     <string name="tip_illegal_file">文件非法</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="exit">退出</string>
+    <string name="current_version">当前版本：</string>
+    <string name="version_update">版本更新</string>
+    <string name="server_version">服务器版本：</string>
+    <string name="upadte_now">立即更新</string>
+    <string name="next_time">下次再说</string>
+    <string name="version_code_current">当前版本号:</string>
+    <string name="version_name_current">当前版本名:</string>
+    <string name="connecting_to_network">正在连接网络,请稍后</string>
+    <string name="download_progress">加载进度 </string>
 </resources>

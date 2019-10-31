@@ -1,5 +1,6 @@
 package com.jz.experiment.chart;
 
+import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.Message;
 
@@ -109,11 +110,21 @@ public abstract class WindChart {
         // chart.setTouchEnabled(false);
 
         //设置是否可以通过双击屏幕放大图表。默认是true
-        chart.setDoubleTapToZoomEnabled(false);
+        chart.setDoubleTapToZoomEnabled(true);
         //设置是否可以缩放 x和y，默认true
-        chart.setScaleEnabled(false);
+        chart.setScaleEnabled(true);
+        //设置是否绘制边框
         chart.setDrawBorders(false);
+        //设置是否可以用手指移动图表
+        chart.setDragEnabled(true);
         chart.setData(mLineData);
+
+        Matrix matrix = new Matrix();
+        // x轴放大4倍，y不变
+        matrix.postScale(1.0f, 1.0f);
+        // 设置缩放
+        chart.getViewPortHandler().refresh(matrix, chart, false);
+
         chart.invalidate(); // refresh
     }
     public static final int WHAT_REFRESH_CHART = 1234;

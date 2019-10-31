@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -77,8 +78,7 @@ public class UsbService extends CommunicationService {
     public boolean initialize() {
 
         //申请USB使用的权限
-        mRequestPermissionPendingIntent = PendingIntent.getBroadcast(this,
-                0, new Intent(ACTION_DEVICE_PERMISSION), 0);
+        mRequestPermissionPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_DEVICE_PERMISSION), 0);
         //注册接收申请权限结果的广播接收器
         IntentFilter permissionFilter = new IntentFilter(ACTION_DEVICE_PERMISSION);
         registerReceiver(mUsbPermissionReceiver, permissionFilter);
@@ -137,7 +137,6 @@ public class UsbService extends CommunicationService {
         int interfaceCount = device.getInterfaceCount();
         UsbInterface usbInterface = null;
         for (int i = 0; i < interfaceCount; i++) {
-
             //获取interfaceClass为USB_CLASS_HID的 interface
             int interfaceClass = device.getInterface(i).getInterfaceClass();
             if (interfaceClass == UsbConstants.USB_CLASS_MASS_STORAGE) {
@@ -155,6 +154,7 @@ public class UsbService extends CommunicationService {
      *
      * @param deviceName
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void connect(String deviceName) {
         HashMap<String, UsbDevice> deviceMap = mUsbManager.getDeviceList();
         Iterator<UsbDevice> iterator = deviceMap.values().iterator();
@@ -168,6 +168,8 @@ public class UsbService extends CommunicationService {
         }
 
         if (targetDevice!=null && classHid(targetDevice)) {
+            if(!targetDevice.getManufacturerName().equals("STM32 USB Test"))
+                return;
             mTargetDevice = targetDevice;
         }
 
@@ -629,7 +631,6 @@ public class UsbService extends CommunicationService {
             String action = intent.getAction();
             UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
-
                 connect(device.getDeviceName());
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
 

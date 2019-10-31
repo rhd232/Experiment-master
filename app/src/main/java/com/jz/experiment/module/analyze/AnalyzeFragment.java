@@ -183,6 +183,7 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
         }
 
     }
+
     private ExpeJsonBean mExpeJsonBean=null;
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -220,9 +221,6 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
                         return;
                     }
                     switchMode();
-
-
-
                 }
             }
         }
@@ -292,7 +290,6 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
             ctValues = dtChart.getDtData().m_CTValue;
             falsePositive = dtChart.getDtData().m_falsePositive;
         }
-
         KSList.clear();
         KSList = Well.getWell().getKsList();
         for (String chan : ChanList) {

@@ -167,8 +167,8 @@
                             android:paddingRight="17dp"
                             android:paddingBottom="7dp"
                             android:text="@string/setup_mode_melting"
-                            android:visibility="gone"
-                            android:textColor="@color/selector_ffffff_1f4e99" />
+                            android:textColor="@color/selector_ffffff_1f4e99"
+                            android:visibility="gone" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"

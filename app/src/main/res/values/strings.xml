@@ -166,4 +166,16 @@
     <string name="print_date">Date</string>
 
     <string name="tip_illegal_file">Illegal File</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="exit">exit</string>
+    <string name="current_version">Current Version :</string>
+    <string name="version_update">Version Update</string>
+    <string name="server_version">Server Version :</string>
+    <string name="upadte_now">Update Now</string>
+    <string name="next_time">Next Time</string>
+    <string name="version_code_current">Version Code Current:</string>
+    <string name="version_name_current">Version Name Current:</string>
+    <string name="connecting_to_network">Connecting to network, please wait</string>
+    <string name="download_progress">Download Progress </string>
 </resources>
