@@ -1,6 +1,9 @@
 package com.wind.base.mvp.view;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -12,8 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wind.base.R;
+import com.wind.base.dialog.LoadingDialogHelper;
 import com.wind.base.utils.DisplayUtil;
 import com.wind.view.NestedTabLayout;
 
@@ -48,8 +53,7 @@ public abstract class TabLayoutFragment
         //ButterKnife.bind(this,view);
         layout_tab = view.findViewById(R.id.layout_tab);
         view_pager = view.findViewById(R.id.layout_view_pager);
-        mFragmentAdapter = new ContainerPagerAdapter(getChildFragmentManager(),
-                getFragments(), getTitles());
+        mFragmentAdapter = new ContainerPagerAdapter(getChildFragmentManager(), getFragments(), getTitles());
         view_pager.setAdapter(mFragmentAdapter);
 
         layout_tab.setupWithViewPager(view_pager);
@@ -62,6 +66,29 @@ public abstract class TabLayoutFragment
         });*/
         layout_tab.setTabMode(TabLayout.MODE_SCROLLABLE);
        // layout_tab.setTabMode(TabLayout.MODE_FIXED);
+
+/*        layout_tab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                LoadingDialogHelper.showOpLoading(getActivity());
+                mHandler.sendEmptyMessageDelayed(0, 3000);
+*//*                LoadingDialogHelper.showOpLoading(getActivity());
+                new Handler().postDelayed(new Runnable(){
+                    public void run(){
+                        //execute the task
+                        LoadingDialogHelper.hideOpLoading();
+                    }
+                },5000);*//*
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                return;
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                return;
+            }
+        });*/
     }
 
     protected abstract List<Fragment> getFragments();
@@ -212,4 +239,17 @@ public abstract class TabLayoutFragment
     protected void addOnTabSelectedListener(TabLayout.OnTabSelectedListener listener) {
         layout_tab.addOnTabSelectedListener(listener);
     }
+
+
+    Handler mHandler = new Handler() {
+        public void handleMessage(Message paramAnonymousMessage) {
+            switch (paramAnonymousMessage.what) {
+                default:
+                    break;
+                case 0:
+                    LoadingDialogHelper.hideOpLoading();
+                    break;
+            }
+        }
+    };
 }

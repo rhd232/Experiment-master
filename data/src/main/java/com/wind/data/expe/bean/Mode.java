@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 public class Mode implements Parcelable {
     private String name;
-    private int ctThreshold=10;
+    private float ctThreshold=1;
     private int ctMin=13;
 
     public Mode(String name){
@@ -46,11 +46,11 @@ public class Mode implements Parcelable {
         this.name = name;
     }
 
-    public int getCtThreshold() {
+    public Float getCtThreshold() {
         return ctThreshold;
     }
 
-    public void setCtThreshold(int ctThreshold) {
+    public void setCtThreshold(Float ctThreshold) {
         this.ctThreshold = ctThreshold;
     }
 

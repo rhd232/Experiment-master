@@ -49,11 +49,11 @@ public class PcrCommand {
      * 设置过冲温度和时间
      */
     public static PcrCommand ofOvershotTemperature() {
-        float positiveOvershotTime=10;
-        float positiveOvershotTemp=1;
+        float positiveOvershotTime=5;
+        float positiveOvershotTemp=4;
 
-        float negativeOvershotTime=10;
-        float negativeOvershotTemp=1;
+        float negativeOvershotTime=5;
+        float negativeOvershotTemp=4;
         int command=0x13;
         int length=18;
         int type=0x08;

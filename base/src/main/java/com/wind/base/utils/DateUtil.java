@@ -3,6 +3,7 @@ package com.wind.base.utils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by wind on 2016/11/4.
@@ -13,6 +14,7 @@ public class DateUtil {
     public static String get(){
         return get(new Date().getTime());
     }
+
     public static String get(long milliTime){
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy.MM.dd");
         String date=dateFormat.format(new Date(milliTime));
@@ -72,6 +74,7 @@ public class DateUtil {
 
         return retVal;
     }
+
     public static String getHowLongOrDate(long milliTimeOne,long milliTimeOther) {
         String retVal="";
         long delta=milliTimeOne-milliTimeOther;
@@ -98,6 +101,7 @@ public class DateUtil {
 
         return retVal;
     }
+
     private static boolean isSameDay(long inputTime) {
 
         TimeInfo tStartAndEndTime = getTodayStartAndEndTime();
@@ -149,6 +153,7 @@ public class DateUtil {
                 .get(Calendar.YEAR);
         return isSameYear;
     }
+
     private static class TimeInfo {
         private long startTime;
         private long endTime;
@@ -172,6 +177,7 @@ public class DateUtil {
             this.endTime = var1;
         }
     }
+
     public static TimeInfo getTodayStartAndEndTime() {
         Calendar calendar1 = Calendar.getInstance();
         calendar1.set(Calendar.HOUR_OF_DAY, 0);
@@ -194,6 +200,7 @@ public class DateUtil {
         info.setEndTime(endTime);
         return info;
     }
+
     public static TimeInfo getYesterdayStartAndEndTime() {
         Calendar calendar1 = Calendar.getInstance();
         calendar1.add(Calendar.DATE, -1);
@@ -217,5 +224,25 @@ public class DateUtil {
         info.setStartTime(startTime);
         info.setEndTime(endTime);
         return info;
+    }
+
+    public static long getToadyStartTime(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeZone(TimeZone.getDefault());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
+    }
+
+    public static long getToadyEndime(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeZone(TimeZone.getDefault());
+        cal.set(Calendar.HOUR_OF_DAY, 24);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return  cal.getTimeInMillis();
     }
 }

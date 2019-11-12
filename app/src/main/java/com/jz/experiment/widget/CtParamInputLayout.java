@@ -24,8 +24,8 @@ import rx.functions.Action1;
 public class CtParamInputLayout extends FrameLayout {
 
 
-    public static int DEFALUT_MIN_CT=13;
-    public static int DEFALUT_THRESHHOLD_CT=10;
+    public static int DEFALUT_MIN_CT = 13 ;
+    public static float DEFALUT_THRESHHOLD_CT = 1 ;
 
     public CtParamInputLayout(@NonNull Context context) {
         this(context, null);
@@ -86,7 +86,7 @@ public class CtParamInputLayout extends FrameLayout {
             setText(et_ct_threshold,DEFALUT_THRESHHOLD_CT+"");
            // et_ct_threshold.setText(DEFALUT_THRESHHOLD_CT+"");
         } else {
-            param.ctThreshhold = Integer.parseInt(ctThreshold);
+            param.ctThreshhold = Float.parseFloat(ctThreshold);
         }
 
         return param;
@@ -103,17 +103,17 @@ public class CtParamInputLayout extends FrameLayout {
 
     }
 
-    public void set(int ctMin,int ctThreshhold){
+    public void set(int ctMin,float ctThreshhold){
         et_ct_min.setText(ctMin+"");
         et_ct_threshold.setText(ctThreshhold+"");
     }
     public static class CtParam implements Parcelable {
         public int ctMin;
-        public int ctThreshhold;
+        public Float ctThreshhold;
         public CtParam(){}
         protected CtParam(Parcel in) {
             ctMin = in.readInt();
-            ctThreshhold = in.readInt();
+            ctThreshhold = in.readFloat();
         }
 
         public static final Creator<CtParam> CREATOR = new Creator<CtParam>() {
@@ -136,7 +136,7 @@ public class CtParamInputLayout extends FrameLayout {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeInt(ctMin);
-            dest.writeInt(ctThreshhold);
+            dest.writeFloat(ctThreshhold);
         }
     }
 

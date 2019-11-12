@@ -88,7 +88,7 @@ public class ExpeJsonBean {
         public boolean autoInt;
 
         @JSONField(name = "ct_threshold")
-        public int ctThreshold;
+        public float ctThreshold;
         @JSONField(name = "ct_min")
         public int ctMin;
     }

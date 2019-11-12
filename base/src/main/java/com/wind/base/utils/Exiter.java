@@ -2,6 +2,7 @@ package com.wind.base.utils;
 
 import android.app.Activity;
 
+import com.wind.base.R;
 import com.wind.toastlib.ToastUtil;
 
 import java.util.Timer;
@@ -17,7 +18,7 @@ public class Exiter {
         Timer tExit = null;
         if (isExit == false) {
             isExit = true; // 准备退出
-            ToastUtil.showToast(activity, "再按一次退出程序");
+            ToastUtil.showToast(activity, R.string.exit_app_confirm);
             tExit = new Timer();
             tExit.schedule(new TimerTask() {
                 @Override

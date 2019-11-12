@@ -11,6 +11,7 @@ import com.wind.base.bean.MeltingStage;
 import com.wind.base.bean.PartStage;
 import com.wind.base.bean.Stage;
 import com.wind.base.bean.StartStage;
+import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.Channel;
 import com.wind.data.expe.bean.ChannelInfoModel;
 import com.wind.data.expe.bean.DtMode;
@@ -295,12 +296,12 @@ public class ExpeDataStore {
                 }
             }
         });
-
     }
+
     public Observable<FindExpeResponse> findAllCompleted() {
         final FindExpeResponse response = new FindExpeResponse();
         response.setErr(-1);
-        final SqlDelightStatement statement = ExpeInfo.FACTORY.find_all_completed();
+        final SqlDelightStatement statement = ExpeInfo.FACTORY.find_all_completed(DateUtil.getToadyStartTime(),DateUtil.getToadyEndime());
         return mBriteDb.createQuery(ExpeInfo.TABLE_NAME,statement.statement)
                 .mapToList(new Func1<Cursor, HistoryExperiment>() {
                     @Override
