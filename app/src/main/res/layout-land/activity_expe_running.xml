@@ -8,12 +8,49 @@
 
     <com.jz.experiment.widget.DeviceStateBar
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <com.wind.view.TitleBar
         android:id="@+id/title_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_dt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:background="@color/white" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_melt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:background="@color/white"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart_temp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="1"
+            android:background="@color/white" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -96,45 +133,12 @@
             android:id="@+id/tv_stop"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:background="@drawable/btn_selector_stop"
+            android:gravity="center"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:background="@color/color1F4E99"
-            android:gravity="center"
             android:text="@string/running_stop"
             android:textColor="@color/white" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/chart_dt"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white" />
-
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/chart_melt"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white"
-                android:visibility="gone" />
-        </FrameLayout>
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart_temp"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/white" />
     </LinearLayout>
 
     <!--<TextView

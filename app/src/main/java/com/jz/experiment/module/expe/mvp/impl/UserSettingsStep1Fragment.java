@@ -154,8 +154,6 @@ public class UserSettingsStep1Fragment extends BaseFragment {
         CommData.ReadDatapositionFile(getActivity());
         TrimReader.getInstance().ReadTrimFile(getActivity());
 
-
-
     }
 
     private void caculateItemHeight() {
@@ -367,7 +365,7 @@ public class UserSettingsStep1Fragment extends BaseFragment {
                 return;
             }
 
-            AppDialogHelper.showChannelSelectDialog(getActivity(), position , new AppDialogHelper.OnChannelSelectListener() {
+            AppDialogHelper.showChannelSelectDialog(getActivity(), position ,mChannelAdapter, new AppDialogHelper.OnChannelSelectListener() {
                 @Override
                 public void onChannelSelected(int position, ChannelMaterial material) {
                     String name="";

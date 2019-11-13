@@ -21,14 +21,14 @@ public class CurveReader {
         CCurveShowPolyFit cCurveShow =  new CCurveShowPolyFit();
 
         int minCt=CtParamInputLayout.DEFALUT_MIN_CT;
-        int threshold=CtParamInputLayout.DEFALUT_THRESHHOLD_CT;
+        float threshold=CtParamInputLayout.DEFALUT_THRESHHOLD_CT;
         if (ctParam!=null){
             minCt=ctParam.ctMin;
             threshold=ctParam.ctThreshhold;
             if (minCt < 5) minCt = 5;
             else if (minCt > 18) minCt = 25;
 
-            if (threshold < 5) threshold = 5;
+            if (threshold < 0.01) threshold = 0.01f;
             else if (threshold > 50) threshold = 50;
         }
         cCurveShow.log_threshold[0] = (float)(threshold * 0.01);

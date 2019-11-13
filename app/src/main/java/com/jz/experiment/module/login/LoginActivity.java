@@ -13,6 +13,7 @@ import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.R;
 import com.wind.base.BaseActivity;
 import com.wind.base.C;
+import com.wind.base.utils.DateUtil;
 import com.wind.base.utils.Navigator;
 
 public class LoginActivity extends BaseActivity{
@@ -24,8 +25,6 @@ public class LoginActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_container);
         replaceFragment(new LoginFragment());
-
-
         getAndroiodScreenProperty();
        // AnitoaLogUtil.writeFileLog("LoginActivity onCreate");
 

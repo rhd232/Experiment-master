@@ -37,10 +37,11 @@
     <Button
         android:id="@+id/exit_download_btn"
         android:layout_width="300dp"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:layout_marginTop="52dp"
         android:background="@drawable/shape_solid1f4e99_corner4"
         android:text="@string/exit"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textSize="10sp" />
 
 </LinearLayout>

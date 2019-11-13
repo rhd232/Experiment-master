@@ -2,6 +2,7 @@ package com.jz.experiment.module.data;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.graphics.Canvas;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -62,6 +64,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -131,7 +134,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
         sv = view.findViewById(R.id.sv);
         ll_root = view.findViewById(R.id.ll_root);
         layout_ctparam_input.setOnCtParamChangeListener(this);
-
         tv_dt.setActivated(true);
         tv_melt.setActivated(false);
         chart_melt.setVisibility(View.GONE);
@@ -518,7 +520,6 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 StandardCurveActivity.start(getActivity(), mExperiment, params);
                 break;
             case R.id.tv_dt:
-
                 time = now;
                 tv_dt.setActivated(true);
                 tv_melt.setActivated(false);
@@ -544,9 +545,7 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
                 // }
                 break;
             case R.id.iv_save:
-
                 doSaveExpe();
-
                 break;
             case R.id.iv_pdf:
              /*   GenerateExpeJsonRequest request = new GenerateExpeJsonRequest();
@@ -805,4 +804,5 @@ public class ExpeDataFragment extends CtFragment implements CtParamInputLayout.O
 
         showChart();
     }
+
 }

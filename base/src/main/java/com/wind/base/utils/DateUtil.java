@@ -226,23 +226,17 @@ public class DateUtil {
         return info;
     }
 
-    public static long getToadyStartTime(){
+    public static long getDayTime(int year, int month , int date , int hour){
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(TimeZone.getDefault());
-        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month - 1);
+        cal.set(Calendar.DATE, date);
+        cal.set(Calendar.HOUR_OF_DAY, hour);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTimeInMillis();
     }
 
-    public static long getToadyEndime(){
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(TimeZone.getDefault());
-        cal.set(Calendar.HOUR_OF_DAY, 24);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return  cal.getTimeInMillis();
-    }
 }

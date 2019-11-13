@@ -37,7 +37,9 @@ import com.wind.data.expe.table.ExpeInfo;
 import com.wind.data.expe.table.SampleInfo;
 import com.wind.data.expe.table.StageInfo;
 
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -298,10 +300,14 @@ public class ExpeDataStore {
         });
     }
 
-    public Observable<FindExpeResponse> findAllCompleted() {
+    public Observable<FindExpeResponse> findAllCompleted(Calendar calendar) {
+        int year,month,date;
+        year = calendar.get(Calendar.YEAR);
+        month = calendar.get(Calendar.MONTH) + 1;
+        date = calendar.get(Calendar.DATE);
         final FindExpeResponse response = new FindExpeResponse();
         response.setErr(-1);
-        final SqlDelightStatement statement = ExpeInfo.FACTORY.find_all_completed(DateUtil.getToadyStartTime(),DateUtil.getToadyEndime());
+        final SqlDelightStatement statement = ExpeInfo.FACTORY.find_all_completed(DateUtil.getDayTime(year, month, date,0),DateUtil.getDayTime(year, month, date, 24));
         return mBriteDb.createQuery(ExpeInfo.TABLE_NAME,statement.statement)
                 .mapToList(new Func1<Cursor, HistoryExperiment>() {
                     @Override

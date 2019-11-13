@@ -1,10 +1,13 @@
 package com.jz.experiment;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,6 +25,7 @@ import com.jz.experiment.module.analyze.AnalyzeFragment;
 import com.jz.experiment.module.data.ExpeDataTabFragment;
 import com.jz.experiment.module.expe.HistoryExperimentsFragment;
 import com.jz.experiment.module.expe.bean.Tab;
+import com.jz.experiment.module.settings.MineFragment;
 import com.jz.experiment.module.settings.event.LogoutEvent;
 import com.jz.experiment.util.DataFileUtil;
 import com.jz.experiment.util.UsbManagerHelper;
@@ -52,6 +56,7 @@ public class MainActivity extends BaseActivity {
     public static final int TAB_INDEX_EXPE = 0;
     public static final int TAB_INDEX_DATA = 1;
     public static final int TAB_INDEX_ANALYZE = 2;
+    public static final int TAB_INDEX_MINE = 3;
     @BindView(R.id.view_pager)
     ViewPager view_pager;
     MainPagerAdapter mAdapter;
@@ -63,6 +68,8 @@ public class MainActivity extends BaseActivity {
     DeviceStateBar main_device_state_bar;
     @BindView(R.id.layout_analyze)
     View layout_analyze;
+    @BindView(R.id.layout_mine)
+    View layout_mine;
     Fragment[] fragments;
 
     public static void start(Context context) {
@@ -83,25 +90,20 @@ public class MainActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         mOnSaveInstanceStateCalled=false;
-        fragments = new Fragment[3];
+        fragments = new Fragment[4];
         fragments[0] = new HistoryExperimentsFragment();
         fragments[1] = new ExpeDataTabFragment();
         fragments[2] = new AnalyzeFragment();
+        fragments[3] = new MineFragment();
 
         mAdapter = new MainPagerAdapter(getSupportFragmentManager(), fragments);
         view_pager.setAdapter(mAdapter);
         view_pager.setOffscreenPageLimit(3);
         onViewClick(layout_expe);
-
-
         Anitoa.getInstance(getActivity());
-
         mHandler.postDelayed(mConnectRunnable, 500);
-
         checkStoragePermission();
-
         AnitoaLogUtil.writeFileLog("MainActivity onCreate");
-
     }
 
 
@@ -190,7 +192,7 @@ public class MainActivity extends BaseActivity {
         return getResources().getColor(R.color.color686868);
     }
 
-    @OnClick({R.id.layout_expe, R.id.layout_data, R.id.layout_analyze})
+    @OnClick({R.id.layout_expe, R.id.layout_data, R.id.layout_analyze,R.id.layout_mine})
     public void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.layout_expe:
@@ -199,7 +201,6 @@ public class MainActivity extends BaseActivity {
                 if (expeDataTabFragment.hasUnSaveExpe()){
 
                 }*/
-
                 resetBottomBar();
                 layout_expe.setActivated(true);
                 view_pager.setCurrentItem(TAB_INDEX_EXPE, false);
@@ -224,6 +225,11 @@ public class MainActivity extends BaseActivity {
                 layout_analyze.setActivated(true);
                 view_pager.setCurrentItem(TAB_INDEX_ANALYZE, false);
                 break;
+            case R.id.layout_mine:
+                resetBottomBar();
+                layout_mine.setActivated(true);
+                view_pager.setCurrentItem(TAB_INDEX_MINE, false);
+                break;
 
         }
     }
@@ -233,7 +239,7 @@ public class MainActivity extends BaseActivity {
         layout_expe.setActivated(false);
         layout_data.setActivated(false);
         layout_analyze.setActivated(false);
-
+        layout_mine.setActivated(false);
 
     }
 
@@ -342,4 +348,6 @@ public class MainActivity extends BaseActivity {
 
         return super.onContextItemSelected(item);
     }
+
+
 }

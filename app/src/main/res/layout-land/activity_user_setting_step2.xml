@@ -12,7 +12,8 @@
 
         <com.jz.experiment.widget.DeviceStateBar
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
         <com.wind.view.TitleBar
             android:id="@+id/title_bar"

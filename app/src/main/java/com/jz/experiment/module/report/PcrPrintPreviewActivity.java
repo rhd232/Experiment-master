@@ -50,12 +50,11 @@ public class PcrPrintPreviewActivity extends BaseActivity {
     @Override
     protected void setTitle() {
         mTitleBar.setTitle(getString(R.string.print_preview));
-        mTitleBar.setRightText(getString(R.string.print));
+//        mTitleBar.setRightText(getString(R.string.print));
+        mTitleBar.setRightIcon(R.drawable.btn_selector_print);
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 UsbService service=Anitoa.getInstance(getActivity()).getUsbService();
                 UsbDevice storageDevice=service.getUsbStorageDevice();
                 if (storageDevice!=null){

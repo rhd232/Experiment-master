@@ -23,9 +23,8 @@ public class UserSettingsStep1Activity extends BaseActivity {
 
     @Override
     protected void setTitle() {
-        String title=getString(R.string.title_setup_1);
-        mTitleBar.setTitle(title);
-        mTitleBar.setRightIcon(R.drawable.icon_history_data);
+        mTitleBar.setTitle(getString(R.string.title_setup_1));
+//        mTitleBar.setRightIcon(R.drawable.icon_history_data);
     }
 
     @Override

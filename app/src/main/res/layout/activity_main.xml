@@ -4,36 +4,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity"
-    android:background="@color/white">
-
-    <com.jz.experiment.widget.DeviceStateBar
-        android:id="@+id/main_device_state_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-    <com.wind.view.ControlableViewPager
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-    </com.wind.view.ControlableViewPager>
-    <!--bottombar-->
-
+    android:background="@color/white"
+    android:orientation="horizontal"
+    tools:context=".MainActivity">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_bar_height"
-        android:layout_gravity="bottom">
+        android:layout_width="80dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
 
 
         <RelativeLayout
+            android:id="@+id/layout_mine"
+            android:layout_width="match_parent"
+            android:layout_height="70dp">
+
+            <ImageView
+                android:id="@+id/mine_img"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/selector_main_mine_tab_icon" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/layout_expe"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_width="match_parent"
+            android:layout_height="70dp">
 
             <ImageView
                 android:id="@+id/expe_img"
@@ -47,9 +46,8 @@
 
         <RelativeLayout
             android:id="@+id/layout_data"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_width="match_parent"
+            android:layout_height="70dp">
 
             <ImageView
                 android:id="@+id/data_img"
@@ -59,11 +57,11 @@
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/selector_main_data_tab_icon" />
         </RelativeLayout>
+
         <RelativeLayout
             android:id="@+id/layout_analyze"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_width="match_parent"
+            android:layout_height="70dp">
 
             <ImageView
                 android:id="@+id/analyze_img"
@@ -74,6 +72,28 @@
                 android:src="@drawable/selector_main_analyze_tab_icon" />
         </RelativeLayout>
     </LinearLayout>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/color999999" />
+
+    <com.jz.experiment.widget.DeviceStateBar
+        android:id="@+id/main_device_state_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <com.wind.view.ControlableViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+    </com.wind.view.ControlableViewPager>
+    <!--bottombar-->
+
 
 </LinearLayout>
 

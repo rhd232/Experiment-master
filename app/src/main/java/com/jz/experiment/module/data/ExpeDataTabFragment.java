@@ -1,5 +1,6 @@
 package com.jz.experiment.module.data;
 
+import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.widget.DatePicker;
+import android.widget.TextView;
 
 import com.anitoa.util.AnitoaLogUtil;
 import com.jz.experiment.R;
@@ -17,15 +20,16 @@ import com.jz.experiment.module.expe.event.ToExpeSettingsEvent;
 import com.wind.base.mvp.view.TabLayoutFragment;
 import com.wind.base.response.BaseResponse;
 import com.wind.base.utils.ActivityUtil;
+import com.wind.base.utils.DateUtil;
 import com.wind.data.expe.bean.HistoryExperiment;
 import com.wind.data.expe.datastore.ExpeDataStore;
 import com.wind.data.expe.response.FindExpeResponse;
 import com.wind.view.TitleBar;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -37,15 +41,23 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class ExpeDataTabFragment extends TabLayoutFragment {
-
+    Calendar mLocalCalendar;
     ExpeDataStore mExpeDataStore;
     LoadingLayout layout_loading;
     TitleBar mTitleBar;
+    TextView mDateTime;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         AnitoaLogUtil.writeFileLog("ExpeDataTabFragment onViewCreated savedInstanceState==null?" + (savedInstanceState == null));
         super.onViewCreated(view, savedInstanceState);
+
+/*        isFirstLoad = true;//视图创建完成，将变量置为true
+        if (getUserVisibleHint()) {//判断Fragment是否可见
+            loadExpe();//数据加载操作
+            isFirstLoad = false;//将变量置为false
+        }*/
+        mLocalCalendar = Calendar.getInstance();
         EventBus.getDefault().register(this);
         if (savedInstanceState != null) {
             if (mFragmentAdapter.getFragments()!=null) {
@@ -69,9 +81,15 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
             }
         });
         mTitleBar = view.findViewById(R.id.title_bar);
+        mDateTime = view.findViewById(R.id.tv_datetime);
+        mDateTime.setText(DateUtil.get(System.currentTimeMillis()));
+        mDateTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeReportDate();
+            }
+        });
         initTitleBar();
-
-
         Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
                 .subscribe(new Action1<Long>() {
                     @Override
@@ -96,14 +114,15 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
     }
 
     private void initTitleBar() {
-        mTitleBar.setTextColor(Color.WHITE);
-        mTitleBar.setRightTextColor(Color.WHITE);
+        mTitleBar.setTextColor(Color.BLACK);
+        mTitleBar.setRightTextColor(Color.BLACK);
         mTitleBar.setLeftVisibility(View.GONE);
-        mTitleBar.setBackgroundColor(getResources().getColor(R.color.color686868));
+        mTitleBar.setBackgroundColor(getResources().getColor(R.color.white));
         String title = getString(R.string.title_data);
         mTitleBar.setTitle(title);
-        String filter = getString(R.string.running_filter);
-        mTitleBar.setRightText(filter);
+/*        String filter = getString(R.string.running_filter);
+        mTitleBar.setRightText(filter);*/
+        mTitleBar.setRightIcon(R.drawable.btn_selector_filter);
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,13 +142,12 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
         });
         AnitoaLogUtil.writeFileLog("ExpeTab loadExpe");
         mFindSubscription = mExpeDataStore
-                .findAllCompleted()
+                .findAllCompleted(mLocalCalendar)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<FindExpeResponse>() {
                     @Override
                     public void call(FindExpeResponse response) {
-
                         if (response.getErrCode() == BaseResponse.CODE_SUCCESS) {
                             List<HistoryExperiment> experiments = response.getItems();
                             if (experiments == null || experiments.isEmpty()) {
@@ -144,8 +162,6 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
                                     ExpeDataFragment f = ExpeDataFragment.newInstance(expe);
                                     fragments.add(f);
                                     titles.add(expe.getName());
-
-
                                 }
                                 mFragmentAdapter.getFragments().clear();
                                 mFragmentAdapter.getFragments().addAll(fragments);
@@ -258,7 +274,6 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
 
     @Subscribe
     public void onRefreshExpeItemsEvent(RefreshExpeItemsEvent event) {
-
         reload();
     }
 
@@ -267,6 +282,28 @@ public class ExpeDataTabFragment extends TabLayoutFragment {
             loadExpe();
         }
     }
+
+    private DatePickerDialog mDatePickerDialog;
+    private void changeReportDate() {
+        Calendar localCalendar = Calendar.getInstance();
+        if (this.mDatePickerDialog == null)
+            this.mDatePickerDialog = new DatePickerDialog(this.getContext(), this.mDateSetListener, localCalendar.get(Calendar.YEAR), localCalendar.get(Calendar.MONTH), localCalendar.get(Calendar.DATE));
+        this.mDatePickerDialog.show();
+    }
+
+    DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker paramAnonymousDatePicker, int year, int month, int date) {
+
+//            String str5 = null;
+            Calendar localCalendar = Calendar.getInstance();
+            localCalendar.set(Calendar.YEAR, year);
+            localCalendar.set(Calendar.MONTH, month);
+            localCalendar.set(Calendar.DATE, date);
+            mDateTime.setText(DateUtil.get(localCalendar.getTimeInMillis()));
+            mLocalCalendar = localCalendar;
+            loadExpe();
+        }
+    };
 }
 
 

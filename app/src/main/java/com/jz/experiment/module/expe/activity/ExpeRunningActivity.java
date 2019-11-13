@@ -159,7 +159,8 @@ public class ExpeRunningActivity extends BaseActivity implements AnitoaConnectio
         String running = getString(R.string.title_running);
         String filter = getString(R.string.running_filter);
         mTitleBar.setTitle(running);
-        mTitleBar.setRightText(filter);
+//        mTitleBar.setRightText(filter);
+        mTitleBar.setRightIcon(R.drawable.btn_selector_filter);
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

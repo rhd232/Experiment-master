@@ -24,7 +24,7 @@ public class UserSettingsStep2Activity extends BaseActivity {
     protected void setTitle() {
         String title=getString(R.string.title_setup_2);
         mTitleBar.setTitle(title);
-        mTitleBar.setRightIcon(R.drawable.icon_program_save);
+        mTitleBar.setRightIcon(R.drawable.btn_selector_save);
 
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override

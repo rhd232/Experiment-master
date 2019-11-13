@@ -11,7 +11,7 @@
     <string name="melting_stage">Melting Stage</string>
     <array name="spinner_values">
         <item>PCR</item>
-        <item>Melting Curve</item>
+        <item>HRM</item>
     </array>analyze_select_file
 
     <string name="title_analyze">Analyze</string>
@@ -36,7 +36,7 @@
 
     <string name="title_running">Running</string>
     <string name="running_filter">Filter</string>
-    <string name="running_mode_melting">Operations: Melting Curve</string>
+    <string name="running_mode_melting">Operations: HRM</string>
     <string name="running_mode_pcr">Operations: PCR</string>
     <string name="running_timer">Timer：</string>
     <string name="running_stop">Manual Stop</string>
@@ -68,7 +68,7 @@
     <string name="title_setup_2">Setup-Protocol</string>
     <string name="setup_operation">Operation</string>
     <string name="setup_mode_dt">PCR</string>
-    <string name="setup_mode_melting">Melting Curve</string>
+    <string name="setup_mode_melting">HRM</string>
     <string name="setup_start">Start</string>
     <string name="setup_total_cycles">Cycles:</string>
     <string name="setup_pic_step">Capture Step:</string>
@@ -91,9 +91,12 @@
 
     <string name="login_error_tips">Incorrect Name Or Passward</string>
 
+    <string name="title_detect">Detect</string>
+    <string name="title_mine">Mine</string>
     <string name="title_data">Result</string>
     <string name="data_by">Performed By:</string>
     <string name="data_finish_time">Time Stamp:</string>
+    <string name="data_finish_date">Date Stamp:</string>
     <string name="data_during_time">Total Time:</string>
     <string name="data_ct_lower">Ct Lower Limit:</string>
     <string name="data_ct_threshold">Ct Threshold(%):</string>
@@ -108,6 +111,7 @@
     <string name="pwd_enter_old">Enter Old Password</string>
     <string name="pwd_enter_new">Enter New Password</string>
     <string name="pwd_enter_confirm">Enter Retype New Password</string>
+    <string name="pwd_submit">submit</string>
 
         <string name="pwd_not_equal_pwd">The new Password is not consistant with the confirmed password</string>
     <string name="pwd_not_pwd_rule">The new password dones't meet the requirements</string>
@@ -178,4 +182,5 @@
     <string name="version_name_current">Version Name Current:</string>
     <string name="connecting_to_network">Connecting to network, please wait</string>
     <string name="download_progress">Download Progress </string>
+
 </resources>

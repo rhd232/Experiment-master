@@ -31,7 +31,6 @@ public class UserSettingsActivity extends BaseActivity {
 
     @Override
     protected void setTitle() {
-
         String title=getString(R.string.title_user_settings);
         mTitleBar.setTitle(title);
     }

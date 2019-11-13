@@ -68,7 +68,8 @@ public class CCurveShowPolyFit {
 
     public double[][] ifactor = new double[MAX_CHAN][MAX_CYCL];
 
-    public float[] log_threshold = new float[]{0.12f, 0.12f, 0.12f, 0.12f};
+//    public float[] log_threshold = new float[]{0.12f, 0.12f, 0.12f, 0.12f};
+    public float[] log_threshold = new float[]{0.005f, 0.005f, 0.005f, 0.005f};
     //float[] log_threshold = new float[] { 11f, 11f, 11f, 11f };
 
     float[] ct_offset = new float[4];
@@ -613,7 +614,7 @@ public class CCurveShowPolyFit {
 
                 for (int k = 0; k < MIN_CT2-3; k++)
                 {
-                    yyy[k] = yData[j][k];
+                    yyy[k] = yData[j][k+3];
                     xxx[k] = (double)k + 3;//maybe
                 }
 

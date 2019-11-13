@@ -97,13 +97,14 @@ public class AnalyzeFragment extends CtFragment implements CtParamInputLayout.On
     }
 
     private void initTitleBar() {
-        mTitleBar.setTextColor(Color.WHITE);
-        mTitleBar.setRightTextColor(Color.WHITE);
+        mTitleBar.setTextColor(Color.BLACK);
+        mTitleBar.setRightTextColor(Color.BLACK);
         mTitleBar.setLeftVisibility(View.GONE);
-        mTitleBar.setBackgroundColor(getResources().getColor(R.color.color686868));
+        mTitleBar.setBackgroundColor(getResources().getColor(R.color.white));
 
         mTitleBar.setTitle(getString(R.string.title_analyze));
-        mTitleBar.setRightText(getString(R.string.running_filter));
+//        mTitleBar.setRightText(getString(R.string.running_filter));
+        mTitleBar.setRightIcon(R.drawable.btn_selector_filter);
         mTitleBar.getRightView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -72,6 +72,7 @@ public class AppUpdateActivity extends Activity {
                 case R.id.exit_download_btn:
                     apkDownloadApk = false;
                     finish();
+                    startSplashActivity();
                     break;
             }
         }
@@ -82,8 +83,10 @@ public class AppUpdateActivity extends Activity {
         // If we've received a touch notification that the user has touched
         // outside the app, finish the activity.
         if (MotionEvent.ACTION_OUTSIDE == event.getAction()) {
-            if (updateFlag)
+            if (updateFlag){
                 finish();
+                startSplashActivity();
+            }
             else
                 Toast.makeText(getBaseContext(), R.string.connecting_to_network, Toast.LENGTH_LONG).show();
             return true;
@@ -101,9 +104,6 @@ public class AppUpdateActivity extends Activity {
     }
 
     protected void onDestroy() {
-        Intent localIntent = new Intent();
-        localIntent.setClass(this, SplashActivity.class);
-        this.startActivity(localIntent);
         super.onDestroy();
     }
 
@@ -113,6 +113,7 @@ public class AppUpdateActivity extends Activity {
             mExitBtn.setEnabled(true);
             if (msg.arg1 == 101) {
                 finish();
+                startSplashActivity();
                 return;
             }
             proBar.setProgress(msg.arg1);
@@ -156,5 +157,11 @@ public class AppUpdateActivity extends Activity {
         } else
             internetOk = false;
         return internetOk;
+    }
+
+    private void startSplashActivity(){
+        Intent localIntent = new Intent();
+        localIntent.setClass(this, SplashActivity.class);
+        this.startActivity(localIntent);
     }
 }

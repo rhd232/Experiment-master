@@ -86,7 +86,7 @@
         <activity android:name=".module.expe.activity.UserSettingsStep2Activity"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|orientation|layoutDirection|screenLayout|screenSize"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
 
         <activity android:name=".module.expe.activity.UserSettingsStep1Activity"
             android:screenOrientation="landscape"

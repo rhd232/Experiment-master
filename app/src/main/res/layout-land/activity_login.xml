@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll_loginView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:background="@color/white">
+    android:gravity="center">
 
 
     <LinearLayout
@@ -110,23 +112,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tv_app_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/color999999"
-               />
+                android:textColor="@color/color999999" />
 
             <TextView
                 android:id="@+id/tv_lower_computer_host_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/color999999"
+                android:layout_marginLeft="25dp"
 
-                android:layout_marginLeft="25dp"/>
+                android:textColor="@color/color999999" />
 
 
         </LinearLayout>
@@ -135,8 +136,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tv_lower_computer_img_version"
@@ -153,4 +154,4 @@
 
         </LinearLayout>
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>

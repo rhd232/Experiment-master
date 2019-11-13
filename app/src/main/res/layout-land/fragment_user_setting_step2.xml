@@ -1,82 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_user_setting_step2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:focusable="true"
     android:background="@color/white"
+    android:focusable="true"
     android:focusableInTouchMode="true"
-    >
+    android:orientation="vertical">
     <!---实验模式标题栏-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/white"
         android:orientation="horizontal">
-
-        <RelativeLayout
-            android:id="@+id/rl_mode_sel"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="8dp"
-            android:layout_weight="1"
-            android:background="@color/white">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="44dp"
-
-
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <View
-                    android:layout_width="2dp"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
-                    android:background="@color/color1F4E99" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/setup_operation"
-                    android:textColor="@color/color333333"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_mode"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="12dp"
-                android:drawableRight="@drawable/icon_arrow_right"
-                android:drawablePadding="6dp"
-                android:gravity="center"
-                android:text=""
-                android:textColor="@color/color333333" />
-
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/tv_next"
-            android:layout_width="200dp"
-            android:layout_height="44dp"
-            android:layout_gravity="bottom"
-            android:background="@color/color1F4E99"
-            android:gravity="center"
-            android:text="@string/start"
-            android:textColor="@color/white" />
-    </LinearLayout>
-
-    <!--实验循环设置栏-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/white">
 
         <FrameLayout
             android:layout_width="wrap_content"
@@ -87,7 +24,7 @@
                 android:layout_width="30dp"
                 android:layout_height="match_parent"
                 android:layout_marginTop="136dp"
-                android:layout_marginBottom="47dp"/>
+                android:layout_marginBottom="47dp" />
         </FrameLayout>
         <!--com.jz.experiment.widget.FixDragConflictRecyclerView-->
 
@@ -98,7 +35,7 @@
 
         </com.jz.experiment.widget.SlidingConfilctRecyclerView>
     </LinearLayout>
-    <!--熔解曲线参数设置栏，已并入实验循环设置栏-->
+
     <LinearLayout
         android:id="@+id/layout_melt"
         android:layout_width="match_parent"
@@ -174,6 +111,72 @@
                 android:textColorHint="#B2B1B6" />
         </LinearLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/rl_mode_sel"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:background="@color/white">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+
+
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="20dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:background="@color/color1F4E99" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setup_operation"
+                    android:textColor="@color/color333333"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="12dp"
+                android:drawableRight="@drawable/icon_arrow_right"
+                android:drawablePadding="6dp"
+                android:gravity="center"
+                android:text=""
+                android:textColor="@color/color333333" />
+
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_next"
+            android:layout_width="200dp"
+            android:layout_height="44dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/btn_selector_start"
+            android:gravity="center"
+            android:text="@string/start"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <!--实验循环设置栏-->
+    <!--熔解曲线参数设置栏，已并入实验循环设置栏-->
 </LinearLayout>
 
 

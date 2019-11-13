@@ -11,6 +11,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.jz.experiment.R;
+import com.jz.experiment.module.expe.adapter.ChannelAdapter;
 import com.jz.experiment.module.expe.adapter.ChannelMaterialAdapter;
 import com.jz.experiment.module.expe.adapter.StepSelectAdapter;
 import com.wind.data.expe.bean.ChannelMaterial;
@@ -89,7 +90,7 @@ public class AppDialogHelper {
         });
     }
 
-    public static void showChannelSelectDialog(Context context, final int position, final OnChannelSelectListener listener) {
+    public static void showChannelSelectDialog(Context context, final int position, final ChannelAdapter channelAdapter, final OnChannelSelectListener listener) {
         final AlertDialog alertDialog = AlertDialogUtil.showAlertDialog(context, R.layout.dialog_channel_select,
                 false);
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
@@ -165,6 +166,15 @@ public class AppDialogHelper {
                 adapter.notifyDataSetChanged();
             }
         });
+        //初始化已选项
+        for(int i = 0 ; i < list.size() ; i++){
+            if(channelAdapter.getItem(position).getValue() == null)
+                return;
+            if(channelAdapter.getItem(position).getValue().equals(list.get(i).getName())){
+                adapter.getData().get(i).setSelected(true);
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
     public interface OnChannelSelectListener {

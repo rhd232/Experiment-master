@@ -6,11 +6,11 @@ android {
         applicationId "com.jz.experiment"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 137
-        versionName "1.3.9"
+        versionCode 139
+        versionName "1.4.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-       /* externalNativeBuild {
+       /* externalNativeBuild {constraint-layout
             cmake {
                 cppFlags ""
             }
@@ -60,7 +60,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
     implementation 'cat.ereza:customactivityoncrash:2.2.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation project(':domain')
     implementation project(path: ':location')
     implementation project(path: ':wview')
@@ -82,8 +82,8 @@ dependencies {
     //implementation 'com.google.dagger:dagger-android:2.16'
     //implementation 'com.google.dagger:dagger-android-support:2.16' // if you use the support libraries
     //annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.6'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.6'
     /** **butterKnife注解处理器  *******/
     annotationProcessor baseDependencies.butterKnifeProcessor
     testImplementation 'junit:junit:4.12'
